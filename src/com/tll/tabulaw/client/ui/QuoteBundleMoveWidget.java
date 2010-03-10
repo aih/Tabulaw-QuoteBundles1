@@ -143,8 +143,8 @@ public class QuoteBundleMoveWidget extends AbstractModelChangingWidget {
 			Model mQuoteClone = draggedQuoteModel.copy(CopyCriteria.keepReferences());
 			targetQuoteBundleWidget.addQuote(mQuoteClone, true);
 
-			String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
-			Notifier.get().info(msg);
+			//String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
+			//Notifier.get().info(msg);
 
 			// deny since we are copying
 			throw new VetoDragException();
@@ -270,8 +270,8 @@ public class QuoteBundleMoveWidget extends AbstractModelChangingWidget {
 		Model mQuoteBundle = quoteBundleWidget.getModel();
 		addQuoteBundleOption(mQuoteBundle);
 
-		String msg = quoteBundleWidget.getModel().descriptor() + " closed.";
-		Notifier.get().info(msg);
+		//String msg = quoteBundleWidget.getModel().descriptor() + " closed.";
+		//Notifier.get().info(msg);
 	}
 
 	/**
@@ -289,7 +289,7 @@ public class QuoteBundleMoveWidget extends AbstractModelChangingWidget {
 	public void postNewQuoteBundle(Model mQuoteBundle) {
 		PocModelStore.get().persist(mQuoteBundle, this);
 		addQuoteBundleOption(mQuoteBundle);
-		Notifier.get().info("'" + mQuoteBundle.descriptor() + "' added.");
+		//Notifier.get().info("'" + mQuoteBundle.descriptor() + "' added.");
 	}
 
 	public void refresh() {

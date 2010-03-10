@@ -7,6 +7,8 @@ package com.tll.tabulaw.client.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -87,12 +89,14 @@ public class PocModelStore {
 	}
 	
 	private final HashMap<PocEntityType, List<Model>> map = new HashMap<PocEntityType, List<Model>>();
+	
+	private final HashMap<PocEntityType, Comparator<Model>> comparators = new HashMap<PocEntityType, Comparator<Model>>();
 
 	/**
 	 * The app-wide current quote bundle.
 	 */
 	private Model currentQuoteBundle;
-
+	
 	/**
 	 * Constructor
 	 */
@@ -116,8 +120,8 @@ public class PocModelStore {
 		String[][] cases = new String[][] {
 			// id, citation, parties, year, url, date
 			{ "1", "424 U.S. 1 S. Ct. 612, 46 L. Ed. 2d 659 (1976)", "Buckley v. Valeo", "1976", "doc?docId=1", "7/7/1976" }, 
-			{ "2", "222? U.S. 777? (2010)", "Citizens United v. FEC", "2010", "doc?docId=2", "5/5/2010" }, 
-			{ "3", "333? U.S. 888? (1978)", "First National v. Belotti", "1978", "doc?docId=3", "4/26/1978" },
+			{ "2", "558 U.S. 50 (2010)", "Citizens United v. FEC", "2010", "doc?docId=2", "5/5/2010" }, 
+			{ "3", "435 U.S. 765 (1978)", "First National v. Belotti", "1978", "doc?docId=3", "4/26/1978" },
 			{ "4", "540 U.S. 93 (2003)", "McConnell v. Federal Election Commission", "2003", "doc?docId=4", "2/3/2003" },
 			{ "5", "376 U.S. 254 (1964)", "New York Times v. Sullivan", "1964", "doc?docId=5", "4/1/1964" },
 		};
@@ -184,6 +188,19 @@ public class PocModelStore {
 			Date caseDate = DateTimeFormat.getShortDateFormat().parse(acase[5]);
 			m.set(new DatePropertyValue("date", metaDocument.get("date"), caseDate));
 		}
+		comparators.put(PocEntityType.CASE, new Comparator<Model>() {
+			
+			@Override
+			public int compare(Model o1, Model o2) {
+				int year1 = Integer.valueOf(o1.asString("year"));
+				int year2 = Integer.valueOf(o2.asString("year"));
+				if(year1 > year2) return 1;
+				if(year2 > year1) return -1;
+				String c1 = o1.asString("citation");
+				String c2 = o2.asString("citation");
+				return c1.compareTo(c2);
+			}
+		});
 
 		// documents
 		ArrayList<Model> docList = new ArrayList<Model>();
@@ -202,6 +219,15 @@ public class PocModelStore {
 
 			m.set(new StringPropertyValue("title", metaDocument.get("title"), doc[2]));
 		}
+		comparators.put(PocEntityType.DOCUMENT, new Comparator<Model>() {
+			
+			@Override
+			public int compare(Model o1, Model o2) {
+				String title1 = o1.asString("title");
+				String title2 = o2.asString("title");
+				return title1.compareTo(title2);
+			}
+		});
 
 		// quotes
 		ArrayList<Model> quoteList = new ArrayList<Model>();
@@ -223,8 +249,20 @@ public class PocModelStore {
 
 			m.set(new StringPropertyValue("tags", metaQuote.get("tags"), q[2]));
 			m.set(new StringPropertyValue("quote", metaQuote.get("quote"), q[3]));
-			m.set(new ObjectPropertyValue("mark", metaQuote.get("quote"), null));
+			m.set(new ObjectPropertyValue("mark", metaQuote.get("mark"), null));
 		}
+		comparators.put(PocEntityType.QUOTE, new Comparator<Model>() {
+			
+			@Override
+			public int compare(Model o1, Model o2) {
+				String docTitle1 = o1.asString("document.title");
+				String docTitle2 = o2.asString("document.title");
+				int rcmp = docTitle1.compareTo(docTitle2);
+				if(rcmp != 0) return rcmp;
+				// TODO sort by mark!
+				return rcmp;
+			}
+		});
 
 		// quote bundles
 		ArrayList<Model> bundleList = new ArrayList<Model>();
@@ -259,7 +297,16 @@ public class PocModelStore {
 
 			m.set(new RelatedManyProperty(PocEntityType.QUOTE, "quotes", true, someQuotes));
 		}
-	}
+		comparators.put(PocEntityType.QUOTE_BUNDLE, new Comparator<Model>() {
+			
+			@Override
+			public int compare(Model o1, Model o2) {
+				String name1 = o1.getName();
+				String name2 = o2.getName();
+				return name1.compareTo(name2);
+			}
+		});
+	} // constructor
 
 	/**
 	 * Provides the next available id for use in creating new entities.
@@ -320,6 +367,10 @@ public class PocModelStore {
 		ArrayList<Model> rlist = new ArrayList<Model>(list.size());
 		for(Model m : list) {
 			rlist.add(m);
+		}
+		Comparator<Model> cmp = comparators.get(etype);
+		if(cmp != null) {
+			Collections.sort(rlist, cmp);
 		}
 		return rlist;
 	}
