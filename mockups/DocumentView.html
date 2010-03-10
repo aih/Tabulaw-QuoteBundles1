@@ -1,0 +1,177 @@
+<html>
+<head>
+<link rel="shortcut icon" href="favicon.ico" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<!-- gwt-log -->
+<style>.log-panel{background-color:#ecf2fc;border:1px solid red;margin:0;filter:alpha(opacity\=95);opacity:0.95;z-index:1000;}.log-panel .Gx8miifDB{font-size:10pt;margin:0;text-align:left;}.log-panel BUTTON{font-size:10pt;margin:0;}.log-panel .Gx8miifEB{cursor:move;font-weight:bold;}.log-panel .Gx8miifM{margin:0 1.2em;}.log-panel BUTTON.Gx8miifL{color:#444 !important;}.log-panel .Gx8miifCB{white-space:nowrap;}.log-panel .Gx8miifN{font-family:monospace;cursor:help;}.log-panel .Gx8miifO{background-color:#f0f0f0;}.log-panel .Gx8miifBB{background-color:#fff;}.log-panel .Gx8miifAB{cursor:se-resize;}</style>
+
+<!-- gwt-dnd -->
+<style>HTML{margin:0 !important;border:none !important;}.dragdrop-handle{cursor:move;user-select:none;-khtml-user-select:none;-moz-user-select:none;}.Gx8miifB{zoom:1;}.dragdrop-dragging{zoom:normal;}.Gx8miifI{border:1px dashed #1e90ff;margin:0 !important;zoom:1;z-index:100;}.dragdrop-flow-panel-positioner{color:#1e90ff;display:inline;text-align:center;vertical-align:middle;}.dragdrop-proxy{background-color:#7af;}.dragdrop-selected,.dragdrop-dragging,.dragdrop-proxy{filter:alpha(opacity\=30);opacity:0.3;}.dragdrop-movable-panel{z-index:200;margin:0 !important;border:none !important;}</style>
+
+<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+<title>Document View - MOCKUP</title>
+
+<link rel="stylesheet" href="../war/poc/css/reset.css">
+<link rel="stylesheet" href="../war/poc/css/base.css">
+<link rel="stylesheet" href="../war/poc/css/widget-gwt.css">
+<link rel="stylesheet" href="../war/poc/css/widget-tll.css">
+<link rel="stylesheet" href="../war/poc/css/hnav.css">
+<link rel="stylesheet" href="../war/poc/css/msg.css">
+<link rel="stylesheet" href="../war/poc/css/options.css">
+<link rel="stylesheet" href="../war/poc/css/toolbar.css">
+<link rel="stylesheet" href="../war/poc/css/view.css">
+<link rel="stylesheet" href="../war/poc/css/viewpath.css">
+<link rel="stylesheet" href="../war/poc/css/tableview.css">
+
+<link rel="stylesheet" href="../war/css/poc.css">
+
+</head>
+<body class="documentDetail">
+
+<div class="container">
+
+  <div id="navCol">
+    <img class="logo" src="../war/images/tabulaw_logo.png" alt="Tabulaw" />
+  </div><!-- #navCol -->
+
+  <div id="mainCol">
+
+  	<div id="navRow">
+
+      <!-- NavRowPanel -->
+      <table cellspacing="0" cellpadding="0">
+        <tbody>
+          <tr>
+            <td align="left" style="vertical-align: top;">
+            <div class="gwt-PushButton navButton widget gwt-PushButton-up"><input
+              type="text" tabindex="-1"
+              style="opacity: 0; height: 1px; width: 1px; z-index: -1; overflow: hidden; position: absolute;">
+            <div class="html-face">My Documents</div>
+            </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- END NavRowPanel -->
+
+    </div><!-- #navRow -->
+  	
+    <div id="portal">
+      
+      <!-- Portal -->
+      <div>
+        <div>
+
+<!-- view contents -->
+<table cellspacing="0" cellpadding="0" class="viewContainer viewContainer-pinned">
+  <tbody>
+    <tr>
+      <td align="left" style="vertical-align: top;">
+      <table cellspacing="0" cellpadding="0" class="toolbar viewToolbar">
+        <tbody>
+          <tr>
+            <td width="100%" align="left" style="vertical-align: top;">
+            <div class="viewTitle">Document Detail</div>
+            </td>
+            <td align="left" style="vertical-align: top;" class="button">
+            <div tabindex="0" class="button button-up" role="button" title="Refresh" aria-pressed="false"><input
+              type="text" tabindex="-1"
+              style="opacity: 0; height: 1px; width: 1px; z-index: -1; overflow: hidden; position: absolute;"><img
+              border="0"
+              style="width: 16px; height: 16px; background: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB5UlEQVR42qWSzUsUYRzH5z+KDh26RCehDh2jSx0ULxFBezAoJAKxg6DSy0ZGSSsmtVSSpZhoL3toCezFal1y3dV9nX1Jpd0dZ2Zn5uM8z6jr7lpEPfBlnoH5fH7P7/mNovzv6ntcoDm9DwtceZCn667KuZs52vuznLqW4cTVNG2X0xzpSskc9iWRgsA7ZIbfOAzN2vinLQZf1ugbN+kJGnSP6VwMaFy4V+XsnSqdt8oyBzvnaTlBz2ieS8N5zt/2Kp/szXC8O8XR7Yp7c6A9jDLyPMzfLscBy3Ywag6JdIlDxzpQ7j8N/RE6c13Zhh1MGwlrhs3k2y+eYOjRXAuUq34lUnzG+1S/FIjUaqAboOk2Zc2qC5pbEPAOtJMOv/esuIKyZrNe3iNobkF8KKpLWbkuq2zCegUJlzbM37cwFfftikyTXTi46KP0Cxeuoa4ZdYF/9NW+FycSL32XcCT/Tb6ra6D+NEkXDYLTnz3BjcDUvnBz5mLjJAuQLhisqjojLz41CtwRY1nuqCxPcnpQYXJpgInoAPPZiITjRVjJ6cSym40CMWNLzNgUYxI37UkKG+5FusdOuWAiDz9ysJzRiSa1RoH4q6KxVRYWV/iwkCD0McFMeJmJUIwnr5cYm2lNg0Bs/jVbBOXzwp3R8PoAAAAASUVORK5CYII=&quot;) no-repeat scroll 0px 0px transparent;"
+              src="../war/poc/clear.cache.gif" class="gwt-Image"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+    <tr>
+      <td align="left" style="vertical-align: top;">
+      <div class="view">
+      <table cellspacing="0" cellpadding="0" class="docView">
+        <tbody>
+          <tr>
+            <td align="left" style="vertical-align: top;">
+            <div class="docHeader">New York Times v. Sullivan</div>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" style="vertical-align: top;">
+<div class="docPortal">
+<iframe id="docContainer" name="docContainer" class="docContainer docContainerFrame" src="../src/com/tll/tabulaw/client/cases/Times-v-Sullivan.htm"></iframe>
+</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- END view contents -->
+
+<script src="../war/js/goog.js"></script>
+<script type="text/javascript">
+/**
+ * Handler for mouseup events in document body. 
+ */
+function onMouseUpInDocBody(e) {
+  //alert('mouse up e.target: '+e.target);
+  //alert('goog.dom.AbstractRange.getBrowserSelectionForWindow(frames[0]): '+goog.dom.AbstractRange.getBrowserSelectionForWindow(frames[0]));
+  var tsel = goog.dom.AbstractRange.getBrowserSelectionForWindow(frames[0]);
+  if(tsel != null) {
+    // create
+    alert('tsel: '+tsel); 
+  }
+}
+/*
+ * Initializer for document text selection tracking.
+ */
+function captureDocTextSelections() {
+  //alert('captureDocTextSelections - START');
+	//var docframe = goog.dom.$('docContainer');
+	//var docframeDomDocument=frames[0].document;
+	//var docframeDomBody = docframeDomDocument.body;
+  
+  var dbody=frames['docContainer'].document.body;
+  //alert('dbody: '+dbody);
+
+	// capture user selections w/in the iframe content
+	goog.events.listen(dbody, 'mouseup', onMouseUpInDocBody);
+}
+
+/**
+ * Shutdown method to release any resources allocated for document text selections.
+ */
+function uncaptureDocTextSelections() {
+  alert('uncaptureDocTextSelections');
+  goog.events.unlisten(docframeDomBody, 'mouseup', onMouseUpInDocBody);   
+}
+
+//set common parent domain
+document.domain = '<file://>'
+
+//captureDocTextSelections();
+var frame = document.getElementById('docContainer');
+var frameDoc = frame.conentDocument;
+alert('frameDoc: ' + frameDoc);
+
+</script>
+        
+        </div>
+      </div>
+      <!-- END Portal -->
+
+    </div><!-- #portal -->
+
+	</div><!-- #mainCol -->
+
+</div><!-- container -->
+
+<p class="footer">&copy; 2010 Tabulaw, Inc.</p>
+
+</body>
+</html>
