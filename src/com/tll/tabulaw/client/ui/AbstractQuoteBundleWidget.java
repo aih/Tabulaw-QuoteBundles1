@@ -275,16 +275,17 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	protected final void sync(Model mQuoteBundleToSyncTo) {
 		List<Model> existingQuotes = mQuoteBundle.relatedMany("quotes").getModelList();
 		List<Model> changedQuotes = mQuoteBundleToSyncTo.relatedMany("quotes").getModelList();
-		for(Model mchanged : changedQuotes) {
-			if(Model.findInCollection(existingQuotes, mchanged.getKey()) == null) {
-				// quote to add
-				addQuote(mchanged, false);
-			}
-		}
+		// IMPT: remove quotes first so highlighting works against a *clean* dom!
 		for(Model mexisting : existingQuotes) {
 			if(Model.findInCollection(changedQuotes, mexisting.getKey()) == null) {
 				// quote to remove
 				removeQuote(mexisting, false, false);
+			}
+		}
+		for(Model mchanged : changedQuotes) {
+			if(Model.findInCollection(existingQuotes, mchanged.getKey()) == null) {
+				// quote to add
+				addQuote(mchanged, false);
 			}
 		}
 	}

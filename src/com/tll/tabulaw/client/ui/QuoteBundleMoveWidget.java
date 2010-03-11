@@ -141,6 +141,7 @@ public class QuoteBundleMoveWidget extends AbstractModelChangingWidget {
 
 			// clone the dragged quote widget
 			Model mQuoteClone = draggedQuoteModel.copy(CopyCriteria.keepReferences());
+			mQuoteClone.setId(PocModelStore.get().getNextId(PocEntityType.QUOTE));
 			targetQuoteBundleWidget.addQuote(mQuoteClone, true);
 
 			//String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;

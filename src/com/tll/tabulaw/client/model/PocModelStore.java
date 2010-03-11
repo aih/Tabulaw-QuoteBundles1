@@ -313,7 +313,7 @@ public class PocModelStore {
 	 * @param entityType the desired entity type
 	 * @return the next available id
 	 */
-	private String getNextId(PocEntityType entityType) {
+	public String getNextId(PocEntityType entityType) {
 		Collection<Model> mclc = map.get(entityType);
 		if(mclc == null) throw new IllegalStateException("Can't resolve next id: Unhandled entity type: " + entityType);
 		int largest = 0;
