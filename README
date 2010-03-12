@@ -1,0 +1,12 @@
+poc ("Proof of Concept") is a demo app for owned by Tabulaw, Inc. programmed by jopaki of The Logic Lab.
+
+project points:
+
+ - eclipse Google Web Application project.
+
+ - build.xml is the sole project build file.
+ 
+ - poc depends on several gwt modules currently located in /poc/war/WEB-INF/lib  
+   They are enumerated both in the eclipse project settings file and the ant build.xml file 
+   and are mostly ones from The Logic Lab (tll-*) along with gwt-log and gwt-dnd currently.  
+
