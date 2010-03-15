@@ -7,10 +7,10 @@ package com.tll.tabulaw.client.ui;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Focusable;
+import com.tll.client.ui.field.AbstractBindableFlowFieldPanel;
 import com.tll.client.ui.field.AbstractFieldGroupProvider;
 import com.tll.client.ui.field.FieldFactory;
 import com.tll.client.ui.field.FieldGroup;
-import com.tll.client.ui.field.FlowFieldPanel;
 import com.tll.client.ui.field.FlowPanelFieldComposer;
 import com.tll.client.ui.field.IFieldRenderer;
 
@@ -19,7 +19,7 @@ import com.tll.client.ui.field.IFieldRenderer;
  * UI handling of adding a new quote bundle.
  * @author jpk
  */
-public class AddQuoteBundlePanel extends FlowFieldPanel {
+public class AddQuoteBundlePanel extends AbstractBindableFlowFieldPanel {
 	
 	static class FieldProvider extends AbstractFieldGroupProvider {
 
@@ -51,13 +51,6 @@ public class AddQuoteBundlePanel extends FlowFieldPanel {
 		}
 	}
 	
-	/**
-	 * Constructor
-	 */
-	public AddQuoteBundlePanel() {
-		super();
-	}
-
 	@Override
 	protected FieldGroup generateFieldGroup() {
 		return new FieldProvider().getFieldGroup();
@@ -69,6 +62,6 @@ public class AddQuoteBundlePanel extends FlowFieldPanel {
 	}
 	
 	public Focusable getFocusable() {
-		return (Focusable) getFieldGroup().getFieldWidget("qbName"); 
+		return getFieldGroup().getFieldWidget("qbName"); 
 	}
 }

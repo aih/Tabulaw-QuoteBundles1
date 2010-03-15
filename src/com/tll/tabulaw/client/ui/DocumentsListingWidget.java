@@ -8,6 +8,7 @@ package com.tll.tabulaw.client.ui;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Image;
 import com.tll.client.listing.AbstractListingConfig;
@@ -138,19 +139,25 @@ public class DocumentsListingWidget extends AbstractModelChangingWidget {
 			super.sort(config.getDefaultSorting());
 		}
 	} // ListingOperator
-
+	
 	static final ListingOperator operator = new ListingOperator();
 
 	private final DocListing listingWidget;
 
+	private final FlowPanel pnl = new FlowPanel();
+	
 	/**
 	 * Constructor
 	 */
 	public DocumentsListingWidget() {
 		super();
+		
 		listingWidget = new DocListing();
 		listingWidget.setOperator(operator);
-		initWidget(listingWidget);
+		
+		pnl.add(listingWidget);
+		
+		initWidget(pnl);
 	}
 	
 	public void refresh() {

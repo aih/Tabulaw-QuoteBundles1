@@ -9,29 +9,28 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.tll.client.ui.Dialog;
 import com.tll.client.ui.FocusCommand;
 import com.tll.client.ui.edit.EditEvent;
-import com.tll.client.ui.edit.EditPanel;
 import com.tll.client.ui.edit.IEditHandler;
+import com.tll.client.ui.edit.ModelEditPanel;
 import com.tll.client.validate.ErrorHandlerBuilder;
 import com.tll.client.validate.ErrorHandlerDelegate;
-import com.tll.tabulaw.client.model.PocModelStore;
-import com.tll.tabulaw.common.model.PocEntityType;
+import com.tll.common.model.Model;
 
 
 /**
  * Dialog for handling quote bundles to the app.
  * @author jpk
  */
-public class AddQuoteBundleDialog extends Dialog implements IEditHandler {
+public class AddQuoteBundleDialog extends Dialog implements IEditHandler<Model> {
 	
 	private final AddQuoteBundlePanel fieldPanel = new AddQuoteBundlePanel();
 	
-	private final EditPanel editPanel = new EditPanel(fieldPanel, true, false, false);
+	private final ModelEditPanel editPanel = new ModelEditPanel(fieldPanel, true, false, false);
 	
 	/**
 	 * Constructor
 	 * @param editHandler required: handles add quote bundle edit events
 	 */
-	public AddQuoteBundleDialog(IEditHandler editHandler) {
+	public AddQuoteBundleDialog(IEditHandler<Model> editHandler) {
 		super(null, false);
 		
 		setText("Add Quote Bundle");
@@ -50,14 +49,13 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler {
 	}
 
 	@Override
-	public void onEdit(EditEvent event) {
+	public void onEdit(EditEvent<Model> event) {
 		hide();
 	}
 
 	@Override
 	public void show() {
 		super.show();
-		editPanel.setModel(PocModelStore.get().create(PocEntityType.QUOTE_BUNDLE));
 		DeferredCommand.addCommand(new FocusCommand(fieldPanel.getFocusable(), true));
 	}
 }

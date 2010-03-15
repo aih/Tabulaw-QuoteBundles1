@@ -40,12 +40,11 @@ import com.tll.util.ObjectUtil;
  * CASE props
  * ----------
  *  id
- *   parties
- *   citation
- *   url
- *   year
- *   extractHtml (document extract in HTML)
- *   date
+ *  parties
+ *  citation
+ *  url
+ *  year
+ *  date
  * 
  * DOCUMENT props
  * --------------
@@ -119,11 +118,11 @@ public class PocModelStore {
 
 		String[][] cases = new String[][] {
 			// id, citation, parties, year, url, date
-			{ "1", "424 U.S. 1 S. Ct. 612, 46 L. Ed. 2d 659 (1976)", "Buckley v. Valeo", "1976", "doc?docId=1", "7/7/1976" }, 
-			{ "2", "558 U.S. 50 (2010)", "Citizens United v. FEC", "2010", "doc?docId=2", "5/5/2010" }, 
-			{ "3", "435 U.S. 765 (1978)", "First National v. Belotti", "1978", "doc?docId=3", "4/26/1978" },
-			{ "4", "540 U.S. 93 (2003)", "McConnell v. Federal Election Commission", "2003", "doc?docId=4", "2/3/2003" },
-			{ "5", "376 U.S. 254 (1964)", "New York Times v. Sullivan", "1964", "doc?docId=5", "4/1/1964" },
+			{ "1", "424 U.S. 1 S. Ct. 612, 46 L. Ed. 2d 659 (1976)", "Buckley v. Valeo", "1976", null, "7/7/1976" }, 
+			{ "2", "558 U.S. 50 (2010)", "Citizens United v. FEC", "2010", null, "5/5/2010" }, 
+			{ "3", "435 U.S. 765 (1978)", "First National v. Belotti", "1978", null, "4/26/1978" },
+			{ "4", "540 U.S. 93 (2003)", "McConnell v. Federal Election Commission", "2003", null, "2/3/2003" },
+			{ "5", "376 U.S. 254 (1964)", "New York Times v. Sullivan", "1964", null, "4/1/1964" },
 		};
 
 		// document metadata

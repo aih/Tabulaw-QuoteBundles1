@@ -115,7 +115,7 @@ public class DocumentViewer extends Composite implements IHasModel {
 		header.setHTML("<p>" + html + "</p>");
 
 		// body
-		String url = mDocument.asString("case.url");
+		String url = "doc?docId=" + mDocument.getId();
 		Log.debug("Setting document content in iframe for url: " + url);
 		frame.getElement().setId(getFrameId());
 		frame.setUrl(url);

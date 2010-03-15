@@ -78,10 +78,13 @@
 		<include name="com/tll/tll-dao-api/${tll.deps.version}/tll-dao-api-${tll.deps.version}.jar" />
 		<include name="com/tll/tll-client-core/${tll.deps.version}/tll-client-core-${tll.deps.version}.jar" />
 		<include name="com/tll/tll-client-ui/${tll.deps.version}/tll-client-ui-${tll.deps.version}.jar" />
-		<include name="com/tll/tll-client-view/${tll.deps.version}/tll-client-view-${tll.deps.version}.jar" />
+		<include name="com/tll/tll-client-rpc/${tll.deps.version}/tll-client-rpc-${tll.deps.version}.jar" />
 		<include name="com/tll/tll-client-model/${tll.deps.version}/tll-client-model-${tll.deps.version}.jar" />
-		<include name="com/tll/tll-client-listing/${tll.deps.version}/tll-client-listing-${tll.deps.version}.jar" />
+		<include name="com/tll/tll-client-view/${tll.deps.version}/tll-client-view-${tll.deps.version}.jar" />
 		<include name="com/tll/tll-client-field/${tll.deps.version}/tll-client-field-${tll.deps.version}.jar" />
+		<include name="com/tll/tll-client-databind/${tll.deps.version}/tll-client-databind-${tll.deps.version}.jar" />
+		<include name="com/tll/tll-client-persist/${tll.deps.version}/tll-client-persist-${tll.deps.version}.jar" />
+		<include name="com/tll/tll-client-listing/${tll.deps.version}/tll-client-listing-${tll.deps.version}.jar" />
 	</fileset>
 	
 	<target name="updateTllDeps" description="Updates all tll dependencies">

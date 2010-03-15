@@ -16,6 +16,8 @@ import com.tll.client.mvc.view.ViewClass;
 import com.tll.client.ui.edit.EditEvent;
 import com.tll.client.ui.edit.IEditHandler;
 import com.tll.client.ui.edit.EditEvent.EditOp;
+import com.tll.common.model.Model;
+import com.tll.tabulaw.client.model.PocModelStore;
 import com.tll.tabulaw.client.ui.AddQuoteBundleDialog;
 import com.tll.tabulaw.client.ui.QuoteBundleMoveWidget;
 import com.tll.tabulaw.client.ui.nav.AbstractNavButton;
@@ -41,7 +43,7 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	class NewQuoteBundleButton extends AbstractNavButton implements IEditHandler {
+	class NewQuoteBundleButton extends AbstractNavButton implements IEditHandler<Model> {
 		
 		AddQuoteBundleDialog dialog;
 		
@@ -64,9 +66,11 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 		}
 
 		@Override
-		public void onEdit(EditEvent event) {
+		public void onEdit(EditEvent<Model> event) {
 			if(event.getOp() == EditOp.ADD) {
-				movePanel.postNewQuoteBundle(event.getEditedModel());
+				Model mQuoteBundle = event.getContent();
+				PocModelStore.get().persist(mQuoteBundle, this);
+				movePanel.postNewQuoteBundle(event.getContent());
 			}
 		}
 
