@@ -14,15 +14,6 @@
 		<url-pattern>/doc/*</url-pattern>
 	</servlet-mapping>
 
-  <servlet>
-    <servlet-name>RemoteDocIngestService</servlet-name>
-    <servlet-class>com.tll.tabulaw.server.rpc.RemoteDocIngestService</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>RemoteDocIngestService</servlet-name>
-    <url-pattern>/poc/rpc/rdi</url-pattern>
-  </servlet-mapping>
-	
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>Poc.html</welcome-file>

@@ -44,7 +44,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 * Extensible quote bundle header widget.
 	 * @author jpk
 	 */
-	protected static class Header extends AbstractModelChangingWidget {
+	protected static class Header extends AbstractModelChangeAwareWidget {
 
 		protected final FlowPanel header = new FlowPanel();
 

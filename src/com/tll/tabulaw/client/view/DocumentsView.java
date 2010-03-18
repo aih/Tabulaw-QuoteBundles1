@@ -57,12 +57,12 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 
 	@Override
 	protected final void doRefresh() {
-		docListing.refresh();
+		docListing.getOperator().refresh();
 	}
 
 	@Override
 	protected final void doDestroy() {
-		docListing.clear();
+		docListing.getOperator().clear();
 	}
 
 	@Override

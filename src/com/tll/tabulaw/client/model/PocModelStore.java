@@ -55,23 +55,23 @@ import com.tll.util.ObjectUtil;
  * QUOTE props
  * --------------
  *   id
- *   document (doc ref)
+ *   document (ref)
  *   quote (text selection)
  *   tags (set of keywords)
- *   mark (MarkOverlay js object)
+ *   mark (ref - MarkOverlay js object)
  *   
  * QUOTE_BUNDLE props
  * ------------------
  *   id
- *   user (user ref)
+ *   user (ref)
  *   name
  *   description
- *   quotes (referenced quotes)
+ *   quotes (ref)
  * 
  * NOTE props
  * -----------
  *   id
- *   user (creating user ref)
+ *   user (ref - the creating user)
  *   date_created
  *   name
  *   description
@@ -153,8 +153,8 @@ public class PocModelStore {
 			{ "3", "2", "1st Amendment", "Heed Their Rising Voices" },
 			{ "4", "3", "Climate, Political", "The District Judge denied the application for a three-judge court and directed that the case be transmitted to the Court of Appeals." },
 			{ "5", "3", "Climate, Political, Government", "The intricate statutory scheme adopted by Congress to regulate federal election campaigns includes restrictions 13 on political contributions and expenditures that apply broadly to all phases of and all participants in the election process." },
-			{ "6", "4", "Free Speech", "The basic premise underlying the Court’s ruling is its iteration, and constant reiteration, of the proposition that the First Amendment bars regulatory distinctions based on a speaker’s identity, including its “identity” as a corporation." },
-			{ "7", "5", "Political", "770 Appellants argued that § 8 violates the First Amendment, the Due Process and Equal Protection Clauses of the Fourteenth Amendment, and similar provisions of the Massachusetts Constitution." }, 
+			{ "6", "4", "Free Speech", "The basic premise underlying the Courtï¿½s ruling is its iteration, and constant reiteration, of the proposition that the First Amendment bars regulatory distinctions based on a speakerï¿½s identity, including its ï¿½identityï¿½ as a corporation." },
+			{ "7", "5", "Political", "770 Appellants argued that ï¿½ 8 violates the First Amendment, the Due Process and Equal Protection Clauses of the Fourteenth Amendment, and similar provisions of the Massachusetts Constitution." }, 
 		};
 
 		// quote bundle metadata
@@ -332,7 +332,23 @@ public class PocModelStore {
 	 * @return Newly created model with id set and cleared properties
 	 */
 	public Model create(PocEntityType entityType) {
-		Model proto = map.get(entityType).get(0).copy(CopyCriteria.keepReferences());
+		Model proto = map.get(entityType).get(0).copy(CopyCriteria.noReferences());
+		// stub related props if needed
+		switch(entityType) {
+			case CASE:
+				break;
+			case DOCUMENT:
+				break;
+			case NOTE:
+				break;
+			case QUOTE:
+				proto.set(new RelatedOneProperty(PocEntityType.DOCUMENT, null, "document", true));
+				break;
+			case QUOTE_BUNDLE:
+				// add quotes prop
+				proto.set(new RelatedManyProperty(PocEntityType.QUOTE, "quotes", true, null));
+				break;
+		}
 		proto.clearPropertyValues(false, false);
 		proto.setId(getNextId(entityType));
 		return proto;

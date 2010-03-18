@@ -5,14 +5,20 @@
  */
 package com.tll.tabulaw.client.view;
 
+import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.model.ModelChangeEvent;
+import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tll.client.mvc.ViewManager;
+import com.tll.client.mvc.view.UnloadViewRequest;
 import com.tll.client.mvc.view.ViewClass;
 import com.tll.client.mvc.view.ViewOptions;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
 import com.tll.tabulaw.client.model.PocModelStore;
 import com.tll.tabulaw.client.ui.DocumentHighlightWidget;
+import com.tll.tabulaw.client.ui.ModelChangeDispatcher;
 
 /**
  * Displays a single document allowing quote/bundle editing.
@@ -100,6 +106,27 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 
 	@Override
 	protected void handleModelChange(ModelChangeEvent event) {
+		if(event.getChangeOp() == ModelChangeOp.DELETED && event.getModelKey().equals(docKey)) {
+			// gotta unload bro
+			Log.debug("Unloading doc view: " + this);
+			ViewManager.get().dispatch(new UnloadViewRequest(getViewKey(), true, true));
+			return;
+		}
 		docWidget.onModelChangeEvent(event);
 	}
+	
+	private HandlerRegistration hrModelChange;
+
+	@Override
+	protected void onLoad() {
+		super.onLoad();
+		hrModelChange = addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
+	}
+
+	@Override
+	protected void onUnload() {
+		hrModelChange.removeHandler();
+		super.onUnload();
+	}
+
 }

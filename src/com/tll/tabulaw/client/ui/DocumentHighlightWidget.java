@@ -29,7 +29,7 @@ import com.tll.tabulaw.common.model.PocEntityType;
  * existing quotes in the bundle are re-displayed upon widget load.
  * @author jpk
  */
-public class DocumentHighlightWidget extends AbstractModelChangingWidget implements ITextSelectHandler, IViewChangeHandler {
+public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget implements ITextSelectHandler, IViewChangeHandler {
 
 	private final DocumentViewer wDocViewer = new DocumentViewer();
 
@@ -89,9 +89,11 @@ public class DocumentHighlightWidget extends AbstractModelChangingWidget impleme
 
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
+		super.onModelChangeEvent(event);
 		if(!maybeSetCurrentQuoteBundle()) {
+			ModelChangeOp op = event.getChangeOp();
 			Model m = event.getModel();
-			if(event.getChangeOp() == ModelChangeOp.UPDATED && m.getKey().equals(crntQbKey)) {
+			if(op == ModelChangeOp.UPDATED && m.getKey().equals(crntQbKey)) {
 				wDocQuoteBundle.sync(m);
 			}
 		}

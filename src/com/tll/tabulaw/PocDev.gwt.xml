@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to="poc">
+
+	<inherits name="com.allen_sauer.gwt.log.gwt-log-OFF" />
+
+	<inherits name="com.tll.tabulaw.Poc" />
+
+	<entry-point class="com.tll.tabulaw.client.Poc" />
+
+</module>

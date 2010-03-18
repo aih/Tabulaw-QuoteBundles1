@@ -13,11 +13,6 @@ import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.mvc.view.IViewInitializer;
 import com.tll.client.mvc.view.StaticViewInitializer;
 import com.tll.client.mvc.view.ViewClass;
-import com.tll.client.ui.edit.EditEvent;
-import com.tll.client.ui.edit.IEditHandler;
-import com.tll.client.ui.edit.EditEvent.EditOp;
-import com.tll.common.model.Model;
-import com.tll.tabulaw.client.model.PocModelStore;
 import com.tll.tabulaw.client.ui.AddQuoteBundleDialog;
 import com.tll.tabulaw.client.ui.QuoteBundleMoveWidget;
 import com.tll.tabulaw.client.ui.nav.AbstractNavButton;
@@ -43,13 +38,13 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	class NewQuoteBundleButton extends AbstractNavButton implements IEditHandler<Model> {
+	class NewQuoteBundleButton extends AbstractNavButton {
 		
 		AddQuoteBundleDialog dialog;
 		
 		public NewQuoteBundleButton() {
 			super("New Quote Bundle", Styles.PLUS);
-			dialog = new AddQuoteBundleDialog(this);
+			dialog = new AddQuoteBundleDialog();
 			dialog.setGlassEnabled(true);
 			setClickHandler(new ClickHandler() {
 				
@@ -63,15 +58,6 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 		@Override
 		protected String getTitleText(String buttonText) {
 			return "Create a Quote Bundle...";
-		}
-
-		@Override
-		public void onEdit(EditEvent<Model> event) {
-			if(event.getOp() == EditOp.ADD) {
-				Model mQuoteBundle = event.getContent();
-				PocModelStore.get().persist(mQuoteBundle, this);
-				movePanel.postNewQuoteBundle(event.getContent());
-			}
 		}
 
 		@Override

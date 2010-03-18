@@ -39,4 +39,7 @@ public class DocumentViewNavButton extends AbstractNavButton {
 		return new DocumentViewInitializer(documentKey);
 	}
 
+	public ModelKey getDocKey() {
+		return documentKey;
+	}
 }

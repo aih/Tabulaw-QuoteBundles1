@@ -7,6 +7,7 @@ package com.tll.tabulaw.client.ui;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLTable;
@@ -15,6 +16,7 @@ import com.tll.client.listing.AbstractListingConfig;
 import com.tll.client.listing.Column;
 import com.tll.client.listing.DataListingOperator;
 import com.tll.client.listing.IListingConfig;
+import com.tll.client.listing.IListingOperator;
 import com.tll.client.listing.ITableCellRenderer;
 import com.tll.client.listing.ModelCellRenderer;
 import com.tll.client.model.ModelChangeEvent;
@@ -34,12 +36,12 @@ import com.tll.tabulaw.common.model.PocEntityType;
  * Lists documents for a given user.
  * @author jpk
  */
-public class DocumentsListingWidget extends AbstractModelChangingWidget {
+public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
 	static class DocListing extends ModelListingWidget<DocumentsListingWidget.Table> {
 
 		public DocListing() {
-			super(new Table(config), null);
+			super(config.getListingId(), config.getListingElementName(), new Table(config), null);
 		}
 		
 		@Override
@@ -60,6 +62,20 @@ public class DocumentsListingWidget extends AbstractModelChangingWidget {
 		protected void onCellClick(int colIndex, int rowIndex) {
 			if(rowIndex > 0 && colIndex < 2)
 				ViewManager.get().dispatch(new ShowViewRequest(new DocumentViewInitializer(getRowKey(rowIndex))));
+		}
+
+		private HandlerRegistration hrModelChange;
+
+		@Override
+		protected void onLoad() {
+			super.onLoad();
+			hrModelChange = addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
+		}
+
+		@Override
+		protected void onUnload() {
+			hrModelChange.removeHandler();
+			super.onUnload();
 		}
 	}
 
@@ -134,9 +150,9 @@ public class DocumentsListingWidget extends AbstractModelChangingWidget {
 		}
 
 		@Override
-		public void refresh() {
+		protected void doFetch(int ofset, Sorting srtg) {
 			getDataProvider().setList(PocModelStore.get().getAll(PocEntityType.DOCUMENT));
-			super.sort(config.getDefaultSorting());
+			super.doFetch(ofset, srtg);
 		}
 	} // ListingOperator
 	
@@ -160,16 +176,14 @@ public class DocumentsListingWidget extends AbstractModelChangingWidget {
 		initWidget(pnl);
 	}
 	
-	public void refresh() {
-		listingWidget.refresh();
+	public IListingOperator<Model> getOperator() {
+		return listingWidget.getOperator();
 	}
 	
-	public void clear() {
-		listingWidget.clear();
-	}
-
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
+		super.onModelChangeEvent(event);
 		listingWidget.onModelChangeEvent(event);
 	}
+	
 }

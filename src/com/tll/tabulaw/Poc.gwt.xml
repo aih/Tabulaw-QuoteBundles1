@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module rename-to="poc">
+<module>
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="com.google.gwt.http.HTTP" />
 
@@ -7,26 +7,14 @@
 	<!-- <inherits name="com.google.gwt.user.theme.chrome.Chrome"/> -->
 	<!-- <inherits name="com.google.gwt.user.theme.dark.Dark"/>     -->
 
-	<inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" />
-	<set-property name="log_ConsoleLogger" value="ENABLED" />
-	<set-property name="log_FirebugLogger" value="ENABLED" />
-	<set-property name="log_SystemLogger" value="ENABLED" />
-	<set-property name="log_GWTLogger" value="DISABLED" />
-	<set-property name="log_DivLogger" value="DISABLED" />
-	<set-property name="log_RemoteLogger" value="DISABLED" />
-	<set-property name="log_WindowLogger" value="DISABLED" />
-
 	<inherits name="com.allen_sauer.gwt.dnd.gwt-dnd" />
 
 	<inherits name="com.tll.Rpc" />
 	<inherits name="com.tll.View" />
-	<inherits name="com.tll.ClientModel" />
-	<inherits name="com.tll.Field" />
 	<inherits name="com.tll.Listing" />
+	<inherits name="com.tll.Databind" />
 
 	<stylesheet src="../css/poc.css" />
-
-	<entry-point class="com.tll.tabulaw.client.Poc" />
 
 	<source path="client" />
 	<source path="common" />

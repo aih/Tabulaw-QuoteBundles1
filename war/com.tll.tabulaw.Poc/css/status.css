@@ -1,0 +1,48 @@
+@CHARSET "ISO-8859-1";
+
+/* StatusDisplay widget */
+.statusDisplay {
+	background-color: black;
+}
+
+.statusDisplay table {
+}
+
+.statusDisplay div {
+	padding: 2px;
+}
+
+.statusDisplay * {
+	font-size: 10px;
+	font-family: monospace;
+}
+
+.statusDisplay .info {
+	color: aqua;
+}
+
+.statusDisplay .warn {
+	color: yellow;
+}
+
+.statusDisplay .error {
+	color: red;
+}
+
+.statusDisplay .fatal {
+	color: red;
+	font-weight: bold;
+}
+/*
+.statusDisplay .success {
+	color: white;
+}
+
+.statusDisplay .debug {
+	color: green;
+}
+
+.statusDisplay .trace {
+	color: silver;
+}
+*/

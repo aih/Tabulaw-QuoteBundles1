@@ -49,7 +49,7 @@
     	<arg value="${gwt.compile.style}" />
 			<arg value="-logLevel" />
 			<arg value="${gwt.log.level}" />
-      <arg value="com.tll.tabulaw.Poc"/>
+      <arg value="${gwt.compile.module}"/>
     </java>
   </target>
 
@@ -68,7 +68,7 @@
 			<arg value="-style" />
     	<arg value="${gwt.compile.style}" />
 			<arg value="${gwt.log.level}" />
-      <arg value="com.tll.tabulaw.Poc"/>
+      <arg value="com.tll.tabulaw.Poc-dev"/>
     </java>
   </target>
 	
@@ -83,7 +83,7 @@
 		<include name="com/tll/tll-client-view/${tll.deps.version}/tll-client-view-${tll.deps.version}.jar" />
 		<include name="com/tll/tll-client-field/${tll.deps.version}/tll-client-field-${tll.deps.version}.jar" />
 		<include name="com/tll/tll-client-databind/${tll.deps.version}/tll-client-databind-${tll.deps.version}.jar" />
-		<include name="com/tll/tll-client-persist/${tll.deps.version}/tll-client-persist-${tll.deps.version}.jar" />
+		<include name="com/tll/tll-client-marshal/${tll.deps.version}/tll-client-marshal-${tll.deps.version}.jar" />
 		<include name="com/tll/tll-client-listing/${tll.deps.version}/tll-client-listing-${tll.deps.version}.jar" />
 	</fileset>
 	

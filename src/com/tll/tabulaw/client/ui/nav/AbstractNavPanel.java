@@ -5,18 +5,18 @@
  */
 package com.tll.tabulaw.client.ui.nav;
 
-import com.google.gwt.user.client.ui.Composite;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.IViewChangeHandler;
 import com.tll.client.mvc.view.ViewChangeEvent;
 import com.tll.client.mvc.view.ViewKey;
+import com.tll.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 
 /**
  * A nav related widget relating to view navigation that recieves view change
  * events.
  * @author jpk
  */
-public abstract class AbstractNavPanel extends Composite implements IViewChangeHandler {
+public abstract class AbstractNavPanel extends AbstractModelChangeAwareWidget implements IViewChangeHandler {
 
 	/**
 	 * The retained current which is set <b>after</b> {@link #handleViewChange()}

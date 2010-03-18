@@ -15,14 +15,16 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.TabBar;
 import com.tll.client.model.ModelChangeEvent;
+import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.ViewKey;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
 import com.tll.tabulaw.client.model.PocModelStore;
-import com.tll.tabulaw.client.ui.AbstractModelChangingWidget;
+import com.tll.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tll.tabulaw.client.view.DocumentView;
+import com.tll.tabulaw.common.model.PocEntityType;
 
 /**
  * The top nav row.
@@ -63,7 +65,7 @@ public class NavRowPanel extends AbstractNavPanel {
 	 * events.
 	 * @author jpk
 	 */
-	public static class CurrentQuoteBundleDisplayWidget extends AbstractModelChangingWidget {
+	public static class CurrentQuoteBundleDisplayWidget extends AbstractModelChangeAwareWidget {
 
 		private final HTML html = new HTML();
 		private ModelKey crntQbKey;
@@ -86,6 +88,7 @@ public class NavRowPanel extends AbstractNavPanel {
 
 		@Override
 		public void onModelChangeEvent(ModelChangeEvent event) {
+			super.onModelChangeEvent(event);
 			update();
 		}
 
@@ -213,4 +216,27 @@ public class NavRowPanel extends AbstractNavPanel {
 		return crntQuoteBudleWidget;
 	}
 
+	@Override
+	public void onModelChangeEvent(ModelChangeEvent event) {
+		super.onModelChangeEvent(event);
+		if(event.getChangeOp() == ModelChangeOp.DELETED && event.getModelKey().getEntityType() == PocEntityType.DOCUMENT) {
+			// remove open doc tab
+			boolean found = false;
+			int i = 0;
+			for(DocumentViewNavButton b : openDocNavButtons) {
+				if(b.getDocKey().equals(event.getModelKey())) {
+					found = true;
+					break;
+				}
+				i++;
+			}
+			if(found) {
+				openDocTabs.removeTab(i);
+				openDocNavButtons.remove(i);
+			}
+		}
+		else {
+			crntQuoteBudleWidget.onModelChangeEvent(event);
+		}
+	}
 }

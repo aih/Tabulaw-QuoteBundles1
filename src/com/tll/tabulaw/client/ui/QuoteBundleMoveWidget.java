@@ -35,7 +35,7 @@ import com.tll.tabulaw.common.model.PocEntityType;
  * Manages the editing of quote bundles via drag and drop.
  * @author jpk
  */
-public class QuoteBundleMoveWidget extends AbstractModelChangingWidget {
+public class QuoteBundleMoveWidget extends AbstractModelChangeAwareWidget {
 
 	static class Styles {
 
@@ -282,17 +282,6 @@ public class QuoteBundleMoveWidget extends AbstractModelChangingWidget {
 		return qbListingWidget;
 	}
 
-	/**
-	 * Adds a new quote bundle to the datastore as well as the ui managing the
-	 * drag and drop stuff.
-	 * @param mQuoteBundle
-	 */
-	public void postNewQuoteBundle(Model mQuoteBundle) {
-		PocModelStore.get().persist(mQuoteBundle, this);
-		addQuoteBundleOption(mQuoteBundle);
-		//Notifier.get().info("'" + mQuoteBundle.descriptor() + "' added.");
-	}
-
 	public void refresh() {
 		clearBundleOptions();
 		clearQuoteBundleColumns();
@@ -393,16 +382,24 @@ public class QuoteBundleMoveWidget extends AbstractModelChangingWidget {
 
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
+		super.onModelChangeEvent(event);
 		Model m = event.getModel();
-		if(event.getChangeOp() == ModelChangeOp.UPDATED && m.getKey().getEntityType() == PocEntityType.QUOTE_BUNDLE) {
-			ModelKey key = m.getKey();
-			// look for the quote bundle in the pinned quote bundle widgets
-			for(int i = 0; i < columns.getWidgetCount(); i++) {
-				QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) columns.getWidget(i);
-				Model qbm = qbw.getModel();
-				if(qbm.getKey().equals(key)) {
-					qbw.sync(m);
+		if(m.getKey().getEntityType() == PocEntityType.QUOTE_BUNDLE) {
+			if(event.getChangeOp() == ModelChangeOp.UPDATED) {
+				ModelKey key = m.getKey();
+				// look for the quote bundle in the pinned quote bundle widgets
+				for(int i = 0; i < columns.getWidgetCount(); i++) {
+					QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) columns.getWidget(i);
+					Model qbm = qbw.getModel();
+					if(qbm.getKey().equals(key)) {
+						qbw.sync(m);
+					}
 				}
+			}
+			if(event.getChangeOp() == ModelChangeOp.ADDED) {
+				Model mQuoteBundle = event.getModel();
+				addQuoteBundleOption(mQuoteBundle);
+				Notifier.get().info("'" + mQuoteBundle.descriptor() + "' added.");
 			}
 		}
 	}

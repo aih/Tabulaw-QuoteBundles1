@@ -5,18 +5,18 @@
  */
 package com.tll.tabulaw.client.ui;
 
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.tll.client.model.IModelChangeHandler;
 import com.tll.client.model.ModelChangeEvent;
 
 /**
- * Base class for widgets that generate {@link ModelChangeEvent}s. Additionally,
- * this widget class implements {@link IModelChangeHandler} for convenience.
+ * Base class for widgets that source and/or accept {@link ModelChangeEvent}s.
  * Implementations are free to ignore {@link ModelChangeEvent}s.
  * @author jpk
  */
-public abstract class AbstractModelChangingWidget extends Composite implements IModelChangeHandler {
+public abstract class AbstractModelChangeAwareWidget extends Composite implements IModelChangeHandler {
 
 	private HandlerRegistration hrModelChange;
 
@@ -34,6 +34,6 @@ public abstract class AbstractModelChangingWidget extends Composite implements I
 
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
-		// base impl no-op
+		Log.debug("Handling model change: " + event);
 	}
 }

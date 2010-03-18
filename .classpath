@@ -16,7 +16,7 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-view-0.0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-field-0.0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-databind-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-persist-0.0.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-marshal-0.0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-listing-0.0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

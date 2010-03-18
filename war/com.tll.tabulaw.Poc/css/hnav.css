@@ -1,0 +1,16 @@
+.hnav {	
+}
+
+.hnav ul,.hnav ul li {
+	display: inline;
+	list-style-type: none;
+}
+
+.hnav ul li a,.hnav ul li p {
+	display: inline;
+	white-space: nowrap;
+}
+
+.hnav ul li a:link, .hnav ul li a:visited, .hnav ul li a:active, .hnav ul li a:hover {
+	text-decoration: none;
+}

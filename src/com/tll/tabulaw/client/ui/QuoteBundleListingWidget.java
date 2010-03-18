@@ -29,7 +29,7 @@ public final class QuoteBundleListingWidget extends Composite {
 		public BOption(String bundleId, String bundleName) {
 			super(bundleName);
 			this.bundleId = bundleId;
-			setTitle(bundleName);
+			setTitle("Click or drag to edit");
 		}
 
 		public String getBundleId() {

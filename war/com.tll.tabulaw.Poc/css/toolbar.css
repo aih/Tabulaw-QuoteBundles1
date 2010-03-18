@@ -1,0 +1,73 @@
+@CHARSET "ISO-8859-1";
+
+.toolbar {
+	height: 24px;
+	background-color: #EAEAEA;
+}
+
+.toolbar td {
+	/* NOTE: this middle aligns ALL toolbar contents which can't be overridden! */
+	vertical-align: middle !important;
+	padding: 2px;
+}
+
+.toolbar .split {
+	margin: 0 4px 0 4px;
+}
+
+.toolbar td.button {
+}
+
+.toolbar * {
+	white-space: nowrap;
+}
+
+/* PushButton and ToggleButton custom styling for inside a view toolbar. */
+.button-up,
+.button-up-hovering,
+.button-up-disabled,
+.button-down,
+.button-down-hovering,
+.button-down-disabled {
+  margin: 0;
+  text-decoration: none;
+}
+.button-up,
+.button-up-hovering,
+.button-up-disabled {
+  padding: 3px 4px 3px 4px;
+}
+.button-up {
+  border: 1px solid #EAEAEA;
+  cursor: pointer;
+  cursor: hand;
+}
+.button-up-hovering {
+  border: 1px solid #CFCFCF;
+	background-color: white;
+  cursor: pointer;
+  cursor: hand;
+}
+.button-up-disabled {
+  border: 1px solid #EAEAEA;
+  cursor: default;
+}
+.button-down,
+.button-down-hovering,
+.button-down-disabled {
+  padding: 4px 3px 2px 5px;
+}
+.button-down {
+  border: 1px solid #EAEAEA;
+  cursor: pointer;
+  cursor: hand;
+}
+.button-down-hovering {
+  border: 1px solid #EAEAEA;
+  cursor: pointer;
+  cursor: hand;
+}
+.button-down-disabled {
+  border: 1px solid #EAEAEA;
+  cursor: default;
+}

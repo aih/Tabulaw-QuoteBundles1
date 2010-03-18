@@ -200,7 +200,7 @@ body {
 		color: #2F2F2F;
 	}
 	#navRow .openDocs .gwt-TabBarItem-selected {
-		display:none;
+		/*display:none;*/
 	}
 	/* the contained nav row panel */
 	.navRow {

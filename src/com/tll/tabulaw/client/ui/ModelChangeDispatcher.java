@@ -32,7 +32,7 @@ public class ModelChangeDispatcher implements IModelChangeHandler {
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		// apply the model change to the nav row
-		Poc.getNavRow().getCrntQuoteBudleWidget().onModelChangeEvent(event);
+		Poc.getNavRow().onModelChangeEvent(event);
 		
 		// apply the model change to the currently cached views
 		Widget sourceWidget = (Widget) event.getSource();
