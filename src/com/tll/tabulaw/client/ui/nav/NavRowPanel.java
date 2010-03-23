@@ -120,13 +120,16 @@ public class NavRowPanel extends AbstractNavPanel {
 	public NavRowPanel() {
 		super();
 
+		DocumentSearchNavButton nbDocSearch = new DocumentSearchNavButton();
 		DocumentsNavButton nbDocListing = new DocumentsNavButton();
 		QuoteBundlesNavButton nbQuoteBundles = new QuoteBundlesNavButton();
 
+		mainViewButtons.add(nbDocSearch);
 		mainViewButtons.add(nbDocListing);
 		mainViewButtons.add(nbQuoteBundles);
 
 		mainViewTabs.addStyleName(Styles.MAIN_VIEWS);
+		mainViewTabs.addTab(nbDocSearch);
 		mainViewTabs.addTab(nbDocListing);
 		mainViewTabs.addTab(nbQuoteBundles);
 

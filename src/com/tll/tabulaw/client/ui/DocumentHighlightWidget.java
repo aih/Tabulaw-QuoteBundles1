@@ -34,7 +34,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 	private final DocumentViewer wDocViewer = new DocumentViewer();
 
 	private final QuoteBundleDocWidget wDocQuoteBundle = new QuoteBundleDocWidget();
-
+	
 	private final HorizontalSplitPanel hsp = new HorizontalSplitPanel();
 
 	private ModelKey crntQbKey;

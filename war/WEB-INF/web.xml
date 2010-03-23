@@ -14,6 +14,16 @@
 		<url-pattern>/doc/*</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>DocSearchService</servlet-name>
+		<servlet-class>com.tll.tabulaw.server.rpc.DocSearchService</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>DocSearchService</servlet-name>
+		<url-pattern>/poc/doc/search</url-pattern>
+	</servlet-mapping>
+
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>Poc.html</welcome-file>

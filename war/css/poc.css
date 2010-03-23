@@ -454,3 +454,32 @@ iframe.docContainer {
 		overflow: hidden;
 	}
 	
+/* docSearch view */
+.docSearch {
+}
+	.image {
+	}
+	.gwt-SuggestBox {
+		margin-left: 20px;
+		font-size: 22px;
+		font-weight: bold;
+	}
+	.gwt-SuggestBoxPopup {
+		
+	} 
+		.gwt-SuggestBoxPopup .item {
+			max-width: 600px;
+		}
+			.gwt-SuggestBoxPopup .item .entry {
+				width: 600px;
+			}
+				.gwt-SuggestBoxPopup .item .entry .title {
+					font-weight: bold;
+				}
+				.gwt-SuggestBoxPopup .item .entry .summary {
+					font-size: smaller;
+					/*font-style: italic;*/
+					white-space: normal;
+				}
+			.gwt-SuggestBoxPopup .item-selected {
+			} 

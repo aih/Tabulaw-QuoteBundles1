@@ -16,6 +16,7 @@ import com.tll.tabulaw.client.ui.Notifier;
 import com.tll.tabulaw.client.ui.Portal;
 import com.tll.tabulaw.client.ui.nav.NavColPanel;
 import com.tll.tabulaw.client.ui.nav.NavRowPanel;
+import com.tll.tabulaw.client.view.DocumentSearchView;
 import com.tll.tabulaw.client.view.DocumentView;
 import com.tll.tabulaw.client.view.DocumentsView;
 import com.tll.tabulaw.client.view.QuoteBundlesView;
@@ -58,7 +59,7 @@ public class Poc implements EntryPoint {
 
 			@SuppressWarnings("synthetic-access")
 			public void execute() {
-				ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
+				ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentSearchView.klas)));
 			}
 		});
 	}
@@ -98,6 +99,7 @@ public class Poc implements EntryPoint {
 	}
 
 	private void populateViewClasses() {
+		ViewClass.addClass(DocumentSearchView.klas);
 		ViewClass.addClass(DocumentsView.klas);
 		ViewClass.addClass(DocumentView.klas);
 		ViewClass.addClass(QuoteBundlesView.klas);
