@@ -35,7 +35,7 @@ import com.tll.tabulaw.common.model.PocEntityType;
  * Manages the editing of quote bundles via drag and drop.
  * @author jpk
  */
-public class QuoteBundleMoveWidget extends AbstractModelChangeAwareWidget {
+public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 
 	static class Styles {
 
@@ -188,7 +188,7 @@ public class QuoteBundleMoveWidget extends AbstractModelChangeAwareWidget {
 	/**
 	 * Constructor
 	 */
-	public QuoteBundleMoveWidget() {
+	public QuoteBundlesManageWidget() {
 		super();
 
 		boundaryPanel.addStyleName(Styles.BOUNDARY_AREA);
@@ -323,11 +323,13 @@ public class QuoteBundleMoveWidget extends AbstractModelChangeAwareWidget {
 	 * Adds a bundle option to the bundle listing only not affecting the quote
 	 * bundle columns in the main viewing area.
 	 * @param mQuoteBundle
+	 * @return new added option
 	 */
-	private void addQuoteBundleOption(Model mQuoteBundle) {
+	private BOption addQuoteBundleOption(Model mQuoteBundle) {
 		BOption option = new BOption(mQuoteBundle.getId(), mQuoteBundle.getName());
 		qbListingWidget.getOptionsPanel().addOption(option);
 		bundleOptionController.makeDraggable(option);
+		return option;
 	}
 
 	/**
@@ -398,7 +400,8 @@ public class QuoteBundleMoveWidget extends AbstractModelChangeAwareWidget {
 			}
 			if(event.getChangeOp() == ModelChangeOp.ADDED) {
 				Model mQuoteBundle = event.getModel();
-				addQuoteBundleOption(mQuoteBundle);
+				// add and pin directly
+				pinQuoteBundle(addQuoteBundleOption(mQuoteBundle));
 				Notifier.get().info("'" + mQuoteBundle.descriptor() + "' added.");
 			}
 		}

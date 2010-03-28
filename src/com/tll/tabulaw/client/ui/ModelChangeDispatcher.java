@@ -43,7 +43,7 @@ public class ModelChangeDispatcher implements IModelChangeHandler {
 				((IModelChangeHandler)view).onModelChangeEvent(event);
 			}
 			else {
-				Log.debug(view + " sourced: " + event);
+				Log.debug("View ( " + view + " ) -sourced- : " + event);
 			}
 		}
 	}

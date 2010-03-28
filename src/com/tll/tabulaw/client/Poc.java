@@ -7,9 +7,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.model.ModelChangeEvent;
-import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.StaticViewInitializer;
@@ -58,17 +56,13 @@ public class Poc implements EntryPoint {
 	 * <p>
 	 * Fires a {@link ModelChangeEvent} when successful.
 	 * @param mQuoteBundle non-null
-	 * @param source optional source widget when specified, a model change event
-	 *        is fired on it
 	 * @return <code>true</code> if the current quote bundle ref was actually
 	 *         updated and a model change event was fired.
 	 */
-	public static boolean setCurrentQuoteBundle(Model mQuoteBundle, Widget source) {
+	public static boolean setCurrentQuoteBundle(Model mQuoteBundle) {
 		if(mQuoteBundle == null) throw new NullPointerException();
 		if(currentQuoteBundle == null || !currentQuoteBundle.getKey().equals(mQuoteBundle)) {
 			currentQuoteBundle = mQuoteBundle;
-			// fire model change event
-			if(source != null) source.fireEvent(new ModelChangeEvent(ModelChangeOp.UPDATED, mQuoteBundle, null));
 			return true;
 		}
 		return false;
@@ -135,12 +129,12 @@ public class Poc implements EntryPoint {
 		ViewManager.get().addViewChangeHandler(navColPanel);
 		ViewManager.get().addViewChangeHandler(navRowPanel);
 		
+		// pre-load quote bundles view so it recieves model change events staying in sync!
+		ViewManager.get().loadView(new StaticViewInitializer(QuoteBundlesView.klas));
+		
 		// initialize the ui msg notifier
 		Notifier.init(navColPanel);
 		
-		// default set the current quote bundle
-		navRowPanel.getCrntQuoteBudleWidget().update();
-
 		Log.debug("Building complete.");
 	}
 

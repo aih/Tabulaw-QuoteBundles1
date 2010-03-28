@@ -35,7 +35,7 @@ public abstract class AbstractModelChangeAwareWidget extends Composite implement
 
 	@Override
 	public HandlerRegistration addModelChangeHandler(IModelChangeHandler handler) {
-		return addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
+		return addHandler(handler, ModelChangeEvent.TYPE);
 	}
 
 	@Override

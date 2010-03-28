@@ -49,7 +49,7 @@ public abstract class AbstractPocView<I extends IViewInitializer> extends Abstra
 	
 	@Override
 	public final void onModelChangeEvent(ModelChangeEvent event) {
-		Log.debug("View ( " + toString() + " ) is handling model change event: " + event.toString() + "..");
+		Log.debug("View ( " + this + " ) is handling model change event: " + event.toString() + "..");
 		handleModelChange(event);
 	}
 }

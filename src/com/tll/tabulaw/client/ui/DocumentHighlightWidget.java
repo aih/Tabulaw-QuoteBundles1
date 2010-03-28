@@ -125,29 +125,32 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> 
 	 * @return <code>true</code> if the current quote bundle was changed
 	 */
 	private boolean maybeSetCurrentQuoteBundle() {
-		Model mCrntQuoteBundle = Poc.getCurrentQuoteBundle();
-		if(mCrntQuoteBundle == null) {
+		Model mQb = Poc.getCurrentQuoteBundle();
+		if(mQb == null) {
 			assert crntQbKey == null;
 			// auto-create a new quote bundle
 			Model mDoc = wDocViewer.getModel();
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
 			String qbName = mDoc.asString("title");
 			String qbDesc = "Quote Bundle for " + qbName;
-			mCrntQuoteBundle = PocModelFactory.get().buildQuoteBundle(qbName, qbDesc);
-			mCrntQuoteBundle.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE_BUNDLE));
-			Poc.setCurrentQuoteBundle(mCrntQuoteBundle, this);
+			mQb = PocModelFactory.get().buildQuoteBundle(qbName, qbDesc);
+			mQb.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE_BUNDLE));
+
+			Poc.setCurrentQuoteBundle(mQb);
+			// fire model change event
+			PocModelCache.get().persist(mQb, this);
 		}
-		if(crntQbKey == null || !crntQbKey.equals(mCrntQuoteBundle.getKey())) {
+		if(crntQbKey == null || !crntQbKey.equals(mQb.getKey())) {
 			if(crntQbKey != null) {
 				wDocQuoteBundle.clearQuotesFromUi();
 			}
 			if(Log.isDebugEnabled()) {
 				String from = wDocQuoteBundle.getModel() == null ? "-empty-" : wDocQuoteBundle.getModel().descriptor();
-				String to = mCrntQuoteBundle.descriptor();
+				String to = mQb.descriptor();
 				Log.debug("maybeSetCurrentQuoteBundle() - Re-setting model from: " + from + " to " + to);
 			}
-			wDocQuoteBundle.setModel(mCrntQuoteBundle);
-			crntQbKey = mCrntQuoteBundle.getKey();
+			wDocQuoteBundle.setModel(mQb);
+			crntQbKey = mQb.getKey();
 			return true;
 		}
 		return false;

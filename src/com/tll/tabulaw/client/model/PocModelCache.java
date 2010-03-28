@@ -6,6 +6,7 @@
 package com.tll.tabulaw.client.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -155,12 +156,19 @@ public class PocModelCache {
 	 */
 	public void persist(Model m, Widget source) {
 		List<Model> list = cache.get(m.getEntityType());
+
 		Model existing = null;
-		for(Model em : list) {
-			if(em.getKey().equals(m.getKey())) {
-				existing = em;
-				break;
+		
+		if(m.getId() != null) {
+			for(Model em : list) {
+				if(em.getKey().equals(m.getKey())) {
+					existing = em;
+					break;
+				}
 			}
+		}
+		else {
+			m.setId(getNextId((PocEntityType) m.getEntityType()));
 		}
 
 		ModelChangeOp op = existing == null ? ModelChangeOp.ADDED : ModelChangeOp.UPDATED;
@@ -174,6 +182,17 @@ public class PocModelCache {
 
 		// fire model change event
 		if(source != null) source.fireEvent(new ModelChangeEvent(op, copy, null));
+	}
+	
+	/**
+	 * Cache all model instances in the given collection.
+	 * <p>NO model change event will be fired.
+	 * @param clc collection containing model data to persist
+	 */
+	public void persistAll(Collection<Model> clc) {
+		for(Model m : clc) {
+			persist(m, null);
+		}
 	}
 
 	/**

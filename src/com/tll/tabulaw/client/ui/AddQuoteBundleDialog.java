@@ -63,14 +63,12 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<IModelE
 		if(event.getOp() == EditOp.ADD) {
 			Model mQuoteBundle = event.getContent().getModel();
 			
-			boolean setCurrent = (Poc.getCurrentQuoteBundle() == null);
-			
 			// persist
 			mQuoteBundle.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE_BUNDLE));
-			PocModelCache.get().persist(mQuoteBundle, setCurrent ? null : this);
+			PocModelCache.get().persist(mQuoteBundle, this);
 			
 			// default set the current quote bundle if not set yet
-			if(setCurrent) Poc.setCurrentQuoteBundle(mQuoteBundle, this);
+			Poc.setCurrentQuoteBundle(mQuoteBundle);
 		}
 		// defer the hide so the model change event bubble up in the dom since
 		// hide() removes the dialog from the dom

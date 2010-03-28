@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module rename-to="poc">
+	<inherits name="com.google.gwt.user.Debug" />
 
-	<inherits name="com.allen_sauer.gwt.log.gwt-log-OFF" />
+	<inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" />
+	<set-property name="log_ConsoleLogger" value="ENABLED" />
+	<set-property name="log_FirebugLogger" value="ENABLED" />
+	<set-property name="log_SystemLogger" value="ENABLED" />
+	<set-property name="log_GWTLogger" value="DISABLED" />
+	<set-property name="log_DivLogger" value="DISABLED" />
+	<set-property name="log_RemoteLogger" value="DISABLED" />
+	<set-property name="log_WindowLogger" value="DISABLED" />
 
 	<inherits name="com.tll.tabulaw.Poc" />
 

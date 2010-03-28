@@ -14,7 +14,7 @@ import com.tll.client.mvc.view.IViewInitializer;
 import com.tll.client.mvc.view.StaticViewInitializer;
 import com.tll.client.mvc.view.ViewClass;
 import com.tll.tabulaw.client.ui.AddQuoteBundleDialog;
-import com.tll.tabulaw.client.ui.QuoteBundleMoveWidget;
+import com.tll.tabulaw.client.ui.QuoteBundlesManageWidget;
 import com.tll.tabulaw.client.ui.nav.AbstractNavButton;
 
 /**
@@ -68,14 +68,14 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 	
 	private final Widget[] navColWidgets;
 	
-	private final QuoteBundleMoveWidget movePanel;
+	private final QuoteBundlesManageWidget movePanel;
 	
 	/**
 	 * Constructor
 	 */
 	public QuoteBundlesView() {
 		super();
-		movePanel = new QuoteBundleMoveWidget();
+		movePanel = new QuoteBundlesManageWidget();
 		
 		HTML viewName = new HTML(getLongViewName());
 		viewName.setStyleName("viewTitle");
