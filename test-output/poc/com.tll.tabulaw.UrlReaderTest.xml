@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.tll.tabulaw.UrlReaderTest" failures="0" tests="1" time="16.12" errors="0">
-  <properties/>
-  <testcase name="testParseGoogleScholarDocContent" time="16.077" classname="com.tll.tabulaw.UrlReaderTest"/>
-</testsuite>

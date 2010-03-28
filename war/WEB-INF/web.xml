@@ -15,13 +15,13 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>DocSearchService</servlet-name>
-		<servlet-class>com.tll.tabulaw.server.rpc.DocSearchService</servlet-class>
+		<servlet-name>DocService</servlet-name>
+		<servlet-class>com.tll.tabulaw.server.rpc.DocService</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
-		<servlet-name>DocSearchService</servlet-name>
-		<url-pattern>/poc/doc/search</url-pattern>
+		<servlet-name>DocService</servlet-name>
+		<url-pattern>/poc/doc</url-pattern>
 	</servlet-mapping>
 
 	<!-- Default page to serve -->
@@ -29,4 +29,10 @@
 		<welcome-file>Poc.html</welcome-file>
 	</welcome-file-list>
 	
+	<!-- 
+	<login-config>
+	  <auth-method>BASIC</auth-method>
+	  <realm-name>default</realm-name>
+	</login-config>
+	-->
 </web-app>

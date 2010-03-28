@@ -27,7 +27,7 @@ import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.common.model.CopyCriteria;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
-import com.tll.tabulaw.client.model.PocModelStore;
+import com.tll.tabulaw.client.model.PocModelCache;
 import com.tll.tabulaw.client.ui.QuoteBundleListingWidget.BOption;
 import com.tll.tabulaw.common.model.PocEntityType;
 
@@ -141,7 +141,7 @@ public class QuoteBundleMoveWidget extends AbstractModelChangeAwareWidget {
 
 			// clone the dragged quote widget
 			Model mQuoteClone = draggedQuoteModel.copy(CopyCriteria.keepReferences());
-			mQuoteClone.setId(PocModelStore.get().getNextId(PocEntityType.QUOTE));
+			mQuoteClone.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE));
 			targetQuoteBundleWidget.addQuote(mQuoteClone, true);
 
 			//String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
@@ -250,7 +250,7 @@ public class QuoteBundleMoveWidget extends AbstractModelChangeAwareWidget {
 		String qbName = option.getBundleName();
 
 		// replace just dropped option with quote bundle widget
-		Model mQuoteBundle = PocModelStore.get().get(new ModelKey(PocEntityType.QUOTE_BUNDLE, qbId, qbName));
+		Model mQuoteBundle = PocModelCache.get().get(new ModelKey(PocEntityType.QUOTE_BUNDLE, qbId, qbName));
 
 		insertQuoteBundleColumn(mQuoteBundle, 0);
 	}
@@ -287,7 +287,7 @@ public class QuoteBundleMoveWidget extends AbstractModelChangeAwareWidget {
 		clearQuoteBundleColumns();
 
 		// populate
-		List<Model> mbundles = PocModelStore.get().getAll(PocEntityType.QUOTE_BUNDLE);
+		List<Model> mbundles = PocModelCache.get().getAll(PocEntityType.QUOTE_BUNDLE);
 		if(mbundles != null) {
 			for(int i = 0; i < mbundles.size(); i++) {
 				if(i < NUM_COLUMNS) {

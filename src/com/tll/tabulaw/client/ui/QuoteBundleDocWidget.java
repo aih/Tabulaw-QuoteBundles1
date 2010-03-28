@@ -14,11 +14,15 @@ import com.tll.tabulaw.client.model.MarkOverlay;
  */
 public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteDocWidget, AbstractQuoteBundleWidget.Header> {
 
+	static class DocHeader extends AbstractQuoteBundleWidget.Header {
+		
+	}
+	
 	/**
 	 * Constructor
 	 */
 	public QuoteBundleDocWidget() {
-		super(new Header());
+		super(new DocHeader());
 	}
 
 	@Override

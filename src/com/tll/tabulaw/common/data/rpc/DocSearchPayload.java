@@ -16,7 +16,7 @@ import com.tll.common.data.Status;
  */
 public class DocSearchPayload extends Payload {
 
-	private List<DocSearchResult> results;
+	private List<CaseDocSearchResult> results;
 
 	/**
 	 * Constructor
@@ -37,11 +37,11 @@ public class DocSearchPayload extends Payload {
 	 * @return Map of html tokens (key) representing a single search result mapped
 	 *         to the corres. doc url.
 	 */
-	public List<DocSearchResult> getResults() {
+	public List<CaseDocSearchResult> getResults() {
 		return results;
 	}
 
-	public void setResults(List<DocSearchResult> results) {
+	public void setResults(List<CaseDocSearchResult> results) {
 		this.results = results;
 	}
 }

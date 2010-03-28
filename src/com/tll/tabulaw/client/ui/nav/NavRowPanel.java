@@ -21,7 +21,7 @@ import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.ViewKey;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
-import com.tll.tabulaw.client.model.PocModelStore;
+import com.tll.tabulaw.client.Poc;
 import com.tll.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tll.tabulaw.client.view.DocumentView;
 import com.tll.tabulaw.common.model.PocEntityType;
@@ -76,7 +76,7 @@ public class NavRowPanel extends AbstractNavPanel {
 		}
 
 		public void update() {
-			Model cqb = PocModelStore.get().getCurrentQuoteBundle();
+			Model cqb = Poc.getCurrentQuoteBundle();
 			if(cqb != null) {
 				ModelKey key = cqb.getKey();
 				if(!key.equals(crntQbKey)) {
@@ -120,16 +120,13 @@ public class NavRowPanel extends AbstractNavPanel {
 	public NavRowPanel() {
 		super();
 
-		DocumentSearchNavButton nbDocSearch = new DocumentSearchNavButton();
 		DocumentsNavButton nbDocListing = new DocumentsNavButton();
 		QuoteBundlesNavButton nbQuoteBundles = new QuoteBundlesNavButton();
 
-		mainViewButtons.add(nbDocSearch);
 		mainViewButtons.add(nbDocListing);
 		mainViewButtons.add(nbQuoteBundles);
 
 		mainViewTabs.addStyleName(Styles.MAIN_VIEWS);
-		mainViewTabs.addTab(nbDocSearch);
 		mainViewTabs.addTab(nbDocListing);
 		mainViewTabs.addTab(nbQuoteBundles);
 

@@ -12,7 +12,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.tll.common.model.Model;
-import com.tll.tabulaw.client.model.PocModelStore;
+import com.tll.tabulaw.client.Poc;
+import com.tll.tabulaw.client.model.PocModelCache;
 
 /**
  * Supports editing capabilty for a quote bundle.
@@ -51,7 +52,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 
 				@Override
 				public void onClick(ClickEvent event) {
-					if(PocModelStore.get().setCurrentQuoteBundle(mQuoteBundle, EditHeader.this)) {
+					if(Poc.setCurrentQuoteBundle(mQuoteBundle, EditHeader.this)) {
 						Notifier.get().info("Current Quote Bundle set.");
 					}
 				}
@@ -74,15 +75,13 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 
 	} // EditHeader
 	
-	private final PickupDragController quoteController;
-
 	/**
 	 * Constructor
-	 * @param quoteController
+	 * @param dragController optional
 	 */
-	public QuoteBundleEditWidget(PickupDragController quoteController) {
+	public QuoteBundleEditWidget(PickupDragController dragController) {
 		super(new EditHeader());
-		this.quoteController = quoteController;
+		setDragController(dragController);
 	}
 	
 	public void setCloseHandler(ClickHandler closeHandler) {
@@ -104,26 +103,11 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 		for(int i = 0; i < quotePanel.getWidgetCount(); i++) {
 			Widget w = quotePanel.getWidget(i);
 			if(w instanceof QuoteEditWidget) {
-				if(PocModelStore.get().compareQuotes(mQuote, ((QuoteEditWidget) w).getModel())) {
+				if(PocModelCache.get().compareQuotes(mQuote, ((QuoteEditWidget) w).getModel())) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-
-	@Override
-	public QuoteEditWidget addQuote(Model mQuote, boolean persist) {
-		QuoteEditWidget qew = super.addQuote(mQuote, persist);
-		if(qew != null) quoteController.makeDraggable(qew, qew.getDragHandle());
-		return qew;
-	}
-
-	@Override
-	public QuoteEditWidget removeQuote(Model mQuote, boolean persist, boolean deleteQuote) {
-		QuoteEditWidget qew = super.removeQuote(mQuote, persist, deleteQuote);
-		if(qew != null) quoteController.makeNotDraggable(qew);
-		return qew;
-	}
-	
 }

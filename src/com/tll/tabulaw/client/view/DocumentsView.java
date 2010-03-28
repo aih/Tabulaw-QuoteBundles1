@@ -5,10 +5,12 @@
  */
 package com.tll.tabulaw.client.view;
 
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.mvc.view.StaticViewInitializer;
 import com.tll.client.mvc.view.ViewClass;
+import com.tll.tabulaw.client.ui.DocSuggestWidget;
 import com.tll.tabulaw.client.ui.DocumentsListingWidget;
 
 
@@ -33,7 +35,11 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
+	private final DocSuggestWidget docSuggest = new DocSuggestWidget();
+	
 	private final DocumentsListingWidget docListing = new DocumentsListingWidget();
+	
+	private HandlerRegistration hr;
 	
 	@Override
 	public String getLongViewName() {
@@ -52,17 +58,26 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 
 	@Override
 	protected void doInitialization(StaticViewInitializer initializer) {
+		addWidget(docSuggest);
 		addWidget(docListing);
+		
+		// this is necessary since the docListing widget won't see the model change
+		// event fired
+		// from doc suggest widget since it exists under the *same* view which model
+		// change dispatcher doesn't support
+		hr = docSuggest.addModelChangeHandler(docListing);
 	}
 
 	@Override
 	protected final void doRefresh() {
-		docListing.getOperator().refresh();
+		//docListing.getOperator().refresh();
+		docListing.loadData();
 	}
 
 	@Override
 	protected final void doDestroy() {
-		docListing.getOperator().clear();
+		//docListing.getOperator().clear();
+		hr.removeHandler();
 	}
 
 	@Override

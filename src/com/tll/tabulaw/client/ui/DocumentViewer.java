@@ -6,20 +6,58 @@
 package com.tll.tabulaw.client.ui;
 
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.model.IHasModel;
 import com.tll.common.model.Model;
+import com.tll.tabulaw.client.Poc;
 
 /**
- * Displays a single document allowng for quotes to be generated from user text
- * selections.
+ * Displays a single document either statically (default) or in a rich text area
+ * (edit mode).
+ * <p>
+ * Fires a {@link ValueChangeEvent} of value: "edit" when the document view is
+ * set to edit mode.
+ * <p>
+ * Fires a {@link ValueChangeEvent} of value: "static" when the document view is
+ * set to read-only mode.
  * @author jpk
  */
-public class DocumentViewer extends Composite implements IHasModel {
+public class DocumentViewer extends Composite implements IHasModel, DoubleClickHandler, HasValueChangeHandlers<DocumentViewer.ViewMode> {
+
+	public static enum ViewMode {
+		EDIT,
+		STATIC;
+	}
+
+	static class DocViewHeader extends Composite {
+
+		private final FlowPanel pnl = new FlowPanel();
+		private final DblClickHTML html = new DblClickHTML();
+
+		public DocViewHeader() {
+			super();
+			pnl.setStyleName(Styles.DOC_HEADER);
+			html.setStyleName(Styles.DOC_HEADER_LABEL);
+			pnl.add(html);
+			initWidget(pnl);
+		}
+
+		public void insert(Widget w, int beforeIndex) {
+			pnl.insert(w, 0);
+		}
+	}
 
 	public static class Styles {
 
@@ -29,9 +67,14 @@ public class DocumentViewer extends Composite implements IHasModel {
 		public static final String DOC_VIEW = "docView";
 
 		/**
-		 * The document header (always visible)
+		 * Row just above the document content
 		 */
 		public static final String DOC_HEADER = "docHeader";
+
+		/**
+		 * Displays the document title
+		 */
+		public static final String DOC_HEADER_LABEL = "docHeaderLabel";
 
 		/**
 		 * The scrollable area containing the document body.
@@ -43,27 +86,35 @@ public class DocumentViewer extends Composite implements IHasModel {
 		 */
 		public static final String DOC_CONTAINER = "docContainer";
 
+		/**
+		 * Indicates doc view is in edit mode.
+		 */
+		public static final String EDIT = "edit";
 	} // Styles
 
 	/**
 	 * docView
 	 */
-	private final VerticalPanel vp = new VerticalPanel();
+	private final FlowPanel pnl = new FlowPanel();
 
 	/**
 	 * docHeader
 	 */
-	private final HTML header = new HTML();
+	private final DocViewHeader header = new DocViewHeader();
 
 	/**
-	 * docHeader
+	 * portal
 	 */
-	private final SimplePanel sp = new SimplePanel();
+	private final FlowPanel portal = new FlowPanel();
 
 	/**
 	 * The iframe tag in which the doc is loaded.
 	 */
 	private final Frame frame;
+
+	private DocEditWidget dew;
+
+	private PushButton btnSave, btnCancel;
 
 	private Model mDocument;
 
@@ -73,21 +124,21 @@ public class DocumentViewer extends Composite implements IHasModel {
 	public DocumentViewer() {
 		super();
 
-		header.setStyleName(Styles.DOC_HEADER);
+		header.html.addDoubleClickHandler(this);
 
-		vp.setStyleName(Styles.DOC_VIEW);
-		vp.add(header);
+		pnl.setStyleName(Styles.DOC_VIEW);
+		pnl.add(header);
 
-		sp.addStyleName(Styles.DOC_PORTAL);
-		vp.add(sp);
+		portal.addStyleName(Styles.DOC_PORTAL);
+		pnl.add(portal);
 
 		frame = new Frame();
 		// frame.getElement().setId(Styles.DOC_CONTAINER_ID);
 		frame.setStyleName(Styles.DOC_CONTAINER);
 		frame.getElement().setAttribute("frameBorder", "0"); // for IE
-		sp.add(frame);
+		portal.add(frame);
 
-		initWidget(vp);
+		initWidget(pnl);
 	}
 
 	public Model getModel() {
@@ -111,13 +162,109 @@ public class DocumentViewer extends Composite implements IHasModel {
 		this.mDocument = mDocument;
 
 		// header
-		String html = mDocument.asString("case.parties");
-		header.setHTML("<p>" + html + "</p>");
+		String html = mDocument.asString("title");
+		header.html.setHTML("<p>" + html + "</p>");
+		header.html.setTitle("Double click to edit");
 
-		// body
-		String url = "doc?docId=" + mDocument.getId();
-		Log.debug("Setting document content in iframe for url: " + url);
+		// doc content
 		frame.getElement().setId(getFrameId());
-		frame.setUrl(url);
+		String hash = mDocument.asString("hash");
+		Log.debug("Setting document content in iframe for doc: " + hash);
+		frame.setUrl("doc?id=" + hash);
+	}
+
+	public native String getDocHtml() /*-{
+		var fid = this.@com.tll.tabulaw.client.ui.DocumentViewer::getFrameId()();
+		var frame = $wnd.goog.dom.$(fid);
+		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
+		return fbody.innerHTML;
+	}-*/;
+
+	public native void setDocHtml(String html) /*-{
+		var fid = this.@com.tll.tabulaw.client.ui.DocumentViewer::getFrameId()();
+		var frame = $wnd.goog.dom.$(fid);
+		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
+		//$wnd.alert('html: ' + html);
+		fbody.innerHTML = html;
+	}-*/;
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<ViewMode> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
+	}
+
+	@Override
+	public void onDoubleClick(DoubleClickEvent event) {
+		if(dew == null) {
+
+			// wire up save/cancel buttons
+			assert btnSave == null;
+			assert btnCancel == null;
+			btnSave = new PushButton("Save", new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent clkEvt) {
+					// save the doc
+					setDocHtml(dew.getHTML());
+					staticMode();
+				}
+			});
+			btnSave.setTitle("Save Document");
+			btnCancel = new PushButton("Cancel", new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent clkEvt) {
+					staticMode();
+				}
+			});
+			btnCancel.setTitle("Revert Document");
+
+			dew = new DocEditWidget();
+			dew.setVisible(false);
+			portal.add(dew);
+		}
+
+		if(!dew.isVisible()) {
+			editMode();
+		}
+	}
+
+	public DocEditWidget getDocEditWidget() {
+		return dew;
+	}
+
+	/**
+	 * Sets the mode to edit.
+	 */
+	private void editMode() {
+		pnl.addStyleName(Styles.EDIT);
+		dew.setHTML(getDocHtml());
+		frame.setVisible(false);
+		dew.setVisible(true);
+
+		header.html.setTitle("Editing");
+		header.insert(dew.getEditBar(), 0);
+
+		Poc.getNavCol().addWidget(btnSave);
+		Poc.getNavCol().addWidget(btnCancel);
+
+		ValueChangeEvent.fire(this, ViewMode.EDIT);
+	}
+
+	/**
+	 * Sets the mode to static.
+	 */
+	private void staticMode() {
+		frame.setVisible(true);
+		dew.setVisible(false);
+		pnl.removeStyleName(Styles.EDIT);
+
+		dew.getEditBar().removeFromParent();
+		header.html.setTitle("Double click to edit");
+
+		Poc.getNavCol().removeWidget(btnSave);
+		Poc.getNavCol().removeWidget(btnCancel);
+
+		ValueChangeEvent.fire(this, ViewMode.STATIC);
 	}
 }

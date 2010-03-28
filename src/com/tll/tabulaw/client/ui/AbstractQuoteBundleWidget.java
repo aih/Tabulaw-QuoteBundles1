@@ -2,6 +2,7 @@ package com.tll.tabulaw.client.ui;
 
 import java.util.List;
 
+import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -10,7 +11,7 @@ import com.tll.client.model.IHasModel;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
-import com.tll.tabulaw.client.model.PocModelStore;
+import com.tll.tabulaw.client.model.PocModelCache;
 
 /**
  * Widget that displays a quote bundle.
@@ -109,6 +110,8 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 
 	protected Model mQuoteBundle;
 
+	private PickupDragController dragController;
+
 	/**
 	 * Constructor
 	 * @param headerWidget The header widget
@@ -119,6 +122,19 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		setStyleName(Styles.WQBUNDLE);
 		add(header);
 		add(quotePanel);
+	}
+
+	/**
+	 * Set the drag controller.
+	 * @param dragController
+	 */
+	protected final void setDragController(PickupDragController dragController) {
+		if(this.dragController == dragController) return;
+		
+		// already set
+		if(this.dragController != null) throw new IllegalStateException();
+		
+		this.dragController = dragController;
 	}
 
 	/**
@@ -181,8 +197,10 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	/**
 	 * Adds a quote.
 	 * @param mQuote quote model to add
-	 * @param persist save both the bundle and quote model data (firing model change events)?
-	 * @param addToThisBundleModel Add the given quote model to our internal model instance?
+	 * @param persist save both the bundle and quote model data (firing model
+	 *        change events)?
+	 * @param addToThisBundleModel Add the given quote model to our internal model
+	 *        instance?
 	 * @return the added quote widget
 	 */
 	protected Q addQuote(Model mQuote, boolean persist, boolean addToThisBundleModel) {
@@ -190,12 +208,13 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		if(addToThisBundleModel && mQuoteBundle != null) mQuoteBundle.relatedMany("quotes").insert(mQuote, 0);
 		if(persist) {
 			// add the quote updating the bundle quote refs too
-			PocModelStore.get().persist(mQuote, this);
-			PocModelStore.get().persist(mQuoteBundle, this);
+			PocModelCache.get().persist(mQuote, this);
+			PocModelCache.get().persist(mQuoteBundle, this);
 		}
 		// add to the ui
 		Q qw = getNewQuoteWidget(mQuote);
 		quotePanel.add(qw);
+		if(qw != null) makeQuoteDraggable(qw, true);
 		return qw;
 	}
 
@@ -215,15 +234,45 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 			if(mQuoteBundle.relatedMany("quotes").remove(mQuote.getKey())) {
 				if(persist) {
 					// delete the quote updating the bundle quote refs too
-					if(deleteQuote) PocModelStore.get().remove(mQuote.getKey(), this);
-					PocModelStore.get().persist(mQuoteBundle, this);
+					if(deleteQuote) PocModelCache.get().remove(mQuote.getKey(), this);
+					PocModelCache.get().persist(mQuoteBundle, this);
 				}
 				Q qw = (Q) quotePanel.getWidget(index);
 				quotePanel.remove(index);
+				makeQuoteDraggable(qw, false);
 				return qw;
 			}
 		}
 		throw new IllegalStateException();
+	}
+	
+	private void makeQuoteDraggable(AbstractQuoteWidget qw, boolean draggable) {
+		if(dragController == null) return;
+		if(draggable) {
+			if(!qw.draggable) {
+				dragController.makeDraggable(qw, qw.getDragHandle());
+				qw.draggable = true;
+			}
+		}
+		else {
+			if(qw.draggable) {
+				dragController.makeNotDraggable(qw);
+				qw.draggable = false;
+			}
+		}
+	}
+
+	/**
+	 * Iterates through all the quote widgets making them either draggable or not
+	 * draggable.
+	 * @param draggable make draggable (or not)?
+	 */
+	public void makeQuotesDraggable(boolean draggable) {
+		if(dragController == null) throw new IllegalStateException();
+		AbstractQuoteWidget[] arr = getQuoteWidgets();
+		for(AbstractQuoteWidget qw : arr) {
+			makeQuoteDraggable(qw, draggable);
+		}
 	}
 
 	/**

@@ -44,6 +44,12 @@ public class NavColPanel extends AbstractNavPanel {
 		((VerticalPanel)getWidget()).add(w);
 	}
 	
+	public void removeWidget(Widget w) {
+		if(((VerticalPanel)getWidget()).remove(w)) {
+			w.removeStyleName(Styles.WIDGET);
+		}
+	}
+	
 	@Override
 	protected void handleViewChange() {
 		ViewKey key = ViewManager.get().getCurrentViewKey();

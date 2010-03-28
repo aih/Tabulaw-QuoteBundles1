@@ -16,7 +16,7 @@ import com.tll.client.mvc.view.ViewClass;
 import com.tll.client.mvc.view.ViewOptions;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
-import com.tll.tabulaw.client.model.PocModelStore;
+import com.tll.tabulaw.client.model.PocModelCache;
 import com.tll.tabulaw.client.ui.DocumentHighlightWidget;
 import com.tll.tabulaw.client.ui.ModelChangeDispatcher;
 
@@ -97,7 +97,7 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 	protected void doRefresh() {
 		// fetch the mDoc
 		assert docKey != null;
-		Model mDocument = PocModelStore.get().get(docKey);
+		Model mDocument = PocModelCache.get().get(docKey);
 		docWidget.setDocument(mDocument);
 
 		// set the doc key name to the document's title

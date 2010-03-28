@@ -117,6 +117,8 @@ public abstract class AbstractQuoteWidget extends Composite implements IHasModel
 	protected final QuoteBlock quoteBlock = new QuoteBlock();
 
 	protected final AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget;
+	
+	protected boolean draggable;
 
 	protected Model mQuote;
 

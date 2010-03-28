@@ -8,6 +8,7 @@ package com.tll.tabulaw.client.ui;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
+import com.tll.client.model.IHasModelChangeHandlers;
 import com.tll.client.model.IModelChangeHandler;
 import com.tll.client.model.ModelChangeEvent;
 
@@ -16,20 +17,25 @@ import com.tll.client.model.ModelChangeEvent;
  * Implementations are free to ignore {@link ModelChangeEvent}s.
  * @author jpk
  */
-public abstract class AbstractModelChangeAwareWidget extends Composite implements IModelChangeHandler {
+public abstract class AbstractModelChangeAwareWidget extends Composite implements IHasModelChangeHandlers, IModelChangeHandler {
 
 	private HandlerRegistration hrModelChange;
 
 	@Override
 	protected void onLoad() {
 		super.onLoad();
-		hrModelChange = addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
+		hrModelChange = addModelChangeHandler(ModelChangeDispatcher.get());
 	}
 
 	@Override
 	protected void onUnload() {
 		hrModelChange.removeHandler();
 		super.onUnload();
+	}
+
+	@Override
+	public HandlerRegistration addModelChangeHandler(IModelChangeHandler handler) {
+		return addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
 	}
 
 	@Override

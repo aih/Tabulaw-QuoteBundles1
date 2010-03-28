@@ -12,6 +12,9 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Image;
+import com.tll.client.data.rpc.IRpcHandler;
+import com.tll.client.data.rpc.RpcCommand;
+import com.tll.client.data.rpc.RpcEvent;
 import com.tll.client.listing.AbstractListingConfig;
 import com.tll.client.listing.Column;
 import com.tll.client.listing.DataListingOperator;
@@ -22,14 +25,18 @@ import com.tll.client.listing.ModelCellRenderer;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
+import com.tll.client.ui.RpcUiHandler;
 import com.tll.client.ui.listing.ModelListingTable;
 import com.tll.client.ui.listing.ModelListingWidget;
 import com.tll.client.util.GlobalFormat;
 import com.tll.common.model.Model;
 import com.tll.dao.Sorting;
+import com.tll.listhandler.IListHandler;
 import com.tll.listhandler.InMemoryListHandler;
-import com.tll.tabulaw.client.model.PocModelStore;
+import com.tll.tabulaw.client.Poc;
+import com.tll.tabulaw.client.model.PocModelCache;
 import com.tll.tabulaw.client.view.DocumentViewInitializer;
+import com.tll.tabulaw.common.data.rpc.DocListingPayload;
 import com.tll.tabulaw.common.model.PocEntityType;
 
 /**
@@ -38,10 +45,13 @@ import com.tll.tabulaw.common.model.PocEntityType;
  */
 public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
-	static class DocListing extends ModelListingWidget<DocumentsListingWidget.Table> {
+	static class DocListing extends ModelListingWidget<DocumentsListingWidget.Table> implements IRpcHandler {
 
+		RpcUiHandler rpcui;
+		
 		public DocListing() {
 			super(config.getListingId(), config.getListingElementName(), new Table(config), null);
+			rpcui = new RpcUiHandler(this);
 		}
 		
 		@Override
@@ -49,6 +59,11 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 			if(event.getModelKey() != null && event.getModelKey().getEntityType() == PocEntityType.DOCUMENT) {
 				super.onModelChangeEvent(event);
 			}
+		}
+
+		@Override
+		public void onRpcEvent(RpcEvent event) {
+			rpcui.onRpcEvent(event);
 		}
 	}
 
@@ -79,47 +94,50 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		}
 	}
 
-	static class ListingConfig extends AbstractListingConfig<Model> {
+	static class CellRenderer extends ModelCellRenderer {
 
-		static class CellRenderer extends ModelCellRenderer {
+		@Override
+		public void renderCell(int rowIndex, final int cellIndex, final Model rowData, Column column,
+				final HTMLTable table) {
+			if(cellIndex == 2) {
+				Image img = new Image("images/trash.gif", 0, 0, 10, 11);
+				img.setTitle("Delete document..");
+				img.addClickHandler(new ClickHandler() {
 
-			@Override
-			public void renderCell(int rowIndex, final int cellIndex, final Model rowData, Column column,
-					final HTMLTable table) {
-				if(cellIndex == 2) {
-					Image img = new Image("images/trash.gif", 0, 0, 10, 11);
-					img.setTitle("Delete document..");
-					img.addClickHandler(new ClickHandler() {
-
-						@Override
-						public void onClick(ClickEvent event) {
-							event.stopPropagation();
-							String docref = rowData.asString("title");
-							if(Window.confirm("Delete document '" + docref + "'?")) {
-								Model deleted = PocModelStore.get().remove(rowData.getKey(), table);
-								if(deleted != null) {
-									operator.refresh();
-								}
+					@Override
+					public void onClick(ClickEvent event) {
+						event.stopPropagation();
+						String docref = rowData.asString("title");
+						if(Window.confirm("Delete document '" + docref + "'?")) {
+							/*Model deleted = */PocModelCache.get().remove(rowData.getKey(), table);
+							// TODO confirm
+							/*
+							if(deleted != null) {
+								operator.refresh();
 							}
+							*/
 						}
-					});
-					table.setWidget(rowIndex, cellIndex, img);
-				}
-				else {
-					super.renderCell(rowIndex, cellIndex, rowData, column, table);
-				}
+					}
+				});
+				table.setWidget(rowIndex, cellIndex, img);
 			}
-		} // CellRenderer
+			else {
+				super.renderCell(rowIndex, cellIndex, rowData, column, table);
+			}
+		}
+	} // CellRenderer
+	
+	static class ListingConfig extends AbstractListingConfig<Model> {
 
 		static final Sorting defaultSorting = new Sorting("title");
 
-		static final String[] modelProps = new String[] {
-			"title", "case.date" };
+		static final String[] modelProps = new String[] { "title", "case.date" };
 
-		static final Column[] cols =
-				new Column[] {
-					new Column("Title", null, "title", null, "title"),
-					new Column("Date", GlobalFormat.DATE, "case.date", null, "date"), new Column("", null, null, null, "delete"), };
+		static final Column[] cols = new Column[] {
+			new Column("Title", null, "title", null, "title"),
+			new Column("Date", GlobalFormat.DATE, "case.date", null, "date"), 
+			new Column("", null, null, null, "delete"), 
+		};
 
 		public ListingConfig() {
 			super("Document", modelProps, cols, defaultSorting, 10);
@@ -143,20 +161,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
 	static final IListingConfig<Model> config = new ListingConfig();
 
-	static class ListingOperator extends DataListingOperator<Model, InMemoryListHandler<Model>> {
-
-		public ListingOperator() {
-			super(config.getPageSize(), new InMemoryListHandler<Model>(), config.getDefaultSorting());
-		}
-
-		@Override
-		protected void doFetch(int ofset, Sorting srtg) {
-			getDataProvider().setList(PocModelStore.get().getAll(PocEntityType.DOCUMENT));
-			super.doFetch(ofset, srtg);
-		}
-	} // ListingOperator
-	
-	static final ListingOperator operator = new ListingOperator();
+	private DataListingOperator<Model, IListHandler<Model>> operator;
 
 	private final DocListing listingWidget;
 
@@ -169,7 +174,6 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		super();
 		
 		listingWidget = new DocListing();
-		listingWidget.setOperator(operator);
 		
 		pnl.add(listingWidget);
 		
@@ -177,7 +181,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 	}
 	
 	public IListingOperator<Model> getOperator() {
-		return listingWidget.getOperator();
+		return operator;
 	}
 	
 	@Override
@@ -186,4 +190,26 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		listingWidget.onModelChangeEvent(event);
 	}
 	
+	public void loadData() {
+		// get docs from server
+		if(operator == null) {
+			new RpcCommand<DocListingPayload>() {
+				
+				@Override
+				protected void doExecute() {
+					setSource(listingWidget);
+					Poc.getDocService().getCachedDocs(this);
+				}
+
+				@Override
+				protected void handleSuccess(DocListingPayload result) {
+					super.handleSuccess(result);
+					InMemoryListHandler<Model> listHandler = new InMemoryListHandler<Model>(result.getCachedDocs());
+					operator = new DataListingOperator<Model, IListHandler<Model>>(config.getPageSize(), listHandler, config.getDefaultSorting());
+					listingWidget.setOperator(operator);
+					operator.refresh();
+				}
+			}.execute();
+		}
+	}
 }

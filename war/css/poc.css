@@ -23,7 +23,8 @@ body {
 	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 }
 
-.gwt-DialogBox {
+.gwt-DialogBox,
+.html-face {
 	font-family: Arial, Helvetica, sans-serif;
 }
 	.gwt-DialogBox .caption {
@@ -119,6 +120,15 @@ body {
 	#navCol .widget {
 		margin-bottom: 10px;
 		width: 145px;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+	}
+	#navCol .gwt-PushButton {
+		width: 100px !important;
+	}
+	#navCol .html-face {
+		text-align: center;
+		font-weight: bold;
 	}
 	#navCol .navButton {
 		background-color: #BFBFBF;
@@ -301,12 +311,6 @@ body {
 	background-color: #DFDFDF;
 	font-family: Arial, Helvetica, sans-serif;
 	width: 100%;
-	/*
-	-moz-border-radius-topright: 4px;
-	-moz-border-radius-topleft: 4px;
-	-webkit-border-top-right-radius: 4px;
-	-webkit-border-top-left-radius: 4px;
-	*/
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 }
@@ -328,40 +332,124 @@ body {
 .wquote .quoted {
 	padding: 2px 1px 0 2px;
 	font-size: 11px;
-	/*overflow: hidden;*/
-	/*
-	border: 1px solid #DFDFDF;
-	-moz-border-radius-bottomright: 2px;
-	-moz-border-radius-bottomleft: 2px;
-	-webkit-border-bottom-right-radius: 2px;
-	-webkit-border-bottom-left-radius: 2px;
-	*/
 }
+
+/* docSuggest widget */
+.docSuggest {
+	margin-bottom: 30px;
+}
+	.image {
+	}
+	.gwt-SuggestBox {
+		margin-left: 20px;
+		font-size: 22px;
+		font-weight: bold;
+	}
+	.gwt-SuggestBoxPopup {
+		
+	} 
+		.gwt-SuggestBoxPopup .item {
+			max-width: 500px;
+		}
+			.gwt-SuggestBoxPopup .item .entry {
+				width: 500px;
+				margin: 1px 0 1px 0;
+			}
+				.gwt-SuggestBoxPopup .item .entry .title {
+				}
+				.gwt-SuggestBoxPopup .item .entry .summary {
+					color: gray;
+					font-size: smaller;
+					white-space: normal;
+				}
+			.gwt-SuggestBoxPopup .item-selected {
+			} 
 
 /* document viewer widget */
 .docView {
 	width: 100%;
-	/*overflow: hidden;*/
 }
 .docPortal {
 }
 .docHeader {
+	width: 100%;
+	height: 22px;
+
+}
+.docHeaderLabel {
+	cursor: default;
 	text-transform: uppercase;
 	font-weight: bold;
-	background-color: #BFBFBF;
-	margin-left: 15px;
 	padding: 3px;
-	float: right;
 	font-family: Arial, Helvetica, sans-serif;
 	white-space: nowrap;
+	float: left;
+
+	background-color: #BFBFBF;
+	float: right;
 	-moz-border-radius-bottomleft: 2px;
 	-webkit-border-bottom-left-radius: 2px;
 }
-iframe.docContainer {
+.docContainer { 
 	width: 100%;
-	height: 552px;
+	height: 553px;
 	border: 0;
 }
+.docEdit .gwt-RichTextArea {
+	width: 100%;
+	height: 528px;
+	border: 0;
+}
+
+.docEdit {
+}
+	
+.editBar {
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	float: left;
+	height: 30px;
+	background-color: #BFBFBF;
+	margin-top: 20px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+	.editBar .toolbar {
+		height: 20px;
+		margin-top: 5px;
+		background-color: #BFBFBF;
+	}
+	.editBar .toolbar p,
+	.editBar .toolbar .pencil {
+		/*float: left;*/
+	}
+	.editBar .toolbar .button {
+		padding-top: 0;
+		padding-bottom: 0;
+		font-weight: bold;
+		text-align: center;
+		/*background-color: #EAEAEA;*/
+		border: 0 !important;
+	}
+	.editBar .toolbar .edit {
+		font-weight: bold;
+		margin-right: 50px;
+	}
+	.editBar .toolbar .button-up {
+	}
+	.editBar .toolbar .button .html-face {
+	}
+	.editBar .toolbar .button-up-hovering {
+	}
+	.editBar .toolbar .button-up-disabled {
+	}
+	.editBar .toolbar .button-down {
+	}
+	.editBar .toolbar .button-down-hovering {
+	}
+	.editBar .toolbar .button-down-disabled {
+	}
+
 
 /* ***view style overrides*** */
 
@@ -435,8 +523,7 @@ iframe.docContainer {
 		margin: 0;
 	}
 	.docview .wqbundle {
-		margin-left: 10px;
-		/*width: 100%;*/
+		margin: 5px 0 0 5px;
 	}
 	.docview .quotes {
 	}
@@ -453,33 +540,3 @@ iframe.docContainer {
 		max-height: 50px;
 		overflow: hidden;
 	}
-	
-/* docSearch view */
-.docSearch {
-}
-	.image {
-	}
-	.gwt-SuggestBox {
-		margin-left: 20px;
-		font-size: 22px;
-		font-weight: bold;
-	}
-	.gwt-SuggestBoxPopup {
-		
-	} 
-		.gwt-SuggestBoxPopup .item {
-			max-width: 600px;
-		}
-			.gwt-SuggestBoxPopup .item .entry {
-				width: 600px;
-			}
-				.gwt-SuggestBoxPopup .item .entry .title {
-					font-weight: bold;
-				}
-				.gwt-SuggestBoxPopup .item .entry .summary {
-					font-size: smaller;
-					/*font-style: italic;*/
-					white-space: normal;
-				}
-			.gwt-SuggestBoxPopup .item-selected {
-			} 
