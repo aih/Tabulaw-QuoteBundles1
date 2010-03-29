@@ -173,16 +173,19 @@ public abstract class AbstractQuoteWidget extends Composite implements IHasModel
 
 	public void setModel(Model mQuote) {
 		this.mQuote = mQuote;
-		String title, subtitle, quote = mQuote.asString("quote");
+		
+		String title, subtitle = "", quote = mQuote.asString("quote");
+		title = mQuote.asString("document.title");
+		
+		// case doc?
 		if(mQuote.propertyExists("document.case")) {
-			// case doc
-			title = mQuote.asString("document.case.parties");
+			String parties = mQuote.asString("document.case.parties");
+			if(parties != null && parties.length() > 0 && !"null".equals(parties)) {
+				title = parties;
+			}
 			subtitle = mQuote.asString("document.case.citation");
 		}
-		else {
-			title = mQuote.asString("document.title");
-			subtitle = "";
-		}
+		
 		citeBlock.set(title, subtitle);
 		quoteBlock.set(quote);
 	}
