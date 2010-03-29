@@ -79,7 +79,8 @@ public class DocService extends RpcServlet implements IDocService {
 			while(itr.hasNext()) {
 				File f = itr.next();
 				String s = FileUtils.readFileToString(f);
-				Model mDoc = DocUtils.deserializeCaseDocModel(s);
+				s = s.trim();
+				Model mDoc = DocUtils.deserializeDocument(s);
 				if(mDoc != null) docList.add(mDoc);
 			}
 		}
@@ -174,7 +175,7 @@ public class DocService extends RpcServlet implements IDocService {
 				}
 
 				// cache (write to disk)
-				String serialized = DocUtils.serializeCaseDocModel(mDoc);
+				String serialized = DocUtils.serializeDocument(mDoc);
 				FileUtils.writeStringToFile(f, serialized + htmlContent);
 			}
 			payload.setLocalUrl(filename);

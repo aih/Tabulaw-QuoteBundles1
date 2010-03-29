@@ -32,12 +32,12 @@ import com.tll.tabulaw.client.model.MarkOverlay;
  *  citation
  *  url
  *  year
- *  date
  * 
  * DOCUMENT props
  * --------------
  *   id
  *   title
+ *   date
  *   case (ref)
  *   hash (unique identifier token)
  *   [htmlContent] (transient)
@@ -94,35 +94,13 @@ public class PocModelFactory {
 		// metaDocument.put("extractHtml", new PropertyMetadata(PropertyType.STRING,
 		// false, true, -1));
 		metaCase.put("url", new PropertyMetadata(PropertyType.STRING, false, true, -1));
-		metaCase.put("date", new PropertyMetadata(PropertyType.DATE, false, true, -1));
-
-		/*
-		String[][] cases = new String[][] {
-			// id, citation, parties, year, url, date
-			{ "1", "424 U.S. 1 S. Ct. 612, 46 L. Ed. 2d 659 (1976)", "Buckley v. Valeo", "1976", null, "7/7/1976" }, 
-			{ "2", "558 U.S. 50 (2010)", "Citizens United v. FEC", "2010", null, "5/5/2010" }, 
-			{ "3", "435 U.S. 765 (1978)", "First National v. Belotti", "1978", null, "4/26/1978" },
-			{ "4", "540 U.S. 93 (2003)", "McConnell v. Federal Election Commission", "2003", null, "2/3/2003" },
-			{ "5", "376 U.S. 254 (1964)", "New York Times v. Sullivan", "1964", null, "4/1/1964" },
-		};
-		*/
 
 		// document metadata
 		HashMap<String, PropertyMetadata> metaDocument = new HashMap<String, PropertyMetadata>();
 		metadata.put(PocEntityType.DOCUMENT, metaDocument);
 		metaDocument.put("title", new PropertyMetadata(PropertyType.STRING, false, true, 64));
+		metaDocument.put("date", new PropertyMetadata(PropertyType.DATE, false, true, -1));
 		metaDocument.put("hash", new PropertyMetadata(PropertyType.STRING, false, true, 64));
-
-		/*
-		String[][] documents = new String[][] {
-			// id, case_id, title, hash
-			{ "1", "1", "Buckley v. Valeo", "Buckley-v-Valeo.htm"}, 
-			{ "2", "2", "Citizens United v. FEC", "CitizensUnited-v-FEC.htm"}, 
-			{ "3", "3", "First National v. Belotti", "FirstNatl-v-Belotti.htm"},
-			{ "4", "4", "McConnell v. Federal Election Commission", "McConnell-v-FEC.htm"}, 
-			{ "5", "5", "New York Times v. Sullivan", "Times-v-Sullivan.htm"}, 
-		};
-		*/
 
 		// quote metadata
 		HashMap<String, PropertyMetadata> metaQuote = new HashMap<String, PropertyMetadata>();
@@ -149,117 +127,6 @@ public class PocModelFactory {
 		metadata.put(PocEntityType.QUOTE_BUNDLE, metaQuoteBundle);
 		metaQuoteBundle.put("name", new PropertyMetadata(PropertyType.STRING, false, true, 50));
 		metaQuoteBundle.put("description", new PropertyMetadata(PropertyType.STRING, false, false, 255));
-
-		/*
-		String[][] quoteBundles = new String[][] {
-			// id, name, description
-			{ "1", "1st Amendment", "Quotes related to the first Amendment." }, 
-			{ "2", "Broadcast Regulations", "Quotes related to Broadcast Regulations." }, 
-			{ "3", "Campaign Finance", "Quotes related to political advertising and free speech." }, 
-			{ "4", "Climate Regulation", "Quotes pertinent to Climate Regulation." }, 
-			{ "5", "FCC Quotes", "Quotes related to the FCC." }, 
-		};
-		*/
-
-		/*
-		// cases
-		ArrayList<Model> caseList = new ArrayList<Model>();
-		map.put(PocEntityType.CASE, caseList);
-		for(String[] acase : cases) {
-			Model m = new Model(PocEntityType.CASE);
-			caseList.add(m);
-			// id, citation, parties, year, url, date
-			m.setId(acase[0]);
-			m.set(new StringPropertyValue("citation", metaDocument.get("citation"), acase[1]));
-			m.set(new StringPropertyValue("parties", metaDocument.get("parties"), acase[2]));
-			m.set(new StringPropertyValue("year", metaDocument.get("year"), acase[3]));
-			m.set(new StringPropertyValue("url", metaDocument.get("url"), acase[4]));
-			Date caseDate = DateTimeFormat.getShortDateFormat().parse(acase[5]);
-			m.set(new DatePropertyValue("date", metaDocument.get("date"), caseDate));
-		}
-		*/
-
-		/*
-		// documents
-		ArrayList<Model> docList = new ArrayList<Model>();
-		map.put(PocEntityType.DOCUMENT, docList);
-		for(String[] doc : documents) {
-			Model m = new Model(PocEntityType.DOCUMENT);
-			docList.add(m);
-			// id, case_id, title, hash
-
-			m.setId(doc[0]);
-			for(Model mCase : caseList) {
-				if(mCase.getId().equals(doc[1])) {
-					m.set(new RelatedOneProperty(PocEntityType.CASE, mCase, "case", true));
-				}
-			}
-
-			m.set(new StringPropertyValue("title", metaDocument.get("title"), doc[2]));
-			m.set(new StringPropertyValue("hash", metaDocument.get("hash"), doc[3]));
-		}
-		*/
-
-		/*
-		// quotes
-		ArrayList<Model> quoteList = new ArrayList<Model>();
-		map.put(PocEntityType.QUOTE, quoteList);
-		for(String[] q : quotes) {
-			Model m = new Model(PocEntityType.QUOTE);
-			quoteList.add(m);
-			// id, doc_id, tags, quote
-			m.setId(q[0]);
-
-			// resolve ref'd doc
-			String docId = q[1];
-			for(Model mDoc : docList) {
-				if(mDoc.getId().equals(docId)) {
-					m.set(new RelatedOneProperty(PocEntityType.DOCUMENT, mDoc, "document", true));
-					break;
-				}
-			}
-
-			m.set(new StringPropertyValue("tags", metaQuote.get("tags"), q[2]));
-			m.set(new StringPropertyValue("quote", metaQuote.get("quote"), q[3]));
-			m.set(new ObjectPropertyValue("mark", metaQuote.get("mark"), null));
-		}
-		*/
-
-		/*
-		// quote bundles
-		ArrayList<Model> bundleList = new ArrayList<Model>();
-		map.put(PocEntityType.QUOTE_BUNDLE, bundleList);
-		for(String[] qb : quoteBundles) {
-			Model m = new Model(PocEntityType.QUOTE_BUNDLE);
-			bundleList.add(m);
-			// id, name, description
-			String name = qb[1];
-			m.setId(qb[0]);
-			m.set(new StringPropertyValue("name", metaQuoteBundle.get("name"), name));
-			m.set(new StringPropertyValue("description", metaQuoteBundle.get("description"), qb[2]));
-
-			// arbitrarily add some quotes to our bundles
-			ArrayList<Model> someQuotes = new ArrayList<Model>();
-			if("Climate Regulation".equals(name)) {
-				someQuotes.add(quoteList.get(0));
-				someQuotes.add(quoteList.get(1));
-			}
-			else if("Campaign Finance".equals(name)) {
-				someQuotes.add(quoteList.get(1));
-				someQuotes.add(quoteList.get(2));
-			}
-			else if("1st Amendment".equals(name)) {
-				someQuotes.add(quoteList.get(2));
-				someQuotes.add(quoteList.get(3));
-			}
-			else if("FCC Quotes".equals(name)) {
-				someQuotes.add(quoteList.get(0));
-				someQuotes.add(quoteList.get(4));
-			}
-
-			m.set(new RelatedManyProperty(PocEntityType.QUOTE, "quotes", true, someQuotes));
-		}
-		*/
 	} // constructor
 
 	/**
@@ -281,11 +148,11 @@ public class PocModelFactory {
 				proto.set(new StringPropertyValue("parties", meta.get("parties"), null));
 				proto.set(new StringPropertyValue("year", meta.get("year"), null));
 				proto.set(new StringPropertyValue("url", meta.get("url"), null));
-				proto.set(new DatePropertyValue("date", meta.get("date"), new Date()));
 				break;
 			case DOCUMENT:
 				meta = metadata.get(PocEntityType.DOCUMENT);
 				proto.set(new StringPropertyValue("title", meta.get("title"), null));
+				proto.set(new DatePropertyValue("date", meta.get("date"), new Date()));
 				proto.set(new StringPropertyValue("hash", meta.get("hash"), null));
 				break;
 			case NOTE:
@@ -313,34 +180,43 @@ public class PocModelFactory {
 	 * Creates a new Model representing a document that references a case.
 	 * @param docTitle
 	 * @param docHash the server-side filename
+	 * @param docDate
 	 * @param parties
 	 * @param citation
 	 * @param url
 	 * @param year
-	 * @param date
 	 * @return newly created model
 	 */
-	public Model buildCaseDoc(String docTitle, String docHash, String parties, String citation, String url, String year,
-			Date date) {
+	public Model buildCaseDoc(String docTitle, String docHash, Date docDate, String parties, String citation, String url,
+			String year) {
 		Model docCase = create(PocEntityType.CASE);
 		docCase.setString("parties", parties);
 		docCase.setString("citation", citation);
 		docCase.setString("url", url);
 		docCase.setString("year", year);
-		docCase.setProperty("date", date, PropertyType.DATE);
 
 		Model doc = create(PocEntityType.DOCUMENT);
 		doc.setString("title", docTitle);
+		doc.setProperty("date", docDate, PropertyType.DATE);
 		doc.setString("hash", docHash);
 		doc.set(new RelatedOneProperty(PocEntityType.CASE, docCase, "case", true));
 
 		return doc;
 	}
 
-	public Model buildContractDoc() {
-		Model docContract = create(PocEntityType.DOCUMENT);
-		// TODO
-		return docContract;
+	/**
+	 * Create a new contract type doc.
+	 * @param docTitle
+	 * @param docHash
+	 * @param docDate
+	 * @return newly created model
+	 */
+	public Model buildContractDoc(String docTitle, String docHash, Date docDate) {
+		Model doc = create(PocEntityType.DOCUMENT);
+		doc.setString("title", docTitle);
+		doc.setProperty("date", docDate, PropertyType.DATE);
+		doc.setString("hash", docHash);
+		return doc;
 	}
 
 	/**

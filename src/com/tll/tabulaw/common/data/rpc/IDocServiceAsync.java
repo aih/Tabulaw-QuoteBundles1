@@ -11,7 +11,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author jpk
  */
 public interface IDocServiceAsync {
-
+	
 	void search(DocSearchRequest request, AsyncCallback<DocSearchPayload> callback);
 	
 	void fetch(String url, AsyncCallback<DocFetchPayload> callback);

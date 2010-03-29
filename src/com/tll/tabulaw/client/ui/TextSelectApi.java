@@ -62,7 +62,7 @@ public class TextSelectApi implements IFiresTextSelectEvents {
 		//alert('init - twindow: '+twindow);
 
 		$wnd.onFrameLoaded = function(iframedoc) {
-			//alert('iframedoc:' + iframedoc);
+			//alert('onFrameLoaded! iframedoc:' + iframedoc);
 			//alert('iframedoc.body:' + iframedoc.body);
 			
 			//////
@@ -82,6 +82,7 @@ public class TextSelectApi implements IFiresTextSelectEvents {
 
 				var mark;
 				try {
+					//alert('iframedoc: ' + iframedoc + ', rng: ' + rng);
 					mark  = new $wnd.Mark(iframedoc, rng);
 					@com.tll.tabulaw.client.ui.TextSelectApi::fireTextSelectEvent(Lcom/tll/tabulaw/client/model/MarkOverlay;)(mark);
 				}

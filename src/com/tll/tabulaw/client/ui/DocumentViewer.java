@@ -233,6 +233,10 @@ public class DocumentViewer extends Composite implements IHasModel, DoubleClickH
 		return dew;
 	}
 
+	private boolean isEditMode() {
+		return dew != null && dew.isVisible();
+	}
+
 	/**
 	 * Sets the mode to edit.
 	 */
@@ -266,5 +270,11 @@ public class DocumentViewer extends Composite implements IHasModel, DoubleClickH
 		Poc.getNavCol().removeWidget(btnCancel);
 
 		ValueChangeEvent.fire(this, ViewMode.STATIC);
+	}
+
+	public Widget[] getNavColWidgets() {
+		return isEditMode() ? new Widget[] {
+			btnSave, btnCancel
+		} : null;
 	}
 }

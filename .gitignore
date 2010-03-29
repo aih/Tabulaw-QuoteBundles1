@@ -2,4 +2,6 @@
 classes/
 war/poc/
 war/com.tll.tabulaw.Poc/
-*.war/test-output
+*.war
+/gwtc
+/test-output

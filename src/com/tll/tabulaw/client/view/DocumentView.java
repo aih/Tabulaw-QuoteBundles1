@@ -77,7 +77,7 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 
 	@Override
 	public Widget[] getNavColWidgets() {
-		return null;
+		return docWidget.getNavColWidgets();
 	}
 
 	/**

@@ -75,7 +75,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			initWidget(html);
 		}
 
-		private void update() {
+		public void update() {
 			Model cqb = Poc.getCurrentQuoteBundle();
 			if(cqb != null) {
 				ModelKey key = cqb.getKey();

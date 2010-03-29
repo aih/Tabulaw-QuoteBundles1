@@ -19,7 +19,7 @@
   <target name="static" description="Copy static classpath resources to WEB-INF/classes">
     <mkdir dir="war/WEB-INF/classes" />
     <copy todir="war/WEB-INF/classes" preservelastmodified="true">
-    	<fileset dir="docs" includes="**/*" />
+    	<fileset dir="docs" includes="**/*.htm" />
     </copy>
   </target>
 
@@ -47,6 +47,10 @@
 			<jvmarg value="-Xss1024k" />
 			<arg value="-style" />
     	<arg value="${gwt.compile.style}" />
+			<arg value="-gen" />
+    	<arg value="gwtc" />
+			<arg value="-workDir" />
+    	<arg value="gwtc/work" />
 			<arg value="-logLevel" />
 			<arg value="${gwt.log.level}" />
       <arg value="${gwt.compile.module}"/>
@@ -93,19 +97,20 @@
 		</copy>
 	</target>
 
-<!--
-Test targets suppressed because -junit argument was not specified when running webAppCreator.
-
   <target name="javac.tests" depends="javac" description="Compiles test code">
     <javac srcdir="test" includes="**" encoding="utf-8"
       source="1.5" target="1.5" nowarn="true"
       debug="true" debuglevel="lines,vars,source">
-      <classpath location="path_to_the_junit_jar"/>
+      <classpath location="libs/testng-5.10-jdk15.jar"/>
       <classpath refid="project.class.path"/>
     </javac>
+    <copy todir="war/WEB-INF/classes">
+      <fileset dir="test" excludes="**/*.java"/>
+    </copy>
   </target>
   
-  <target name="test.dev" depends="javac.tests" description="Run development mode tests">
+  <!--
+	<target name="test.dev" depends="javac.tests" description="Run development mode tests">
     <mkdir dir="reports/htmlunit.dev" />
     <junit fork="yes" printsummary="yes" haltonfailure="yes">
       <jvmarg line="-Xmx256m" />
@@ -153,7 +158,7 @@ Test targets suppressed because -junit argument was not specified when running w
     <antcall target="test.dev" />
     <antcall target="test.prod" />
   </target>
--->
+	-->
 
   <target name="build" depends="gwtc" description="Build this project" />
 
@@ -178,6 +183,8 @@ Test targets suppressed because -junit argument was not specified when running w
   <target name="clean" description="Cleans this project">
     <delete dir="war/WEB-INF/classes" failonerror="false" />
     <delete dir="war/poc" failonerror="false" />
+    <delete dir="war/com.tll.tabulaw.Poc" failonerror="false" />
+    <delete dir="gwtc" failonerror="false" />
   </target>
 
 </project>

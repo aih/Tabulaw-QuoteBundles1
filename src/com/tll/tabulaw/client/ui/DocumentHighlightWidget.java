@@ -15,6 +15,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalSplitPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.DOMExt;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
@@ -102,8 +103,13 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> 
 		hsp.add(wDocViewer);
 		hsp.add(wDocQuoteBundle);
 		boundaryPanel.add(hsp);
+		
 		initWidget(boundaryPanel);
-
+		//initWidget(hsp);
+	}
+	
+	public Widget[] getNavColWidgets() {
+		return wDocViewer.getNavColWidgets();
 	}
 
 	@Override

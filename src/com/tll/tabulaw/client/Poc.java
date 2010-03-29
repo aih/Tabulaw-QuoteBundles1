@@ -63,6 +63,7 @@ public class Poc implements EntryPoint {
 		if(mQuoteBundle == null) throw new NullPointerException();
 		if(currentQuoteBundle == null || !currentQuoteBundle.getKey().equals(mQuoteBundle)) {
 			currentQuoteBundle = mQuoteBundle;
+			getNavRow().getCrntQuoteBudleWidget().update();
 			return true;
 		}
 		return false;

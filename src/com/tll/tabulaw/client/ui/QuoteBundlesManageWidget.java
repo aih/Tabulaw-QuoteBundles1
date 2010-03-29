@@ -402,7 +402,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 				Model mQuoteBundle = event.getModel();
 				// add and pin directly
 				pinQuoteBundle(addQuoteBundleOption(mQuoteBundle));
-				Notifier.get().info("'" + mQuoteBundle.descriptor() + "' added.");
+				//Notifier.get().info("'" + mQuoteBundle.descriptor() + "' added.");
 			}
 		}
 	}

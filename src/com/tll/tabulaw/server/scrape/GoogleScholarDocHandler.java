@@ -223,19 +223,42 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 	
 	@Override
 	public Model parseSingleDocument(String rawHtml) {
-		String citation, docTitle, htmlContent;
+		String parties = "", citation = "", year = "", docTitle = "", htmlContent = "";
 		Date date = new Date();
 		
 		try {
 			HtmlCleaner cleaner = new HtmlCleaner();
 			TagNode root = cleaner.clean(rawHtml);
+			TagNode[] tnarr;
 			
 			// extract citation/doc title
-			TagNode[] titles = root.getElementsByName("title", true);
-			if(titles == null || titles.length < 1)
+			tnarr = root.getElementsByName("title", true);
+			if(tnarr == null || tnarr.length < 1)
 				throw new IllegalArgumentException("No title tag found");
-			citation = titles[0].getText().toString();
-			docTitle = citation;
+			citation = tnarr[0].getText().toString().replace(" - Google Scholar", "");
+			if(citation.length() < 1) {
+				tnarr = root.getElementsByAttValue("class", "gsl_title", true, false);
+				if(tnarr != null && tnarr.length > 0) {
+					citation = tnarr[0].getText().toString().replace(" - Google Scholar", "");
+				}
+			}
+			
+			String[] sarr = citation.split(",");
+			if(sarr.length >= 2) {
+				parties = sarr[0].trim();
+				docTitle = parties;
+			}
+			else {
+				docTitle = citation;
+			}
+			
+			int dtlen = citation.length();
+			if(dtlen > 4) {
+				String sub = citation.substring(dtlen - 4);
+				if(sub.startsWith("19") || sub.startsWith("20")) {
+					year = sub;
+				}
+			}
 			
 			// extract #gsl_opinion div (docContent)
 			TagNode[] tags = root.getElementsByAttValue("id", "gsl_opinion", true, false);
@@ -264,7 +287,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 			throw new IllegalArgumentException(e);
 		}
 		
-		Model doc = PocModelFactory.get().buildCaseDoc(docTitle, null, null, citation, null, null, date);
+		Model doc = PocModelFactory.get().buildCaseDoc(docTitle, null, date, parties, citation, null, year);
 		doc.setString("htmlContent", htmlContent);
 		return doc;
 	}

@@ -12,9 +12,14 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import com.tll.common.model.Model;
+import com.tll.tabulaw.common.model.PocModelFactory;
 
 /**
  * Tests {@link DocUtils} methods.
@@ -22,12 +27,51 @@ import org.testng.annotations.Test;
  */
 @Test
 public class DocUtilsTest {
+	
+	@Test(enabled = true)
+	public void testSerializeCaseDocModel() throws Exception {
+		Model m = PocModelFactory.get().buildCaseDoc("docTitle", "docHash", new Date(), "parties", "citation", "url", "year");
+		String s = DocUtils.serializeDocument(m);
+		
+		Calendar c = Calendar.getInstance();
+		String snow = c.get(Calendar.MONTH) + 1 + "/" + c.get(Calendar.DATE) + "/" + c.get(Calendar.YEAR);  
+		
+		String expected = "[casedoc]title:docTitle|date:" + snow + "|hash:docHash|parties:parties|citation:citation|url:url|year:year\n";
+		Assert.assertEquals(s, expected);
+	}
+
+	@Test(enabled = true)
+	public void testDeserializeCaseDocModel() throws Exception {
+		Calendar c = Calendar.getInstance();
+		c.clear(Calendar.HOUR_OF_DAY);
+		c.clear(Calendar.HOUR);
+		c.clear(Calendar.AM_PM);
+		c.clear(Calendar.MINUTE);
+		c.clear(Calendar.SECOND);
+		c.clear(Calendar.MILLISECOND);
+		Date date = c.getTime();
+		
+		String snow = c.get(Calendar.MONTH) + 1 + "/" + c.get(Calendar.DATE) + "/" + c.get(Calendar.YEAR);  
+		String sized = "[casedoc]title:docTitle|date:" + snow + "|hash:docHash|parties:parties|citation:citation|url:url|year:year|\n";
+		
+		Model m = DocUtils.deserializeDocument(sized);
+		
+		Assert.assertEquals(m.asString("title"), "docTitle");
+		Assert.assertEquals(m.getPropertyValue("date"), date);
+		Assert.assertEquals(m.asString("hash"), "docHash");
+		
+		// case related
+		Assert.assertEquals(m.asString("case.parties"), "parties");
+		Assert.assertEquals(m.asString("case.citation"), "citation");
+		Assert.assertEquals(m.asString("case.url"), "url");
+		Assert.assertEquals(m.asString("case.year"), "year");
+	}
 
 	/**
 	 * Tests the localizing of a doc string
 	 * @throws Exception
 	 */
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void localizeDocTest() throws Exception {
 		String html = "<p>This is test html.</p>";
 

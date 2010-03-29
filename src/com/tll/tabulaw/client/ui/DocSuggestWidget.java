@@ -19,8 +19,12 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.tll.client.data.rpc.IRpcHandler;
+import com.tll.client.data.rpc.RpcCommand;
+import com.tll.client.data.rpc.RpcEvent;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
+import com.tll.client.ui.RpcUiHandler;
 import com.tll.client.ui.msg.Msgs;
 import com.tll.common.model.Model;
 import com.tll.common.msg.Msg;
@@ -40,7 +44,7 @@ import com.tll.tabulaw.common.model.PocModelFactory;
  * Search as you type doc search widget.
  * @author jpk
  */
-public class DocSuggestWidget extends AbstractModelChangeAwareWidget {
+public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements IRpcHandler {
 
 	public static class Styles {
 
@@ -99,6 +103,8 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget {
 	private final DocSearchSuggestBox docSuggestBox;
 
 	private final FlowPanel pnl = new FlowPanel();
+	
+	private final RpcUiHandler uiHandler;
 
 	/**
 	 * Constructor
@@ -113,6 +119,8 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget {
 		pnl.add(searchImage);
 		pnl.add(docSuggestBox);
 		initWidget(pnl);
+		
+		addHandler(this, RpcEvent.TYPE);
 
 		// add default selection handler
 		docSuggestBox.addSelectionHandler(new SelectionHandler<Suggestion>() {
@@ -126,17 +134,32 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget {
 				Model mDoc = PocModelCache.get().getCaseDocByRemoteUrl(docRemoteUrl);
 				if(mDoc == null) {
 					Log.debug("Fetching remote doc: " + docRemoteUrl);
-					Poc.getDocService().fetch(docRemoteUrl, new AsyncCallback<DocFetchPayload>() {
+					
+					
+					new RpcCommand<DocFetchPayload>() {
 
 						@Override
-						public void onSuccess(DocFetchPayload result) {
+						protected void doExecute() {
+							this.source = DocSuggestWidget.this;
+							Poc.getDocService().fetch(docRemoteUrl, this);
+						}
+
+						@Override
+						protected void handleFailure(Throwable caught) {
+							super.handleFailure(caught);
+							Log.error("Unable to fetch remote document", caught);
+						}
+
+						@Override
+						protected void handleSuccess(DocFetchPayload result) {
+							super.handleSuccess(result);
 							if(result.hasErrors()) {
 								Msgs.post(result.getStatus().getMsgs(Msg.MsgAttr.EXCEPTION.flag), docSuggestBox);
 								return;
 							}
 							final Model mNewDoc =
-									PocModelFactory.get().buildCaseDoc(dsr.getTitle(), result.getLocalUrl(), null, dsr.getCitation(), dsr.getUrl(),
-											null, new Date());
+									PocModelFactory.get().buildCaseDoc(dsr.getTitle(), result.getLocalUrl(), new Date(), null, dsr.getCitation(),
+											dsr.getUrl(), null);
 							mNewDoc.setId(PocModelCache.get().getNextId(PocEntityType.DOCUMENT));
 
 							// persist the new doc and propagate through app
@@ -152,12 +175,8 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget {
 								}
 							});
 						}
-
-						@Override
-						public void onFailure(Throwable caught) {
-							Log.error("Unable to fetch remote document", caught);
-						}
-					});
+						
+					}.execute();
 				}
 				else {
 					final DocumentViewInitializer dvi = new DocumentViewInitializer(mDoc.getKey());
@@ -171,5 +190,13 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget {
 				}
 			}
 		});
+		
+		uiHandler = new RpcUiHandler(docSuggestBox);
 	}
+
+	@Override
+	public void onRpcEvent(RpcEvent event) {
+		uiHandler.onRpcEvent(event);
+	}
+	
 }

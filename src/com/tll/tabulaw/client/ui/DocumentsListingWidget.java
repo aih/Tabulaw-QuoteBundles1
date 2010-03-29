@@ -14,18 +14,16 @@ import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.tll.client.data.rpc.IRpcHandler;
 import com.tll.client.data.rpc.RpcCommand;
-import com.tll.client.data.rpc.RpcEvent;
 import com.tll.client.listing.AbstractListingConfig;
 import com.tll.client.listing.Column;
 import com.tll.client.listing.DataListingOperator;
 import com.tll.client.listing.IListingConfig;
 import com.tll.client.listing.ModelCellRenderer;
+import com.tll.client.listing.ModelPropertyFormatter;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
-import com.tll.client.ui.RpcUiHandler;
 import com.tll.client.ui.listing.ModelListingTable;
 import com.tll.client.ui.listing.ModelListingWidget;
 import com.tll.client.util.GlobalFormat;
@@ -44,13 +42,13 @@ import com.tll.tabulaw.common.model.PocEntityType;
  */
 public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
-	static class DocListing extends ModelListingWidget<DocumentsListingWidget.Table> implements IRpcHandler {
+	static class DocListing extends ModelListingWidget<DocumentsListingWidget.Table> /*implements IRpcHandler*/ {
 
-		final RpcUiHandler rpcui;
+		//final RpcUiHandler rpcui;
 		
 		public DocListing() {
 			super(config.getListingId(), config.getListingElementName(), new Table(config), null);
-			rpcui = new RpcUiHandler(this);
+			//rpcui = new RpcUiHandler(this);
 		}
 		
 		Table getTable() {
@@ -70,10 +68,12 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 			}
 		}
 
+		/*
 		@Override
 		public void onRpcEvent(RpcEvent event) {
 			rpcui.onRpcEvent(event);
 		}
+		*/
 	}
 
 	static class Table extends ModelListingTable {
@@ -128,7 +128,8 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 				table.setWidget(rowIndex, cellIndex, img);
 			}
 			else {
-				super.renderCell(rowIndex, cellIndex, rowData, column, table);
+				String cv = ModelPropertyFormatter.pformat(rowData, column.getPropertyName(), column.getFormat());
+				table.setHTML(rowIndex, cellIndex, cv == null ? getValueForNull() : cv);
 			}
 		}
 	} // CellRenderer
@@ -137,16 +138,16 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
 		static final Sorting defaultSorting = new Sorting("title");
 
-		static final String[] modelProps = new String[] { "title", "case.date" };
+		static final String[] modelProps = new String[] { "title", "date" };
 
 		static final Column[] cols = new Column[] {
 			new Column("Title", null, "title", null, "title"),
-			new Column("Date", GlobalFormat.DATE, "case.date", null, "date"), 
+			new Column("Date", GlobalFormat.DATE, "date", null, "date"), 
 			new Column("", null, null, null, "delete"), 
 		};
 
 		public ListingConfig() {
-			super("Document", modelProps, cols, defaultSorting, 10);
+			super("Document", modelProps, cols, defaultSorting, 1000);
 		}
 
 		@Override

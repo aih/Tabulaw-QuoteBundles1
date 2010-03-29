@@ -29,7 +29,7 @@ import com.tll.util.ClassUtil;
 @Test
 public class GoogleScholarDocHandlerTest {
 	
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testParseStaticSearchResultsResponse() throws Exception {
 		
 		String raw;
@@ -56,7 +56,7 @@ public class GoogleScholarDocHandlerTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testParseLiveSearchResultsResponse() throws Exception {
 		IDocHandler docHandler = new GoogleScholarDocHandler();
 		
@@ -84,7 +84,7 @@ public class GoogleScholarDocHandlerTest {
 		
 		String raw;
 		try {
-			URL url = getClass().getClassLoader().getResource("gsdoc.htm");
+			URL url = getClass().getClassLoader().getResource("com/tll/tabulaw/server/scrape/gsdoc.htm");
 			File f = new File(url.toURI());
 			raw = FileUtils.readFileToString(f);
 		}
@@ -98,10 +98,19 @@ public class GoogleScholarDocHandlerTest {
 		GoogleScholarDocHandler docHandler = new GoogleScholarDocHandler();
 		
 		Model caseDoc = docHandler.parseSingleDocument(raw);
-		System.out.println(caseDoc);
+		
+		String docTitle = caseDoc.asString("title");
+		String caseCitation = caseDoc.asString("case.citation");
+		String caseYear = caseDoc.asString("case.year");
+		String caseParties = caseDoc.asString("case.parties");
+		
+		Assert.assertEquals(docTitle, "Board of Supervisors of James City Cty. v. Rowe");
+		Assert.assertEquals(caseParties, "Board of Supervisors of James City Cty. v. Rowe");
+		Assert.assertEquals(caseCitation, "Board of Supervisors of James City Cty. v. Rowe, 216 SE 2d 199 - Va: Supreme Court 1975");
+		Assert.assertEquals(caseYear, "1975");
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testParseLiveDocResponse() throws Exception {
 		IDocHandler docHandler = new GoogleScholarDocHandler();
 		
