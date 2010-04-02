@@ -35,7 +35,7 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 		 * doc data is re-fetched since we are using an iframe and since we are not
 		 * currently auto-saving the doc.
 		 */
-		private static final ViewOptions POC_DOC_VIEW_OPTIONS = new ViewOptions(false, false, false, false, false, true);
+		private static final ViewOptions VIEW_OPTIONS = new ViewOptions(false, false, false, false, false, true);
 
 		@Override
 		public String getName() {
@@ -49,7 +49,7 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 
 		@Override
 		public ViewOptions getViewOptions() {
-			return POC_DOC_VIEW_OPTIONS;
+			return VIEW_OPTIONS;
 		}
 	}
 

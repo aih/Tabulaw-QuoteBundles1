@@ -20,6 +20,23 @@ function clearWindowSelections(wnd, doc) {
 	else if (doc && doc.selection) doc.selection.empty();
 }
 
+/**
+ * DEBUG
+ */
+function nodeToString(node) {
+  var val;
+  switch(node.nodeType) {
+  case 3: // text
+    val = node.nodeValue;
+    if(val.length > 7) val = val.substr(0, 7) + '...';
+    return 'TEXT_NODE: ' + val + '(parent: ' + node.parentNode.id + ')';
+  case 1: // element
+  	return 'ELEMENT_NODE: ' + node.id;
+  case 8: // comment
+    return 'COMMENT_NODE: ' + node.nodeValue;
+  }
+}
+
 /*
 if (!window['Node']) {
 	alert('No node!');
@@ -125,15 +142,13 @@ function NodePath(root) {
 //Node.prototype.siblingNumber = function () {
 function nodeSiblingNumber(e) {
 	var i = 0;
-	
+
 	while (e = e.previousSibling) {
-		//alert('e: ' + e);
 		if (e.isNotOriginal) {
 			continue;
 		}
 		i++;
 	}
-
 	return i;
 }
 
@@ -199,21 +214,29 @@ function nodePromoteChildren(e) {
   if(parent.normalize) parent.normalize();
 }
 
+/**
+ * Surrounds the given text node with the given element node.
+ * @param textNode the text node to surround
+ * @param surroundElm the element with which to surround
+ * @return
+ */
+function textNodeSurround(textNode, surroundElm) {
+	textNode.parentNode.insertBefore(surroundElm, textNode);
+	surroundElm.appendChild(textNode);
+}
+
 var mcounter = 0;
 
 /**
  * Mark - constructor
  * 
- * @param elmDoc The dom document ref to use as the root. This is necessary to
- *          dis-ambiguate when applying this to nested documents in iframes for
- *          example.
  * @param range goog.dom.AbstractRange
  * 
  * @throws 'No text selected'
  * @throws 'Non-textual range'
  * @throws 'Unsupported range type'
  */
-function Mark(elmDoc, range) {
+function Mark(range) {
 
 	this.markId = 'mark_' + (++mcounter);
 	this.text = '';
@@ -221,7 +244,14 @@ function Mark(elmDoc, range) {
 	this.startOffset = 0;
 	this.endNodePath = null;
 	this.endOffset = 0;
-	this.elmDoc = elmDoc;
+	
+	/* 
+	 * the highlight spans
+	 * FORMAT:
+	 * 	 id="{markId}_{span index}"
+	 *   class="highlight {markId}"
+	 */
+	this.hspan = null;
 
 	this.onHover = function (event) {
 		// TODO set focus of corres. quote
@@ -231,6 +261,7 @@ function Mark(elmDoc, range) {
 		return this.text;
 	}
 
+	/*
 	this.eq = function (other, noCheckBack) {
 		var startsAreEqual = false,
 			endsAreEqual = false;
@@ -241,11 +272,9 @@ function Mark(elmDoc, range) {
 			return false;
 		}
 
-		/*
-		if (this.pageUrl != other.pageUrl) {
-			return false;
-		}
-		*/
+		//if (this.pageUrl != other.pageUrl) {
+			//return false;
+		//}
 
 		if ( this.startNodePath.eq(other.startNodePath) ) {
 			startsAreEqual = true;
@@ -286,6 +315,7 @@ function Mark(elmDoc, range) {
 		}
 		return false;
 	}
+	*/
 	
 	/**
 	 * Creates a new goog.dom.TextRange from the state of this Mark.
@@ -319,61 +349,26 @@ function Mark(elmDoc, range) {
 			throw 'Ranges can not overlap';
 	}
 	
-	this.isPartialRange = function(range) {
-		// TODO impl
-	}
-
 	/**
-	 * Attempts to provide an un-partialized range from the given range.
-	 * @return An un-partialized range
-	 * @throws error when the range is un-partialize-able
+	 * Appends a highlight span to the member hspan array.
+	 * @param rdoc the document ref of the associated text range 
+	 * @return the added span element for convenience
 	 */
-	// TODO fix
-	/*
-	this.unpartialize = function(range) {
-		var elmCnt, trange, tnStart = null, tnEnd = null, tnEndLen = 0;
+	this.addHighlightSpan = function(rdoc) {
+		var span, index;
 		
-		if(!this.isPartialRange(range)) {
-			// we have a good range
-			return range;
-		}
+		if(!this.hspan) this.hspan = [];
+		index = this.hspan.length;
 		
-		// try to select the entire containing element text
-		elmCnt = range.getContainerElement();
-		if(elmCnt == this.elmDoc.body)
-			throw 'Un-resolvable partialized range';
+		span = rdoc.createElement('span');
+		span.isNotOriginal = true;
+		span.id = this.markId + '_' + index;
+		span.className = 'highlight ' + this.markId;
+		//span.addEventListener( "mouseover", this.onHover, false);
 		
-		// get first text node child
-		var nitr = new goog.dom.NodeIterator(elmCnt);
-		var ndesc;
-		try {
-			while(ndesc = nitr.next()) {
-				//alert('ndesc.nodeName: ' + ndesc.nodeName);
-				if(ndesc.nodeType == 3 && ndesc.nodeValue.trim().length > 1) {
-					if(!tnStart) {
-						tnStart = ndesc;
-					} else {
-						tnEnd = ndesc;
-					}
-				}
-				//if(nitr.isEndTag()) break;
-			}
-		} catch(e) {
-			if(!(e instanceof goog.iter.StopIteration)) throw e;
-		}
-		
-		//alert('tnStart: ' + tnStart);
-		//alert('tntnEnd.nodeValue: ' + tnEnd.nodeValue);
-		//alert('tnEnd.nodeValue.length: ' + tnEnd.nodeValue.length);
-		trange = goog.dom.Range.createFromNodes(tnStart, 0, tnEnd, tnEnd.nodeValue.length);
-		//alert('trange: ' + trange);
-		
-		// validate again
-		this.validateRange(trange);
-		
-		return trange;
+		this.hspan[index] = span;
+		return span;
 	}
-	*/
 	
 	/**
 	 * Highlights the text bounded by the given range -OR- the text bounded by the
@@ -390,28 +385,94 @@ function Mark(elmDoc, range) {
 	 * @throws 'Highlighting failed'
 	 */
 	this.highlight = function(range) {
+		var span, node;
+
 		if(this.hspan) return;	// already highlighted
 		
 		if(!range) range = this.createRange();
-		
-		this.hspan = this.elmDoc.createElement('span');
-		this.hspan.isNotOriginal = true;
-		this.hspan.id = this.markId;
-		this.hspan.className = 'highlight';
-		//this.hspan.addEventListener( "mouseover", this.onHover, false);
-		
+
+		/*
 		try {
 			range.surroundContents(this.hspan);
 		} catch(e) {
 			this.hspan = null;
 			throw e;
 		}
+		*/
+		
+		var startNode = range.getStartNode();
+		var startOffset = range.getStartOffset();
+		var endNode = range.getEndNode();
+		var endOffset = range.getEndOffset();
+		
+		if(startNode.nodeType != 3 || endNode.nodeType != 3) throw 'start and end nodes must be textual';
+		
+		var rdoc = range.getDocument();
 
-		// the all important reify of hspan necessary for IE
-		this.hspan = this.elmDoc.getElementById(this.markId);
-		if(!this.hspan) throw 'Highlighting failed';
+	  var tri = new goog.dom.TextRangeIterator(startNode, startOffset, endNode, endOffset, false);
+	  while(true) {
+	    try {
+	      node = tri.next();
+	      
+	      // startNode
+	      if(node == startNode) {
+	      	var prefixTextNode = null;
+      		
+	      	// split the text node at the offset to allow for insertion of highlight span
+      		if(startOffset > 0) {
+		      	var prefixText = node.nodeValue.substr(0, startOffset);
+	      		prefixTextNode = rdoc.createTextNode(prefixText);
+      		}
+    			
+      		if(node == endNode) {
+      			var tlen = node.nodeValue.length;
+      			var suffixTextNode = null;
+      			if(endOffset <= tlen) {
+	      			var suffixText = node.nodeValue.substr(endOffset+1);
+		      		suffixTextNode = rdoc.createTextNode(suffixText);
+      			}
+        		if(prefixTextNode != null) {
+  	      		node.parentNode.insertBefore(prefixTextNode, node);
+        		}
+        		if(suffixTextNode != null) {
+        			node.parentNode.insertBefore(suffixTextNode, node.nextSibling);
+        		}
+        		span = this.addHighlightSpan(rdoc);
+	      		node.nodeValue = node.nodeValue.substr(startOffset, endOffset - startOffset);
+        		textNodeSurround(node, span);
+	      		break;	// we're done
+      		} else {
+	      		node.nodeValue = node.nodeValue.substr(startOffset);
+      		}
+	      }
+	      
+	      // endNode
+	      if(node == endNode) {
+	      	var textlen = node.nodeValue.length;
+	      	if(endOffset < textlen) {
+	      		// split the text node at the offset to allow for insertion of highlight span
+	      		var suffixText = node.nodeValue.substr(endOffset+1);
+	      		var suffixTextNode = rdoc.createTextNode(suffixText);
+	      		node.parentNode.insertBefore(suffixTextNode, node.nextSibling);
+	      		node.nodeValue = node.nodeValue.substr(endOffset);
+	      	}
+	      	span = this.addHighlightSpan(rdoc);
+      		textNodeSurround(node, span);
+	      }
 
-		this.text = range.getText();
+	      // middle text node
+	      if(node != startNode && node != endNode && node.nodeType == 3) {
+	      	// surround the text node with a highlight span
+	      	span = this.addHighlightSpan(rdoc);
+	      	//alert('span: ' + span);
+	      	textNodeSurround(node, span);
+	      }
+	      
+	    } catch(e) {
+	    	if(e === goog.iter.StopIteration) break;
+	    	alert('woops: ' + e);
+	    }
+	  }
 	}
 	
 	/**
@@ -419,22 +480,32 @@ function Mark(elmDoc, range) {
 	 * any highlighting for this mark.
 	 */
 	this.unhighlight = function() {
-	  if(!this.hspan) return; // not selected
-	  nodePromoteChildren(this.hspan);
+	  var span;
+		
+		if(!this.hspan) return; // not selected
+		
+	  for(var i = 0; i < this.hspan.length; i++) {
+		  span = this.hspan[i];
+	  	nodePromoteChildren(span);
+	  }
+	  
 	  this.hspan = null;
 	}
 	
 	var root, urange;
 	
 	this.validateRange(range);
-	//urange = this.unpartialize(range);
 	urange = range;
 	
-	var root = this.elmDoc.body;
+	var root = urange.getDocument().body;
+	this.text = urange.getText();
 	this.startNodePath = nodeGetNodePath(urange.getStartNode(), root);
 	this.endNodePath = nodeGetNodePath(urange.getEndNode(), root);
 	this.startOffset = urange.getStartOffset();
 	this.endOffset = urange.getEndOffset();
 
-	this.highlight(urange);
+	//this.highlight(urange);
+	
+	//alert('urange.getWindow(): ' + urange.getWindow() + ', urange.getDocument(): ' + urange.getDocument());
+	clearWindowSelections(urange.getWindow(), urange.getDocument());
 } // Mark constructor

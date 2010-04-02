@@ -5,7 +5,6 @@
  */
 package com.tll.tabulaw.client.ui;
 
-import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.tll.client.model.IHasModelChangeHandlers;
@@ -40,6 +39,6 @@ public abstract class AbstractModelChangeAwareWidget extends Composite implement
 
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
-		Log.debug("Handling model change: " + event);
+		//Log.debug("Handling model change: " + event);
 	}
 }

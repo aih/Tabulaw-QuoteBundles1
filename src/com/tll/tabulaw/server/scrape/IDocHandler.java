@@ -9,8 +9,8 @@ import java.net.URL;
 import java.util.List;
 
 import com.tll.common.model.Model;
+import com.tll.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tll.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tll.tabulaw.common.data.rpc.CaseDocSearchResult;
 import com.tll.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 
 /**

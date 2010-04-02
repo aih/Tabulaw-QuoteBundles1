@@ -24,7 +24,7 @@ import com.tll.common.model.PropertyPathException;
 import com.tll.common.msg.Msg.MsgAttr;
 import com.tll.common.msg.Msg.MsgLevel;
 import com.tll.server.rpc.RpcServlet;
-import com.tll.tabulaw.common.data.rpc.CaseDocSearchResult;
+import com.tll.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tll.tabulaw.common.data.rpc.DocFetchPayload;
 import com.tll.tabulaw.common.data.rpc.DocListingPayload;
 import com.tll.tabulaw.common.data.rpc.DocSearchPayload;

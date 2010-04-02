@@ -24,6 +24,16 @@
 		<url-pattern>/poc/doc</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>DocUploadServlet</servlet-name>
+		<servlet-class>com.tll.tabulaw.server.DocUploadServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>DocUploadServlet</servlet-name>
+		<url-pattern>/poc/doc/upload</url-pattern>
+	</servlet-mapping>
+
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>Poc.html</welcome-file>

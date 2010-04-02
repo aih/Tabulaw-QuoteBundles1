@@ -51,8 +51,7 @@ public class NavColPanel extends AbstractNavPanel {
 	}
 	
 	@Override
-	protected void handleViewChange() {
-		ViewKey key = ViewManager.get().getCurrentViewKey();
+	protected void handleViewLoad(ViewKey key) {
 		if(key == null || key.equals(currentViewKey)) return;
 
 		// reset the nav row and col based on the new current view type and possibly
@@ -81,4 +80,7 @@ public class NavColPanel extends AbstractNavPanel {
 		currentViewKey = key;
 	}
 
+	@Override
+	protected void handleViewUnload(ViewKey key) {
+	}
 }

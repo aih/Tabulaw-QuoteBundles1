@@ -5,7 +5,9 @@
  */
 package com.tll.tabulaw.client.ui;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -32,7 +34,7 @@ import com.tll.tabulaw.client.Poc;
 import com.tll.tabulaw.client.Resources;
 import com.tll.tabulaw.client.model.PocModelCache;
 import com.tll.tabulaw.client.view.DocumentViewInitializer;
-import com.tll.tabulaw.common.data.rpc.CaseDocSearchResult;
+import com.tll.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tll.tabulaw.common.data.rpc.DocFetchPayload;
 import com.tll.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tll.tabulaw.common.data.rpc.DocSearchRequest;
@@ -53,6 +55,31 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 		public static final String ENTRY = "entry";
 		public static final String TITLE = "title";
 		public static final String SUMMARY = "summary";
+	}
+
+	static class DocSuggestion implements Suggestion {
+
+		final CaseDocSearchResult doc;
+		final String displayString;
+
+		public DocSuggestion(CaseDocSearchResult doc) {
+			super();
+			this.doc = doc;
+			displayString =
+					"<div class=\"entry\"><div class=\"title\">" + doc.getTitleHtml() + "</div><div class=\"summary\">"
+							+ doc.getSummary() + "</div></div>";
+		}
+
+		@Override
+		public String getDisplayString() {
+			return displayString;
+		}
+
+		@Override
+		public String getReplacementString() {
+			return doc.getTitle();
+		}
+
 	}
 
 	class DocSearchSuggestOracle extends SuggestOracle {
@@ -78,7 +105,12 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 				public void onSuccess(DocSearchPayload result) {
 					if(!result.getStatus().hasErrors()) {
 						query = aquery;
-						Response sresponse = new Response(result.getResults());
+						List<CaseDocSearchResult> searchResults = result.getResults();
+						ArrayList<DocSuggestion> suggestions = new ArrayList<DocSuggestion>(searchResults.size());
+						for(final CaseDocSearchResult doc : searchResults) {
+							suggestions.add(new DocSuggestion(doc));
+						}
+						Response sresponse = new Response(suggestions);
 						callback.onSuggestionsReady(request, sresponse);
 					}
 				}
@@ -103,7 +135,7 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 	private final DocSearchSuggestBox docSuggestBox;
 
 	private final FlowPanel pnl = new FlowPanel();
-	
+
 	private final RpcUiHandler uiHandler;
 
 	/**
@@ -119,7 +151,7 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 		pnl.add(searchImage);
 		pnl.add(docSuggestBox);
 		initWidget(pnl);
-		
+
 		addHandler(this, RpcEvent.TYPE);
 
 		// add default selection handler
@@ -128,14 +160,13 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {
 				// fetch the doc
-				final CaseDocSearchResult dsr = (CaseDocSearchResult) event.getSelectedItem();
-				final String docRemoteUrl = dsr.getUrl();
+				final CaseDocSearchResult caseDoc = ((DocSuggestion) event.getSelectedItem()).doc;
+				final String docRemoteUrl = caseDoc.getUrl();
 				Log.debug("Checking for client cache of docRemoteUrl: " + docRemoteUrl);
 				Model mDoc = PocModelCache.get().getCaseDocByRemoteUrl(docRemoteUrl);
 				if(mDoc == null) {
 					Log.debug("Fetching remote doc: " + docRemoteUrl);
-					
-					
+
 					new RpcCommand<DocFetchPayload>() {
 
 						@Override
@@ -158,8 +189,8 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 								return;
 							}
 							final Model mNewDoc =
-									PocModelFactory.get().buildCaseDoc(dsr.getTitle(), result.getLocalUrl(), new Date(), null, dsr.getCitation(),
-											dsr.getUrl(), null);
+									PocModelFactory.get().buildCaseDoc(caseDoc.getTitle(), result.getLocalUrl(), new Date(), null,
+											caseDoc.getCitation(), caseDoc.getUrl(), null);
 							mNewDoc.setId(PocModelCache.get().getNextId(PocEntityType.DOCUMENT));
 
 							// persist the new doc and propagate through app
@@ -175,7 +206,7 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 								}
 							});
 						}
-						
+
 					}.execute();
 				}
 				else {
@@ -190,7 +221,7 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 				}
 			}
 		});
-		
+
 		uiHandler = new RpcUiHandler(docSuggestBox);
 	}
 
@@ -198,5 +229,5 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 	public void onRpcEvent(RpcEvent event) {
 		uiHandler.onRpcEvent(event);
 	}
-	
+
 }

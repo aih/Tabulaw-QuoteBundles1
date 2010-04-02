@@ -16,7 +16,7 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
 import com.tll.common.model.Model;
-import com.tll.tabulaw.common.data.rpc.CaseDocSearchResult;
+import com.tll.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tll.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tll.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tll.tabulaw.common.model.PocModelFactory;
@@ -175,17 +175,18 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 
 		TagNode[] tnarr;
 		TagNode tn;
-		String cname, docTitle, docUrl, citation, docSummary;
+		String cname, docTitle, docTitleHtml, docUrl, citation, docSummary;
 		
 		for(TagNode rawElm : rawResults) {
-			cname = docTitle = docUrl = citation = docSummary = "";
+			cname = docTitle = docTitleHtml = docUrl = citation = docSummary = "";
 
 			// parse the child h3 element
 			tnarr = rawElm.getElementsByName("h3", true);
 			if(tnarr != null && tnarr.length > 0) {
 				tn = (TagNode) tnarr[0].getChildTagList().get(0);
 				docUrl = "http://scholar.google.com" + tn.getAttributes().get("href");
-				docTitle = cleaner.getInnerHtml(tn);
+				docTitleHtml = cleaner.getInnerHtml(tn);
+				docTitle = docTitleHtml.replace("<b>", "").replace("</b>", "");
 			}
 			else {
 				System.out.println("WARN: No h3 tag found in search result entry");
@@ -214,8 +215,11 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 			}
 			
 			docSummary = docSummary.trim().replaceAll("\n", "") + "...";
+			
+			// TODO fix and not use current date rather extract it
+			Date docDate = new Date();
 
-			results.add(new CaseDocSearchResult(docTitle, docUrl, citation, docSummary));
+			results.add(new CaseDocSearchResult(docTitle, docDate, docUrl, citation, docTitleHtml, docSummary));
 		}
 		
 		return results;

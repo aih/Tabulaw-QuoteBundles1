@@ -22,6 +22,23 @@
   margin-top: 30px;
   padding: 10px;
 }
+
+#root {
+  position: relative;
+  top: 240px;
+  margin: 10px;
+  padding: 3px;
+  border: 1px solid maroon;
+  font-size: 16px;
+  font-family: monospace;
+}
+#root p {
+  margin: 6px 0 6px 0;
+}
+.elm {
+  color: red;
+  font-weight: bold
+}
 </style>
 
 <script type="text/javascript" src="../war/js/goog.js"></script>
@@ -29,23 +46,29 @@
 
 <script type="text/javascript">
 
+var marks = [];
+
 /**
  * Adds a Mark entry to the marks table for subsequent testing 
  * via the buttons in the created table row.
+ * @return the created mark
  */
 function postRange(range) {
   var tr, td, btn, mark;
 
   try {
-    mark = new Mark(document, range);
+    mark = new Mark(range);
+    mark.highlight(range);
   } catch(e) {
     alert(e);
     return;
   }
 
+  // retain the mark
+  marks.push(mark);
+
   // post mark to swindow
   tr = document.createElement('tr');
-  tr.mark = mark; // retain the mark
   td = document.createElement('td');
   td.innerHTML = mark.markId;
   tr.appendChild(td);
@@ -69,7 +92,7 @@ function postRange(range) {
 
   // add/remove mark toggle button
   btn = document.createElement('button');
-  btn.innerHTML = 'Highlight';
+  btn.innerHTML = 'Unhighlight';
   btn.mark = mark; // ref
   goog.events.listen(btn, 'click', function(e){
     var btn = e.target;
@@ -88,27 +111,13 @@ function postRange(range) {
   tr.appendChild(td);
 
   goog.dom.$('tmarks').appendChild(tr);
-}
 
-// init
-function init() {
-  var mouseUpHandler = function(e){
-    var range = goog.dom.Range.createFromWindow(window);
-    var text = range.getText();
-    if(text && text.length > 0) {
-      postRange(range);
-
-      // kill the range
-      range.collapse();
-      range = null;
-    }
-  };
-  goog.events.listen(goog.dom.$('doc'), 'mouseup', mouseUpHandler);
+  return mark;
 }
 </script>
 
 </head>
-<body lang=EN-US link=blue vlink=purple style='tab-interval:.5in' onLoad='init();'>
+<body onLoad='init();'>
 
 <!-- swindow -->
 <div id="swindow">
@@ -133,649 +142,62 @@ function init() {
 </div>
 <!-- END swindow -->
 
-<div id="doc" class=Section1>
-
-<p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><b><span style='font-size:12.0pt;
-font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>376
-U.S. 254 (1964)</span></b><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
-
-<p class=MsoNormal align=center style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-auto;text-align:center;line-height:normal;mso-outline-level:3'><b><span
-style='font-size:13.5pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'>NEW YORK TIMES CO.<br>
-v.<br>
-SULLIVAN.<o:p></o:p></span></b></p>
-
-<p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><span style='font-size:12.0pt;font-family:
-"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>No. 39.<o:p></o:p></span></p>
-
-<p class=MsoNormal align=center style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-auto;text-align:center;line-height:normal'><b><span style='font-size:12.0pt;
-font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>Supreme
-Court of <span style='color:black;background:#A0FFFF'>United</span> States.</span></b><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'><o:p></o:p></span></p>
-
-<p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><span style='font-size:12.0pt;font-family:
-"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>Argued
-January 6, 1964.<o:p></o:p></span></p>
-
-<p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><span style='font-size:12.0pt;font-family:
-"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>Decided
-March 9, 1964.</span><a name="r[1]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[1]"><span
-style='mso-bookmark:"r\[1\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[1]</span></span><span
-style='mso-bookmark:"r\[1\]"'></span></a><span style='mso-bookmark:"r\[1\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'><o:p></o:p></span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
-normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>CERTIORARI TO THE SUPREME COURT OF
-ALABAMA. <o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>255 <i>Herbert Wechsler</i> argued
-the cause for petitioner in No. 39. With him on the brief were <i>Herbert
-Brownell, Thomas F. Daly, Louis M. Loeb, T. Eric Embry, Marvin E. Frankel,
-Ronald S. Diana</i> and <i>Doris Wechsler.</i><o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><i><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>William P. Rogers</span></i><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> and <i>Samuel R. Pierce, Jr.</i> argued the cause for
-petitioners in No. 40. With <i>Mr. Pierce</i> on the brief were <i>I. H.
-Wachtel, Charles S. Conley, Benjamin Spiegel, Raymond S. Harris, Harry H.
-Wachtel, Joseph B. Russell, David N. Brainin, Stephen J. Jelin</i> and <i>Charles
-B. Markham.</i><o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><i><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>M. Roland Nachman, Jr.</span></i><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> argued the cause for respondent in both cases. With him on
-the brief were <i>Sam Rice Baker</i> and <i>Calvin Whitesell.</i><o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Briefs of <i>amici curiae,</i>
-urging reversal, were filed in No. 39 by <i>William P. Rogers, Gerald W. Siegel</i>
-and <i>Stanley Godofsky</i> for the Washington Post Company, and by <i>Howard
-Ellis, Keith Masters</i> and <i>Don H. Reuben</i> for the Tribune Company.
-Brief of <i>amici curiae,</i> urging reversal, was filed in both cases by <i>Edward
-S. Greenbaum, Harriet F. Pilpel, Melvin L. Wulf, Nanette Dembitz</i> and <i>Nancy
-F. Wechsler</i> for the American Civil Liberties Union et al.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>256 MR. JUSTICE BRENNAN delivered
-the opinion of the Court.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>We are required in this case to
-determine for the first time the extent to which the constitutional protections
-for speech and press limit a State's power to award damages in a libel action
-brought by a public official against critics of his official conduct.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Respondent L. B. Sullivan is one of
-the three elected Commissioners of the City of Montgomery, Alabama. He
-testified that he was &quot;Commissioner of Public Affairs and the duties are
-supervision of the Police Department, Fire Department, Department of Cemetery
-and Department of Scales.&quot; He brought this civil libel action against the
-four individual petitioners, who are Negroes and Alabama clergymen, and against
-petitioner the New York Times Company, a New York corporation which publishes
-the New York Times, a daily newspaper. A jury in the Circuit Court of
-Montgomery County awarded him damages of $500,000, the full amount claimed,
-against all the petitioners, and the Supreme Court of Alabama affirmed. 273
-Ala. 656, 144 So. 2d 25.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Respondent's complaint alleged that
-he had been libeled by statements in a full-page advertisement that was carried
-in the New York Times on March 29, 1960.</span><a name="r[2]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[2]"><span
-style='mso-bookmark:"r\[2\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[2]</span></span><span
-style='mso-bookmark:"r\[2\]"'></span></a><span style='mso-bookmark:"r\[2\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> Entitled &quot;Heed Their Rising Voices,&quot; the
-advertisement began by stating that &quot;As the whole world knows by now,
-thousands of Southern Negro students are engaged in widespread non-violent
-demonstrations in positive affirmation of the right to live in human dignity as
-guaranteed by the U. S. Constitution and the Bill of Rights.&quot; It went on
-to charge that &quot;in their efforts to uphold these guarantees, they are
-being met by an unprecedented wave of terror by those who would deny and negate
-that document which the whole world looks upon as setting the pattern for
-modern freedom. . . .&quot; Succeeding 257 paragraphs purported to illustrate
-the &quot;wave of terror&quot; by describing certain alleged events. The text
-concluded with an appeal for funds for three purposes: support of the student
-movement, &quot;the struggle for the right-to-vote,&quot; and the legal defense
-of Dr. Martin Luther King, Jr., leader of the movement, against a perjury
-indictment then pending in Montgomery.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>The text appeared over the names of
-64 persons, many widely known for their activities in public affairs, religion,
-trade unions, and the performing arts. Below these names, and under a line
-reading &quot;We in the south who are struggling daily for dignity and freedom
-warmly endorse this appeal,&quot; appeared the names of the four individual
-petitioners and of 16 other persons, all but two of whom were identified as
-clergymen in various Southern cities. The advertisement was signed at the
-bottom of the page by the &quot;Committee to Defend Martin Luther King and the
-Struggle for Freedom in the South,&quot; and the officers of the Committee were
-listed.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Of the 10 paragraphs of text in the
-advertisement, the third and a portion of the sixth were the basis of
-respondent's claim of libel. They read as follows:<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Third paragraph:<o:p></o:p></span></p>
-
-<p class=MsoNormal style='margin-bottom:5.0pt;line-height:normal'><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'>&quot;In Montgomery, Alabama, after students sang `My
-Country, 'Tis of Thee' on the State Capitol steps, their leaders were expelled
-from school, and truckloads of police armed with shotguns and tear-gas ringed
-the Alabama State College Campus. When the entire student body protested to
-state authorities by refusing to re-register, their dining hall was padlocked
-in an attempt to starve them into submission.&quot;<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Sixth paragraph:<o:p></o:p></span></p>
-
-<p class=MsoNormal style='margin-bottom:5.0pt;line-height:normal'><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'>&quot;Again and again the Southern violators have answered
-Dr. King's peaceful protests with intimidation and violence. They have bombed
-his home almost killing his wife and child. They have 258 assaulted his person.
-They have arrested him seven times—for `speeding,' `loitering' and similar
-`offenses.' And now they have charged him with `perjury'—a <i>felony</i> under
-which they could imprison him for <i>ten years.</i> . . .&quot;<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Although neither of these statements
-mentions respondent by name, he contended that the word &quot;police&quot; in
-the third paragraph referred to him as the Montgomery Commissioner who
-supervised the Police Department, so that he was being accused of
-&quot;ringing&quot; the campus with police. He further claimed that the
-paragraph would be read as imputing to the police, and hence to him, the
-padlocking of the dining hall in order to starve the students into submission.</span><a
-name="r[3]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[3]"><span
-style='mso-bookmark:"r\[3\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[3]</span></span><span
-style='mso-bookmark:"r\[3\]"'></span></a><span style='mso-bookmark:"r\[3\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> As to the sixth paragraph, he contended that since arrests
-are ordinarily made by the police, the statement &quot;They have arrested [Dr.
-King] seven times&quot; would be read as referring to him; he further contended
-that the &quot;They&quot; who did the arresting would be equated with the
-&quot;They&quot; who committed the other described acts and with the
-&quot;Southern violators.&quot; Thus, he argued, the paragraph would be read as
-accusing the Montgomery police, and hence him, of answering Dr. King's protests
-with &quot;intimidation and violence,&quot; bombing his home, assaulting his
-person, and charging him with perjury. Respondent and six other Montgomery
-residents testified that they read some or all of the statements as referring
-to him in his capacity as Commissioner.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>It is uncontroverted that some of
-the statements contained in the paragraphs were not accurate descriptions of
-events which occurred in Montgomery. Although Negro students staged a
-demonstration on the State Capitol steps, they sang the National Anthem and not
-&quot;My 259 Country, 'Tis of Thee.&quot; Although nine students were expelled
-by the State Board of Education, this was not for leading the demonstration at
-the Capitol, but for demanding service at a lunch counter in the Montgomery
-County Courthouse on another day. Not the entire student body, but most of it,
-had protested the expulsion, not by refusing to register, but by boycotting
-classes on a single day; virtually all the students did register for the
-ensuing semester. The campus dining hall was not padlocked on any occasion, and
-the only students who may have been barred from eating there were the few who
-had neither signed a preregistration application nor requested temporary meal
-tickets. Although the police were deployed near the campus in large numbers on
-three occasions, they did not at any time &quot;ring&quot; the campus, and they
-were not called to the campus in connection with the demonstration on the State
-Capitol steps, as the third paragraph implied. Dr. King had not been arrested
-seven times, but only four; and although he claimed to have been assaulted some
-years earlier in connection with his arrest for loitering outside a courtroom,
-one of the officers who made the arrest denied that there was such an assault.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>On the premise that the charges in
-the sixth paragraph could be read as referring to him, respondent was allowed
-to prove that he had not participated in the events described. Although Dr.
-King's home had in fact been bombed twice when his wife and child were there,
-both of these occasions antedated respondent's tenure as Commissioner, and the
-police were not only not implicated in the bombings, but had made every effort
-to apprehend those who were. Three of Dr. King's four arrests took place before
-respondent became Commissioner. Although Dr. King had in fact been indicted (he
-was subsequently acquitted) on two counts of perjury, each of which carried a possible
-five-year sentence, respondent had nothing to do with procuring the indictment.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>260 Respondent made no effort to
-prove that he suffered actual pecuniary loss as a result of the alleged libel.</span><a
-name="r[4]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[4]"><span
-style='mso-bookmark:"r\[4\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[4]</span></span><span
-style='mso-bookmark:"r\[4\]"'></span></a><span style='mso-bookmark:"r\[4\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> One of his witnesses, a former employer, testified that if
-he had believed the statements, he doubted whether he &quot;would want to be
-associated with anybody who would be a party to such things that are stated in
-that ad,&quot; and that he would not re-employ respondent if he believed
-&quot;that he allowed the Police Department to do the things that the paper say
-he did.&quot; But neither this witness nor any of the others testified that he
-had actually believed the statements in their supposed reference to respondent.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>The cost of the advertisement was
-approximately $4800, and it was published by the Times upon an order from a New
-York advertising agency acting for the signatory Committee. The agency
-submitted the advertisement with a letter from A. Philip Randolph, Chairman of
-the Committee, certifying that the persons whose names appeared on the
-advertisement had given their permission. Mr. Randolph was known to the Times'
-Advertising Acceptability Department as a responsible person, and in accepting
-the letter as sufficient proof of authorization it followed its established
-practice. There was testimony that the copy of the advertisement which
-accompanied the letter listed only the 64 names appearing under the text, and
-that the statement, &quot;We in the south . . . warmly endorse this
-appeal,&quot; and the list of names thereunder, which included those of the
-individual petitioners, were subsequently added when the first proof of the
-advertisement was received. Each of the individual petitioners testified that
-he had not authorized the use of his name, and that he had been unaware of its
-use until receipt of respondent's demand for a retraction. The manager of the
-Advertising Acceptability 261 Department testified that he had approved the
-advertisement for publication because he knew nothing to cause him to believe
-that anything in it was false, and because it bore the endorsement of &quot;a
-number of people who are well known and whose reputation&quot; he &quot;had no
-reason to question.&quot; Neither he nor anyone else at the Times made an
-effort to confirm the accuracy of the advertisement, either by checking it
-against recent Times news stories relating to some of the described events or
-by any other means.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Alabama law denies a public officer
-recovery of punitive damages in a libel action brought on account of a
-publication concerning his official conduct unless he first makes a written
-demand for a public retraction and the defendant fails or refuses to comply.
-Alabama Code, Tit. 7, § 914. Respondent served such a demand upon each of the
-petitioners. None of the individual petitioners responded to the demand,
-primarily because each took the position that he had not authorized the use of
-his name on the advertisement and therefore had not published the statements
-that respondent alleged had libeled him. The Times did not publish a retraction
-in response to the demand, but wrote respondent a letter stating, among other
-things, that &quot;we . . . are somewhat puzzled as to how you think the
-statements in any way reflect on you,&quot; and &quot;you might, if you desire,
-let us know in what respect you claim that the statements in the advertisement
-reflect on you.&quot; Respondent filed this suit a few days later without
-answering the letter. The Times did, however, subsequently publish a retraction
-of the advertisement upon the demand of Governor John Patterson of Alabama, who
-asserted that the publication charged him with &quot;grave misconduct and . . .
-improper actions and omissions as Governor of Alabama and Ex-Officio Chairman
-of the State Board of Education of Alabama.&quot; When asked to explain why
-there had been a retraction for the Governor but not for respondent, the 262
-Secretary of the Times testified: &quot;We did that because we didn't want anything
-that was published by The Times to be a reflection on the State of Alabama and
-the Governor was, as far as we could see, the embodiment of the State of
-Alabama and the proper representative of the State and, furthermore, we had by
-that time learned more of the actual facts which the ad purported to recite
-and, finally, the ad did refer to the action of the State authorities and the
-Board of Education presumably of which the Governor is the ex-officio chairman
-. . . .&quot; On the other hand, he testified that he did not think that
-&quot;any of the language in there referred to Mr. Sullivan.&quot;<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>The trial judge submitted the case
-to the jury under instructions that the statements in the advertisement were
-&quot;libelous per se&quot; and were not privileged, so that petitioners might
-be held liable if the jury found that they had published the advertisement and
-that the statements were made &quot;of and concerning&quot; respondent. The
-jury was instructed that, because the statements were libelous <i>per se,</i>
-&quot;the law . . . implies legal injury from the bare fact of publication
-itself,&quot; &quot;falsity and malice are presumed,&quot; &quot;general
-damages need not be alleged or proved but are presumed,&quot; and
-&quot;punitive damages may be awarded by the jury even though the amount of
-actual damages is neither found nor shown.&quot; An award of punitive
-damages—as distinguished from &quot;general&quot; damages, which are
-compensatory in nature—apparently requires proof of actual malice under Alabama
-law, and the judge charged that &quot;mere negligence or carelessness is not
-evidence of actual malice or malice in fact, and does not justify an award of
-exemplary or punitive damages.&quot; He refused to charge, however, that the
-jury must be &quot;convinced&quot; of malice, in the sense of &quot;actual
-intent&quot; to harm or &quot;gross negligence and recklessness,&quot; to make
-such an award, and he also refused to require that a verdict for respondent
-differentiate between compensatory and punitive damages. The judge rejected
-petitioners' contention 263 that his rulings abridged the freedoms of speech
-and of the press that are guaranteed by the First and Fourteenth Amendments.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>In affirming the judgment, the
-Supreme Court of Alabama sustained the trial judge's rulings and instructions
-in all respects. 273 Ala. 656, 144 So. 2d 25. It held that &quot;where the
-words published tend to injure a person libeled by them in his reputation,
-profession, trade or business, or charge him with an indictable offense, or
-tend to bring the individual into public contempt,&quot; they are
-&quot;libelous per se&quot;; that &quot;the matter complained of is, under the
-above doctrine, libelous per se, if it was published of and concerning the
-plaintiff&quot;; and that it was actionable without &quot;proof of pecuniary
-injury . . . , such injury being implied.&quot; <i>Id.,</i> at 673, 676, 144
-So. 2d, at 37, 41. It approved the trial court's ruling that the jury could
-find the statements to have been made &quot;of and concerning&quot; respondent,
-stating: &quot;We think it common knowledge that the average person knows that
-municipal agents, such as police and firemen, and others, are under the control
-and direction of the city governing body, and more particularly under the
-direction and control of a single commissioner. In measuring the performance or
-deficiencies of such groups, praise or criticism is usually attached to the
-official in complete control of the body.&quot; <i>Id.,</i> at 674-675, 144 So.
-2d at 39. In sustaining the trial court's determination that the verdict was
-not excessive, the court said that malice could be inferred from the Times'
-&quot;irresponsibility&quot; in printing the advertisement while &quot;the
-Times in its own files had articles already published which would have
-demonstrated the falsity of the allegations in the advertisement&quot;; from
-the Times' failure to retract for respondent while retracting for the Governor,
-whereas the falsity of some of the allegations was then known to the Times and
-&quot;the matter contained in the advertisement was equally false as to both
-parties&quot;; and from the testimony of the Times' Secretary that, 264 apart
-from the statement that the dining hall was pad-locked, he thought the two paragraphs
-were &quot;substantially correct.&quot; <i>Id.,</i> at 686-687, 144 So. 2d at
-50-51. The court reaffirmed a statement in an earlier opinion that &quot;There
-is no legal measure of damages in cases of this character.&quot; <i>Id.,</i> at
-686, 144 So. 2d, at 50. It rejected petitioners' constitutional contentions
-with the brief statements that &quot;The First Amendment of the U. S.
-Constitution does not protect libelous publications&quot; and &quot;The
-Fourteenth Amendment is directed against State action and not private action.&quot;
-<i>Id.,</i> at 676, 144 So. 2d, at 40.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Because of the importance of the
-constitutional issues involved, we granted the separate petitions for
-certiorari of the individual petitioners and of the Times. 371 U. S. 946. We
-reverse the judgment. We hold that the rule of law applied by the Alabama
-courts is constitutionally deficient for failure to provide the safeguards for
-freedom of speech and of the press that are required by the First and
-Fourteenth Amendments in a libel action brought by a public official against
-critics of his official conduct.</span><a name="r[5]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[5]"><span
-style='mso-bookmark:"r\[5\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[5]</span></span><span
-style='mso-bookmark:"r\[5\]"'></span></a><span style='mso-bookmark:"r\[5\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> We 265 further hold that under the proper safeguards the
-evidence presented in this case is constitutionally insufficient to support the
-judgment for respondent.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal;mso-outline-level:2'><b><span style='font-size:18.0pt;
-font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>I<o:p></o:p></span></b></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>We may dispose at the outset of two
-grounds asserted to insulate the judgment of the Alabama courts from
-constitutional scrutiny. The first is the proposition relied on by the State
-Supreme Court—that &quot;The Fourteenth Amendment is directed against State
-action and not private action.&quot; That proposition has no application to
-this case. Although this is a civil lawsuit between private parties, the
-Alabama courts have applied a state rule of law which petitioners claim to
-impose invalid restrictions on their constitutional freedoms of speech and
-press. It matters not that that law has been applied in a civil action and that
-it is common law only, though supplemented by statute. See, <i>e. g.,</i>
-Alabama Code, Tit. 7, §§ 908-917. The test is not the form in which state power
-has been applied but, whatever the form, whether such power has in fact been
-exercised. See <a
-href="http://scholar.google.com/scholar_case?case=7954245598668410247&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Ex
-parte Virginia,</i> 100 U. S. 339, 346-347</a>; <a
-href="http://scholar.google.com/scholar_case?case=6044978439409333072&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>American
-Federation of Labor</i> v. <i>Swing,</i> 312 U. S. 321</a>.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>The second contention is that the
-constitutional guarantees of freedom of speech and of the press are
-inapplicable here, at least so far as the Times is concerned, because the
-allegedly libelous statements were published as part of a paid, &quot;commercial&quot;
-advertisement. The argument relies on <a
-href="http://scholar.google.com/scholar_case?case=14755001745453098209&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Valentine</i>
-v. <i>Chrestensen,</i> 316 U. S. 52,</a> where the Court held that a city
-ordinance forbidding street distribution of commercial and business advertising
-matter did not abridge the First Amendment freedoms, even as applied to a
-handbill having a commercial message on one side but a protest against certain
-official action on the other. The reliance is wholly misplaced. The Court in <i>Chrestensen</i>
-reaffirmed the constitutional protection for &quot;the freedom of communicating
-266 information and disseminating opinion&quot;; its holding was based upon the
-factual conclusions that the handbill was &quot;purely commercial
-advertising&quot; and that the protest against official action had been added
-only to evade the ordinance.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>The publication here was not a
-&quot;commercial&quot; advertisement in the sense in which the word was used in
-<i>Chrestensen.</i> It communicated information, expressed opinion, recited
-grievances, protested claimed abuses, and sought financial support on behalf of
-a movement whose existence and objectives are matters of the highest public
-interest and concern. See <a
-href="http://scholar.google.com/scholar_case?case=13147024771433949854&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>N.
-A. A. C. P.</i> v. <i>Button,</i> 371 U. S. 415, 435</a>. That the Times was
-paid for publishing the advertisement is as immaterial in this connection as is
-the fact that newspapers and books are sold. <a
-href="http://scholar.google.com/scholar_case?case=6226605592262258810&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Smith</i>
-v. <i>California,</i> 361 U. S. 147, 150</a>; cf. <a
-href="http://scholar.google.com/scholar_case?case=7402288339517306664&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Bantam
-Books, Inc.,</i> v. <i>Sullivan,</i> 372 U. S. 58, 64, n. 6</a>. Any other
-conclusion would discourage newspapers from carrying &quot;editorial
-advertisements&quot; of this type, and so might shut off an important outlet
-for the promulgation of information and ideas by persons who do not themselves
-have access to publishing facilities—who wish to exercise their freedom of
-speech even though they are not members of the press. Cf. <a
-href="http://scholar.google.com/scholar_case?case=5706334303740337745&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Lovell</i>
-v. <i>Griffin,</i> 303 U. S. 444, 452</a>; <a
-href="http://scholar.google.com/scholar_case?case=16366253899607993730&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Schneider</i>
-v. <i>State,</i> 308 U. S. 147, 164</a>. The effect would be to shackle the
-First Amendment in its attempt to secure &quot;the widest possible
-dissemination of information from diverse and antagonistic sources.&quot; <a
-href="http://scholar.google.com/scholar_case?case=12116214944985887583&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Associated
-Press</i> v. <b><i><span style='color:black'>United</span></i></b><i> States,</i>
-326 U. S. 1, 20</a>. To avoid placing such a handicap upon the freedoms of
-expression, we hold that if the allegedly libelous statements would otherwise
-be constitutionally protected from the present judgment, they do not forfeit
-that protection because they were published in the from of a paid
-advertisement.</span><a name="r[6]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[6]"><span
-style='mso-bookmark:"r\[6\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[6]</span></span><span
-style='mso-bookmark:"r\[6\]"'></span></a><span style='mso-bookmark:"r\[6\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'><o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal;mso-outline-level:2'><b><span style='font-size:18.0pt;
-font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>267
-II<o:p></o:p></span></b></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Under Alabama law as applied in this
-case, a publication is &quot;libelous per se&quot; if the words &quot;tend to
-injure a person . . . in his reputation&quot; or to &quot;bring [him] into
-public contempt&quot;; the trial court stated that the standard was met if the
-words are such as to &quot;injure him in his public office, or impute
-misconduct to him in his office, or want of official integrity, or want of
-fidelity to a public trust . . . .&quot; The jury must find that the words were
-published &quot;of and concerning&quot; the plaintiff, but where the plaintiff
-is a public official his place in the governmental hierarchy is sufficient
-evidence to support a finding that his reputation has been affected by
-statements that reflect upon the agency of which he is in charge. Once
-&quot;libel per se&quot; has been established, the defendant has no defense as
-to stated facts unless he can persuade the jury that they were true in all
-their particulars. <i>Alabama Ride Co.</i> v. <i>Vance,</i> 235 Ala. 263, 178
-So. 438 (1938); <a
-href="http://scholar.google.com/scholar_case?case=7426911620799207434&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Johnson
-Publishing Co.</i> v. <i>Davis,</i> 271 Ala. 474, 494-495, 124 So. 2d 441,
-457-458 (1960)</a>. His privilege of &quot;fair comment&quot; for expressions
-of opinion depends on the truth of the facts upon which the comment is based. <i>Parsons</i>
-v. <i>Age-Herald Publishing Co.,</i> 181 Ala. 439, 450, 61 So. 345, 350 (1913).
-Unless he can discharge the burden of proving truth, general damages are
-presumed, and may be awarded without proof of pecuniary injury. A showing of
-actual malice is apparently a prerequisite to recovery of punitive damages, and
-the defendant may in any event forestall a punitive award by a retraction
-meeting the statutory requirements. Good motives and belief in truth do not
-negate an inference of malice, but are relevant only in mitigation of punitive
-damages if the jury chooses to accord them weight. <a
-href="http://scholar.google.com/scholar_case?case=7426911620799207434&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Johnson
-Publishing Co.</i> v. <i>Davis, supra,</i> 271 Ala., at 495, 124 So. 2d, at 458</a>.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>268 The question before us is
-whether this rule of liability, as applied to an action brought by a public
-official against critics of his official conduct, abridges the freedom of
-speech and of the press that is guaranteed by the first and Fourteenth
-Amendments.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>Respondent relies heavily, as did
-the Alabama courts, on statements of this Court to the effect that the
-Constitution does not protect libelous publications.</span><a name="r[7]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[7]"><span
-style='mso-bookmark:"r\[7\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[7]</span></span><span
-style='mso-bookmark:"r\[7\]"'></span></a><span style='mso-bookmark:"r\[7\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> Those statements do not foreclose our inquiry here. None of
-the cases sustained the use of libel laws to impose sanctions upon expression
-critical of the official conduct of public officials. The dictum in <a
-href="http://scholar.google.com/scholar_case?case=16385554282045511590&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Pennekamp</i>
-v. <i>Florida,</i> 328 U. S. 331, 348-349,</a> that &quot;when the statements
-amount to defamation, a judge has such remedy in damages for libel as do other
-public servants,&quot; implied no view as to what remedy might constitutionally
-be afforded to public officials. In <a
-href="http://scholar.google.com/scholar_case?case=11103450757210626375&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Beauharnais</i>
-v. <i>Illinois,</i> 343 U. S. 250,</a> the Court sustained an Illinois criminal
-libel statute as applied to a publication held to be both defamatory of a
-racial group and &quot;liable to cause violence and disorder.&quot; But the
-Court was careful to note that it &quot;retains and exercises authority to
-nullify action which encroaches on freedom of utterance under the guise of
-punishing libel&quot;; for &quot;public men, are, as it were, public property,&quot;
-and &quot;discussion cannot be denied and the right, as well as the duty, of
-criticism must not be stifled.&quot; <i>Id.,</i> at 263-264, and n. 18. In the
-only previous case that did present the question of constitutional limitations
-upon the power to award damages for libel of a public official, the Court was
-equally divided and the question was not decided. <i>Schenectady Union Pub. Co.</i>
-v. <i>Sweeney,</i> 316 U. S. 642. 269 In deciding the question now, we are
-compelled by neither precedent nor policy to give any more weight to the
-epithet &quot;libel&quot; than we have to other &quot;mere labels&quot; of
-state law. <a
-href="http://scholar.google.com/scholar_case?case=13147024771433949854&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>N.
-A. A. C. P.</i> v. <i>Button,</i> 371 U. S. 415, 429</a>. Like insurrection,</span><a
-name="r[8]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[8]"><span
-style='mso-bookmark:"r\[8\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[8]</span></span><span
-style='mso-bookmark:"r\[8\]"'></span></a><span style='mso-bookmark:"r\[8\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> contempt,</span><a name="r[9]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[9]"><span
-style='mso-bookmark:"r\[9\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[9]</span></span><span
-style='mso-bookmark:"r\[9\]"'></span></a><span style='mso-bookmark:"r\[9\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> advocacy of unlawful acts,</span><a name="r[10]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[10]"><span
-style='mso-bookmark:"r\[10\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[10]</span></span><span
-style='mso-bookmark:"r\[10\]"'></span></a><span style='mso-bookmark:"r\[10\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> breach of the peace,</span><a name="r[11]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[11]"><span
-style='mso-bookmark:"r\[11\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[11]</span></span><span
-style='mso-bookmark:"r\[11\]"'></span></a><span style='mso-bookmark:"r\[11\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> obscenity,</span><a name="r[12]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[12]"><span
-style='mso-bookmark:"r\[12\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[12]</span></span><span
-style='mso-bookmark:"r\[12\]"'></span></a><span style='mso-bookmark:"r\[12\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> solicitation of legal business,</span><a name="r[13]"></a><a
-href="http://scholar.google.com/scholar_case?case=10183527771703896207&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002#[13]"><span
-style='mso-bookmark:"r\[13\]"'><span style='font-size:10.0pt;mso-bidi-font-size:
-11.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:"Times New Roman"'>[13]</span></span><span
-style='mso-bookmark:"r\[13\]"'></span></a><span style='mso-bookmark:"r\[13\]"'></span><span
-style='font-size:12.0pt;font-family:"Times New Roman","serif";mso-fareast-font-family:
-"Times New Roman"'> and the various other formulae for the repression of
-expression that have been challenged in this court, libel can claim no
-talismanic immunity from constitutional limitations. It must be measured by
-standards that satisfy the First Amendment.<o:p></o:p></span></p>
-
-<p class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-line-height:normal'><span style='font-size:12.0pt;font-family:"Times New Roman","serif";
-mso-fareast-font-family:"Times New Roman"'>The general proposition that freedom
-of expression upon public questions is secured by the First Amendment has long
-been settled by our decisions. The constitutional safeguard, we have said,
-&quot;was fashioned to assure unfettered interchange of ideas for the bringing
-about of political and social changes desired by the people.&quot; <a
-href="http://scholar.google.com/scholar_case?case=14778925784015245625&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Roth</i>
-v. <b><i><span style='color:black'>United</span></i></b><i> States,</i> 354 U.
-S. 476, 484</a>. &quot;The maintenance of the opportunity for free political
-discussion to the end that government may be responsive to the will of the
-people and that changes may be obtained by lawful means, an opportunity
-essential to the security of the Republic, is a fundamental principle of our
-constitutional system.&quot; <a
-href="http://scholar.google.com/scholar_case?case=6244546070778813024&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Stromberg</i>
-v. <i>California,</i> 283 U. S. 359, 369</a>. &quot;[I]t is a prized American
-privilege to speak one's mind, although not always with perfect good taste, on
-all public institutions,&quot; <a
-href="http://scholar.google.com/scholar_case?case=8195705027584002697&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Bridges</i>
-v. <i>California,</i> 314 U. S. 252, 270,</a> and this opportunity is to be
-afforded for &quot;vigorous advocacy&quot; no less than &quot;abstract
-discussion.&quot; <a
-href="http://scholar.google.com/scholar_case?case=13147024771433949854&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>N.
-A. A. C. P.</i> v. <i>Button,</i> 371 U. S. 415, 429</a>. 270 The First
-Amendment, said Judge Learned Hand, &quot;presupposes that right conclusions
-are more likely to be gathered out of a multitude of tongues, than through any
-kind of authoritative selection. To many this is, and always will be, folly;
-but we have staked upon it our all.&quot; <a
-href="http://scholar.google.com/scholar_case?case=4073020527820814667&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><b><i><span
-style='color:black'>United</span></i></b><i> States</i> v. <i>Associated Press,</i>
-52 F. Supp. 362, 372 (D. C. S. D. N. Y. 1943)</a>. Mr. Justice Brandeis, in his
-concurring opinion in <a
-href="http://scholar.google.com/scholar_case?case=9558803063364299687&amp;q=citizens+united+fec&amp;hl=en&amp;as_sdt=2002"><i>Whitney</i>
-v. <i>California,</i> 274 U. S. 357, 375-376,</a> gave the principle its
-classic formulation:<o:p></o:p></span></p>
-
+<div id="root">
+  <p id="p1">Paragraph one.</p>
+  
+  <p id="p2">
+  Lorem <a id="link1" href="#" class="elm">link1</a>ipsum <span id="span1" class="elm">span1</span> sit amet, <span id="span2" class="elm">span2</span>
+  </p>
+  
+  <p id="p3">
+  <span id="span3" class="elm">span3</span>, sed do eiusmod <span id="span3a" class="elm">span3a</span> tempor 
+  incididunt <span id="span3b" class="elm">span3b</span> ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+  nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+  </p>
+  
+  <p id="p4">
+  Duis aute irure dolor in reprehenderit in
+  voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+  culpa qui officia deserunt mollit anim id est <span id="span4" class="elm">span4</span>
+  </p>
+  
 </div>
+
+<script type="text/javascript">
+
+function iterateRange(range) {
+  // startNode, startOffset, endNode, endOffset, opt_reverse
+  var tri = new goog.dom.TextRangeIterator(range.getStartNode(), range.getStartOffset(), range.getEndNode(), range.getEndOffset(), false);
+  var node;
+  var sb =  new goog.string.StringBuffer();
+  while(true) {
+    try {
+      node = tri.next();
+      sb.append(nodeToString(node));
+      sb.append('\n');
+    } catch(e) {
+      if(e === goog.iter.StopIteration) break;
+    }
+  }
+  alert('Range nodes:\n' + sb.toString());
+}
+
+// init
+function init() {
+  var mouseUpHandler = function(e){
+    var range = goog.dom.Range.createFromWindow(window);
+    var text = range.getText();
+    if(text && text.length > 0) {
+      var mark = postRange(range);
+
+      // show the nodes the ranges covers
+      //iterateRange(range);
+    }
+  };
+  goog.events.listen(goog.dom.$('root'), 'mouseup', mouseUpHandler);
+}
+
+</script>
 
 </body>
 </html>

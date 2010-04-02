@@ -10,7 +10,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.mvc.view.StaticViewInitializer;
 import com.tll.client.mvc.view.ViewClass;
+import com.tll.client.mvc.view.ViewOptions;
 import com.tll.tabulaw.client.ui.DocSuggestWidget;
+import com.tll.tabulaw.client.ui.DocUploadWidget;
 import com.tll.tabulaw.client.ui.DocumentsListingWidget;
 
 
@@ -24,6 +26,11 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 
 	public static final class Class extends PocViewClass {
 
+		/**
+		 * Keep this view in the dom (for now) so se don't loose the form.
+		 */
+		private static final ViewOptions VIEW_OPTIONS = new ViewOptions(false, false, false, false, false, true);
+		
 		@Override
 		public String getName() {
 			return "Documents";
@@ -33,9 +40,16 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 		public DocumentsView newView() {
 			return new DocumentsView();
 		}
+
+		@Override
+		public ViewOptions getViewOptions() {
+			return VIEW_OPTIONS;
+		}
 	}
 	
 	private final DocSuggestWidget docSuggest = new DocSuggestWidget();
+	
+	private final DocUploadWidget docUpload = new DocUploadWidget();
 	
 	private final DocumentsListingWidget docListing = new DocumentsListingWidget();
 	
@@ -59,6 +73,7 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 	@Override
 	protected void doInitialization(StaticViewInitializer initializer) {
 		addWidget(docSuggest);
+		addWidget(docUpload);
 		addWidget(docListing);
 		
 		// this is necessary since the docListing widget won't see the model change

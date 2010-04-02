@@ -16,7 +16,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.tll.common.model.Model;
-import com.tll.tabulaw.common.data.rpc.CaseDocSearchResult;
+import com.tll.tabulaw.common.data.dto.CaseDoc;
+import com.tll.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tll.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tll.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tll.tabulaw.server.DocUtils;
@@ -51,7 +52,7 @@ public class GoogleScholarDocHandlerTest {
 		Assert.assertEquals(results.size(), 3);
 		
 		for(int i = 0; i < results.size(); i++) {
-			CaseDocSearchResult dsr = results.get(i);
+			CaseDoc dsr = results.get(i);
 			System.out.println(dsr);
 		}
 	}
@@ -74,7 +75,7 @@ public class GoogleScholarDocHandlerTest {
 		Assert.assertTrue(results.size() == numResults);
 		
 		for(int i = 0; i < results.size(); i++) {
-			CaseDocSearchResult dsr = results.get(i);
+			CaseDoc dsr = results.get(i);
 			System.out.println(dsr);
 		}
 	}

@@ -1,5 +1,5 @@
-#Sun Mar 28 15:43:36 PDT 2010
+#Thu Apr 01 21:18:35 PDT 2010
 eclipse.preferences.version=1
-entryPointModules=
+entryPointModules=com.tll.tabulaw.PocDev|com.tll.tabulaw.PocProd
 filesCopiedToWebInfLib=gwt-servlet.jar
 gwtCompileSettings=PGd3dC1jb21waWxlLXNldHRpbmdzPjxsb2ctbGV2ZWw+REVCVUc8L2xvZy1sZXZlbD48b3V0cHV0LXN0eWxlPk9CRlVTQ0FURUQ8L291dHB1dC1zdHlsZT48ZXh0cmEtYXJncz48IVtDREFUQVtdXT48L2V4dHJhLWFyZ3M+PHZtLWFyZ3M+PCFbQ0RBVEFbLVhteDUxMm1dXT48L3ZtLWFyZ3M+PC9nd3QtY29tcGlsZS1zZXR0aW5ncz4\=

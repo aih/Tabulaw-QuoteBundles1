@@ -44,7 +44,11 @@ public class DocUtils {
 
 		cssHighightStylesBlock = "<style type=\"text/css\">.highlight{background-color:yellow;}</style>";
 	}
-
+	
+	public static String dateAsString(Date date) {
+		return dateFormat.format(date);
+	}
+	
 	public static String serializeDocument(Model mDoc) {
 		StringBuilder sb = new StringBuilder(1024);
 

@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-log-3.0.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-dnd-3.0.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-io-1.4.jar"/>
@@ -21,5 +20,7 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-listing-0.0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="libs/testng-5.10-jdk15.jar" sourcepath="C:/mr/org/testng/testng/5.10/testng-5.10-sources.jar"/>
 	<classpathentry kind="lib" path="C:/dev/tabulaw/poc/war/WEB-INF/lib/htmlcleaner2_1.jar" sourcepath="C:/dev/libs/htmlcleaner/src"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-fileupload-1.2.1.jar" sourcepath="C:/dev/libs/commons-fileupload-1.2.1/lib/commons-fileupload-1.2.1-sources.jar"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

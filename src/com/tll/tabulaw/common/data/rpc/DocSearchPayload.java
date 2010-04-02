@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.tll.common.data.Payload;
 import com.tll.common.data.Status;
+import com.tll.tabulaw.common.data.dto.CaseDocSearchResult;
 
 /**
  * Conveys doc search results from server to client.

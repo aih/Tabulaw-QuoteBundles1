@@ -5,7 +5,6 @@
  */
 package com.tll.tabulaw.client.ui.nav;
 
-import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.IViewChangeHandler;
 import com.tll.client.mvc.view.ViewChangeEvent;
 import com.tll.client.mvc.view.ViewKey;
@@ -19,23 +18,32 @@ import com.tll.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 public abstract class AbstractNavPanel extends AbstractModelChangeAwareWidget implements IViewChangeHandler {
 
 	/**
-	 * The retained current which is set <b>after</b> {@link #handleViewChange()}
-	 * is invoked.
+	 * The retained current view key.
 	 */
 	protected ViewKey currentViewKey;
 
 	@Override
 	public final void onViewChange(ViewChangeEvent event) {
-		ViewKey pending = ViewManager.get().getCurrentViewKey();
-		if(currentViewKey != null && currentViewKey.equals(pending)) {
-			return;
+		if(event.getOp() == ViewChangeEvent.ViewOp.LOAD) {
+			handleViewLoad(event.getKey());
+			if(currentViewKey == null || !currentViewKey.equals(event.getKey())) {
+				currentViewKey = event.getKey();
+			}
 		}
-		handleViewChange();
-		currentViewKey = pending;
+		else if(event.getOp() == ViewChangeEvent.ViewOp.UNLOAD) {
+			handleViewUnload(event.getKey());
+		}
 	}
 
 	/**
-	 * Responsible for updating its state if necessary upon a view change event.
+	 * Handles caught view load events.
+	 * @param key the view key of the loaded view
 	 */
-	protected abstract void handleViewChange();
+	protected abstract void handleViewLoad(ViewKey key);
+	
+	/**
+	 * Handles caught view unload events.
+	 * @param key the view key of the unloaded view
+	 */
+	protected abstract void handleViewUnload(ViewKey key);
 }

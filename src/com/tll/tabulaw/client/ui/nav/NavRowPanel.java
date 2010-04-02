@@ -8,6 +8,7 @@ package com.tll.tabulaw.client.ui.nav;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -18,6 +19,7 @@ import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
+import com.tll.client.mvc.view.UnloadViewRequest;
 import com.tll.client.mvc.view.ViewKey;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
@@ -97,6 +99,8 @@ public class NavRowPanel extends AbstractNavPanel {
 	private static void showView(ArrayList<? extends AbstractNavButton> list, int index) {
 		ViewManager.get().dispatch(new ShowViewRequest(list.get(index).getViewInitializer()));
 	}
+	
+	private static final int maxNumOpenViews = 6;
 
 	private final ArrayList<AbstractNavButton> mainViewButtons = new ArrayList<AbstractNavButton>();
 
@@ -166,7 +170,7 @@ public class NavRowPanel extends AbstractNavPanel {
 	}
 
 	@Override
-	protected void handleViewChange() {
+	protected void handleViewLoad(ViewKey key) {
 		handlingViewChange = true;
 		int i = 0;
 		ViewKey crntViewKey = ViewManager.get().getCurrentViewKey();
@@ -178,13 +182,20 @@ public class NavRowPanel extends AbstractNavPanel {
 				DocumentView dview = (DocumentView) ViewManager.get().resolveView(crntViewKey);
 				ModelKey docKey = dview.getDocKey();
 				DocumentViewNavButton dnb = new DocumentViewNavButton(docKey);
-				openDocNavButtons.add(dnb);
-				openDocTabs.addTab(dnb);
-				index = openDocTabs.getTabCount() - 1;
+				openDocNavButtons.add(0, dnb);
+				openDocTabs.insertTab(dnb, 0);
+				index = 0;
 			}
 			openDocTabs.selectTab(index);
 			// unselect main view tabs
 			mainViewTabs.selectTab(-1);
+			
+			// unload oldest view if at capacity
+			if(openDocNavButtons.size() > maxNumOpenViews) {
+				openDocTabs.setVisible(false);
+				ViewKey tounload = openDocNavButtons.get(openDocNavButtons.size() - 1).getViewInitializer().getViewKey();
+				ViewManager.get().dispatch(new UnloadViewRequest(tounload, true, false));
+			}
 		}
 		else {
 			for(AbstractNavButton navBtn : mainViewButtons) {
@@ -201,6 +212,19 @@ public class NavRowPanel extends AbstractNavPanel {
 			openDocTabs.selectTab(-1);
 		}
 		handlingViewChange = false;
+	}
+
+	@Override
+	protected void handleViewUnload(ViewKey key) {
+		if(key.getViewClass() == DocumentView.klas) {
+			int index = getTabIndexFromViewKey(key, false);
+			if(index >= 0) {
+				Log.debug("Removing old doc view: " + key);
+				openDocNavButtons.remove(index);
+				openDocTabs.removeTab(index);
+				openDocTabs.setVisible(true);
+			}
+		}
 	}
 
 	private int getTabIndexFromViewKey(ViewKey viewKey, boolean mainView) {
