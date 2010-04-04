@@ -1,7 +1,4 @@
 *.class
-classes/
-war/poc/
-war/com.tll.tabulaw.Poc/
 *.war
-/gwtc
 /test-output
+/target

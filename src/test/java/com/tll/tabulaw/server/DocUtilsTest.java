@@ -25,7 +25,7 @@ import com.tll.tabulaw.common.model.PocModelFactory;
  * Tests {@link DocUtils} methods.
  * @author jpk
  */
-@Test
+@Test(groups = "server")
 public class DocUtilsTest {
 	
 	@Test(enabled = true)

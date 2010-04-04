@@ -27,7 +27,7 @@ import com.tll.util.ClassUtil;
  * Tests {@link GoogleScholarDocHandler}
  * @author jpk
  */
-@Test
+@Test(groups = "server")
 public class GoogleScholarDocHandlerTest {
 	
 	@Test(enabled = false)

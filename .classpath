@@ -1,26 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-log-3.0.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-dnd-3.0.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-io-1.4.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-core-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-dao-api-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-schema-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-core-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-ui-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-rpc-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-model-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-view-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-field-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-databind-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-marshal-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tll-client-listing-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/testng-5.10-jdk15.jar" sourcepath="C:/mr/org/testng/testng/5.10/testng-5.10-sources.jar"/>
-	<classpathentry kind="lib" path="C:/dev/tabulaw/poc/war/WEB-INF/lib/htmlcleaner2_1.jar" sourcepath="C:/dev/libs/htmlcleaner/src"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-fileupload-1.2.1.jar" sourcepath="C:/dev/libs/commons-fileupload-1.2.1/lib/commons-fileupload-1.2.1-sources.jar"/>
-	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT"/>
-	<classpathentry kind="output" path="war/WEB-INF/classes"/>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry kind="output" path="target/war/WEB-INF/classes"/>
 </classpath>
