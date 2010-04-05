@@ -171,25 +171,6 @@
 				</configuration>
 			</plugin>
 
-			<!-- 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-						<manifestEntries>
-							<mode>${mode}</mode>
-							<url>${project.url}</url>
-						</manifestEntries>
-					</archive>
-					<excludes>
-						<exclude>javax/**</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-			-->
-			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -224,7 +205,6 @@
 				</executions>
 			</plugin>
 			
-			<!-- 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -258,7 +238,7 @@
 									<jvmarg value="-Xmx768m" />
 									<jvmarg value="-Xss1024k" />
 									<arg value="-war" />
-						    	<arg value="target/war" />
+						    	<arg value="target/${project.build.finalName}" />
 									<arg value="-style" />
 						    	<arg value="${gwt.compile.style}" />
 									<arg value="-gen" />
@@ -274,7 +254,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			-->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -288,10 +267,25 @@
 						<phase>prepare-package</phase>
 						<configuration>
 							<finalName>tll-server</finalName>
-							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
+							<outputDirectory>target/${project.build.finalName}/WEB-INF/lib</outputDirectory>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
 								<descriptor>src/main/assembly/tll-server.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+					<execution>
+						<id>warpack</id>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<finalName>${project.build.finalName}</finalName>
+							<outputDirectory>target</outputDirectory>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>src/main/assembly/warpack.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>
@@ -302,12 +296,14 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.1-beta-1</version>
+				<!-- 
 				<configuration>
 					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
 					<warSourceDirectory>target/war</warSourceDirectory>
 					<warSourceExcludes>**/work/**,**/tll*</warSourceExcludes>
 					<warSourceIncludes>tll-server.jar</warSourceIncludes>
 				</configuration>
+				-->
 				<executions>
 					<execution>
 						<id>fill-war-dir</id>
@@ -321,6 +317,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 		</plugins>
 	</build>
 
