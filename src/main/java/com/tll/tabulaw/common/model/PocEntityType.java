@@ -14,10 +14,14 @@ import com.tll.common.model.IEntityType;
  */
 public enum PocEntityType implements IEntityType, INameValueProvider<String> {
 
+	USER("user"),
+	
 	CASE("case"),
 	DOCUMENT("Documents"),
+	
 	QUOTE("Quote"),
 	QUOTE_BUNDLE("Quote Bundle"),
+	
 	NOTE("Note");
 
 	private String name;

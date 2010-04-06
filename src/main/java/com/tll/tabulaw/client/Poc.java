@@ -3,8 +3,6 @@ package com.tll.tabulaw.client;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.tll.client.model.ModelChangeEvent;
@@ -12,6 +10,7 @@ import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.StaticViewInitializer;
 import com.tll.client.mvc.view.ViewClass;
+import com.tll.client.ui.LoginDialog;
 import com.tll.common.model.CopyCriteria;
 import com.tll.common.model.Model;
 import com.tll.tabulaw.client.ui.Notifier;
@@ -23,6 +22,8 @@ import com.tll.tabulaw.client.view.DocumentsView;
 import com.tll.tabulaw.client.view.QuoteBundlesView;
 import com.tll.tabulaw.common.data.rpc.IDocService;
 import com.tll.tabulaw.common.data.rpc.IDocServiceAsync;
+import com.tll.tabulaw.common.data.rpc.IUserContextService;
+import com.tll.tabulaw.common.data.rpc.IUserContextServiceAsync;
 
 /**
  * Poc
@@ -34,6 +35,8 @@ public class Poc implements EntryPoint {
 	 * The sole doc service in the app.
 	 */
 	private static final IDocServiceAsync docService;
+	
+	private static final IUserContextServiceAsync userContextService;
 	
 	/**
 	 * The sole current quote bundle.
@@ -71,6 +74,7 @@ public class Poc implements EntryPoint {
 	
 	static {
 		docService = (IDocServiceAsync) GWT.create(IDocService.class);
+		userContextService = (IUserContextServiceAsync) GWT.create(IUserContextService.class);
 	}
 
 	/**
@@ -90,6 +94,8 @@ public class Poc implements EntryPoint {
 		return (Portal) RootPanel.get("portal").getWidget(0);
 	}
 
+	private LoginDialog loginDialog;
+	
 	public void onModuleLoad() {
 		Log.setUncaughtExceptionHandler();
 		History.newItem(INITIAL_HISTORY_TOKEN);
@@ -100,13 +106,53 @@ public class Poc implements EntryPoint {
 		// build out the core structure
 		build();
 
-		DeferredCommand.addCommand(new Command() {
+		/*
+		userContextService.getUserContext(new AsyncCallback<UserContextPayload>() {
+			
+			@Override
+			public void onSuccess(UserContextPayload result) {
+				if(result.getUser() == null) {
+					// not logged in
+					if(loginDialog == null) {
+						loginDialog = new LoginDialog("/login");
+						loginDialog.addUserSessionHandler(new IUserSessionHandler() {
+							
+							@Override
+							public void onUserSessionEvent(UserSessionEvent event) {
+								if(event.isStart()) {
+									
+									loginDialog.hide();
+									loginDialog = null;
+									
+									DeferredCommand.addCommand(new Command() {
 
-			@SuppressWarnings("synthetic-access")
-			public void execute() {
-				ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
+										@SuppressWarnings("synthetic-access")
+										public void execute() {
+											ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
+										}
+									});
+								}
+							}
+						});
+					}
+					loginDialog.show();
+				}
+				else {
+					if(loginDialog != null) {
+						loginDialog.hide();
+						loginDialog = null;
+					}
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
 			}
 		});
+		*/
+		
+		// TODO temp bypass logins
+		ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
 	}
 
 	private void build() {

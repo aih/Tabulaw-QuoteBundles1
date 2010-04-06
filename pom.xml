@@ -54,14 +54,14 @@
 	</profiles>
 
 	<build>
+		
+		<!--
 		<resources>
 			<resource>
-				<!--
 				NOTE: we need to keep ClientBundle referenced resources in the same dir
 				as the one that holds the ClientBundle interface for the google web/gwt plugin to 
 				not given errors.
 				For consistency, we put *.gwt.xml files under this root dir as well.  
-				-->
 				<directory>src/main/java</directory>
 				<includes>
 					<include>**/client/**</include>
@@ -87,6 +87,7 @@
 				</includes>
 			</testResource>
 		</testResources>
+		-->
 
 		<outputDirectory>target/war/WEB-INF/classes</outputDirectory>
 
@@ -376,7 +377,20 @@
 			<version>2.1</version>
 		</dependency>
 
+		<!-- must use older version of slf4j-log4j12 binding so that jodconverter doesn't error out -->
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.4.3</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.artofsolving</groupId>
+			<artifactId>jodconverter</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+    
+    <dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-core</artifactId>
 			<version>${tll.version}</version>
@@ -534,10 +548,6 @@
 			<version>${tll.version}</version>
 			<exclusions>
 				<exclusion>
-					<artifactId>slf4j-api</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-				<exclusion>
 					<artifactId>tll-mail</artifactId>
 					<groupId>com.tll</groupId>
 				</exclusion>
@@ -562,6 +572,12 @@
 					<groupId>com.google.code.guice</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.tll</groupId>
+			<artifactId>tll-client-login</artifactId>
+			<version>${tll.version}</version>
 		</dependency>
 
 		<dependency>

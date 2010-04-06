@@ -19,6 +19,7 @@
 	<inherits name="com.tll.View" />
 	<inherits name="com.tll.Listing" />
 	<inherits name="com.tll.Databind" />
+	<inherits name="com.tll.Login" />
 
 	<stylesheet src="../css/poc.css" />
 

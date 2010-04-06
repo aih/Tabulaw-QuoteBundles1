@@ -3,6 +3,30 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5">
+	
+  <listener>
+    <listener-class>com.tll.tabulaw.server.FileConverterBootstrapper</listener-class>
+  </listener>
+
+	<servlet>
+		<servlet-name>UserContextService</servlet-name>
+		<servlet-class>com.tll.tabulaw.server.rpc.UserContextService</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>UserContextService</servlet-name>
+		<url-pattern>/poc/userContext</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>UserContextServlet</servlet-name>
+		<servlet-class>com.tll.tabulaw.server.UserContextServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>UserContextServlet</servlet-name>
+		<url-pattern>/login</url-pattern>
+	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>DocViewServlet</servlet-name>

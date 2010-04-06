@@ -21,10 +21,8 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 
-import com.tll.tabulaw.server.convert.DocToHtmlFileConverter;
 import com.tll.tabulaw.server.convert.IFileConverter;
-import com.tll.tabulaw.server.convert.PassthoughFileConverter;
-import com.tll.tabulaw.server.convert.TextToHtmlFileConverter;
+import com.tll.tabulaw.server.convert.IFileConverter.FileType;
 
 /**
  * Saves uploaded documents.
@@ -33,23 +31,6 @@ import com.tll.tabulaw.server.convert.TextToHtmlFileConverter;
 public class DocUploadServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 4089402890142022345L;
-
-	static IFileConverter resolveConverter(List<FileItem> items) {
-		// for now, just do it by filename
-		// also, assume we have a single file item
-		FileItem item = items.get(0);
-		String filename = item.getName();
-
-		if(filename.endsWith(".doc")) {
-			return new DocToHtmlFileConverter();
-		}
-		else if(filename.endsWith(".txt") || filename.endsWith(".rtf")) {
-			return new TextToHtmlFileConverter();
-		}
-
-		// as a fall-back, provide a pass through converter
-		return new PassthoughFileConverter();
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -66,7 +47,6 @@ public class DocUploadServlet extends HttpServlet {
 			// Parse the request
 			try {
 				List<FileItem> items = upload.parseRequest(req);
-				IFileConverter converter = resolveConverter(items);
 
 				File f = null;
 				for(FileItem item : items) {
@@ -87,7 +67,13 @@ public class DocUploadServlet extends HttpServlet {
 					}
 				}
 				if(f == null) throw new ServletException("No uploaded file content detected.");
-				File converted = converter.convert(f);
+				
+				// convert to html
+				IFileConverter fconverter =
+						(IFileConverter) req.getSession().getServletContext().getAttribute(
+								FileConverterBootstrapper.FILE_CONVERTER_KEY);
+				File fout = fconverter.convert(f, FileType.HTML);
+				
 				resp.setStatus(HttpServletResponse.SC_CREATED);
 				
 				StringBuilder sb = new StringBuilder();
@@ -96,7 +82,7 @@ public class DocUploadServlet extends HttpServlet {
 				sb.append("|docDate:");
 				sb.append(DocUtils.dateAsString(new Date()));
 				sb.append("|docHash:");
-				sb.append(converted.getName());
+				sb.append(fout.getName());
 				
 				resp.getWriter().print(sb.toString());
 				resp.flushBuffer();
