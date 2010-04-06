@@ -53,8 +53,15 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 	
 	private final DocumentsListingWidget docListing = new DocumentsListingWidget();
 	
-	private HandlerRegistration hr;
+	private HandlerRegistration hrModelChange_suggest, hrModelChange_upload;
 	
+	/**
+	 * Constructor
+	 */
+	public DocumentsView() {
+		super();
+	}
+
 	@Override
 	public String getLongViewName() {
 		return "Documents";
@@ -80,7 +87,10 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 		// event fired
 		// from doc suggest widget since it exists under the *same* view which model
 		// change dispatcher doesn't support
-		hr = docSuggest.addModelChangeHandler(docListing);
+		hrModelChange_suggest = docSuggest.addModelChangeHandler(docListing);
+		
+		// notify listing of uploaded file so a row may be added
+		hrModelChange_upload = docUpload.addModelChangeHandler(docListing);
 	}
 
 	@Override
@@ -92,11 +102,15 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 	@Override
 	protected final void doDestroy() {
 		//docListing.getOperator().clear();
-		hr.removeHandler();
+		hrModelChange_suggest.removeHandler();
+		hrModelChange_suggest = null;
+		hrModelChange_upload.removeHandler();
+		hrModelChange_upload = null;
 	}
 
 	@Override
 	protected void handleModelChange(ModelChangeEvent event) {
 		docListing.onModelChangeEvent(event);
+		//docUpload.onModelChangeEvent(event);
 	}
 }

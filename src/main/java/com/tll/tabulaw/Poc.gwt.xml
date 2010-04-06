@@ -7,13 +7,13 @@
 	<!-- <inherits name="com.google.gwt.user.theme.chrome.Chrome"/> -->
 	<!-- <inherits name="com.google.gwt.user.theme.dark.Dark"/>     -->
 
-	<inherits name="com.allen_sauer.gwt.dnd.gwt-dnd" />
-
-	<!-- 
+  <!-- 
 		this suppress gwt rpc warnings
 		see: http://code.google.com/p/google-web-toolkit/issues/detail?id=4438 
 	-->
 	<extend-configuration-property name="rpc.blacklist" value="com.google.gwt.user.client.ui.*Collection"/>
+
+	<inherits name="com.allen_sauer.gwt.dnd.gwt-dnd" />
 
 	<inherits name="com.tll.Rpc" />
 	<inherits name="com.tll.View" />

@@ -144,7 +144,7 @@ public class DocUtils {
 		if("casedoc".equals(type))
 			return PocModelFactory.get().buildCaseDoc(title, hash, date, parties, citation, url, year);
 		else if("contractdoc".equals(type))
-			return PocModelFactory.get().buildContractDoc(title, hash, date);
+			return PocModelFactory.get().buildDoc(title, hash, date);
 		else
 		 throw new IllegalArgumentException("Unhandled doc type: " + type);
 	}

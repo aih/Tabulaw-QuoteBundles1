@@ -74,7 +74,7 @@ public class DocService extends RpcServlet implements IDocService {
 		File cproot;
 		try {
 			cproot = new File(getClass().getClassLoader().getResource("").toURI());
-			Iterator<File> itr = FileUtils.iterateFiles(cproot, new String[] { "htm"
+			Iterator<File> itr = FileUtils.iterateFiles(cproot, new String[] { "htm", "html"
 			}, false);
 			while(itr.hasNext()) {
 				File f = itr.next();

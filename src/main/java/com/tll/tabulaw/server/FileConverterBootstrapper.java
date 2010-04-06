@@ -22,7 +22,7 @@ public class FileConverterBootstrapper implements ServletContextListener {
 	
 	public static final String FILE_CONVERTER_KEY = Integer.toString(IFileConverter.class.getName().hashCode());
 	
-	private static final String OPEN_OFFICE_CONNECTION_KEY = Integer.toString(OpenOfficeConnection.class.getName().hashCode());
+	private static final String OPEN_OFFICE_CONNECTION_KEY = Integer.toString("OpenOfficeConnection".hashCode());
 	
 	@Override
 	public void contextInitialized(ServletContextEvent event) {

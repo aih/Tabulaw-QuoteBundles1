@@ -177,6 +177,21 @@ public class PocModelFactory {
 	}
 
 	/**
+	 * Create a new contract type doc.
+	 * @param docTitle
+	 * @param docHash
+	 * @param docDate
+	 * @return newly created model
+	 */
+	public Model buildDoc(String docTitle, String docHash, Date docDate) {
+		Model doc = create(PocEntityType.DOCUMENT);
+		doc.setString("title", docTitle);
+		doc.setProperty("date", docDate, PropertyType.DATE);
+		doc.setString("hash", docHash);
+		return doc;
+	}
+
+	/**
 	 * Creates a new Model representing a document that references a case.
 	 * @param docTitle
 	 * @param docHash the server-side filename
@@ -189,33 +204,15 @@ public class PocModelFactory {
 	 */
 	public Model buildCaseDoc(String docTitle, String docHash, Date docDate, String parties, String citation, String url,
 			String year) {
+		Model doc = buildDoc(docTitle, docHash, docDate);
+		
 		Model docCase = create(PocEntityType.CASE);
 		docCase.setString("parties", parties);
 		docCase.setString("citation", citation);
 		docCase.setString("url", url);
 		docCase.setString("year", year);
-
-		Model doc = create(PocEntityType.DOCUMENT);
-		doc.setString("title", docTitle);
-		doc.setProperty("date", docDate, PropertyType.DATE);
-		doc.setString("hash", docHash);
 		doc.set(new RelatedOneProperty(PocEntityType.CASE, docCase, "case", true));
 
-		return doc;
-	}
-
-	/**
-	 * Create a new contract type doc.
-	 * @param docTitle
-	 * @param docHash
-	 * @param docDate
-	 * @return newly created model
-	 */
-	public Model buildContractDoc(String docTitle, String docHash, Date docDate) {
-		Model doc = create(PocEntityType.DOCUMENT);
-		doc.setString("title", docTitle);
-		doc.setProperty("date", docDate, PropertyType.DATE);
-		doc.setString("hash", docHash);
 		return doc;
 	}
 

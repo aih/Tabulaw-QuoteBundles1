@@ -5,7 +5,14 @@
  */
 package com.tll.tabulaw.server.convert;
 
+import java.io.File;
+import java.net.URL;
+
+import junit.framework.Assert;
+
 import org.testng.annotations.Test;
+
+import com.tll.tabulaw.server.convert.IFileConverter.FileType;
 
 /**
  * @author jpk
@@ -14,7 +21,12 @@ import org.testng.annotations.Test;
 public class OpenOfficeFileConverterTest {
 
 	public void testDocToHtmlConversion() throws Exception {
-		
+		URL url = getClass().getResource("");
+		String canonicalname = url.getPath() + "test.doc";
+		File fin = new File(canonicalname);
+		IFileConverter fc = OpenOfficeFileConverter.create();
+		File fout = fc.convert(fin, FileType.HTML);
+		Assert.assertNotNull(fout);
 	}
 	
 	public void testDocxToHtmlConversion() throws Exception {

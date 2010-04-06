@@ -10,12 +10,7 @@ import java.util.Date;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
@@ -27,13 +22,16 @@ import com.tll.client.data.rpc.RpcEvent;
 import com.tll.client.ui.RpcUiHandler;
 import com.tll.client.util.Fmt;
 import com.tll.client.util.GlobalFormat;
+import com.tll.common.model.Model;
+import com.tll.tabulaw.client.model.PocModelCache;
 import com.tll.tabulaw.common.data.dto.Doc;
+import com.tll.tabulaw.common.model.PocModelFactory;
 
 /**
  * Uploads documents to the tabulaw server.
  * @author jpk
  */
-public class DocUploadWidget extends Composite implements HasValueChangeHandlers<Doc> {
+public class DocUploadWidget extends AbstractModelChangeAwareWidget {
 
 	public static class Styles {
 
@@ -116,16 +114,12 @@ public class DocUploadWidget extends Composite implements HasValueChangeHandlers
 						doc.setHash(value);
 					}
 				}
-				ValueChangeEvent.fire(DocUploadWidget.this, doc);
+				// persist and propagate
+				Model mDoc = PocModelFactory.get().buildDoc(doc.getTitle(), doc.getHash(), doc.getDate());
+				PocModelCache.get().persist(mDoc, DocUploadWidget.this);
 			}
 		});
 		
 		initWidget(form);
 	}
-
-	@Override
-	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Doc> handler) {
-		return addHandler(handler, ValueChangeEvent.getType());
-	}
-
 }

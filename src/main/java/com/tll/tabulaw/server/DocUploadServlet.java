@@ -78,7 +78,8 @@ public class DocUploadServlet extends HttpServlet {
 				
 				StringBuilder sb = new StringBuilder();
 				sb.append("docTitle:");
-				sb.append("TODO");
+				// TODO ideally, get the title by looking inside file contents
+				sb.append(fout.getName());
 				sb.append("|docDate:");
 				sb.append(DocUtils.dateAsString(new Date()));
 				sb.append("|docHash:");
