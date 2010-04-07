@@ -29,6 +29,16 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>DocUploadServlet</servlet-name>
+		<servlet-class>com.tll.tabulaw.server.DocUploadServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>DocUploadServlet</servlet-name>
+		<url-pattern>/poc/docupload</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>DocViewServlet</servlet-name>
 		<servlet-class>com.tll.tabulaw.server.DocViewServlet</servlet-class>
 	</servlet>
@@ -46,16 +56,6 @@
 	<servlet-mapping>
 		<servlet-name>DocService</servlet-name>
 		<url-pattern>/poc/doc</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>DocUploadServlet</servlet-name>
-		<servlet-class>com.tll.tabulaw.server.DocUploadServlet</servlet-class>
-	</servlet>
-	
-	<servlet-mapping>
-		<servlet-name>DocUploadServlet</servlet-name>
-		<url-pattern>/poc/doc/upload</url-pattern>
 	</servlet-mapping>
 
 	<!-- Default page to serve -->

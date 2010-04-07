@@ -20,9 +20,12 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.tll.tabulaw.server.convert.IFileConverter;
 import com.tll.tabulaw.server.convert.IFileConverter.FileType;
+import com.tll.util.StringUtil;
 
 /**
  * Saves uploaded documents.
@@ -31,6 +34,8 @@ import com.tll.tabulaw.server.convert.IFileConverter.FileType;
 public class DocUploadServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 4089402890142022345L;
+
+	private static final Log log = LogFactory.getLog(DocUploadServlet.class);
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -46,51 +51,67 @@ public class DocUploadServlet extends HttpServlet {
 
 			// Parse the request
 			try {
+				IFileConverter fconverter =
+						(IFileConverter) req.getSession().getServletContext().getAttribute(
+								FileConverterBootstrapper.FILE_CONVERTER_KEY);
+				if(fconverter == null) {
+					throw new Exception("No file converters found.");
+				}
+
+				StringBuilder sb = new StringBuilder();
+
 				List<FileItem> items = upload.parseRequest(req);
 
+				String uploadPath = new File(getClass().getClassLoader().getResource("").toURI()).getPath() + File.separator;
 				File f = null;
+				int numSuccessful = 0;
 				for(FileItem item : items) {
 					if(!item.isFormField()) {
 						String filename = item.getName();
-						if(filename != null) {
-							filename = FilenameUtils.getName(filename);
-						}
-						File cproot = new File(getClass().getClassLoader().getResource("").toURI());
-						f = new File(cproot.getPath() + File.separator + filename);
+						if(StringUtil.isEmpty(filename)) continue;
+						filename = FilenameUtils.getName(filename);
+						f = new File(uploadPath + filename);
 						try {
 							item.write(f);
 						}
 						catch(Exception e) {
-							throw new ServletException("Unable to write uploaded file to disk: " + e.getMessage(), e);
+							throw new Exception("Unable to write uploaded file to disk: " + e.getMessage(), e);
 						}
-						break;
+						numSuccessful++;
+
+						// convert to html
+						File fout = fconverter.convert(f, FileType.HTML);
+
+						if(sb.length() == 0) {
+							sb.append("[START]");
+						}
+						if(numSuccessful > 1) {
+							sb.append(',');
+						}
+						sb.append("docTitle:");
+						// TODO ideally, get the title by looking inside file contents
+						sb.append(fout.getName());
+						sb.append("|docDate:");
+						sb.append(DocUtils.dateAsString(new Date()));
+						sb.append("|docHash:");
+						sb.append(fout.getName());
 					}
 				}
-				if(f == null) throw new ServletException("No uploaded file content detected.");
-				
-				// convert to html
-				IFileConverter fconverter =
-						(IFileConverter) req.getSession().getServletContext().getAttribute(
-								FileConverterBootstrapper.FILE_CONVERTER_KEY);
-				File fout = fconverter.convert(f, FileType.HTML);
-				
+				if(sb.length() > 0) {
+					// we have at least one uploaded doc (success)
+					sb.append("[END]");
+				}
+
+				String response = sb.toString();
+
 				resp.setStatus(HttpServletResponse.SC_CREATED);
-				
-				StringBuilder sb = new StringBuilder();
-				sb.append("docTitle:");
-				// TODO ideally, get the title by looking inside file contents
-				sb.append(fout.getName());
-				sb.append("|docDate:");
-				sb.append(DocUtils.dateAsString(new Date()));
-				sb.append("|docHash:");
-				sb.append(fout.getName());
-				
-				resp.getWriter().print(sb.toString());
+				resp.getWriter().print(response);
 				resp.flushBuffer();
 			}
 			catch(Exception e) {
-				//throw new ServletException(, e);
-				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to digest uploaded file: " + e.getMessage());
+				String emsg = "Unable to digest uploaded files: " + e.getMessage();
+				log.error(emsg, e);
+				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, emsg);
 			}
 		}
 		else {

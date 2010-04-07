@@ -25,28 +25,29 @@ import com.tll.util.ObjectUtil;
  * @author jpk
  */
 public class PocModelCache {
+
 	private static final PocModelCache instance = new PocModelCache();
 
 	public static PocModelCache get() {
 		return instance;
 	}
-	
+
 	private final HashMap<PocEntityType, List<Model>> cache = new HashMap<PocEntityType, List<Model>>();
-	
+
 	private final HashMap<PocEntityType, Comparator<Model>> comparators = new HashMap<PocEntityType, Comparator<Model>>();
 
 	/**
 	 * Constructor
 	 */
 	private PocModelCache() {
-		
+
 		// init cache
 		for(PocEntityType et : PocEntityType.values()) {
 			cache.put(et, new ArrayList<Model>());
 		}
-		
+
 		comparators.put(PocEntityType.CASE, new Comparator<Model>() {
-			
+
 			@Override
 			public int compare(Model o1, Model o2) {
 				int year1 = Integer.valueOf(o1.asString("year"));
@@ -58,9 +59,9 @@ public class PocModelCache {
 				return c1.compareTo(c2);
 			}
 		});
-		
+
 		comparators.put(PocEntityType.DOCUMENT, new Comparator<Model>() {
-			
+
 			@Override
 			public int compare(Model o1, Model o2) {
 				String title1 = o1.asString("title");
@@ -70,7 +71,7 @@ public class PocModelCache {
 		});
 
 		comparators.put(PocEntityType.QUOTE, new Comparator<Model>() {
-			
+
 			@Override
 			public int compare(Model o1, Model o2) {
 				String docTitle1 = o1.asString("document.title");
@@ -81,9 +82,9 @@ public class PocModelCache {
 				return rcmp;
 			}
 		});
-		
+
 		comparators.put(PocEntityType.QUOTE_BUNDLE, new Comparator<Model>() {
-			
+
 			@Override
 			public int compare(Model o1, Model o2) {
 				String name1 = o1.getName();
@@ -107,7 +108,7 @@ public class PocModelCache {
 		}
 		return Integer.toString(largest + 1);
 	}
-	
+
 	/**
 	 * Gets the model identified by the given key.
 	 * <p>
@@ -158,7 +159,7 @@ public class PocModelCache {
 		List<Model> list = cache.get(m.getEntityType());
 
 		Model existing = null;
-		
+
 		if(m.getId() != null) {
 			for(Model em : list) {
 				if(em.getKey().equals(m.getKey())) {
@@ -183,15 +184,29 @@ public class PocModelCache {
 		// fire model change event
 		if(source != null) source.fireEvent(new ModelChangeEvent(op, copy, null));
 	}
-	
+
 	/**
 	 * Cache all model instances in the given collection.
-	 * <p>NO model change event will be fired.
+	 * <p>
+	 * NO model change event will be fired.
 	 * @param clc collection containing model data to persist
 	 */
 	public void persistAll(Collection<Model> clc) {
 		for(Model m : clc) {
 			persist(m, null);
+		}
+	}
+
+	/**
+	 * Cache all model instances in the given collection firing a model change
+	 * event for <em>each</em> model in the given collection if the given source
+	 * is not <code>null</code>.
+	 * @param clc collection containing model data to persist
+	 * @param source the sourcing widget that will source a model change event
+	 */
+	public void persistAll(Collection<Model> clc, Widget source) {
+		for(Model m : clc) {
+			persist(m, source);
 		}
 	}
 
@@ -225,7 +240,7 @@ public class PocModelCache {
 	}
 
 	/**
-	 * Compares two quotes for equality by an implicit business key: 
+	 * Compares two quotes for equality by an implicit business key:
 	 * <ul>
 	 * <li>same doc ref
 	 * <li>same quote text
@@ -242,7 +257,7 @@ public class PocModelCache {
 		}
 		return false;
 	}
-	
+
 	public Model getCaseDocByRemoteUrl(String remoteCaseUrl) {
 		List<Model> list = cache.get(PocEntityType.DOCUMENT);
 		for(Model m : list) {

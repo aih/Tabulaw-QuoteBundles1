@@ -29,6 +29,7 @@ public class CaseDocSearchResult extends CaseDoc {
 	 */
 	public CaseDocSearchResult(String title, Date date, String url, String citation, String titleHtml, String summary) {
 		super(title, date, url, citation);
+		this.titleHtml = titleHtml;
 		this.summary = summary;
 	}
 

@@ -5,6 +5,8 @@
  */
 package com.tll.tabulaw.client.ui;
 
+import java.util.Collection;
+
 import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.ui.Position;
 import com.tll.client.ui.msg.MsgPopup;
@@ -49,10 +51,19 @@ public class Notifier {
 		show(msg, MsgLevel.ERROR);
 	}
 	
+	public void post(Collection<Msg> msgs) {
+		final MsgPopup mp = new MsgPopup(refWidget);
+		for(Msg msg : msgs) {
+			mp.addMsg(msg, null);
+			//mp.setAnimationEnabled(true);
+		}
+		mp.showMsgs(Position.BOTTOM, -1, true);
+	}
+	
 	private void show(String msg, MsgLevel level) {
 		final MsgPopup mp = new MsgPopup(refWidget);
 		mp.addMsg(new Msg(msg, level), null);
-		mp.setAnimationEnabled(true);
+		//mp.setAnimationEnabled(true);
 		mp.showMsgs(Position.BOTTOM, -1, true);
 	}
 }

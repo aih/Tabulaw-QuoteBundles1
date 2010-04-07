@@ -334,6 +334,26 @@ body {
 	font-size: 11px;
 }
 
+/* docUpload widget */
+.docUpload {
+	margin: 5px;
+	overflow: auto;
+}
+	.docUpload .uploads {
+		margin-bottom: 20px;
+	}
+	.docUpload .upload {
+		display: block;
+		margin: 3px 0 3px 0;
+	}
+	.docUpload .submit {
+		float: left;
+		font-weight: bold;
+	}
+	.docUpload .cancel {
+		float: right;
+	}
+
 /* docSuggest widget */
 .docSuggest {
 	margin-bottom: 30px;

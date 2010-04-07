@@ -5,14 +5,17 @@
  */
 package com.tll.tabulaw.client.view;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.mvc.view.StaticViewInitializer;
 import com.tll.client.mvc.view.ViewClass;
 import com.tll.client.mvc.view.ViewOptions;
 import com.tll.tabulaw.client.ui.DocSuggestWidget;
-import com.tll.tabulaw.client.ui.DocUploadWidget;
+import com.tll.tabulaw.client.ui.DocUploadDialog;
 import com.tll.tabulaw.client.ui.DocumentsListingWidget;
 
 
@@ -47,13 +50,29 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	private final DocSuggestWidget docSuggest = new DocSuggestWidget();
+	class DocUploadButton extends PushButton implements ClickHandler {
+
+		private DocUploadButton() {
+			super("Upload");
+			addClickHandler(this);
+		}
+
+		@Override
+		public void onClick(ClickEvent event) {
+			if(docUploadDialog == null) docUploadDialog = new DocUploadDialog();
+			docUploadDialog.center();
+		}
+	}
 	
-	private final DocUploadWidget docUpload = new DocUploadWidget();
+	private final DocSuggestWidget docSuggest = new DocSuggestWidget();
 	
 	private final DocumentsListingWidget docListing = new DocumentsListingWidget();
 	
-	private HandlerRegistration hrModelChange_suggest, hrModelChange_upload;
+	private HandlerRegistration hrModelChangeSuggest;
+	
+	private DocUploadDialog docUploadDialog;
+	
+	private final DocUploadButton btnDocUpload = new DocUploadButton();
 	
 	/**
 	 * Constructor
@@ -74,23 +93,19 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 
 	@Override
 	public Widget[] getNavColWidgets() {
-		return null;
+		return new Widget[] { btnDocUpload };
 	}
 
 	@Override
 	protected void doInitialization(StaticViewInitializer initializer) {
 		addWidget(docSuggest);
-		addWidget(docUpload);
 		addWidget(docListing);
 		
 		// this is necessary since the docListing widget won't see the model change
 		// event fired
 		// from doc suggest widget since it exists under the *same* view which model
 		// change dispatcher doesn't support
-		hrModelChange_suggest = docSuggest.addModelChangeHandler(docListing);
-		
-		// notify listing of uploaded file so a row may be added
-		hrModelChange_upload = docUpload.addModelChangeHandler(docListing);
+		hrModelChangeSuggest = docSuggest.addModelChangeHandler(docListing);
 	}
 
 	@Override
@@ -102,15 +117,12 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 	@Override
 	protected final void doDestroy() {
 		//docListing.getOperator().clear();
-		hrModelChange_suggest.removeHandler();
-		hrModelChange_suggest = null;
-		hrModelChange_upload.removeHandler();
-		hrModelChange_upload = null;
+		hrModelChangeSuggest.removeHandler();
+		hrModelChangeSuggest = null;
 	}
 
 	@Override
 	protected void handleModelChange(ModelChangeEvent event) {
 		docListing.onModelChangeEvent(event);
-		//docUpload.onModelChangeEvent(event);
 	}
 }

@@ -5,11 +5,18 @@
  */
 package com.tll.tabulaw.client.ui;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -23,42 +30,61 @@ import com.tll.client.ui.RpcUiHandler;
 import com.tll.client.util.Fmt;
 import com.tll.client.util.GlobalFormat;
 import com.tll.common.model.Model;
+import com.tll.common.msg.Msg;
+import com.tll.common.msg.Msg.MsgLevel;
 import com.tll.tabulaw.client.model.PocModelCache;
 import com.tll.tabulaw.common.data.dto.Doc;
 import com.tll.tabulaw.common.model.PocModelFactory;
+import com.tll.util.StringUtil;
 
 /**
  * Uploads documents to the tabulaw server.
+ * <p>Fires a value change event signaling completion of upload.
  * @author jpk
  */
-public class DocUploadWidget extends AbstractModelChangeAwareWidget {
+public class DocUploadWidget extends AbstractModelChangeAwareWidget implements HasValueChangeHandlers<String> {
 
 	public static class Styles {
 
+		public static final String DOC_UPLOAD = "docUpload";
+
+		public static final String UPLOADS = "uploads";
+
 		public static final String UPLOAD = "upload";
+
 		public static final String SUBMIT = "submit";
+
+		public static final String CANCEL = "cancel";
 	}
 
-	private static final String UPLOAD_ACTION_URL = GWT.getModuleBaseURL() + "doc/upload";
-
 	final FlowPanel panel = new FlowPanel();
+
 	final FormPanel form = new FormPanel();
-	final FileUpload upload = new FileUpload();
-	final Button submit;
 
-	// final TextField textBox = FieldFactory.ftext("fileName", null, "Filename",
-	// null, 40);
-	
+	final FlowPanel pnlUploads = new FlowPanel();
+
+	final FileUpload[] uploads;
+
+	final Button submit, cancel;
+
 	final RpcUiHandler busyHandler;
-
-	public DocUploadWidget() {
+	
+	/**
+	 * Constructor
+	 * @param numUploadSlots the number of form file fields
+	 * @param cancelHandler handles cancel events
+	 * @param busyHandler if specified, called for form onSubmit and onSubmitComplete events 
+	 */
+	public DocUploadWidget(int numUploadSlots, final ClickHandler cancelHandler, RpcUiHandler busyHandler) {
 		super();
-
-		form.setAction(UPLOAD_ACTION_URL);
+		
+		this.busyHandler = busyHandler;
+		
+		form.setAction(GWT.getModuleBaseURL() + "docupload");
 		form.setEncoding(FormPanel.ENCODING_MULTIPART);
 		form.setMethod(FormPanel.METHOD_POST);
 		form.setWidget(panel);
-		
+
 		busyHandler = new RpcUiHandler(form);
 
 		submit = new Button("Submit", new ClickHandler() {
@@ -70,56 +96,109 @@ public class DocUploadWidget extends AbstractModelChangeAwareWidget {
 		});
 		submit.setStyleName(Styles.SUBMIT);
 
-		upload.setName("upload");
-		upload.setStyleName(Styles.UPLOAD);
+		cancel = new Button("Cancel", new ClickHandler() {
 
-		panel.add(upload);
+			@Override
+			public void onClick(ClickEvent event) {
+				cancelHandler.onClick(event);
+			}
+		});
+		cancel.setStyleName(Styles.CANCEL);
+
+		uploads = new FileUpload[numUploadSlots];
+		for(int i = 0; i < numUploadSlots; i++) {
+			FileUpload fu = new FileUpload();
+			fu.setStyleName(Styles.UPLOAD);
+			fu.setName("fupload_" + (i + 1));
+			fu.setTitle("File " + (i + 1));
+			uploads[i] = fu;
+			pnlUploads.add(fu);
+		}
+
+		pnlUploads.setStyleName(Styles.UPLOADS);
+		panel.setStyleName(Styles.DOC_UPLOAD);
+		panel.add(pnlUploads);
 		panel.add(submit);
-		
+		panel.add(cancel);
+
 		form.addSubmitHandler(new SubmitHandler() {
-			
+
 			@Override
 			public void onSubmit(SubmitEvent event) {
-				if(upload.getFilename() == null) {
+				int count = 0;
+				for(FileUpload fu : uploads) {
+					if(!StringUtil.isEmpty(fu.getFilename())) {
+						count++;
+					}
+				}
+				if(count == 0) {
 					event.cancel();
-					Notifier.get().info("Specify a filename to upload");
+					Notifier.get().info("At least one file must be specified for upload.");
 					return;
 				}
-				busyHandler.onRpcEvent(new RpcEvent(RpcEvent.Type.SENT));
+				if(DocUploadWidget.this.busyHandler != null) 
+					DocUploadWidget.this.busyHandler.onRpcEvent(new RpcEvent(RpcEvent.Type.SENT));
 			}
 		});
 
 		form.addSubmitCompleteHandler(new SubmitCompleteHandler() {
-			
+
 			@Override
 			public void onSubmitComplete(SubmitCompleteEvent event) {
-				//Notifier.get().info(event.getResults());
-				busyHandler.onRpcEvent(new RpcEvent(RpcEvent.Type.RECEIVED));
-				// TODO parse the response, stuff into new Model instance and fire value change event
+				// Notifier.get().info(event.getResults());
+				if(DocUploadWidget.this.busyHandler != null) 
+					DocUploadWidget.this.busyHandler.onRpcEvent(new RpcEvent(RpcEvent.Type.RECEIVED));
 				String sresult = event.getResults();
-				sresult = sresult.replace("<pre>", "").replace("</pre>", "");
-				String[] nvs = sresult.split("\\|");
-				Doc doc = new Doc();
-				for(String nv : nvs) {
-					String[] arr = nv.split(":");
-					String name = arr[0], value = arr[1];
-					if("docTitle".equals(name)) {
-						doc.setTitle(value);
-					}
-					else if("docDate".equals(name)) {
-						Date date = Fmt.getDateTimeFormat(GlobalFormat.DATE).parse(value);
-						doc.setDate(date);
-					}
-					else if("docHash".equals(name)) {
-						doc.setHash(value);
-					}
+				int startIndex = sresult.indexOf("[START]");
+				int endIndex = sresult.indexOf("[END]");
+				if(startIndex == -1 || endIndex == -1) {
+					Notifier.get().error("Unable to upload the specified document(s).");
 				}
-				// persist and propagate
-				Model mDoc = PocModelFactory.get().buildDoc(doc.getTitle(), doc.getHash(), doc.getDate());
-				PocModelCache.get().persist(mDoc, DocUploadWidget.this);
+				else {
+					sresult = sresult.substring(startIndex + 7, endIndex);
+					String[] sdocs = sresult.split(",");
+					ArrayList<Model> mdocs = new ArrayList<Model>(sdocs.length);
+					final ArrayList<Msg> msgs = new ArrayList<Msg>(sdocs.length);
+					for(String sdoc : sdocs) {
+						String[] nvs = sdoc.split("\\|");
+						Doc doc = new Doc();
+						for(String nv : nvs) {
+							String[] arr = nv.split(":");
+							String name = arr[0], value = arr[1];
+							if("docTitle".equals(name)) {
+								doc.setTitle(value);
+							}
+							else if("docDate".equals(name)) {
+								Date date = Fmt.getDateTimeFormat(GlobalFormat.DATE).parse(value);
+								doc.setDate(date);
+							}
+							else if("docHash".equals(name)) {
+								doc.setHash(value);
+							}
+						}
+						Model mDoc = PocModelFactory.get().buildDoc(doc.getTitle(), doc.getHash(), doc.getDate());
+						mdocs.add(mDoc);
+						msgs.add(new Msg("Document: '" + doc.getTitle() + "' uploaded.", MsgLevel.INFO));
+					}
+					// persist and propagate
+					PocModelCache.get().persistAll(mdocs, DocUploadWidget.this);
+					ValueChangeEvent.fire(DocUploadWidget.this, "success");
+					DeferredCommand.addCommand(new Command() {
+						
+						@Override
+						public void execute() {
+							Notifier.get().post(msgs);
+						}
+					});
+				}
 			}
 		});
-		
+
 		initWidget(form);
+	}
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
 	}
 }

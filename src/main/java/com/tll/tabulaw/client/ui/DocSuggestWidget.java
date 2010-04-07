@@ -219,6 +219,9 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 						}
 					});
 				}
+				
+				// clear out the suggest text
+				docSuggestBox.setValue("", false);
 			}
 		});
 

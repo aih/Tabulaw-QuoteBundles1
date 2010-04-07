@@ -23,16 +23,12 @@ public class OpenOfficeFileConverter extends AbstractFileConverter {
 	/**
 	 * Factory method for creating instances.
 	 * @return newly created instance having a separate open office connection.
+	 * @throws ConnectException Upon failure to connect with open office. 
 	 */
-	public static OpenOfficeFileConverter create() {
+	public static OpenOfficeFileConverter create() throws ConnectException {
 		// open office file converter
 		SocketOpenOfficeConnection ooc = new SocketOpenOfficeConnection();
-		try {
-			ooc.connect();
-		}
-		catch(ConnectException e) {
-			throw new IllegalStateException("Can't connect to open office: " + e.getMessage(), e);
-		}
+		ooc.connect();
 		return new OpenOfficeFileConverter(ooc);
 	}
 
