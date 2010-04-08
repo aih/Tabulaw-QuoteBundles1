@@ -465,7 +465,6 @@ function Mark(range) {
 	  	var parent = node.parentNode;
 	  	var pcn = parent.className;
 	  	if(pcn && pcn.indexOf('highlight') >= 0 && pcn.indexOf(this.markId) == -1) {
-			  alert('existing highlighted text node!');
 				// existing highlighted text node
 				parent.className += (' ' + this.markId);
 				this.hspans[this.hspans.length] = span;
