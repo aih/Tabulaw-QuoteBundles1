@@ -251,7 +251,7 @@ function Mark(range) {
 	 * 	 id="{markId}_{span index}"
 	 *   class="highlight {markId}"
 	 */
-	this.hspan = null;
+	this.hspans = null;
 
 	this.onHover = function (event) {
 		// TODO set focus of corres. quote
@@ -350,23 +350,21 @@ function Mark(range) {
 	}
 	
 	/**
-	 * Appends a highlight span to the member hspan array.
+	 * Appends a highlight span to the member hspans array w/o affecting the DOM.
 	 * @param rdoc the document ref of the associated text range 
 	 * @return the added span element for convenience
 	 */
 	this.addHighlightSpan = function(rdoc) {
 		var span, index;
 		
-		if(!this.hspan) this.hspan = [];
-		index = this.hspan.length;
+		index = this.hspans.length;
 		
 		span = rdoc.createElement('span');
 		span.isNotOriginal = true;
-		span.id = this.markId + '_' + index;
 		span.className = 'highlight ' + this.markId;
 		//span.addEventListener( "mouseover", this.onHover, false);
-		
-		this.hspan[index] = span;
+
+		this.hspans[index] = span;
 		return span;
 	}
 	
@@ -387,19 +385,12 @@ function Mark(range) {
 	this.highlight = function(range) {
 		var span, node;
 
-		if(this.hspan) return;	// already highlighted
+		if(this.hspans) return;	// already highlighted
+		
+		this.hspans = [];
 		
 		if(!range) range = this.createRange();
 
-		/*
-		try {
-			range.surroundContents(this.hspan);
-		} catch(e) {
-			this.hspan = null;
-			throw e;
-		}
-		*/
-		
 		var startNode = range.getStartNode();
 		var startOffset = range.getStartOffset();
 		var endNode = range.getEndNode();
@@ -408,70 +399,80 @@ function Mark(range) {
 		if(startNode.nodeType != 3 || endNode.nodeType != 3) throw 'start and end nodes must be textual';
 		
 		var rdoc = range.getDocument();
+		
+		// array of text nodes to highlight
+		var htnodes = [];
 
 	  var tri = new goog.dom.TextRangeIterator(startNode, startOffset, endNode, endOffset, false);
+	  
 	  while(true) {
 	    try {
 	      node = tri.next();
 	      
 	      // startNode
 	      if(node == startNode) {
-	      	var prefixTextNode = null;
-      		
-	      	// split the text node at the offset to allow for insertion of highlight span
-      		if(startOffset > 0) {
-		      	var prefixText = node.nodeValue.substr(0, startOffset);
-	      		prefixTextNode = rdoc.createTextNode(prefixText);
-      		}
-    			
-      		if(node == endNode) {
-      			var tlen = node.nodeValue.length;
-      			var suffixTextNode = null;
+	      	if(node == endNode) {
+      			// single text node case
+	      		var tlen = node.nodeValue.length;
+	      		var skip = false;
+	      		if(startOffset > 0) {
+	      			node = node.splitText(startOffset);
+	      			skip = true; // skip over just split node
+	      			endOffset -= startOffset; // adjust the end offset
+	      			tlen -= startOffset;
+	      		}
+      			htnodes[htnodes.length] = node;
       			if(endOffset <= tlen) {
-	      			var suffixText = node.nodeValue.substr(endOffset+1);
-		      		suffixTextNode = rdoc.createTextNode(suffixText);
+      				node.splitText(endOffset);
       			}
-        		if(prefixTextNode != null) {
-  	      		node.parentNode.insertBefore(prefixTextNode, node);
-        		}
-        		if(suffixTextNode != null) {
-        			node.parentNode.insertBefore(suffixTextNode, node.nextSibling);
-        		}
-        		span = this.addHighlightSpan(rdoc);
-	      		node.nodeValue = node.nodeValue.substr(startOffset, endOffset - startOffset);
-        		textNodeSurround(node, span);
-	      		break;	// we're done
-      		} else {
-	      		node.nodeValue = node.nodeValue.substr(startOffset);
-      		}
+      			if(skip) tri.next();
+      			// we're done
+      			break;
+	      	} else {
+      			// different start/end text nodes case
+	      		if(startOffset > 0) {
+	      			htnodes[htnodes.length] = node.splitText(startOffset);
+	      			tri.next(); // skip over just split node
+	      		} else {
+	      			htnodes[htnodes.length] = node;
+	      		}
+	      	}
 	      }
 	      
 	      // endNode
-	      if(node == endNode) {
-	      	var textlen = node.nodeValue.length;
-	      	if(endOffset < textlen) {
-	      		// split the text node at the offset to allow for insertion of highlight span
-	      		var suffixText = node.nodeValue.substr(endOffset+1);
-	      		var suffixTextNode = rdoc.createTextNode(suffixText);
-	      		node.parentNode.insertBefore(suffixTextNode, node.nextSibling);
-	      		node.nodeValue = node.nodeValue.substr(endOffset);
-	      	}
-	      	span = this.addHighlightSpan(rdoc);
-      		textNodeSurround(node, span);
+	      else if(node == endNode) {
+      		var tlen = node.nodeValue.length;
+    			if(endOffset <= tlen) {
+    				node.splitText(endOffset);
+    			}
+  				htnodes[htnodes.length] = node;
 	      }
 
 	      // middle text node
-	      if(node != startNode && node != endNode && node.nodeType == 3) {
-	      	// surround the text node with a highlight span
-	      	span = this.addHighlightSpan(rdoc);
-	      	//alert('span: ' + span);
-	      	textNodeSurround(node, span);
+	      else if(/*node != startNode && node != endNode && */node.nodeType == 3) {
+	      	htnodes[htnodes.length] = node;
 	      }
-	      
+
 	    } catch(e) {
 	    	if(e === goog.iter.StopIteration) break;
 	    	alert('woops: ' + e);
 	    }
+	  }
+	  
+	  // surround the identified text nodes with highlight spans
+	  for(var i=0; i<htnodes.length; i++) {
+	  	var htnode = htnodes[i];
+	  	var parent = node.parentNode;
+	  	var pcn = parent.className;
+	  	if(pcn && pcn.indexOf('highlight') >= 0 && pcn.indexOf(this.markId) == -1) {
+			  alert('existing highlighted text node!');
+				// existing highlighted text node
+				parent.className += (' ' + this.markId);
+				this.hspans[this.hspans.length] = span;
+			} else {
+	  		var span = this.addHighlightSpan(rdoc);
+	    	textNodeSurround(htnode, span);
+			}
 	  }
 	}
 	
@@ -482,19 +483,34 @@ function Mark(range) {
 	this.unhighlight = function() {
 	  var span;
 		
-		if(!this.hspan) return; // not selected
+		if(!this.hspans) return; // not selected
 		
-	  for(var i = 0; i < this.hspan.length; i++) {
-		  span = this.hspan[i];
-	  	nodePromoteChildren(span);
+		var reg = /mark_*/g;
+		
+	  for(var i = 0; i < this.hspans.length; i++) {
+		  span = this.hspans[i];
+	  	// if this span isn't serving any other highlights, promote its children and remove it
+		  // otherwise, just remove the mark id from the span's class name
+		  var matches = span.className.match(reg);
+		  if(matches.length > 1) {
+		  	span.className.replace(this.markId,'');
+		  } else {
+			  nodePromoteChildren(span);
+		  }
 	  }
 	  
-	  this.hspan = null;
+	  this.hspans = null;
 	}
 	
 	var root, urange;
 	
-	this.validateRange(range);
+	try {
+		this.validateRange(range);
+	} catch(e) {
+		clearWindowSelections(range.getWindow(), range.getDocument());
+		throw e;
+	}
+	
 	urange = range;
 	
 	var root = urange.getDocument().body;

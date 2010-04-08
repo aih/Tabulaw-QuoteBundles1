@@ -1,10 +1,10 @@
 <html>
 <head>
-<link type="text/css" rel="stylesheet" href="../src/main/webapp/css/reset.css">
-<link type="text/css" rel="stylesheet" href="../src/main/webapp/css/base.css">
-<link type="text/css" rel="stylesheet" href="../src/main/webapp/css/widget-gwt.css">
-<link type="text/css" rel="stylesheet" href="../src/main/webapp/css/widget-tll.css">
-<link type="text/css" rel="stylesheet" href="../src/main/webapp/css/tableview.css">
+<link type="text/css" rel="stylesheet" href="../target/war/poc/css/reset.css">
+<link type="text/css" rel="stylesheet" href="../target/war/poc/css/base.css">
+<link type="text/css" rel="stylesheet" href="../target/war/poc/css/widget-gwt.css">
+<link type="text/css" rel="stylesheet" href="../target/war/poc/css/widget-tll.css">
+<link type="text/css" rel="stylesheet" href="../target/war/poc/css/tableview.css">
 
 <style type="text/css">
 .highlight {
@@ -37,7 +37,7 @@
 }
 .elm {
   color: red;
-  font-weight: bold
+  font-weight: bold;
 }
 </style>
 
@@ -186,6 +186,7 @@ function iterateRange(range) {
 function init() {
   var mouseUpHandler = function(e){
     var range = goog.dom.Range.createFromWindow(window);
+    if(!range) return;
     var text = range.getText();
     if(text && text.length > 0) {
       var mark = postRange(range);
