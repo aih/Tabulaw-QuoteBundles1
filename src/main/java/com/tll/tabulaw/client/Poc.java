@@ -3,14 +3,19 @@ package com.tll.tabulaw.client;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.StaticViewInitializer;
 import com.tll.client.mvc.view.ViewClass;
+import com.tll.client.ui.IUserSessionHandler;
 import com.tll.client.ui.LoginDialog;
+import com.tll.client.ui.UserSessionEvent;
 import com.tll.common.model.CopyCriteria;
 import com.tll.common.model.Model;
 import com.tll.tabulaw.client.ui.Notifier;
@@ -24,6 +29,7 @@ import com.tll.tabulaw.common.data.rpc.IDocService;
 import com.tll.tabulaw.common.data.rpc.IDocServiceAsync;
 import com.tll.tabulaw.common.data.rpc.IUserContextService;
 import com.tll.tabulaw.common.data.rpc.IUserContextServiceAsync;
+import com.tll.tabulaw.common.data.rpc.UserContextPayload;
 
 /**
  * Poc
@@ -106,7 +112,6 @@ public class Poc implements EntryPoint {
 		// build out the core structure
 		build();
 
-		/*
 		userContextService.getUserContext(new AsyncCallback<UserContextPayload>() {
 			
 			@Override
@@ -115,6 +120,7 @@ public class Poc implements EntryPoint {
 					// not logged in
 					if(loginDialog == null) {
 						loginDialog = new LoginDialog("/login");
+						loginDialog.setGlassEnabled(true);
 						loginDialog.addUserSessionHandler(new IUserSessionHandler() {
 							
 							@Override
@@ -135,13 +141,14 @@ public class Poc implements EntryPoint {
 							}
 						});
 					}
-					loginDialog.show();
+					loginDialog.center();
 				}
 				else {
 					if(loginDialog != null) {
 						loginDialog.hide();
 						loginDialog = null;
 					}
+					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
 				}
 			}
 			
@@ -149,10 +156,9 @@ public class Poc implements EntryPoint {
 			public void onFailure(Throwable caught) {
 			}
 		});
-		*/
 		
 		// TODO temp bypass logins
-		ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
+		//ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
 	}
 
 	private void build() {

@@ -25,6 +25,16 @@ import com.tll.tabulaw.client.model.MarkOverlay;
  * <b>schema definition</b>:
  * 
  * <pre>
+ * USER props
+ * ----------
+ *  id
+ *  username
+ *  password
+ *  dateCreated
+ *  dateModified
+ *  enabled
+ *  role
+ *  
  * CASE props
  * ----------
  *  id
