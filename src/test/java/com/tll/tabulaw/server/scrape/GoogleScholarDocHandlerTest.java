@@ -37,7 +37,7 @@ public class GoogleScholarDocHandlerTest {
 		try {
 			URL url = ClassUtil.getResource("com/tll/tabulaw/server/scrape/testGoogleScholarSearchResults.htm");
 			File f = new File(url.toURI());
-			raw = FileUtils.readFileToString(f);
+			raw = FileUtils.readFileToString(f, "UTF-8");
 		}
 		catch(IOException e) {
 			throw new IllegalStateException(e);
@@ -87,7 +87,7 @@ public class GoogleScholarDocHandlerTest {
 		try {
 			URL url = getClass().getClassLoader().getResource("com/tll/tabulaw/server/scrape/gsdoc.htm");
 			File f = new File(url.toURI());
-			raw = FileUtils.readFileToString(f);
+			raw = FileUtils.readFileToString(f, "UTF-8");
 		}
 		catch(IOException e) {
 			throw new IllegalStateException(e);

@@ -591,6 +591,32 @@
 			<groupId>com.tll</groupId>
 			<artifactId>tll-client-login</artifactId>
 			<version>${tll.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>aopalliance</artifactId>
+					<groupId>aopalliance</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>guice</artifactId>
+					<groupId>com.google.code.guice</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>tll-mail</artifactId>
+					<groupId>com.tll</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-context-support</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>validation-api</artifactId>
+					<groupId>javax.validation</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>tll-service</artifactId>
+					<groupId>com.tll</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

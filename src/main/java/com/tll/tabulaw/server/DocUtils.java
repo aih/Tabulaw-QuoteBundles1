@@ -44,11 +44,11 @@ public class DocUtils {
 
 		cssHighightStylesBlock = "<style type=\"text/css\">.highlight{background-color:yellow;}</style>";
 	}
-	
+
 	public static String dateAsString(Date date) {
 		return dateFormat.format(date);
 	}
-	
+
 	public static String serializeDocument(Model mDoc) {
 		StringBuilder sb = new StringBuilder(1024);
 
@@ -74,9 +74,9 @@ public class DocUtils {
 			sb.append(mDoc.asString("case.year"));
 		}
 		else {
-			//throw new IllegalStateException("Un-handled document model type");
+			// throw new IllegalStateException("Un-handled document model type");
 			// for now, assume it is a contract doc
-			sb.insert(0, "[contractdoc]");
+			sb.insert(0, "[doc]");
 		}
 
 		sb.append("\n"); // newline
@@ -87,7 +87,7 @@ public class DocUtils {
 	public static Model deserializeDocument(String s) {
 		// check to see if we have a serializer first line
 		if(s.charAt(0) != '[') return null;
-		
+
 		// doc related
 		String title = null, hash = null;
 
@@ -100,7 +100,7 @@ public class DocUtils {
 		int eti = firstline.indexOf(']');
 
 		String type = s.substring(1, eti);
-		firstline = firstline.substring(eti+1);
+		firstline = firstline.substring(eti + 1);
 
 		String[] sarr1 = firstline.split("\\|");
 		for(String sub : sarr1) {
@@ -140,13 +140,13 @@ public class DocUtils {
 				}
 			}
 		}
-		
+
 		if("casedoc".equals(type))
 			return PocModelFactory.get().buildCaseDoc(title, hash, date, parties, citation, url, year);
-		else if("contractdoc".equals(type))
+		else if("doc".equals(type))
 			return PocModelFactory.get().buildDoc(title, hash, date);
 		else
-		 throw new IllegalArgumentException("Unhandled doc type: " + type);
+			throw new IllegalArgumentException("Unhandled doc type: " + type);
 	}
 
 	public static int docHash(String remoteUrl) {
@@ -164,9 +164,11 @@ public class DocUtils {
 	 * Also, wraps the given html string with html, head, body tags if not present
 	 * @param doc html content string
 	 * @param docTitle
+	 * @throws IllegalArgumentException When the localization fails due to
+	 *         mal-formed html tags in the given html string
 	 */
-	public static void localizeDoc(StringBuilder doc, String docTitle) {
-		if(doc.indexOf("<html>") == -1) {
+	public static void localizeDoc(StringBuilder doc, String docTitle) throws IllegalArgumentException {
+		if(doc.indexOf("<html") == -1 && doc.indexOf("<HTML") == -1) {
 			String rpl = docTitle == null ? "" : docTitle;
 			doc.insert(0, htmlPrefixBlock.replace("${title}", rpl));
 			doc.append(htmlSuffixBlock);
@@ -174,9 +176,11 @@ public class DocUtils {
 		// inject js callback hook in window.onload
 		if(doc.indexOf(cssHighightStylesBlock) == -1) {
 			int index = doc.indexOf("</head>");
-			assert index > 0;
+			if(index == -1) index = doc.indexOf("</HEAD>");
+			if(index == -1) throw new IllegalArgumentException("No closing html head tag found.");
 			doc.insert(index, cssHighightStylesBlock);
 			index = doc.indexOf("</head>");
+			if(index == -1) index = doc.indexOf("</HEAD>");
 			doc.insert(index, jsScriptCallbackBlock);
 		}
 	}

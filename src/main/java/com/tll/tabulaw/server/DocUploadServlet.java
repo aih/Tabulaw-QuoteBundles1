@@ -19,10 +19,13 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.tll.common.model.Model;
+import com.tll.tabulaw.common.model.PocModelFactory;
 import com.tll.tabulaw.server.convert.IFileConverter;
 import com.tll.tabulaw.server.convert.IFileConverter.FileType;
 import com.tll.util.StringUtil;
@@ -80,21 +83,38 @@ public class DocUploadServlet extends HttpServlet {
 						numSuccessful++;
 
 						// convert to html
-						File fout = fconverter.convert(f, FileType.HTML);
+						File fconverted = fconverter.convert(f, FileType.HTML);
+						
+						// serialize the just created html doc file
+						// NOTE: the doc hash for uploaded docs is just hash of the non-path filename given
+						String docHash = fconverted.getName();
+						String docTitle = docHash; // for now
+						Date docDate = new Date();
+						Model mDoc = PocModelFactory.get().buildDoc(docTitle, docHash, docDate);
+						String sdoc = DocUtils.serializeDocument(mDoc);
 
+						// localize converted doc html
+						{
+							String htmlContent = FileUtils.readFileToString(fconverted, "UTF-8");
+							StringBuilder docsb = new StringBuilder(htmlContent);
+							DocUtils.localizeDoc(docsb, docTitle);
+							htmlContent = docsb.toString();
+							
+							// write to disk
+							if(!fconverted.delete()) {
+								throw new Exception("Unable to delete converted html file");
+							}
+							FileUtils.writeStringToFile(fconverted, sdoc + htmlContent);
+							fconverted = null;
+						}
+						
 						if(sb.length() == 0) {
 							sb.append("[START]");
 						}
 						if(numSuccessful > 1) {
 							sb.append(',');
 						}
-						sb.append("docTitle:");
-						// TODO ideally, get the title by looking inside file contents
-						sb.append(fout.getName());
-						sb.append("|docDate:");
-						sb.append(DocUtils.dateAsString(new Date()));
-						sb.append("|docHash:");
-						sb.append(fout.getName());
+						sb.append(sdoc);
 					}
 				}
 				if(sb.length() > 0) {

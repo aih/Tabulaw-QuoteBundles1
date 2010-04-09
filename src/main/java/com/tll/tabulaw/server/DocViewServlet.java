@@ -41,7 +41,7 @@ public class DocViewServlet extends HttpServlet {
 			throw new ServletException("Unable to read doc file: " + e.getMessage(), e);
 		}
 
-		String fstr = FileUtils.readFileToString(f);
+		String fstr = FileUtils.readFileToString(f, "UTF-8");
 		
 		// strip out serialized first line
 		int index = fstr.indexOf('\n');
@@ -55,6 +55,7 @@ public class DocViewServlet extends HttpServlet {
 		fstr = sb.toString();
 
 		resp.setContentType("text/html");
+		resp.setCharacterEncoding("UTF-8");
 		PrintWriter writer = resp.getWriter();
 		writer.write(fstr);
 		writer.flush();

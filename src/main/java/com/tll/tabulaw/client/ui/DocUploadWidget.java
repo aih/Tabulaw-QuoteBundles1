@@ -164,15 +164,15 @@ public class DocUploadWidget extends AbstractModelChangeAwareWidget implements H
 						Doc doc = new Doc();
 						for(String nv : nvs) {
 							String[] arr = nv.split(":");
-							String name = arr[0], value = arr[1];
-							if("docTitle".equals(name)) {
+							String name = arr[0].trim(), value = arr[1].trim();
+							if(name.endsWith("title")) {
 								doc.setTitle(value);
 							}
-							else if("docDate".equals(name)) {
+							else if(name.endsWith("date")) {
 								Date date = Fmt.getDateTimeFormat(GlobalFormat.DATE).parse(value);
 								doc.setDate(date);
 							}
-							else if("docHash".equals(name)) {
+							else if(name.endsWith("hash")) {
 								doc.setHash(value);
 							}
 						}
