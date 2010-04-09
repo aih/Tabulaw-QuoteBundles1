@@ -37,6 +37,10 @@
 			<name>The Logic Lab</name>
 			<url>http://tll.googlecode.com/svn/mavenrepo/</url>
 		</repository>
+		<repository>
+			<id>htmlcleaner</id>
+			<url>http://goodworkalan.com/m2/repository/net/sourceforge</url>
+		</repository>
 	</repositories>
 	
 	<profiles>

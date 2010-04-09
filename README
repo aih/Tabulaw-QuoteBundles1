@@ -1,8 +1,34 @@
 poc ("Proof of Concept") is a demo app for owned by Tabulaw, Inc. programmed by jopaki of The Logic Lab.
 
-project points:
+software requiremenets:
+----------------------
+	eclipse IDE
+	maven v2.2.1+
 
- - eclipse Google Web Application project.
+eclipse settings:
+----------------
+ 
+ 1) install the following plugins:
+     m2eclipse (maven eclipse plugin)
+     google plugin for eclipse
+     egit (git eclipse plugin)
+     TestNG
 
- - maven manages the build
-
+ 2) manually install gwt-dnd v3.0.1 and gwt-log v3.0.1 into your local maven repo.
+    (These are the only 2 maven dependencies requiring a manual install to one's local maven repo.)
+ 
+ 3) Invoking gwt debug mode w/in eclipse:
+ 		-right click on project- --> Debug as.. --> [google] Web Application
+		goto url in browser: http://127.0.0.1:8888/Poc.html?gwt.codesvr=127.0.0.1:9997 		
+ 
+ 4) Create the application WAR file.  
+ 		
+ 		dev mode
+ 		========
+ 		From a command line at project root:
+ 		"mvn package"
+ 		
+ 		prod mode
+ 		=========
+ 		From a command line at project root:
+ 		"mvn package -P prod"
