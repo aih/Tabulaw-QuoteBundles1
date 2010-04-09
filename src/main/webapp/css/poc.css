@@ -2,7 +2,8 @@
 
 body {
 	font-family: Georgia, "Times New Roman", Times, serif;
-	text-align: center;
+	/*text-align: center;*/
+	line-height: 1.5em;
 }
 
 /* drag and drop overrides */
@@ -51,27 +52,21 @@ body {
 	}
 
 .container {
-	width: 1020px;
-	height: 600px;
-	margin: 0 auto;
-	margin-top: 20px;
+	/*height: 600px;*/
+	margin: 20px 10px 0 10px;
 	overflow: hidden;
-	text-align: left;
+	/*text-align: left;*/
 	
 	/*debug*/
 	/*border: 1px solid skyblue;*/
-}
-* html .container {
-	padding-top: 20px;
 }
 .container * {
 	color: #2F2F2F;
 }
 
-.logo {
-	width: 76px;
-	height: 53px;
-	margin-bottom: 15px;
+#contentwrapper {
+	float: left;
+	width: 100%;
 }
 
 .navButton {
@@ -101,22 +96,30 @@ body {
 		margin-left: 18px;
 		margin-top: 2px;
 	}
+	/*
 	* html .navButton-doc .text {
 		float: right;
 	}
+	*/
 	.navButton-plus {
 		/*background: url(../images/plus-button.png) right no-repeat transparent;*/
 		text-align: center;
 	}
 
-/* the parent element of the .navRow panel */
 #navCol {
 	float: left;
 	width: 145px;
+	margin-left: -100%;
 	
 	/*debug*/
 	/*border: 1px solid pink;*/
+	/*background: none repeat scroll 0 0 #C8FC98;*/
 }
+	#navCol .logo {
+		width: 76px;
+		height: 53px;
+		margin-left: 30px;
+	}
 	#navCol .widget {
 		margin-bottom: 10px;
 		width: 145px;
@@ -164,9 +167,10 @@ body {
 
 /* the parent element of the app portal panel */
 #mainCol {
-	float: left;
+	/*float: left;
 	width: 780px;
-	margin-left: 20px;
+	margin-left: 20px;*/
+	margin-left: 145px;
 	
 	/*debug*/
 	/*border: 1px solid brown;*/
@@ -176,6 +180,7 @@ body {
 #navRow {
 	/*height: 25px;*/
 	border-bottom: 3px solid #BFBFBF;
+	margin-left: 145px;
 	
 	/*debug*/
 	/*border: 1px solid gray;*/
@@ -218,7 +223,7 @@ body {
 	}
 	/* all except IE */
 	html>/**/body .navRow .navRowTbl {
-		width: 781px; /* must be explicit (same width as container) - otherwise, floating breaks */
+		/*width: 781px;*/ /* must be explicit (same width as container) - otherwise, floating breaks */
 	}
 	.navRow .mainViews {
 		float: left;
@@ -243,9 +248,11 @@ body {
 	}
 
 #portal {
-		
 	/*debug*/
 	/*border: 1px solid orange;*/
+}
+* html #portal {
+	width: 95%;
 }
 
 .viewToolbar {
@@ -260,6 +267,11 @@ body {
 		border: 1px solid #fff;
 	}
 
+#footer {
+	clear: left;
+	text-align: center;
+	width: 100%;
+}
 .footer {
 	font-family: Arial, Helvetica, sans-serif;
 	color: gray;
