@@ -14,7 +14,7 @@ import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.StaticViewInitializer;
 import com.tll.client.mvc.view.ViewClass;
 import com.tll.client.ui.IUserSessionHandler;
-import com.tll.client.ui.LoginDialog;
+import com.tll.client.ui.LoginPanel;
 import com.tll.client.ui.UserSessionEvent;
 import com.tll.common.model.CopyCriteria;
 import com.tll.common.model.Model;
@@ -100,7 +100,7 @@ public class Poc implements EntryPoint {
 		return (Portal) RootPanel.get("portal").getWidget(0);
 	}
 
-	private LoginDialog loginDialog;
+	private LoginPanel loginPanel;
 	
 	public void onModuleLoad() {
 		Log.setUncaughtExceptionHandler();
@@ -118,17 +118,16 @@ public class Poc implements EntryPoint {
 			public void onSuccess(UserContextPayload result) {
 				if(result.getUser() == null) {
 					// not logged in
-					if(loginDialog == null) {
-						loginDialog = new LoginDialog("/login");
-						loginDialog.setGlassEnabled(true);
-						loginDialog.addUserSessionHandler(new IUserSessionHandler() {
+					if(loginPanel == null) {
+						loginPanel = new LoginPanel("/login");
+						loginPanel.addUserSessionHandler(new IUserSessionHandler() {
 							
 							@Override
 							public void onUserSessionEvent(UserSessionEvent event) {
 								if(event.isStart()) {
 									
-									loginDialog.hide();
-									loginDialog = null;
+									loginPanel.removeFromParent();
+									loginPanel = null;
 									
 									DeferredCommand.addCommand(new Command() {
 
@@ -141,12 +140,12 @@ public class Poc implements EntryPoint {
 							}
 						});
 					}
-					loginDialog.center();
+					RootPanel.get().add(loginPanel);
 				}
 				else {
-					if(loginDialog != null) {
-						loginDialog.hide();
-						loginDialog = null;
+					if(loginPanel != null) {
+						loginPanel.removeFromParent();
+						loginPanel = null;
 					}
 					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
 				}

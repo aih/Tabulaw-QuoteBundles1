@@ -15,7 +15,9 @@
 		<tll.version>0.0.1-SNAPSHOT</tll.version>
 		<gwt.compile.style>OBF</gwt.compile.style>
 		<gwt.log.level>INFO</gwt.log.level>
-		<gwt.compile.module>com.tll.tabulaw.PocDev</gwt.compile.module>		
+		<gwt.compile.module>com.tll.tabulaw.PocDev</gwt.compile.module>
+		<db4o.version>7.4.121.14026</db4o.version>
+		<springextensions.db4o.version>1.0.0e</springextensions.db4o.version>
 	</properties>
 
 	<url>https://github.com/aih/Tabulaw-QuoteBundles1</url>
@@ -403,6 +405,22 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>db4o</groupId>
+			<artifactId>db4o</artifactId>
+			<version>${db4o.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springextensions.db4o</groupId>
+			<artifactId>org.springextensions.db4o</artifactId>
+			<version>${springextensions.db4o.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tll</groupId>
+			<artifactId>tll-dao-db4o</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	
+		<dependency>
 			<groupId>com.artofsolving</groupId>
 			<artifactId>jodconverter</artifactId>
 			<version>2.2.1</version>
@@ -412,98 +430,33 @@
 			<groupId>com.tll</groupId>
 			<artifactId>tll-core</artifactId>
 			<version>${tll.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>spring-core</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>commons-validator</artifactId>
-					<groupId>commons-validator</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>oro</artifactId>
-					<groupId>oro</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-schema</artifactId>
 			<version>${tll.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>oro</artifactId>
-					<groupId>oro</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>validation-api</artifactId>
-					<groupId>javax.validation</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>hibernate-validator</artifactId>
-					<groupId>org.hibernate</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>guice</artifactId>
-					<groupId>com.google.code.guice</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-beans</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-model</artifactId>
 			<version>${tll.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>aopalliance</artifactId>
-					<groupId>aopalliance</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>validation-api</artifactId>
-					<groupId>javax.validation</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>hibernate-validator</artifactId>
-					<groupId>org.hibernate</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>guice</artifactId>
-					<groupId>com.google.code.guice</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-beans</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-context</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-dao-api</artifactId>
 			<version>${tll.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>aopalliance</artifactId>
-					<groupId>aopalliance</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-beans</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-tx</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>com.tll</groupId>
+			<artifactId>tll-servlet</artifactId>
+			<version>${tll.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tll</groupId>
+			<artifactId>tll-security</artifactId>
+			<version>${tll.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-client-core</artifactId>
@@ -518,27 +471,11 @@
 			<groupId>com.tll</groupId>
 			<artifactId>tll-client-marshal</artifactId>
 			<version>${tll.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>spring-beans</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>guice</artifactId>
-					<groupId>com.google.code.guice</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-client-rpc</artifactId>
 			<version>${tll.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>guice</artifactId>
-					<groupId>com.google.code.guice</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.tll</groupId>
@@ -564,64 +501,16 @@
 			<groupId>com.tll</groupId>
 			<artifactId>tll-client-listing</artifactId>
 			<version>${tll.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>tll-mail</artifactId>
-					<groupId>com.tll</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>ehcache-core</artifactId>
-					<groupId>net.sf.ehcache</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>tll-service</artifactId>
-					<groupId>com.tll</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>tll-config</artifactId>
-					<groupId>com.tll</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>tll-servlet</artifactId>
-					<groupId>com.tll</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>guice</artifactId>
-					<groupId>com.google.code.guice</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
-		
+		<dependency>
+			<groupId>com.tll</groupId>
+			<artifactId>tll-client-persist</artifactId>
+			<version>${tll.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-client-login</artifactId>
 			<version>${tll.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>aopalliance</artifactId>
-					<groupId>aopalliance</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>guice</artifactId>
-					<groupId>com.google.code.guice</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>tll-mail</artifactId>
-					<groupId>com.tll</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-context-support</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>validation-api</artifactId>
-					<groupId>javax.validation</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>tll-service</artifactId>
-					<groupId>com.tll</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>

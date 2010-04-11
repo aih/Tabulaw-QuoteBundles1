@@ -55,6 +55,7 @@ import com.tll.tabulaw.client.model.MarkOverlay;
  * QUOTE props
  * --------------
  *   id
+ *   date created/modified
  *   document (ref)
  *   quote (text selection)
  *   tags (set of keywords)
@@ -63,9 +64,10 @@ import com.tll.tabulaw.client.model.MarkOverlay;
  * QUOTE_BUNDLE props
  * ------------------
  *   id
- *   user (ref)
+ *   date created/modified
  *   name
  *   description
+ *   user (ref)
  *   quotes (ref)
  * 
  * NOTE props

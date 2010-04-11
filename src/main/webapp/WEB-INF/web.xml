@@ -4,10 +4,177 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5">
 	
+  <display-name>Tabulaw</display-name>
+  <description>Tabulaw application</description>
+  
+  <context-param>
+    <description>
+      Dependency Injection modules (class names) that collectively bootstrap the application.
+      This context param is processed by com.tll.server.Bootstrapper.
+    </description>
+    <param-name>di.modules</param-name>
+    <param-value>
+    	com.tll.tabulaw.di.TabulawSecurityModule
+    </param-value>
+  </context-param>
+  
+  <context-param>
+    <description>
+      Declaration of the application dependency injection handlers (class names).
+      These handlers are passed the constructed "dependency injector" providing 
+      an hook to alter the servlet context.
+    </description>
+    <param-name>di.handlers</param-name>
+    <param-value>
+    	 com.tll.server.Db4oBootstrapper
+    	,com.tll.server.SecurityContextBootstrapper 
+    	,com.tll.server.FileConverterBootstrapper
+    </param-value>
+  </context-param>
+
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+	
   <listener>
-    <listener-class>com.tll.tabulaw.server.FileConverterBootstrapper</listener-class>
+    <listener-class>com.tll.server.Bootstrapper</listener-class>
   </listener>
 
+  <servlet>
+    <servlet-name>remoteLoggerServiceImpl</servlet-name>
+    <servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>remoteLoggerServiceImpl</servlet-name>
+    <url-pattern>/poc/gwt-log</url-pattern>
+  </servlet-mapping>
+
+	<!-- SECURITY START -->
+  <filter>
+    <filter-name>HttpSessionContextIntegrationFilter</filter-name>
+    <filter-class>com.tll.server.filter.HttpSessionContextIntegrationFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>HttpSessionContextIntegrationFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <filter>
+    <filter-name>AuthenticationProcessingFilter</filter-name>
+    <filter-class>com.tll.tabulaw.server.filter.TabulawAuthenticationProcessingFilter</filter-class>
+    <init-param>
+      <param-name>authenticationFailureUrl</param-name>
+      <param-value>/poc/login?login_error=1</param-value>
+    </init-param>
+    <init-param>
+      <param-name>defaultTargetUrl</param-name>
+      <param-value>/poc/login</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>AuthenticationProcessingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <filter>
+    <filter-name>AnonymousProcessingFilter</filter-name>
+    <filter-class>com.tll.server.filter.AnonymousProcessingFilter</filter-class>
+    <init-param>
+      <param-name>key</param-name>
+      <param-value>tabulaw</param-value>
+    </init-param>
+    <init-param>
+      <param-name>userAttribute</param-name>
+      <param-value>anonymousUser,ROLE_ANONYMOUS</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>AnonymousProcessingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <filter>
+    <filter-name>ExceptionTranslationFilter</filter-name>
+    <filter-class>com.tll.server.filter.ExceptionTranslationFilter</filter-class>
+    <init-param>
+      <param-name>errorPage</param-name>
+      <param-value>/errorHandler/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>loginFormUrl</param-name>
+      <param-value>/login</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceHttps</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>ExceptionTranslationFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <filter>
+    <filter-name>FilterSecurityInterceptor</filter-name>
+    <filter-class>com.tll.server.filter.FilterSecurityInterceptor</filter-class>
+    <init-param>
+      <param-name>objectDefinitionSource</param-name>
+      <param-value>
+        PATTERN_TYPE_APACHE_ANT
+        /login=ROLE_ANONYMOUS,ROLE_USER,ROLE_ADMINISTRATOR
+        /logoff=ROLE_ANONYMOUS,ROLE_USER,ROLE_ADMINISTRATOR
+        /forgotPassword=ROLE_ANONYMOUS
+        /doc/**=ROLE_USER,ROLE_ADMINISTRATOR
+        /poc/docupload=ROLE_USER,ROLE_ADMINISTRATOR
+      </param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>FilterSecurityInterceptor</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>com.tll.server.servlet.LoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/login</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>LogoutServlet</servlet-name>
+    <servlet-class>com.tll.server.servlet.LogoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LogoutServlet</servlet-name>
+    <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ErrorHandlerServlet</servlet-name>
+    <servlet-class>com.tll.server.servlet.ErrorHandlerServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ErrorHandlerServlet</servlet-name>
+    <url-pattern>/errorHandler/</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>ForgotPasswordService</servlet-name>
+    <servlet-class>com.tll.server.rpc.ForgotPasswordService</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ForgotPasswordService</servlet-name>
+    <url-pattern>/forgotPassword</url-pattern>
+  </servlet-mapping>
+	<!-- SECURITY END -->
+	
 	<servlet>
 		<servlet-name>UserContextService</servlet-name>
 		<servlet-class>com.tll.tabulaw.server.rpc.UserContextService</servlet-class>
@@ -19,13 +186,13 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>UserContextServlet</servlet-name>
-		<servlet-class>com.tll.tabulaw.server.UserContextServlet</servlet-class>
+		<servlet-name>UserDataService</servlet-name>
+		<servlet-class>com.tll.tabulaw.server.rpc.UserDataService</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
-		<servlet-name>UserContextServlet</servlet-name>
-		<url-pattern>/login</url-pattern>
+		<servlet-name>UserDataService</servlet-name>
+		<url-pattern>/poc/userData</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -58,11 +225,6 @@
 		<url-pattern>/poc/doc</url-pattern>
 	</servlet-mapping>
 
-	<!-- Default page to serve -->
-	<welcome-file-list>
-		<welcome-file>Poc.html</welcome-file>
-	</welcome-file-list>
-	
 	<!-- 
 	<login-config>
 	  <auth-method>BASIC</auth-method>

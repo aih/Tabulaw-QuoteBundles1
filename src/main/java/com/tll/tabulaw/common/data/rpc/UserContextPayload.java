@@ -5,31 +5,24 @@
  */
 package com.tll.tabulaw.common.data.rpc;
 
+import java.util.List;
+
 import com.tll.common.data.Payload;
 import com.tll.common.data.Status;
 import com.tll.common.model.Model;
 
 /**
- * AdminContextPayload - Payload for initializing the client-side admin
- * context.
+ * AdminContextPayload - Payload for initializing the client-side admin context.
  * @author jpk
  */
 public class UserContextPayload extends Payload {
 
 	/**
-	 * debug config param
-	 */
-	private boolean debug;
-
-	/**
-	 * environment config param
-	 */
-	private String environment;
-
-	/**
 	 * The logged in user or the user for this http session.
 	 */
 	private Model user;
+
+	private List<Model> bundles;
 
 	/**
 	 * Constructor
@@ -41,29 +34,9 @@ public class UserContextPayload extends Payload {
 	/**
 	 * Constructor
 	 * @param status
-	 * @param debug
-	 * @param environment
-	 * @param user
 	 */
-	public UserContextPayload(Status status, boolean debug, String environment, Model user) {
+	public UserContextPayload(Status status) {
 		super(status);
-		this.debug = debug;
-		this.environment = environment;
-		this.user = user;
-	}
-
-	/**
-	 * @return the debug
-	 */
-	public boolean isDebug() {
-		return debug;
-	}
-
-	/**
-	 * @return the environment
-	 */
-	public String getEnvironment() {
-		return environment;
 	}
 
 	/**
@@ -71,5 +44,20 @@ public class UserContextPayload extends Payload {
 	 */
 	public Model getUser() {
 		return user;
+	}
+
+	public void setUser(Model user) {
+		this.user = user;
+	}
+
+	/**
+	 * @return The defined quote bundles and the referenced qoutes for the user.
+	 */
+	public List<Model> getBundles() {
+		return bundles;
+	}
+
+	public void setBundles(List<Model> bundles) {
+		this.bundles = bundles;
 	}
 }

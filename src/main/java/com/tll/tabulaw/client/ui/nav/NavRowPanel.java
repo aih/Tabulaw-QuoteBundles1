@@ -9,11 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabBar;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
@@ -21,6 +25,7 @@ import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.UnloadViewRequest;
 import com.tll.client.mvc.view.ViewKey;
+import com.tll.client.ui.SimpleHyperLink;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
 import com.tll.tabulaw.client.Poc;
@@ -96,10 +101,44 @@ public class NavRowPanel extends AbstractNavPanel {
 
 	} // CurrentQuoteBundleDisplayWidget
 
+	static class LoggedInUserWidget extends Composite {
+		
+		static class Styles {
+			public static final String LGD_IN_USR = "lgdInUsr";
+			public static final String WELCOME_TEXT = "welcomeText";
+			public static final String LOGOUT = "logout";
+		}
+
+		final Label welcomeText;
+		final SimpleHyperLink lnkLogOut;
+		final FlowPanel pnl = new FlowPanel();
+
+		public LoggedInUserWidget() {
+			super();
+			pnl.setStyleName(Styles.LGD_IN_USR);
+			welcomeText = new Label();
+			welcomeText.setStyleName(Styles.WELCOME_TEXT);
+			lnkLogOut = new SimpleHyperLink("Log Out", new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					// TODO
+				}
+			});
+			lnkLogOut.setStyleName(Styles.LOGOUT);
+
+			pnl.add(welcomeText);
+			pnl.add(lnkLogOut);
+
+			initWidget(pnl);
+		}
+
+	}
+
 	private static void showView(ArrayList<? extends AbstractNavButton> list, int index) {
 		ViewManager.get().dispatch(new ShowViewRequest(list.get(index).getViewInitializer()));
 	}
-	
+
 	private static final int maxNumOpenViews = 6;
 
 	private final ArrayList<AbstractNavButton> mainViewButtons = new ArrayList<AbstractNavButton>();
@@ -189,7 +228,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			openDocTabs.selectTab(index);
 			// unselect main view tabs
 			mainViewTabs.selectTab(-1);
-			
+
 			// unload oldest view if at capacity
 			if(openDocNavButtons.size() > maxNumOpenViews) {
 				openDocTabs.setVisible(false);

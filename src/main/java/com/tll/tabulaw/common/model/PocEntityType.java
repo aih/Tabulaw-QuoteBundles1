@@ -17,7 +17,7 @@ public enum PocEntityType implements IEntityType, INameValueProvider<String> {
 	USER("user"),
 	
 	CASE("case"),
-	DOCUMENT("Documents"),
+	DOCUMENT("Document"),
 	
 	QUOTE("Quote"),
 	QUOTE_BUNDLE("Quote Bundle"),

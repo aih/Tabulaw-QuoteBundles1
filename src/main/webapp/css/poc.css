@@ -3,7 +3,6 @@
 body {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	/*text-align: center;*/
-	line-height: 1.5em;
 }
 
 /* drag and drop overrides */
@@ -52,13 +51,14 @@ body {
 	}
 
 .container {
-	/*height: 600px;*/
-	margin: 20px 10px 0 10px;
+	margin: 20px;
 	overflow: hidden;
-	/*text-align: left;*/
 	
 	/*debug*/
 	/*border: 1px solid skyblue;*/
+}
+* html .container {
+	margin: 0;
 }
 .container * {
 	color: #2F2F2F;
@@ -96,11 +96,9 @@ body {
 		margin-left: 18px;
 		margin-top: 2px;
 	}
-	/*
 	* html .navButton-doc .text {
 		float: right;
 	}
-	*/
 	.navButton-plus {
 		/*background: url(../images/plus-button.png) right no-repeat transparent;*/
 		text-align: center;
@@ -113,12 +111,15 @@ body {
 	
 	/*debug*/
 	/*border: 1px solid pink;*/
-	/*background: none repeat scroll 0 0 #C8FC98;*/
+}
+* html #navCol {
+	padding-top: 20px;
+	padding-left: 20px;
 }
 	#navCol .logo {
 		width: 76px;
 		height: 53px;
-		margin-left: 30px;
+		margin: 0 0 30px 0;
 	}
 	#navCol .widget {
 		margin-bottom: 10px;
@@ -167,24 +168,29 @@ body {
 
 /* the parent element of the app portal panel */
 #mainCol {
-	/*float: left;
-	width: 780px;
-	margin-left: 20px;*/
-	margin-left: 145px;
-	
+	margin-left: 180px;
+
 	/*debug*/
 	/*border: 1px solid brown;*/
 }
 
-/* the parent element of the .navRow widget */
+/* the parent element of the nav row widget */
 #navRow {
-	/*height: 25px;*/
 	border-bottom: 3px solid #BFBFBF;
-	margin-left: 145px;
-	
+
 	/*debug*/
-	/*border: 1px solid gray;*/
+	/*border: 1px solid gray*/
 }
+* html #navRow {
+	padding-top: 20px;
+	margin-right: 20px;
+	height: 25px;
+}
+	/*unfortunately, this doesn't work in IE*/
+	html>/**/body .navRowTbl {
+		width: 100%;
+	}
+	
 	/* nav row tab bar */
 	/*
 	.gwt-TabBar { the tab bar itself }</li>
@@ -217,42 +223,41 @@ body {
 	#navRow .openDocs .gwt-TabBarItem-selected {
 		/*display:none;*/
 	}
-	/* the contained nav row panel */
-	.navRow {
-		/*width: 100%;*/
-	}
-	/* all except IE */
-	html>/**/body .navRow .navRowTbl {
-		/*width: 781px;*/ /* must be explicit (same width as container) - otherwise, floating breaks */
-	}
-	.navRow .mainViews {
-		float: left;
-		margin-right: 30px;
-	}
-	.navRow .openDocs {
-		float: left;
-	}
-	.navRow .crntqb {
-		float: right;
-		text-align: right;
-		margin-top: 24px;
-	}
-	.navRow .crntqb p {
-		font-weight: bold;
-		font-size: 11px;
-	}
-	.navRow .crntqb .echo {
-		font-style: italic;
-		font-weight: normal;
-		margin-right: 5px;
-	}
+	
+/* navRow widget */
+.navRow {
+	/*width: 100%;*/
+	/*overflow: hidden;*/
+}
+.navRow .mainViews {
+	float: left;
+	margin-right: 30px;
+}
+.navRow .openDocs {
+	float: left;
+}
+.navRow .crntqb {
+	float: right;
+	text-align: right;
+	margin-top: 24px;
+}
+.navRow .crntqb p {
+	font-weight: bold;
+	font-size: 11px;
+}
+.navRow .crntqb .echo {
+	font-style: italic;
+	font-weight: normal;
+	margin-right: 5px;
+}
 
 #portal {
 	/*debug*/
 	/*border: 1px solid orange;*/
 }
 * html #portal {
-	width: 95%;
+	width: 96%;
+	overflow: hidden;
 }
 
 .viewToolbar {
@@ -271,6 +276,10 @@ body {
 	clear: left;
 	text-align: center;
 	width: 100%;
+	margin-top: 10px;
+	
+	/*debug*/
+	/*border: 1px solid gray;*/
 }
 .footer {
 	font-family: Arial, Helvetica, sans-serif;
@@ -513,8 +522,8 @@ body {
 /* quote bundle view styling */
 .quoteBundle {
 }
-	.quoteBundle #navRow {
-		margin-bottom: 30px;
+	.quoteBundle .viewContainer {
+		margin-top: 20px;
 	}
 	.quoteBundle .viewToolbar {
 		display:none;

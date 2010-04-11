@@ -201,7 +201,7 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> 
 
 		// move the splitter over to the right
 		// we want to see as much of the doc as possible
-		hsp.setSplitPosition("600px");
+		hsp.setSplitPosition("80%");
 		
 		hrViewMode = wDocViewer.addValueChangeHandler(this);
 
