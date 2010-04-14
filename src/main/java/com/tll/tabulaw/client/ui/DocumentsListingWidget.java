@@ -182,13 +182,17 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		initWidget(pnl);
 	}
 	
+	public Operator getOperator() {
+		return operator;
+	}
+	
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
 		listingWidget.onModelChangeEvent(event);
 	}
 	
-	static class Operator extends DataListingOperator<Model, InMemoryListHandler<Model>> {
+	public static class Operator extends DataListingOperator<Model, InMemoryListHandler<Model>> {
 
 		public Operator() {
 			super(config.getPageSize(), new InMemoryListHandler<Model>(), config.getDefaultSorting());

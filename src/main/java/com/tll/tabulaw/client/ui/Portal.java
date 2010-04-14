@@ -13,7 +13,18 @@ import com.tll.client.mvc.view.IView;
  * This is the parent panel for {@link IView}s in the app.
  * @author jpk
  */
-public class Portal extends FlowPanel {
+public class Portal extends AbstractModelChangeAwareWidget {
+
+	private final FlowPanel pnl = new FlowPanel();
+	
+	public Portal() {
+		super();
+		initWidget(pnl);
+	}
+	
+	public FlowPanel getPanel() {
+		return pnl;
+	}
 
 	@Override
 	protected void onDetach() {

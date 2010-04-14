@@ -14,6 +14,13 @@
     </description>
     <param-name>di.modules</param-name>
     <param-value>
+	    com.tll.di.MailModule
+		  com.tll.tabulaw.di.ExceptionHandlerModule
+    	com.tll.tabulaw.di.ModelModule
+    	com.tll.tabulaw.di.Db4oDaoModule
+    	com.tll.tabulaw.di.EntityServiceFactoryModule
+    	com.tll.tabulaw.di.MarshalModule
+    	com.tll.tabulaw.di.PersistContextModule
     	com.tll.tabulaw.di.TabulawSecurityModule
     </param-value>
   </context-param>
@@ -26,9 +33,10 @@
     </description>
     <param-name>di.handlers</param-name>
     <param-value>
-    	 com.tll.server.Db4oBootstrapper
-    	,com.tll.server.SecurityContextBootstrapper 
-    	,com.tll.server.FileConverterBootstrapper
+    	com.tll.tabulaw.server.Db4oBootstrapper
+    	com.tll.tabulaw.server.PersistContextBootstrapper
+    	com.tll.server.SecurityContextBootstrapper
+    	com.tll.tabulaw.server.FileConverterBootstrapper
     </param-value>
   </context-param>
 
@@ -68,11 +76,11 @@
     <filter-class>com.tll.tabulaw.server.filter.TabulawAuthenticationProcessingFilter</filter-class>
     <init-param>
       <param-name>authenticationFailureUrl</param-name>
-      <param-value>/poc/login?login_error=1</param-value>
+      <param-value>/login?login_error=1</param-value>
     </init-param>
     <init-param>
       <param-name>defaultTargetUrl</param-name>
-      <param-value>/poc/login</param-value>
+      <param-value>/login</param-value>
     </init-param>
   </filter>
   <filter-mapping>
@@ -126,10 +134,13 @@
       <param-value>
         PATTERN_TYPE_APACHE_ANT
         /login=ROLE_ANONYMOUS,ROLE_USER,ROLE_ADMINISTRATOR
-        /logoff=ROLE_ANONYMOUS,ROLE_USER,ROLE_ADMINISTRATOR
-        /forgotPassword=ROLE_ANONYMOUS
-        /doc/**=ROLE_USER,ROLE_ADMINISTRATOR
+        /logout=ROLE_ANONYMOUS,ROLE_USER,ROLE_ADMINISTRATOR
+        /forgotPassword=ROLE_ADMINISTRATOR,ROLE_ANONYMOUS
+        /poc/userContext=ROLE_USER,ROLE_ADMINISTRATOR
+        /poc/userData=ROLE_USER,ROLE_ADMINISTRATOR
         /poc/docupload=ROLE_USER,ROLE_ADMINISTRATOR
+        /poc/doc=ROLE_USER,ROLE_ADMINISTRATOR
+        /doc/**=ROLE_USER,ROLE_ADMINISTRATOR
       </param-value>
     </init-param>
   </filter>
@@ -186,12 +197,12 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>UserDataService</servlet-name>
-		<servlet-class>com.tll.tabulaw.server.rpc.UserDataService</servlet-class>
+		<servlet-name>UserDataServiceRpc</servlet-name>
+		<servlet-class>com.tll.tabulaw.server.rpc.UserDataServiceRpc</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
-		<servlet-name>UserDataService</servlet-name>
+		<servlet-name>UserDataServiceRpc</servlet-name>
 		<url-pattern>/poc/userData</url-pattern>
 	</servlet-mapping>
 

@@ -68,25 +68,25 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 	
 	private final Widget[] navColWidgets;
 	
-	private final QuoteBundlesManageWidget movePanel;
+	private final QuoteBundlesManageWidget qbPanel;
 	
 	/**
 	 * Constructor
 	 */
 	public QuoteBundlesView() {
 		super();
-		movePanel = new QuoteBundlesManageWidget();
+		qbPanel = new QuoteBundlesManageWidget();
 		
 		HTML viewName = new HTML(getLongViewName());
 		viewName.setStyleName("viewTitle");
 		
 		navColWidgets = new Widget[] {
 			viewName,
-			movePanel.getQuoteBundleListingWidget(),
+			qbPanel.getQuoteBundleListingWidget(),
 			new NewQuoteBundleButton(),
 		};
 		
-		addWidget(movePanel);
+		addWidget(qbPanel);
 	}
 
 	@Override
@@ -111,11 +111,11 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 
 	@Override
 	protected void doRefresh() {
-		movePanel.refresh();
+		qbPanel.refresh();
 	}
 
 	@Override
 	protected void handleModelChange(ModelChangeEvent event) {
-		movePanel.onModelChangeEvent(event);
+		qbPanel.onModelChangeEvent(event);
 	}
 }

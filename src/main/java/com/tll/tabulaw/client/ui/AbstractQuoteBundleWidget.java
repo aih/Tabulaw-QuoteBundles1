@@ -3,14 +3,19 @@ package com.tll.tabulaw.client.ui;
 import java.util.List;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.tll.client.model.IHasModel;
 import com.tll.client.model.ModelChangeEvent;
+import com.tll.common.data.Payload;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
+import com.tll.common.msg.Msg;
+import com.tll.tabulaw.client.Poc;
 import com.tll.tabulaw.client.model.PocModelCache;
 
 /**
@@ -228,15 +233,39 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 * @return the widget of the removed quote
 	 */
 	@SuppressWarnings("unchecked")
-	public Q removeQuote(Model mQuote, boolean persist, boolean deleteQuote) {
+	public Q removeQuote(final Model mQuote, boolean persist, final boolean deleteQuote) {
 		int index = getQuoteWidgetIndex(mQuote.getKey());
 		if(index != -1) {
 			if(mQuoteBundle.relatedMany("quotes").remove(mQuote.getKey())) {
 				if(persist) {
-					// delete the quote updating the bundle quote refs too
-					if(deleteQuote) PocModelCache.get().remove(mQuote.getKey(), this);
-					PocModelCache.get().persist(mQuoteBundle, this);
+					// server-side persist
+					String bundleId = mQuoteBundle.getId();
+					String quoteId = mQuote.getId();
+					Poc.getUserDataService().removeQuoteFromBundle(bundleId, 	quoteId, deleteQuote, new AsyncCallback<Payload>() {
+						
+						@Override
+						public void onSuccess(Payload result) {
+							if(result.hasErrors()) {
+								List<Msg> msgs = result.getStatus().getMsgs();
+								Notifier.get().post(msgs);
+							}
+							else {
+								// delete the quote updating the bundle quote refs too
+								if(deleteQuote) PocModelCache.get().remove(mQuote.getKey(), AbstractQuoteBundleWidget.this);
+								PocModelCache.get().persist(mQuoteBundle, AbstractQuoteBundleWidget.this);
+							}
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+							String emsg = "Failed to persist Quote removal.";
+							Log.error(emsg, caught);
+							Notifier.get().error(emsg);
+						}
+					});
 				}
+				// NOTE: we could get out of sync with the server if the xhr call above fails!!
+				// TODO handle the case when xhr call fails!!!
 				Q qw = (Q) quotePanel.getWidget(index);
 				quotePanel.remove(index);
 				makeQuoteDraggable(qw, false);

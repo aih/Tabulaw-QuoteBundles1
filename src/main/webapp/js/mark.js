@@ -63,13 +63,26 @@ function NodePath(root) {
 	this.toString = function() {
 		var s, i;
 
-		s = ' [ ' + nodeNumbers[0];
+		s = '[' + nodeNumbers[0];
 		for (i=1; i < nodeNumbers.length; i++) {
-			s += ', '+ nodeNumbers[i];
+			s += ','+ nodeNumbers[i];
 		}
-		s += ' ] ';
+		s += ']';
 
 		return s;
+	}
+	
+	this.fromString = function(s) {
+		var sp, iarr, i, nn;
+		
+		sp = s.substring(1, s.length-1);
+		sp = sp.split(',')
+		iarr = [];
+		for(i=0; i<sp.length; i++) {
+			nn = parseInt(sp[i]);
+			iarr[i] = nn;
+		}
+		this.setNumbers(iarr);
 	}
 
 	this.addParent = function(nodeNumber) {
@@ -229,35 +242,129 @@ var mcounter = 0;
 
 /**
  * Mark - constructor
- * 
- * @param range goog.dom.AbstractRange
- * 
- * @throws 'No text selected'
- * @throws 'Non-textual range'
- * @throws 'Unsupported range type'
  */
-function Mark(range) {
+function Mark() {
 
 	this.markId = 'mark_' + (++mcounter);
 	this.text = '';
-	this.startNodePath = null;
+	this.startNodePath = null; // NodePath type
 	this.startOffset = 0;
-	this.endNodePath = null;
+	this.endNodePath = null; // NodePath type
 	this.endOffset = 0;
 	
 	/* 
 	 * the highlight spans
 	 * FORMAT:
-	 * 	 id="{markId}_{span index}"
 	 *   class="highlight {markId}"
 	 */
 	this.hspans = null;
+	
+	/**
+	 * Serializes the state of this mark instance to a string.
+	 * FORMAT: 
+	 * "{markId}|{text}|{startNodePath.toString()}|{startOffset}|{endNodePath.toString()}|{endOffset}"
+	 * @return string
+	 * @throws 'No range set' When no range has been applied to this instance
+	 */
+	this.serialize = function() {
+	  var sb;
+		
+		sb =  new goog.string.StringBuffer();
+	  if(!this.startNodePath) throw 'No range set';
+	  sb.append(this.markId);
+	  sb.append('|');
+	  sb.append(this.text);
+	  sb.append('|');
+	  sb.append(this.startNodePath.toString());
+	  sb.append('|');
+	  sb.append(this.startOffset);
+	  sb.append('|');
+	  sb.append(this.endNodePath.toString());
+	  sb.append('|');
+	  sb.append(this.endOffset);
+	  return sb.toString();
+	}
+	
+	/**
+	 * De-serializes from the given string settting this instance's state.
+	 * @param root dom root node (required for a range may be created)
+	 * @param str serialized state as a string ascribing to the format defined in
+	 *            the serialize() method
+	 * @throws 'Invalid serialized token'
+	 */
+	this.deserialize = function(root, str) {
+		var s, sarr;
+		
+		sarr = str.split('|');
+		if(sarr.length != 6) throw 'Invalid serialized token';
+		
+		// clear state
+		this.unhighlight();
+		this.markId = null;
+		this.text = '';
+		this.startNodePath = null;
+		this.startOffset = 0;
+		this.endNodePath = null;
+		this.endOffset = 0;
+	
+		for(var i=0; i<sarr.length; i++) {
+			s = sarr[i];
+			switch(i) {
+			case 0:
+				this.markId = s;
+				break;
+			case 1:
+				this.text = s;
+				break;
+			case 2:
+				this.startNodePath = new NodePath(root);
+				this.startNodePath.fromString(s);
+				break;
+			case 3:
+				this.startOffset = parseInt(s);
+				break;
+			case 4:
+				this.endNodePath = new NodePath(root);
+				this.endNodePath.fromString(s);
+				break;
+			case 5:
+				this.endOffset = parseInt(s);
+				break;
+			}
+		}
+	}
 
+	/**
+	 * Applies the given range re-setting this Mark's state
+	 */
+	this.applyRange = function(range) {
+		var root, urange;
+		
+		try {
+			this.validateRange(range);
+		} catch(e) {
+			clearWindowSelections(range.getWindow(), range.getDocument());
+			throw e;
+		}
+		
+		urange = range;
+		
+		var root = urange.getDocument().body;
+		this.text = urange.getText();
+		this.startNodePath = nodeGetNodePath(urange.getStartNode(), root);
+		this.endNodePath = nodeGetNodePath(urange.getEndNode(), root);
+		this.startOffset = urange.getStartOffset();
+		this.endOffset = urange.getEndOffset();
+
+		//alert('urange.getWindow(): ' + urange.getWindow() + ', urange.getDocument(): ' + urange.getDocument());
+		clearWindowSelections(urange.getWindow(), urange.getDocument());
+	}
+	
 	this.onHover = function (event) {
 		// TODO set focus of corres. quote
 	}
 	
-	this.toString = function () {
+	this.getText = function () {
 		return this.text;
 	}
 
@@ -501,26 +608,16 @@ function Mark(range) {
 	  this.hspans = null;
 	}
 	
-	var root, urange;
-	
-	try {
-		this.validateRange(range);
-	} catch(e) {
-		clearWindowSelections(range.getWindow(), range.getDocument());
-		throw e;
+	if(arguments) {
+		if(arguments.length ==1) {
+			// from range
+			var arg0 = arguments[0];
+			this.applyRange(arg0);
+		} else if(arguments && arguments.length ==2) {
+			// from serialized token
+			var arg0 = arguments[0];
+			var arg1 = arguments[1];
+			this.deserialize(arg0, arg1);
+		}
 	}
-	
-	urange = range;
-	
-	var root = urange.getDocument().body;
-	this.text = urange.getText();
-	this.startNodePath = nodeGetNodePath(urange.getStartNode(), root);
-	this.endNodePath = nodeGetNodePath(urange.getEndNode(), root);
-	this.startOffset = urange.getStartOffset();
-	this.endOffset = urange.getEndOffset();
-
-	//this.highlight(urange);
-	
-	//alert('urange.getWindow(): ' + urange.getWindow() + ', urange.getDocument(): ' + urange.getDocument());
-	clearWindowSelections(urange.getWindow(), urange.getDocument());
 } // Mark constructor

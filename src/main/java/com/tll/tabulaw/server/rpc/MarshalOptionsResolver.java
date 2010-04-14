@@ -16,14 +16,16 @@ import com.tll.tabulaw.common.model.PocEntityType;
  */
 public class MarshalOptionsResolver implements IMarshalOptionsResolver {
 
-	private static final MarshalOptions DEFAULT_OPTIONS = new MarshalOptions(false, 1, null);
+	private static final MarshalOptions DEFAULT_OPTIONS = new MarshalOptions(false, 0);
 	
 	public static final MarshalOptions USER_OPTIONS = DEFAULT_OPTIONS;
 	public static final MarshalOptions CASE_OPTIONS = DEFAULT_OPTIONS;
-	public static final MarshalOptions DOC_OPTIONS = new MarshalOptions(true, 2, null);
-	public static final MarshalOptions QUOTE_OPTIONS = DEFAULT_OPTIONS;
-	public static final MarshalOptions QUOTE_BUNDLE_OPTIONS = DOC_OPTIONS;
-
+	public static final MarshalOptions DOC_OPTIONS = new MarshalOptions(true, 1);
+	public static final MarshalOptions QUOTE_OPTIONS = DOC_OPTIONS;
+	
+	// qb(0) -> qoute(1) -> doc(2) -> case(3)
+	public static final MarshalOptions QUOTE_BUNDLE_OPTIONS = new MarshalOptions(true, 3);
+	
 	@Override
 	public MarshalOptions resolve(IEntityType entityType) throws IllegalArgumentException {
 		if(entityType instanceof PocEntityType) {

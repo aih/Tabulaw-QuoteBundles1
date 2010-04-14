@@ -60,18 +60,18 @@ public class DocUtils {
 		sb.append("|hash:");
 		sb.append(mDoc.asString("hash"));
 
-		if(mDoc.propertyExists("case")) {
+		if(mDoc.propertyExists("caseRef")) {
 			sb.insert(0, "[casedoc]");
 
 			// case: "parties", "citation", "url", "year", "date"
 			sb.append("|parties:");
-			sb.append(mDoc.asString("case.parties"));
+			sb.append(mDoc.asString("caseRef.parties"));
 			sb.append("|citation:");
-			sb.append(mDoc.asString("case.citation"));
+			sb.append(mDoc.asString("caseRef.citation"));
 			sb.append("|url:");
-			sb.append(mDoc.asString("case.url"));
+			sb.append(mDoc.asString("caseRef.url"));
 			sb.append("|year:");
-			sb.append(mDoc.asString("case.year"));
+			sb.append(mDoc.asString("caseRef.year"));
 		}
 		else {
 			// throw new IllegalStateException("Un-handled document model type");

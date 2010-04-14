@@ -23,15 +23,14 @@ import com.tll.config.IConfigAware;
 import com.tll.config.IConfigKey;
 import com.tll.mail.NameEmail;
 import com.tll.server.rpc.IExceptionHandler;
-import com.tll.tabulaw.server.rpc.EmailExceptionHandler;
+import com.tll.tabulaw.server.rpc.ExceptionHandler;
 
 /**
- * EmailExceptionHandlerModule
  * @author jpk
  */
-public class EmailExceptionHandlerModule extends AbstractModule implements IConfigAware {
+public class ExceptionHandlerModule extends AbstractModule implements IConfigAware {
 
-	private static final Log log = LogFactory.getLog(EmailExceptionHandlerModule.class);
+	private static final Log log = LogFactory.getLog(ExceptionHandlerModule.class);
 
 	/**
 	 * ConfigKeys - Configuration property keys for the app context.
@@ -73,7 +72,7 @@ public class EmailExceptionHandlerModule extends AbstractModule implements IConf
 	/**
 	 * Constructor
 	 */
-	public EmailExceptionHandlerModule() {
+	public ExceptionHandlerModule() {
 		super();
 	}
 
@@ -81,7 +80,7 @@ public class EmailExceptionHandlerModule extends AbstractModule implements IConf
 	 * Constructor
 	 * @param config
 	 */
-	public EmailExceptionHandlerModule(Config config) {
+	public ExceptionHandlerModule(Config config) {
 		super();
 		setConfig(config);
 	}
@@ -108,7 +107,7 @@ public class EmailExceptionHandlerModule extends AbstractModule implements IConf
 			}
 		}).in(Scopes.SINGLETON);
 
-		bind(IExceptionHandler.class).to(EmailExceptionHandler.class).in(Scopes.SINGLETON);
+		bind(IExceptionHandler.class).to(ExceptionHandler.class).in(Scopes.SINGLETON);
 	}
 
 }

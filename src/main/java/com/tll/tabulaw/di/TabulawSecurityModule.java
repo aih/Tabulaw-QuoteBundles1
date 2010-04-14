@@ -10,9 +10,7 @@ import org.springframework.security.userdetails.UserDetailsService;
 import com.tll.di.AcegiModule;
 import com.tll.tabulaw.service.entity.UserService;
 
-
 /**
- * 
  * @author jpk
  */
 public class TabulawSecurityModule extends AcegiModule {
@@ -21,5 +19,4 @@ public class TabulawSecurityModule extends AcegiModule {
 	protected Class<? extends UserDetailsService> getUserDetailsImplType() {
 		return UserService.class;
 	}
-
 }

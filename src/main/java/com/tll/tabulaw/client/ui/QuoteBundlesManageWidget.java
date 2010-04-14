@@ -18,15 +18,19 @@ import com.allen_sauer.gwt.dnd.client.drop.VerticalPanelDropController;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tll.common.data.ModelPayload;
 import com.tll.common.model.CopyCriteria;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
+import com.tll.common.msg.Msg;
+import com.tll.tabulaw.client.Poc;
 import com.tll.tabulaw.client.model.PocModelCache;
 import com.tll.tabulaw.client.ui.QuoteBundleListingWidget.BOption;
 import com.tll.tabulaw.common.model.PocEntityType;
@@ -114,7 +118,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 					(QuoteBundleEditWidget) draggedQuoteWidget.getParentQuoteBundleWidget();
 
 			// identify the target quote bundle widget (recipient of draggable)
-			QuoteBundleEditWidget targetQuoteBundleWidget;
+			final QuoteBundleEditWidget targetQuoteBundleWidget;
 			try {
 				targetQuoteBundleWidget = (QuoteBundleEditWidget) context.finalDropController.getDropTarget().getParent();
 			}
@@ -141,12 +145,35 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 
 			// clone the dragged quote widget
 			Model mQuoteClone = draggedQuoteModel.copy(CopyCriteria.keepReferences());
-			mQuoteClone.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE));
-			targetQuoteBundleWidget.addQuote(mQuoteClone, true);
-
-			//String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
-			//Notifier.get().info(msg);
-
+			
+			//mQuoteClone.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE));
+			// server-side persist
+			String bundleId = targetQuoteBundleWidget.getModel().getId();
+			Poc.getUserDataService().addQuoteToBundle(bundleId, mQuoteClone, new AsyncCallback<ModelPayload>() {
+				
+				@Override
+				public void onSuccess(ModelPayload result) {
+					if(result.hasErrors()) {
+						List<Msg> msgs = result.getStatus().getMsgs();
+						Notifier.get().post(msgs);
+					}
+					else {
+						Model persistedQuote = result.getModel();
+						targetQuoteBundleWidget.addQuote(persistedQuote, true);
+	
+						//String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
+						//Notifier.get().info(msg);
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					String emsg = "Failed to persist cloned Quote.";
+					Log.error(emsg, caught);
+					Notifier.get().error(emsg);
+				}
+			});
+			
 			// deny since we are copying
 			throw new VetoDragException();
 		}

@@ -46,7 +46,7 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional(readOnly = true)
 	public List<QuoteBundle> getBundlesForUser(Long userId) {
 		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
-		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, false);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
 		try {
 			List<BundleUserBinding> bindings = dao.findEntities(c, null);
 			if(bindings.size() < 1) return new ArrayList<QuoteBundle>(0);
@@ -71,9 +71,9 @@ public class UserDataService extends AbstractEntityService {
 	 */
 	@Transactional
 	public QuoteBundle saveBundleForUser(Long userId, QuoteBundle bundle) {
-		
+
 		validate(bundle);
-		
+
 		boolean isNew = bundle.isNew();
 
 		// clear out existing
@@ -154,9 +154,11 @@ public class UserDataService extends AbstractEntityService {
 	 * Deletes a quote bundle and its association to the given user.
 	 * @param userId
 	 * @param bundleId
+	 * @throws EntityNotFoundException When either the user or bundle can't be
+	 *         resolved
 	 */
 	@Transactional
-	public void deleteBundleForUser(long userId, long bundleId) {
+	public void deleteBundleForUser(long userId, long bundleId) throws EntityNotFoundException {
 		dao.purge(QuoteBundle.class, bundleId);
 		removeBundleUserBinding(bundleId, userId);
 	}
@@ -165,27 +167,35 @@ public class UserDataService extends AbstractEntityService {
 	 * Adds the given quote to the quote bundle identified by the given bundle id.
 	 * @param bundleId
 	 * @param quote
-	 * @return the existing parent bundle containing the added quote
+	 * @return the persisted quote
 	 */
 	@Transactional
-	public QuoteBundle addQuoteToBundle(long bundleId, Quote quote) {
-		if(!quote.isNew()) throw new IllegalArgumentException();
+	public Quote addQuoteToBundle(long bundleId, Quote quote) {
+		if(!quote.isNew()) throw new IllegalArgumentException("Quote isn't new");
 		validate(quote);
 		QuoteBundle qb = dao.load(QuoteBundle.class, Long.valueOf(bundleId));
 		assert qb != null;
+		Quote persistedQuote = dao.persist(quote);
 		qb.getQuotes().add(quote);
-		return dao.persist(qb);
+		dao.persist(qb);
+		return persistedQuote;
 	}
 
 	/**
 	 * Removes an existing quote from an existing bundle.
+	 * <p>
+	 * The quote is <em>not</em> deleted rather it is put into a potentially
+	 * "orphaned" state meaning no bundles may reference the removed quote.
+	 * <p>
+	 * TODO handle orphaned quotes case
 	 * @param bundleId
 	 * @param quoteId
+	 * @param deleteQuote delete the quote as well?
 	 * @throws EntityNotFoundException when the quote isn't found to exist in the
 	 *         bundle
 	 */
 	@Transactional
-	public void removeQuoteFromBundle(long bundleId, long quoteId) throws EntityNotFoundException {
+	public void removeQuoteFromBundle(long bundleId, long quoteId, boolean deleteQuote) throws EntityNotFoundException {
 		QuoteBundle qb = dao.load(QuoteBundle.class, Long.valueOf(bundleId));
 		Quote tormv = null;
 		if(qb.getQuotes() != null) {
@@ -197,6 +207,11 @@ public class UserDataService extends AbstractEntityService {
 			}
 		}
 		if(tormv == null) throw new EntityNotFoundException("Quote: " + quoteId + " not found in bundle: " + bundleId);
+		qb.getQuotes().remove(tormv);
+		dao.persist(qb);
+		if(deleteQuote) {
+			dao.purge(tormv);
+		}
 	}
 
 	/**
@@ -222,8 +237,8 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional
 	public void removeBundleUserBinding(long bundleId, long userId) throws EntityNotFoundException {
 		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
-		c.getPrimaryGroup().addCriterion("bundleId", bundleId, Comparator.EQUALS, false);
-		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, false);
+		c.getPrimaryGroup().addCriterion("bundleId", bundleId, Comparator.EQUALS, true);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
 		BundleUserBinding binding;
 		try {
 			binding = dao.findEntity(c);

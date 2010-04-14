@@ -13,22 +13,27 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabBar;
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.UnloadViewRequest;
 import com.tll.client.mvc.view.ViewKey;
+import com.tll.client.ui.IUserSessionHandler;
 import com.tll.client.ui.SimpleHyperLink;
+import com.tll.client.ui.UserSessionEvent;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
 import com.tll.tabulaw.client.Poc;
+import com.tll.tabulaw.client.model.PocModelCache;
 import com.tll.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tll.tabulaw.client.view.DocumentView;
 import com.tll.tabulaw.common.model.PocEntityType;
@@ -98,12 +103,18 @@ public class NavRowPanel extends AbstractNavPanel {
 			super.onModelChangeEvent(event);
 			update();
 		}
+		
+		public void clear() {
+			html.setHTML("");
+			crntQbKey = null;
+		}
 
 	} // CurrentQuoteBundleDisplayWidget
 
-	static class LoggedInUserWidget extends Composite {
-		
+	static class LoggedInUserWidget extends AbstractModelChangeAwareWidget {
+
 		static class Styles {
+
 			public static final String LGD_IN_USR = "lgdInUsr";
 			public static final String WELCOME_TEXT = "welcomeText";
 			public static final String LOGOUT = "logout";
@@ -111,28 +122,55 @@ public class NavRowPanel extends AbstractNavPanel {
 
 		final Label welcomeText;
 		final SimpleHyperLink lnkLogOut;
-		final FlowPanel pnl = new FlowPanel();
+		final FlowPanel pnl;
+		final FormPanel frmLogout;
 
 		public LoggedInUserWidget() {
 			super();
+
+			pnl = new FlowPanel();
 			pnl.setStyleName(Styles.LGD_IN_USR);
+
 			welcomeText = new Label();
 			welcomeText.setStyleName(Styles.WELCOME_TEXT);
 			lnkLogOut = new SimpleHyperLink("Log Out", new ClickHandler() {
-				
+
 				@Override
 				public void onClick(ClickEvent event) {
-					// TODO
+					frmLogout.submit();
 				}
 			});
 			lnkLogOut.setStyleName(Styles.LOGOUT);
 
+			frmLogout = new FormPanel();
+			frmLogout.setMethod(FormPanel.METHOD_POST);
+			frmLogout.setAction("/logout");
+
 			pnl.add(welcomeText);
 			pnl.add(lnkLogOut);
+			frmLogout.add(pnl);
 
-			initWidget(pnl);
+			initWidget(frmLogout);
 		}
 
+		public void populate(Model mUser) {
+			welcomeText.setText("Welcome " + mUser.asString("name") + '!');
+		}
+		
+		public void clear() {
+			welcomeText.setText("");
+		}
+
+		@Override
+		public void onModelChangeEvent(ModelChangeEvent event) {
+			super.onModelChangeEvent(event);
+			if(event.getChangeOp() == ModelChangeOp.LOADED) {
+				Model m = event.getModel();
+				if(m.getKey().getEntityType() == PocEntityType.USER) {
+					populate(m);
+				}
+			}
+		}
 	}
 
 	private static void showView(ArrayList<? extends AbstractNavButton> list, int index) {
@@ -151,16 +189,30 @@ public class NavRowPanel extends AbstractNavPanel {
 
 	private final CurrentQuoteBundleDisplayWidget crntQuoteBudleWidget = new CurrentQuoteBundleDisplayWidget();
 
+	private final LoggedInUserWidget liuWidget = new LoggedInUserWidget();
+
 	private final HorizontalPanel hp = new HorizontalPanel();
 
 	private final FlowPanel panel = new FlowPanel();
 
 	private boolean handlingViewChange;
+	
+	/**
+	 * Clears out the nav row resetting its state to that of page refresh state. 
+	 */
+	public void clear() {
+		while(openDocTabs.getTabCount() > 0) openDocTabs.removeTab(0);
+		openDocNavButtons.clear();
+		
+		crntQuoteBudleWidget.clear();
+		liuWidget.clear();
+	}
 
 	/**
 	 * Constructor
+	 * @param userSessionHandler
 	 */
-	public NavRowPanel() {
+	public NavRowPanel(final IUserSessionHandler userSessionHandler) {
 		super();
 
 		DocumentsNavButton nbDocListing = new DocumentsNavButton();
@@ -177,9 +229,20 @@ public class NavRowPanel extends AbstractNavPanel {
 
 		crntQuoteBudleWidget.setStyleName(Styles.CRNT_QB);
 
+		liuWidget.frmLogout.addSubmitHandler(new SubmitHandler() {
+
+			@Override
+			public void onSubmit(SubmitEvent event) {
+				// clear out user state and fire user session end event w/o waiting for server response
+				PocModelCache.get().removeAll(PocEntityType.USER, liuWidget);
+				userSessionHandler.onUserSessionEvent(new UserSessionEvent(false));
+			}
+		});
+
 		hp.setStyleName(Styles.NAV_ROW_TBL);
 		hp.add(mainViewTabs);
 		hp.add(openDocTabs);
+		hp.add(liuWidget);
 
 		panel.setStyleName(Styles.NAV_ROW);
 		panel.add(crntQuoteBudleWidget);
@@ -300,6 +363,7 @@ public class NavRowPanel extends AbstractNavPanel {
 		}
 		else {
 			crntQuoteBudleWidget.onModelChangeEvent(event);
+			liuWidget.onModelChangeEvent(event);
 		}
 	}
 }

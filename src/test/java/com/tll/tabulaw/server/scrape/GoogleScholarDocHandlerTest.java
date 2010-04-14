@@ -101,9 +101,9 @@ public class GoogleScholarDocHandlerTest {
 		Model caseDoc = docHandler.parseSingleDocument(raw);
 		
 		String docTitle = caseDoc.asString("title");
-		String caseCitation = caseDoc.asString("case.citation");
-		String caseYear = caseDoc.asString("case.year");
-		String caseParties = caseDoc.asString("case.parties");
+		String caseCitation = caseDoc.asString("caseRef.citation");
+		String caseYear = caseDoc.asString("caseRef.year");
+		String caseParties = caseDoc.asString("caseRef.parties");
 		
 		Assert.assertEquals(docTitle, "Board of Supervisors of James City Cty. v. Rowe");
 		Assert.assertEquals(caseParties, "Board of Supervisors of James City Cty. v. Rowe");

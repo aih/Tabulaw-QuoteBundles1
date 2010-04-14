@@ -103,7 +103,11 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 
 				@Override
 				public void onSuccess(DocSearchPayload result) {
-					if(!result.getStatus().hasErrors()) {
+					if(result.hasErrors()) {
+						List<Msg> msgs = result.getStatus().getMsgs();
+						Notifier.get().post(msgs);
+					}
+					else {
 						query = aquery;
 						List<CaseDocSearchResult> searchResults = result.getResults();
 						ArrayList<DocSuggestion> suggestions = new ArrayList<DocSuggestion>(searchResults.size());

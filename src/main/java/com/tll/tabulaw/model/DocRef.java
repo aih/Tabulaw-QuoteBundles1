@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.tll.model.IEntity;
 import com.tll.model.NamedEntity;
 import com.tll.schema.BusinessKeyDef;
 import com.tll.schema.BusinessObject;
@@ -23,13 +24,18 @@ import com.tll.schema.BusinessObject;
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Doc Hash", properties = { "hash"
 }))
-public abstract class DocRef extends NamedEntity {
+public class DocRef extends NamedEntity {
+
+	private static final long serialVersionUID = -8257785916791525146L;
 
 	private String title, hash;
 	private Date date;
 	private CaseRef caseRef;
 
-	private static final long serialVersionUID = -8257785916791525146L;
+	@Override
+	public Class<? extends IEntity> entityClass() {
+		return DocRef.class;
+	}
 
 	@NotEmpty
 	@Length(max = 512)
@@ -79,5 +85,4 @@ public abstract class DocRef extends NamedEntity {
 	public void setCaseRef(CaseRef caseRef) {
 		this.caseRef = caseRef;
 	}
-
 }

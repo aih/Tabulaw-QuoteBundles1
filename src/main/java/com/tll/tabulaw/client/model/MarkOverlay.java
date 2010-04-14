@@ -10,18 +10,22 @@ import com.google.gwt.core.client.JavaScriptObject;
 public class MarkOverlay extends JavaScriptObject {
 
 	/**
-	 * @return The text of the user selection.
+	 * @return The entire mark state serialized into a string.
 	 */
-	public final native String getText() /*-{ return this.toString(); }-*/;
+	public final native String serialize() /*-{ return this.serialize(); }-*/;
 
 	/**
-	 * Sets the window object to use.
-	 * @param wnd the window ref
+	 * De-serializes the given token re-setting the state  
+	 * @param body the dom body ref (required to create the corres. range)
+	 * @param stoken the serialized string (return value of serialize())
 	 */
-	public final native void setWindow(JavaScriptObject wnd) /*-{ 
-		this.setWindow(wnd); 
-	}-*/;
-	
+	public final native void deserialize(JavaScriptObject body, String stoken) /*-{ return this.deserialize(body,stoken); }-*/;
+
+	/**
+	 * @return The text of the user selection.
+	 */
+	public final native String getText() /*-{ return this.getText(); }-*/;
+
 	/**
 	 * Highlights the text selection.
 	 */

@@ -24,7 +24,7 @@ public interface IUserDataService extends RemoteService {
 	 * @param bundle
 	 * @return
 	 */
-	ModelPayload saveBundleForUser(long userId, Model bundle);
+	ModelPayload saveBundleForUser(String userId, Model bundle);
 	
 	/**
 	 * Adds a bundle for the given user.
@@ -32,15 +32,15 @@ public interface IUserDataService extends RemoteService {
 	 * @param bundle 
 	 * @return payload containing the persisted marshaled bundle
 	 */
-	ModelPayload addBundleForUser(long userId, Model bundle);
+	ModelPayload addBundleForUser(String userId, Model bundle);
 	
 	/**
 	 * Deletes a bundle for the given user.
 	 * @param userId
-	 * @param bundle
+	 * @param bundleId
 	 * @return payload containing the status of the operation
 	 */
-	Payload deleteBundleForUser(long userId, Model bundle);
+	Payload deleteBundleForUser(String userId, String bundleId);
 
 	/**
 	 * Adds a quote to the bundle
@@ -48,13 +48,14 @@ public interface IUserDataService extends RemoteService {
 	 * @param mQuote quote to add
 	 * @return the persisted and marshaled quote
 	 */
-	ModelPayload addQuoteToBundle(long bundleId, Model mQuote);
+	ModelPayload addQuoteToBundle(String bundleId, Model mQuote);
 	
 	/**
 	 * @param bundleId id of the bundle containing the quote to remove.
 	 * @param quoteId id of the quote to remove
+	 * @param deleteQuote Permanantly delete the quote as well?
 	 * @return the status of the removal
 	 */
-	Payload removeQuoteFromBundle(long bundleId, long quoteId);
+	Payload removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote);
 	
 }

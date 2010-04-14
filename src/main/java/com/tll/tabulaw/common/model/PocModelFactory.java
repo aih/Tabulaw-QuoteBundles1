@@ -11,13 +11,11 @@ import java.util.Map;
 
 import com.tll.common.model.DatePropertyValue;
 import com.tll.common.model.Model;
-import com.tll.common.model.ObjectPropertyValue;
 import com.tll.common.model.RelatedManyProperty;
 import com.tll.common.model.RelatedOneProperty;
 import com.tll.common.model.StringPropertyValue;
 import com.tll.schema.PropertyMetadata;
 import com.tll.schema.PropertyType;
-import com.tll.tabulaw.client.model.MarkOverlay;
 
 /**
  * Provides the mocked data backing the application.
@@ -59,7 +57,8 @@ import com.tll.tabulaw.client.model.MarkOverlay;
  *   document (ref)
  *   quote (text selection)
  *   tags (set of keywords)
- *   mark (ref - MarkOverlay js object)
+ *   serializedMark (serialized MarkOverlay)
+ *   mark (MarkOverlay) [transient]
  *   
  * QUOTE_BUNDLE props
  * ------------------
@@ -119,7 +118,7 @@ public class PocModelFactory {
 		metadata.put(PocEntityType.QUOTE, metaQuote);
 		metaQuote.put("quote", new PropertyMetadata(PropertyType.STRING, false, true, 255));
 		metaQuote.put("tags", new PropertyMetadata(PropertyType.STRING, false, false, 255));
-		metaQuote.put("mark", new PropertyMetadata(PropertyType.OBJECT, false, false, -1));
+		metaQuote.put("serializedMark", new PropertyMetadata(PropertyType.STRING, false, false, -1));
 
 		/*
 		String[][] quotes = new String[][] {
@@ -173,7 +172,7 @@ public class PocModelFactory {
 				meta = metadata.get(PocEntityType.QUOTE);
 				proto.set(new StringPropertyValue("tags", meta.get("tags"), null));
 				proto.set(new StringPropertyValue("quote", meta.get("quote"), null));
-				proto.set(new ObjectPropertyValue("mark", meta.get("mark"), null));
+				proto.set(new StringPropertyValue("serializedMark", meta.get("serializedMark"), null));
 				proto.set(new RelatedOneProperty(PocEntityType.DOCUMENT, null, "document", true));
 				break;
 			case QUOTE_BUNDLE:
@@ -223,7 +222,7 @@ public class PocModelFactory {
 		docCase.setString("citation", citation);
 		docCase.setString("url", url);
 		docCase.setString("year", year);
-		doc.set(new RelatedOneProperty(PocEntityType.CASE, docCase, "case", true));
+		doc.set(new RelatedOneProperty(PocEntityType.CASE, docCase, "caseRef", true));
 
 		return doc;
 	}
@@ -243,16 +242,16 @@ public class PocModelFactory {
 
 	/**
 	 * Creates a new and empty quote bundle.
-	 * @param quote the quote text
-	 * @param document referenced doc model
-	 * @param mark highlight js overlay object
+	 * @param quoteText the quote text
+	 * @param document optional referenced doc model
+	 * @param serializedMark optional serialized highlight token
 	 * @return newly created model
 	 */
-	public Model buildQuote(String quote, Model document, MarkOverlay mark) {
+	public Model buildQuote(String quoteText, Model document, String serializedMark) {
 		Model m = create(PocEntityType.QUOTE);
-		m.setString("quote", mark.getText());
-		m.relatedOne("document").setModel(document);
-		m.setProperty("mark", mark, PropertyType.OBJECT);
+		m.setString("quote", quoteText);
+		if(document != null) m.relatedOne("document").setModel(document);
+		m.setProperty("serializedMark", serializedMark, PropertyType.STRING);
 		return m;
 	}
 }

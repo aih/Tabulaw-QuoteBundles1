@@ -5,6 +5,8 @@
  */
 package com.tll.tabulaw.client.ui;
 
+import java.util.List;
+
 import com.allen_sauer.gwt.dnd.client.DragEndEvent;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
@@ -13,6 +15,7 @@ import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -22,13 +25,15 @@ import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.IViewChangeHandler;
 import com.tll.client.mvc.view.ViewChangeEvent;
+import com.tll.common.data.ModelPayload;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
+import com.tll.common.msg.Msg;
+import com.tll.schema.PropertyType;
 import com.tll.tabulaw.client.Poc;
 import com.tll.tabulaw.client.model.MarkOverlay;
 import com.tll.tabulaw.client.model.PocModelCache;
 import com.tll.tabulaw.client.ui.DocumentViewer.ViewMode;
-import com.tll.tabulaw.common.model.PocEntityType;
 import com.tll.tabulaw.common.model.PocModelFactory;
 
 /**
@@ -40,8 +45,7 @@ import com.tll.tabulaw.common.model.PocModelFactory;
  * existing quotes in the bundle are re-displayed upon widget load.
  * @author jpk
  */
-public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget 
-implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> {
+public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> {
 
 	class DocQuoteDragHandler extends LoggingDragHandler {
 
@@ -52,18 +56,18 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> 
 		@Override
 		public void onPreviewDragEnd(DragEndEvent event) throws VetoDragException {
 			super.onPreviewDragEnd(event);
-			
+
 			// insert the quote text at the cursor location of the doc being edited
 			QuoteDocWidget qw = (QuoteDocWidget) event.getContext().draggable;
 			String quoteText = qw.getModel().asString("quote");
 			wDocViewer.getDocEditWidget().getFormatter().insertHTML(quoteText);
-			
+
 			throw new VetoDragException();
 		}
 	} // DocQuoteDragHandler
 
 	private final DocumentViewer wDocViewer = new DocumentViewer();
-	
+
 	private HandlerRegistration hrViewMode;
 
 	private final QuoteBundleDocWidget wDocQuoteBundle;
@@ -103,25 +107,48 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> 
 		hsp.add(wDocViewer);
 		hsp.add(wDocQuoteBundle);
 		boundaryPanel.add(hsp);
-		
+
 		initWidget(boundaryPanel);
-		//initWidget(hsp);
+		// initWidget(hsp);
 	}
-	
+
 	public Widget[] getNavColWidgets() {
 		return wDocViewer.getNavColWidgets();
 	}
 
 	@Override
 	public void onTextSelect(TextSelectEvent event) {
-		MarkOverlay mark = event.getMark();
+		final MarkOverlay mark = event.getMark();
+		String serializedMark = mark.serialize();
 
 		// create the quote
-		Model quote = PocModelFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), mark);
-		quote.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE));
+		Model quote = PocModelFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
+		// quote.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE));
+		// server-side persist
+		Poc.getUserDataService().addQuoteToBundle(wDocQuoteBundle.getModel().getId(), quote,
+				new AsyncCallback<ModelPayload>() {
 
-		// persist show and highlight
-		wDocQuoteBundle.addQuote(quote, true);
+					@Override
+					public void onSuccess(ModelPayload result) {
+						if(result.hasErrors()) {
+							List<Msg> msgs = result.getStatus().getMsgs();
+							Notifier.get().post(msgs);
+						}
+						else {
+							Model persistedQuote = result.getModel();
+							// cache, show and highlight
+							persistedQuote.setProperty("mark", mark, PropertyType.OBJECT);
+							wDocQuoteBundle.addQuote(persistedQuote, true);
+						}
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						String emsg = "Failed to persist Quote Bundle.";
+						Log.error(emsg, caught);
+						Notifier.get().error(emsg);
+					}
+				});
 	}
 
 	/**
@@ -133,6 +160,8 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> 
 	private boolean maybeSetCurrentQuoteBundle() {
 		Model mQb = Poc.getCurrentQuoteBundle();
 		if(mQb == null) {
+			throw new IllegalStateException("No current qb set");
+			/*
 			assert crntQbKey == null;
 			// auto-create a new quote bundle
 			Model mDoc = wDocViewer.getModel();
@@ -145,6 +174,7 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> 
 			Poc.setCurrentQuoteBundle(mQb);
 			// fire model change event
 			PocModelCache.get().persist(mQb, this);
+			*/
 		}
 		if(crntQbKey == null || !crntQbKey.equals(mQb.getKey())) {
 			if(crntQbKey != null) {
@@ -183,9 +213,42 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> 
 		// update doc viewer with doc
 		wDocViewer.setModel(mDoc);
 
-		// grab the current quote bundle
-		maybeSetCurrentQuoteBundle();
+		if(Poc.getCurrentQuoteBundle() == null) {
+			String userId = PocModelCache.get().getUser().getId();
+			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
+			String qbName = mDoc.asString("title");
+			String qbDesc = "Quote Bundle for " + qbName;
+			final Model mQb = PocModelFactory.get().buildQuoteBundle(qbName, qbDesc);
+			Poc.getUserDataService().addBundleForUser(userId, mQb, new AsyncCallback<ModelPayload>() {
 
+				@Override
+				public void onSuccess(ModelPayload result) {
+					if(result.hasErrors()) {
+						List<Msg> msgs = result.getStatus().getMsgs();
+						Notifier.get().post(msgs);
+					}
+					else {
+						Model persistedQb = result.getModel();
+						Poc.setCurrentQuoteBundle(persistedQb);
+						// fire model change event from the portal to ensure this view sees
+						// the ensuing model change event
+						// which will then trigger maybeSetCurrentQuoteBundle()..
+						PocModelCache.get().persist(persistedQb, Poc.getPortal());
+					}
+				}
+
+				@Override
+				public void onFailure(Throwable caught) {
+					String emsg = "Unable to persist auto-created Quote Bundle";
+					Log.error(emsg, caught);
+					Notifier.get().error(emsg);
+				}
+			});
+		}
+		else {
+			// grab the current quote bundle
+			maybeSetCurrentQuoteBundle();
+		}
 		TextSelectApi.init(wDocViewer.getFrameId());
 	}
 
@@ -202,7 +265,7 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> 
 		// move the splitter over to the right
 		// we want to see as much of the doc as possible
 		hsp.setSplitPosition("80%");
-		
+
 		hrViewMode = wDocViewer.addValueChangeHandler(this);
 
 		ViewManager.get().addViewChangeHandler(this);
@@ -218,7 +281,7 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> 
 		ViewManager.get().removeViewChangeHandler(this);
 
 		hrViewMode.removeHandler();
-		
+
 		super.onUnload();
 	}
 

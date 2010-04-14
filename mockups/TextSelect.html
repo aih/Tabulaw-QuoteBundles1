@@ -58,7 +58,7 @@ function postRange(range) {
 
   try {
     mark = new Mark(range);
-    mark.highlight(range);
+    mark.highlight();
   } catch(e) {
     alert(e);
     return;
@@ -105,6 +105,20 @@ function postRange(range) {
       mark.unhighlight();
       btn.innerHTML = 'Highlight';
     }
+  });
+  td.appendChild(btn);
+
+  // serialize/de-serialize button
+  btn = document.createElement('button');
+  btn.innerHTML = 'Serialize Test';
+  btn.mark = mark; // ref
+  goog.events.listen(btn, 'click', function(e){
+    var btn = e.target;
+    var mark = btn.mark;
+    var stoken = mark.serialize();
+    mark.unhighlight();
+    mark.deserialize(document.body, stoken);
+    mark.highlight();
   });
   td.appendChild(btn);
 

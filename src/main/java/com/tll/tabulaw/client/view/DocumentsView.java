@@ -116,7 +116,7 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 
 	@Override
 	protected final void doDestroy() {
-		//docListing.getOperator().clear();
+		if(docListing.getOperator() != null) docListing.getOperator().clear();
 		hrModelChangeSuggest.removeHandler();
 		hrModelChangeSuggest = null;
 	}

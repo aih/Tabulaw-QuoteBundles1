@@ -61,10 +61,10 @@ public class DocUtilsTest {
 		Assert.assertEquals(m.asString("hash"), "docHash");
 		
 		// case related
-		Assert.assertEquals(m.asString("case.parties"), "parties");
-		Assert.assertEquals(m.asString("case.citation"), "citation");
-		Assert.assertEquals(m.asString("case.url"), "url");
-		Assert.assertEquals(m.asString("case.year"), "year");
+		Assert.assertEquals(m.asString("caseRef.parties"), "parties");
+		Assert.assertEquals(m.asString("caseRef.citation"), "citation");
+		Assert.assertEquals(m.asString("caseRef.url"), "url");
+		Assert.assertEquals(m.asString("caseRef.year"), "year");
 	}
 
 	/**

@@ -46,7 +46,7 @@ import com.tll.tabulaw.model.Authority.AuthorityRoles;
 public class UserService extends AbstractEntityService implements UserDetailsService, IForgotPasswordHandler  {
 
 	private static PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
-
+	
 	/**
 	 * @param password
 	 * @param salt
@@ -88,6 +88,36 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 		super(dao, entityAssembler, vfactory);
 		// this.aclProviderManager = aclProviderManager;
 		this.userCache = userCache;
+		init();
+	}
+	
+	private void init() {
+		// stub anon user if not alreay specified
+		User anonUser = new User();
+		anonUser.setId(1L);
+		Authority a = new Authority();
+		a.setAuthority(AuthorityRoles.ROLE_USER.name());
+		a = new Authority();
+		a.setAuthority(AuthorityRoles.ROLE_ADMINISTRATOR.name());
+		anonUser.addAuthority(a);
+		Date now = new Date();
+		anonUser.setDateCreated(now);
+		anonUser.setDateModified(now);
+		anonUser.setEmailAddress("anon@tabulaw.com");
+		anonUser.setPassword(encodePassword("anon", anonUser.getEmailAddress()));
+		anonUser.setEnabled(true);
+		anonUser.setLocked(false);
+		Calendar c = Calendar.getInstance();
+		c.setTime(now);
+		c.add(Calendar.YEAR, 1);
+		anonUser.setExpires(c.getTime());
+		anonUser.setName("Tabulaw Discovery User");
+		try {
+			dao.persist(anonUser);
+		}
+		catch(EntityNotFoundException e) {
+			// ok
+		}
 	}
 
 	@Transactional

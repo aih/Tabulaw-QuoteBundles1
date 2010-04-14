@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
@@ -93,6 +94,24 @@ public class PocModelCache {
 			}
 		});
 	} // constructor
+	
+	/**
+	 * Clears out the entire model cache.
+	 * <p>No model change event is fired.
+	 */
+	public void clear() {
+		for(List<Model> list : cache.values()) {
+			list.clear();
+		}
+	}
+	
+	/**
+	 * @return The currently logged in user.
+	 */
+	public Model getUser() {
+		List<Model> list = cache.get(PocEntityType.USER);
+		return list.size() < 1 ? null : list.get(0);
+	}
 
 	/**
 	 * Provides the next available id for use in creating new entities.
@@ -100,6 +119,7 @@ public class PocModelCache {
 	 * @return the next available id
 	 */
 	public String getNextId(PocEntityType entityType) {
+		Log.error("ERROR: calling getNextId() for: " + entityType);
 		List<Model> mclc = cache.get(entityType);
 		int largest = 0;
 		for(Model m : mclc) {
@@ -119,8 +139,8 @@ public class PocModelCache {
 	 * @throws IllegalArgumentException When the model can't be found.
 	 */
 	public Model get(ModelKey key) {
-		List<Model> set = cache.get(key.getEntityType());
-		for(Model m : set) {
+		List<Model> list = cache.get(key.getEntityType());
+		for(Model m : list) {
 			if(m.getKey().equals(key)) {
 				return m.copy(CopyCriteria.keepReferences());
 			}
@@ -240,6 +260,25 @@ public class PocModelCache {
 	}
 
 	/**
+	 * Removes all model instances of the given entity type firing a model change
+	 * event for <em>each</em> removed model only if the given source is not
+	 * <code>null</code>.
+	 * @param etype the entity type of which to remove all instances
+	 * @param source the sourcing widget that will source a model change event
+	 */
+	public void removeAll(PocEntityType etype, Widget source) {
+		List<Model> list = cache.get(etype);
+		if(list == null || list.size() < 1) return;
+		ArrayList<Model> rlist = new ArrayList<Model>(list);
+		for(Model m : rlist) {
+			if(list.remove(m)) {
+				// fire model change event
+				if(source != null) source.fireEvent(new ModelChangeEvent(ModelChangeOp.DELETED, m, null));
+			}
+		}
+	}
+
+	/**
 	 * Compares two quotes for equality by an implicit business key:
 	 * <ul>
 	 * <li>same doc ref
@@ -262,7 +301,7 @@ public class PocModelCache {
 		List<Model> list = cache.get(PocEntityType.DOCUMENT);
 		for(Model m : list) {
 			try {
-				String surl = m.asString("case.url");
+				String surl = m.asString("caseRef.url");
 				if(surl != null && surl.equals(remoteCaseUrl)) return m;
 			}
 			catch(IllegalArgumentException e) {

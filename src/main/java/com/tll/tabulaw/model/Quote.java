@@ -23,9 +23,9 @@ public class Quote extends TimeStampEntity {
 
 	private static final long serialVersionUID = -2887172300623884436L;
 
-	private String quoteText, mark;
+	private String quote, serializedMark;
 
-	private DocRef doc;
+	private DocRef document;
 
 	@Override
 	public Class<? extends IEntity> entityClass() {
@@ -34,34 +34,34 @@ public class Quote extends TimeStampEntity {
 
 	@NotEmpty
 	@Length(max = 4000)
-	public String getQuoteText() {
-		return quoteText;
+	public String getQuote() {
+		return quote;
 	}
 
-	public void setQuoteText(String quoteText) {
-		this.quoteText = quoteText;
+	public void setQuote(String quoteText) {
+		this.quote = quoteText;
 	}
 
 	/**
 	 * @return The serialized token holding data for client-side text to be
 	 *         highlighted.
 	 */
-	public String getMark() {
-		return mark;
+	public String getSerializedMark() {
+		return serializedMark;
 	}
 
-	public void setMark(String mark) {
-		this.mark = mark;
+	public void setSerializedMark(String mark) {
+		this.serializedMark = mark;
 	}
 
 	@NotNull
 	@Valid
 	@Reference
-	public DocRef getDoc() {
-		return doc;
+	public DocRef getDocument() {
+		return document;
 	}
 
-	public void setDoc(DocRef doc) {
-		this.doc = doc;
+	public void setDocument(DocRef doc) {
+		this.document = doc;
 	}
 }

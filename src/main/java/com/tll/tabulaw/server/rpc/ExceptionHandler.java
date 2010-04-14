@@ -16,15 +16,15 @@ import com.google.inject.Inject;
 import com.tll.mail.MailManager;
 import com.tll.mail.NameEmail;
 import com.tll.server.rpc.IExceptionHandler;
-import com.tll.tabulaw.di.EmailExceptionHandlerModule.OnErrorEmail;
+import com.tll.tabulaw.di.ExceptionHandlerModule.OnErrorEmail;
 
 /**
- * EmailExceptionHandler - Emails exception notification emails.
+ * ExceptionHandler - Emails exception notification emails.
  * @author jpk
  */
-public class EmailExceptionHandler implements IExceptionHandler {
+public class ExceptionHandler implements IExceptionHandler {
 
-	private static final Log log = LogFactory.getLog(EmailExceptionHandler.class);
+	private static final Log log = LogFactory.getLog(ExceptionHandler.class);
 
 	private final MailManager mailManager;
 
@@ -36,9 +36,10 @@ public class EmailExceptionHandler implements IExceptionHandler {
 	 * @param onErrorEmail
 	 */
 	@Inject
-	public EmailExceptionHandler(MailManager mailManager, @OnErrorEmail NameEmail onErrorEmail) {
+	public ExceptionHandler(MailManager mailManager, @OnErrorEmail NameEmail onErrorEmail) {
 		super();
-		this.mailManager = mailManager;
+		//this.mailManager = mailManager;
+		this.mailManager = null; // TODO temp
 		this.onErrorEmail = onErrorEmail;
 	}
 
@@ -48,10 +49,12 @@ public class EmailExceptionHandler implements IExceptionHandler {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
 
 	public void handleException(final Throwable t) {
-		if(mailManager == null) {
-			log.warn("Can't email exception because no email manager specified.");
-		}
-		else {
+		
+		// log the exception
+		log.error(t.getMessage(), t);
+		
+		// email the exception
+		if(mailManager != null) {
 			final Map<String, Object> data = new HashMap<String, Object>();
 			data.put("header", "Exception Notification (" + t.getClass().getSimpleName() + ")");
 			synchronized (this) {

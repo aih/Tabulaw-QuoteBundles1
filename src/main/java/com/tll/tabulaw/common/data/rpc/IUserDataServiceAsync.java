@@ -16,13 +16,13 @@ import com.tll.common.model.Model;
  */
 public interface IUserDataServiceAsync {
 
-	void saveBundleForUser(long userId, Model bundle, AsyncCallback<ModelPayload> callback);
+	void saveBundleForUser(String userId, Model bundle, AsyncCallback<ModelPayload> callback);
 	
-	void addBundleForUser(long userId, Model bundle, AsyncCallback<ModelPayload> callback);
+	void addBundleForUser(String userId, Model bundle, AsyncCallback<ModelPayload> callback);
 	
-	void deleteBundleForUser(long userId, Model bundle, AsyncCallback<Payload> callback);
+	void deleteBundleForUser(String userId, String bundleId, AsyncCallback<Payload> callback);
 	
-	void addQuoteToBundle(long bundleId, Model mQuote, AsyncCallback<ModelPayload> callback);
+	void addQuoteToBundle(String bundleId, Model mQuote, AsyncCallback<ModelPayload> callback);
 	
-	void removeQuoteFromBundle(long bundleId, long quoteId, AsyncCallback<Payload> callback);
+	void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote, AsyncCallback<Payload> callback);
 }

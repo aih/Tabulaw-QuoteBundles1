@@ -164,7 +164,7 @@ public class DocService extends RpcServlet implements IDocService {
 
 				// parse
 				Model mDoc = handler.parseSingleDocument(fcontents);
-				mDoc.setString("case.url", remoteDocUrl);
+				mDoc.setString("caseRef.url", remoteDocUrl);
 				mDoc.setString("hash", filename);
 				String htmlContent = mDoc.asString("htmlContent");
 				try {

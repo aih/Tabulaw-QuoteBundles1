@@ -14,9 +14,9 @@ import com.tll.common.model.IEntityType;
  */
 public enum PocEntityType implements IEntityType, INameValueProvider<String> {
 
-	USER("user"),
+	USER("User"),
 	
-	CASE("case"),
+	CASE("Case"),
 	DOCUMENT("Document"),
 	
 	QUOTE("Quote"),

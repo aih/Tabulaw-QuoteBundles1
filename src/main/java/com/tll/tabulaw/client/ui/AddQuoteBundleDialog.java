@@ -5,9 +5,13 @@
  */
 package com.tll.tabulaw.client.ui;
 
+import java.util.List;
+
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.ui.Dialog;
 import com.tll.client.ui.FocusCommand;
@@ -18,10 +22,11 @@ import com.tll.client.ui.edit.ModelEditPanel;
 import com.tll.client.ui.edit.EditEvent.EditOp;
 import com.tll.client.validate.ErrorHandlerBuilder;
 import com.tll.client.validate.ErrorHandlerDelegate;
+import com.tll.common.data.ModelPayload;
 import com.tll.common.model.Model;
+import com.tll.common.msg.Msg;
 import com.tll.tabulaw.client.Poc;
 import com.tll.tabulaw.client.model.PocModelCache;
-import com.tll.tabulaw.common.model.PocEntityType;
 import com.tll.tabulaw.common.model.PocModelFactory;
 
 /**
@@ -64,21 +69,44 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<IModelE
 			Model mQuoteBundle = event.getContent().getModel();
 			
 			// persist
-			mQuoteBundle.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE_BUNDLE));
-			PocModelCache.get().persist(mQuoteBundle, this);
-			
-			// default set the current quote bundle if not set yet
-			Poc.setCurrentQuoteBundle(mQuoteBundle);
+			//mQuoteBundle.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE_BUNDLE));
+			// server-side persist
+			String userId = PocModelCache.get().getUser().getId();
+			Poc.getUserDataService().addBundleForUser(userId, mQuoteBundle, new AsyncCallback<ModelPayload>() {
+				
+				@Override
+				public void onSuccess(ModelPayload result) {
+					if(result.hasErrors()) {
+						List<Msg> msgs = result.getStatus().getMsgs();
+						Notifier.get().post(msgs);
+					}
+					else {
+						Model persistedQuoteBundle = result.getModel();
+						PocModelCache.get().persist(persistedQuoteBundle, AddQuoteBundleDialog.this);
+						
+						// default set the current quote bundle if not set yet
+						Poc.setCurrentQuoteBundle(persistedQuoteBundle);
+	
+						// defer the hide so the model change event bubble up in the dom since
+						// hide() removes the dialog from the dom
+						DeferredCommand.addCommand(new Command() {
+	
+							@Override
+							public void execute() {
+								hide();
+							}
+						});
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					String emsg = "Failed to persist Quote Bundle.";
+					Log.error(emsg, caught);
+					Notifier.get().error(emsg);
+				}
+			});
 		}
-		// defer the hide so the model change event bubble up in the dom since
-		// hide() removes the dialog from the dom
-		DeferredCommand.addCommand(new Command() {
-
-			@Override
-			public void execute() {
-				hide();
-			}
-		});
 	}
 
 	@Override
