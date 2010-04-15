@@ -8,18 +8,21 @@ import com.google.gwt.core.client.JavaScriptObject;
  * @author jpk
  */
 public class MarkOverlay extends JavaScriptObject {
+	
+	/**
+	 * De-serializes the given token re-setting the state  
+	 * @param body the dom body ref (required to create the corres. range)
+	 * @param stoken the serialized string (return value of serialize())
+	 * @return de-serialized mark instance
+	 */
+	public static final native MarkOverlay deserialize(JavaScriptObject body, String stoken) /*-{ 
+		return new $wnd.Mark(body, stoken);
+	}-*/;
 
 	/**
 	 * @return The entire mark state serialized into a string.
 	 */
 	public final native String serialize() /*-{ return this.serialize(); }-*/;
-
-	/**
-	 * De-serializes the given token re-setting the state  
-	 * @param body the dom body ref (required to create the corres. range)
-	 * @param stoken the serialized string (return value of serialize())
-	 */
-	public final native void deserialize(JavaScriptObject body, String stoken) /*-{ return this.deserialize(body,stoken); }-*/;
 
 	/**
 	 * @return The text of the user selection.

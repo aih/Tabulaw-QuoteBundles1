@@ -8,6 +8,8 @@ import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.Authentication;
 import org.springframework.security.context.SecurityContext;
@@ -44,6 +46,8 @@ import com.tll.tabulaw.model.Authority.AuthorityRoles;
  * @author jpk
  */
 public class UserService extends AbstractEntityService implements UserDetailsService, IForgotPasswordHandler  {
+	
+	private static final Log log = LogFactory.getLog(UserService.class);
 
 	private static PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
 	
@@ -91,7 +95,8 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 		init();
 	}
 	
-	private void init() {
+	@Transactional
+	public void init() {
 		// stub anon user if not alreay specified
 		User anonUser = new User();
 		anonUser.setId(1L);
@@ -114,9 +119,11 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 		anonUser.setName("Tabulaw Discovery User");
 		try {
 			dao.persist(anonUser);
+			log.debug("Test anon user created.");
 		}
-		catch(EntityNotFoundException e) {
+		catch(EntityExistsException e) {
 			// ok
+			log.debug("Test anon user found to exist.");
 		}
 	}
 

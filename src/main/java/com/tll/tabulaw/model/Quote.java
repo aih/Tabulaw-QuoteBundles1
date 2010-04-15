@@ -6,7 +6,6 @@
 package com.tll.tabulaw.model;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -54,7 +53,6 @@ public class Quote extends TimeStampEntity {
 		this.serializedMark = mark;
 	}
 
-	@NotNull
 	@Valid
 	@Reference
 	public DocRef getDocument() {

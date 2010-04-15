@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tll.client.model.IHasModel;
 import com.tll.client.ui.ImageContainer;
 import com.tll.common.model.Model;
+import com.tll.common.model.RelatedOneProperty;
 
 /**
  * Base class for widgets displaying quotes.
@@ -178,7 +179,11 @@ public abstract class AbstractQuoteWidget extends Composite implements IHasModel
 		title = mQuote.asString("document.title");
 		
 		// case doc?
-		if(mQuote.propertyExists("document.caseRef")) {
+		// TODO this is a hack! bail on Model - its fucked
+		RelatedOneProperty caseRefProp = mQuote.relatedOne("caseRef");
+		Model caseRef = caseRefProp == null ? null : caseRefProp.getModel();
+		
+		if(caseRef != null) {
 			String parties = mQuote.asString("document.caseRef.parties");
 			if(parties != null && parties.length() > 0 && !"null".equals(parties)) {
 				title = parties;

@@ -15,6 +15,7 @@ import com.tll.common.msg.Msg.MsgAttr;
 import com.tll.common.msg.Msg.MsgLevel;
 import com.tll.dao.EntityExistsException;
 import com.tll.dao.EntityNotFoundException;
+import com.tll.server.marshal.MarshalOptions;
 import com.tll.server.rpc.RpcServlet;
 import com.tll.server.rpc.entity.PersistContext;
 import com.tll.server.rpc.entity.PersistHelper;
@@ -85,7 +86,7 @@ public class UserDataServiceRpc extends RpcServlet implements IUserDataService {
 			long lBundleId = Long.valueOf(bundleId);
 			q = userDataService.addQuoteToBundle(lBundleId, q);
 			
-			mQuote = PersistHelper.marshal(context, PocEntityType.QUOTE_BUNDLE, q);
+			context.getMarshaler().marshalEntity(q, new MarshalOptions(false, 0));
 			payload.setModel(mQuote);
 			status.addMsg("Quote added.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}

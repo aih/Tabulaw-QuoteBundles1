@@ -82,7 +82,8 @@ public class TextSelectApi implements IFiresTextSelectEvents {
 
 				var mark;
 				try {
-					//alert('iframedoc: ' + iframedoc + ', rng: ' + rng);
+					if(iframedoc !== rng.getDocument()) alert('range.document != iframedoc!');
+					alert('iframedoc: ' + iframedoc + ', rng.getDocument(): ' + rng.getDocument());
 					mark  = new $wnd.Mark(rng);
 					@com.tll.tabulaw.client.ui.TextSelectApi::fireTextSelectEvent(Lcom/tll/tabulaw/client/model/MarkOverlay;)(mark);
 				}

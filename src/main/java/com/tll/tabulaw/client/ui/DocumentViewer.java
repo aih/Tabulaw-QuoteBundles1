@@ -6,6 +6,7 @@
 package com.tll.tabulaw.client.ui;
 
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
@@ -152,6 +153,16 @@ public class DocumentViewer extends Composite implements IHasModel, DoubleClickH
 	public String getFrameId() {
 		return mDocument == null ? null : "docframe_" + Integer.toString(mDocument.getKey().hashCode());
 	}
+	
+	/**
+	 * @return the DOM iframe body ref of the contained document.
+	 */
+	public native JavaScriptObject getDocBody() /*-{
+		var frameId = this.@com.tll.tabulaw.client.ui.DocumentViewer::getFrameId()();
+		var frame = $wnd.goog.dom.$(frameId);
+		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
+		return fbody;
+	}-*/;
 
 	/**
 	 * Sets the document model data.

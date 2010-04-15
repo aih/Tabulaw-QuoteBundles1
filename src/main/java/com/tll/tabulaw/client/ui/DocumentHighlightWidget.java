@@ -123,7 +123,6 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 
 		// create the quote
 		Model quote = PocModelFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
-		// quote.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE));
 		// server-side persist
 		Poc.getUserDataService().addQuoteToBundle(wDocQuoteBundle.getModel().getId(), quote,
 				new AsyncCallback<ModelPayload>() {
@@ -136,6 +135,17 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 						}
 						else {
 							Model persistedQuote = result.getModel();
+							
+							String serializedMark2 = persistedQuote.asString("serializedMark");
+							MarkOverlay mark3 = MarkOverlay.deserialize(wDocViewer.getDocBody(), serializedMark2);
+							mark3.highlight();
+							
+							// HACK: overwrite the persisted doc ref maintain model integrity
+							// this is due to null caseRef properties coming back in the marshaled model
+							// and it should be there and it trips up the client code as it uses this property 
+							// to determine the doc type (i.e. caseref or contract (no case))
+							persistedQuote.setProperty("document", wDocViewer.getModel(), PropertyType.RELATED_ONE);
+							
 							// cache, show and highlight
 							persistedQuote.setProperty("mark", mark, PropertyType.OBJECT);
 							wDocQuoteBundle.addQuote(persistedQuote, true);
@@ -185,6 +195,9 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 				String to = mQb.descriptor();
 				Log.debug("maybeSetCurrentQuoteBundle() - Re-setting model from: " + from + " to " + to);
 			}
+			String docId = wDocViewer.getModel().getId();
+			assert docId != null;
+			wDocQuoteBundle.init(docId, wDocViewer.getDocBody());
 			wDocQuoteBundle.setModel(mQb);
 			crntQbKey = mQb.getKey();
 			return true;
@@ -213,6 +226,8 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 		// update doc viewer with doc
 		wDocViewer.setModel(mDoc);
 
+		TextSelectApi.init(wDocViewer.getFrameId());
+		
 		if(Poc.getCurrentQuoteBundle() == null) {
 			String userId = PocModelCache.get().getUser().getId();
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
@@ -249,7 +264,6 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 			// grab the current quote bundle
 			maybeSetCurrentQuoteBundle();
 		}
-		TextSelectApi.init(wDocViewer.getFrameId());
 	}
 
 	@Override
