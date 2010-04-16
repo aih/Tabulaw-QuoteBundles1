@@ -33,10 +33,10 @@
     </description>
     <param-name>di.handlers</param-name>
     <param-value>
-    	com.tll.tabulaw.server.Db4oBootstrapper
-    	com.tll.tabulaw.server.PersistContextBootstrapper
+    	com.tabulaw.server.Db4oBootstrapper
+    	com.tabulaw.server.PersistContextBootstrapper
     	com.tll.server.SecurityContextBootstrapper
-    	com.tll.tabulaw.server.FileConverterBootstrapper
+    	com.tabulaw.server.FileConverterBootstrapper
     </param-value>
   </context-param>
 
@@ -73,7 +73,7 @@
   
   <filter>
     <filter-name>AuthenticationProcessingFilter</filter-name>
-    <filter-class>com.tll.tabulaw.server.filter.TabulawAuthenticationProcessingFilter</filter-class>
+    <filter-class>com.tabulaw.server.filter.TabulawAuthenticationProcessingFilter</filter-class>
     <init-param>
       <param-name>authenticationFailureUrl</param-name>
       <param-value>/login?login_error=1</param-value>
@@ -188,7 +188,7 @@
 	
 	<servlet>
 		<servlet-name>UserContextService</servlet-name>
-		<servlet-class>com.tll.tabulaw.server.rpc.UserContextService</servlet-class>
+		<servlet-class>com.tabulaw.server.rpc.UserContextService</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -198,7 +198,7 @@
 
 	<servlet>
 		<servlet-name>UserDataServiceRpc</servlet-name>
-		<servlet-class>com.tll.tabulaw.server.rpc.UserDataServiceRpc</servlet-class>
+		<servlet-class>com.tabulaw.server.rpc.UserDataServiceRpc</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -208,7 +208,7 @@
 
 	<servlet>
 		<servlet-name>DocUploadServlet</servlet-name>
-		<servlet-class>com.tll.tabulaw.server.DocUploadServlet</servlet-class>
+		<servlet-class>com.tabulaw.server.DocUploadServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -218,7 +218,7 @@
 
 	<servlet>
 		<servlet-name>DocViewServlet</servlet-name>
-		<servlet-class>com.tll.tabulaw.server.DocViewServlet</servlet-class>
+		<servlet-class>com.tabulaw.server.DocViewServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -228,7 +228,7 @@
 
 	<servlet>
 		<servlet-name>DocService</servlet-name>
-		<servlet-class>com.tll.tabulaw.server.rpc.DocService</servlet-class>
+		<servlet-class>com.tabulaw.server.rpc.DocService</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>

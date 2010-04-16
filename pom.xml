@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.tll.tabulaw</groupId>
+	<groupId>com.tabulaw</groupId>
 	<artifactId>tabulaw</artifactId>
 	<name>tabulaw</name>
 	<version>0.1.13</version>
@@ -451,12 +451,8 @@
 			<artifactId>org.springextensions.db4o</artifactId>
 			<version>${springextensions.db4o.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-dao-db4o</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
 	
+		<!-- Open Office Java API -->
 		<dependency>
 			<groupId>com.artofsolving</groupId>
 			<artifactId>jodconverter</artifactId>
@@ -482,6 +478,11 @@
 			<groupId>com.tll</groupId>
 			<artifactId>tll-dao-api</artifactId>
 			<version>${tll.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tll</groupId>
+			<artifactId>tll-dao-db4o</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.tll</groupId>
