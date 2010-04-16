@@ -14,15 +14,14 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.PocModelCache;
-import com.tabulaw.common.model.PocModelFactory;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.ui.Dialog;
 import com.tll.client.ui.FocusCommand;
 import com.tll.client.ui.edit.EditEvent;
+import com.tll.client.ui.edit.FieldGroupEditPanel;
 import com.tll.client.ui.edit.IEditHandler;
-import com.tll.client.ui.edit.IModelEditContent;
-import com.tll.client.ui.edit.ModelEditPanel;
 import com.tll.client.ui.edit.EditEvent.EditOp;
+import com.tll.client.ui.field.FieldGroup;
 import com.tll.client.validate.ErrorHandlerBuilder;
 import com.tll.client.validate.ErrorHandlerDelegate;
 import com.tll.common.data.ModelPayload;
@@ -33,11 +32,11 @@ import com.tll.common.msg.Msg;
  * Dialog for handling quote bundles to the app.
  * @author jpk
  */
-public class AddQuoteBundleDialog extends Dialog implements IEditHandler<IModelEditContent> {
+public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGroup> {
 
 	private final AddQuoteBundlePanel fieldPanel = new AddQuoteBundlePanel();
 
-	private final ModelEditPanel editPanel = new ModelEditPanel(fieldPanel, true, false, false);
+	private final FieldGroupEditPanel editPanel = new FieldGroupEditPanel(fieldPanel, true, false, false);
 
 	private HandlerRegistration mcr;
 
@@ -63,16 +62,18 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<IModelE
 	}
 
 	@Override
-	public void onEdit(EditEvent<IModelEditContent> event) {
+	public void onEdit(EditEvent<FieldGroup> event) {
 		// persist the quote bundle
 		if(event.getOp() == EditOp.ADD) {
-			Model mQuoteBundle = event.getContent().getModel();
+			FieldGroup fieldGroup = event.getContent();
+			
+			// TODO convert to model
 			
 			// persist
 			//mQuoteBundle.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE_BUNDLE));
 			// server-side persist
 			String userId = PocModelCache.get().getUser().getId();
-			Poc.getUserDataService().addBundleForUser(userId, mQuoteBundle, new AsyncCallback<ModelPayload>() {
+			Poc.getUserDataService().addBundleForUser(userId, /*mQuoteBundle*/null, new AsyncCallback<ModelPayload>() {
 				
 				@Override
 				public void onSuccess(ModelPayload result) {
@@ -119,7 +120,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<IModelE
 	public void show() {
 		super.show();
 		mcr = addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
-		editPanel.setModel(PocModelFactory.get().buildQuoteBundle(null, null));
+		//editPanel.setModel(PocModelFactory.get().buildQuoteBundle(null, null));
 		DeferredCommand.addCommand(new FocusCommand(fieldPanel.getFocusable(), true));
 	}
 }

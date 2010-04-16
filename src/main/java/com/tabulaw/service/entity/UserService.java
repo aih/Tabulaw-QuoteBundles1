@@ -24,9 +24,9 @@ import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
-import com.tabulaw.model.Authority;
-import com.tabulaw.model.User;
-import com.tabulaw.model.Authority.AuthorityRoles;
+import com.tabulaw.common.model.Authority;
+import com.tabulaw.common.model.User;
+import com.tabulaw.common.model.Authority.AuthorityRoles;
 import com.tll.criteria.Criteria;
 import com.tll.criteria.InvalidCriteriaException;
 import com.tll.criteria.QueryParam;

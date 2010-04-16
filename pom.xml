@@ -15,7 +15,7 @@
 		<tll.version>0.0.1-SNAPSHOT</tll.version>
 		<gwt.compile.style>OBF</gwt.compile.style>
 		<gwt.log.level>INFO</gwt.log.level>
-		<gwt.compile.module>com.tll.tabulaw.PocDev</gwt.compile.module>
+		<gwt.compile.module>com.tabulaw.PocDev</gwt.compile.module>
 		<db4o.version>7.4.121.14026</db4o.version>
 		<springextensions.db4o.version>1.0.0e</springextensions.db4o.version>
 	</properties>
@@ -58,7 +58,7 @@
 			<properties>
 				<gwt.compile.style>PRETTY</gwt.compile.style>
 				<gwt.log.level>INFO</gwt.log.level>
-				<gwt.compile.module>com.tll.tabulaw.PocDev</gwt.compile.module>		
+				<gwt.compile.module>com.tabulaw.PocDev</gwt.compile.module>		
 			</properties>
 		</profile>
 		<profile>
@@ -66,7 +66,7 @@
 			<properties>
 				<gwt.compile.style>OBF</gwt.compile.style>
 				<gwt.log.level>INFO</gwt.log.level>
-				<gwt.compile.module>com.tll.tabulaw.PocProd</gwt.compile.module>		
+				<gwt.compile.module>com.tabulaw.PocProd</gwt.compile.module>		
 			</properties>
 		</profile>
 	</profiles>
@@ -507,21 +507,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.tll</groupId>
-			<artifactId>tll-client-marshal</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-rpc</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-model</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
 			<artifactId>tll-client-view</artifactId>
 			<version>${tll.version}</version>
 		</dependency>
@@ -532,9 +517,28 @@
 		</dependency>
 		<dependency>
 			<groupId>com.tll</groupId>
+			<artifactId>tll-client-rpc</artifactId>
+			<version>${tll.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.tll</groupId>
+			<artifactId>tll-client-marshal</artifactId>
+			<version>${tll.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tll</groupId>
+			<artifactId>tll-client-model</artifactId>
+			<version>${tll.version}</version>
+		</dependency>
+		<!-- 
+		<dependency>
+			<groupId>com.tll</groupId>
 			<artifactId>tll-client-databind</artifactId>
 			<version>${tll.version}</version>
 		</dependency>
+		-->
+		
 		<dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-client-listing</artifactId>
@@ -545,6 +549,7 @@
 			<artifactId>tll-client-persist</artifactId>
 			<version>${tll.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-client-login</artifactId>

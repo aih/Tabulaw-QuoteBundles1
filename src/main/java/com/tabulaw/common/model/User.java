@@ -1,7 +1,7 @@
 /*
  * Created on Jan 1, 2005
  */
-package com.tabulaw.model;
+package com.tabulaw.common.model;
 
 import java.util.Collection;
 import java.util.Date;

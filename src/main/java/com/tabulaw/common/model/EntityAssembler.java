@@ -1,4 +1,4 @@
-package com.tabulaw.model;
+package com.tabulaw.common.model;
 
 import com.google.inject.Inject;
 import com.tll.model.IEntity;

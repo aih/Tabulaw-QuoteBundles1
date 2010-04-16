@@ -3,7 +3,7 @@
  * @author jpk
  * @since Apr 10, 2010
  */
-package com.tabulaw.model;
+package com.tabulaw.common.model;
 
 import javax.validation.Valid;
 

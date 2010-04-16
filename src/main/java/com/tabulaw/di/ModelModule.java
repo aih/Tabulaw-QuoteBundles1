@@ -7,7 +7,7 @@ package com.tabulaw.di;
 
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
-import com.tabulaw.model.EntityAssembler;
+import com.tabulaw.common.model.EntityAssembler;
 import com.tll.dao.db4o.Db4oEntityFactory;
 import com.tll.di.ValidationModule;
 import com.tll.model.EntityMetadata;

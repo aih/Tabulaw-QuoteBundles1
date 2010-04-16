@@ -8,8 +8,8 @@ package com.tabulaw.dao.db4o;
 import java.util.List;
 
 import com.db4o.query.Query;
+import com.tabulaw.common.model.User;
 import com.tabulaw.criteria.SelectNamedQueries;
-import com.tabulaw.model.User;
 import com.tll.criteria.ISelectNamedQueryDef;
 import com.tll.criteria.InvalidCriteriaException;
 import com.tll.dao.db4o.IDb4oNamedQueryTranslator;

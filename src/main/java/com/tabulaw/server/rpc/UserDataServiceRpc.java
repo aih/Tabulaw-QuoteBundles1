@@ -9,8 +9,8 @@ import javax.validation.ConstraintViolationException;
 
 import com.tabulaw.common.data.rpc.IUserDataService;
 import com.tabulaw.common.model.PocEntityType;
-import com.tabulaw.model.Quote;
-import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.service.entity.UserDataService;
 import com.tll.common.data.ModelPayload;
 import com.tll.common.data.Payload;

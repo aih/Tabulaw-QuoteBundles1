@@ -7,8 +7,8 @@ package com.tabulaw.client.ui;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Focusable;
-import com.tll.client.ui.field.AbstractBindableFlowFieldPanel;
 import com.tll.client.ui.field.AbstractFieldGroupProvider;
+import com.tll.client.ui.field.AbstractFieldPanel;
 import com.tll.client.ui.field.FieldFactory;
 import com.tll.client.ui.field.FieldGroup;
 import com.tll.client.ui.field.FlowPanelFieldComposer;
@@ -19,7 +19,7 @@ import com.tll.client.ui.field.IFieldRenderer;
  * UI handling of adding a new quote bundle.
  * @author jpk
  */
-public class AddQuoteBundlePanel extends AbstractBindableFlowFieldPanel {
+public class AddQuoteBundlePanel extends AbstractFieldPanel<FlowPanel> {
 	
 	static class FieldProvider extends AbstractFieldGroupProvider {
 

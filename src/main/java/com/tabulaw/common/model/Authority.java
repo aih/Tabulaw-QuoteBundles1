@@ -1,4 +1,4 @@
-package com.tabulaw.model;
+package com.tabulaw.common.model;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;

@@ -13,9 +13,9 @@ import javax.validation.ValidatorFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
-import com.tabulaw.model.BundleUserBinding;
-import com.tabulaw.model.Quote;
-import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.common.model.BundleUserBinding;
+import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.QuoteBundle;
 import com.tll.criteria.Criteria;
 import com.tll.criteria.InvalidCriteriaException;
 import com.tll.dao.EntityExistsException;

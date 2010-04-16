@@ -7,7 +7,7 @@ package com.tabulaw.server;
 
 import java.io.Serializable;
 
-import com.tabulaw.model.User;
+import com.tabulaw.common.model.User;
 
 public class UserContext implements Serializable {
 

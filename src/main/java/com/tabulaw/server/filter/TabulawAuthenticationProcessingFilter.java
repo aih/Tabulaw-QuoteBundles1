@@ -10,7 +10,7 @@ import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationException;
 import org.springframework.security.context.SecurityContextHolder;
 
-import com.tabulaw.model.User;
+import com.tabulaw.common.model.User;
 import com.tabulaw.server.UserContext;
 import com.tll.server.filter.AuthenticationProcessingFilter;
 

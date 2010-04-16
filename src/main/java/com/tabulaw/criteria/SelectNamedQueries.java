@@ -5,7 +5,7 @@
  */
 package com.tabulaw.criteria;
 
-import com.tabulaw.model.User;
+import com.tabulaw.common.model.User;
 import com.tll.criteria.ISelectNamedQueryDef;
 
 /**

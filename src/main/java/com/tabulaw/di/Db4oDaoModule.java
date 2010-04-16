@@ -6,14 +6,14 @@
 package com.tabulaw.di;
 
 import com.db4o.config.Configuration;
+import com.tabulaw.common.model.Authority;
+import com.tabulaw.common.model.BundleUserBinding;
+import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.common.model.User;
 import com.tabulaw.dao.db4o.Db4oNamedQueryTranslator;
-import com.tabulaw.model.Authority;
-import com.tabulaw.model.BundleUserBinding;
-import com.tabulaw.model.CaseRef;
-import com.tabulaw.model.DocRef;
-import com.tabulaw.model.Quote;
-import com.tabulaw.model.QuoteBundle;
-import com.tabulaw.model.User;
 import com.tll.config.Config;
 import com.tll.dao.db4o.IDb4oNamedQueryTranslator;
 import com.tll.di.AbstractDb4oDaoModule;
