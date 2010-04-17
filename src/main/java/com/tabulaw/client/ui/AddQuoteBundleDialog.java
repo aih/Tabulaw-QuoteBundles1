@@ -24,7 +24,6 @@ import com.tll.client.ui.edit.EditEvent.EditOp;
 import com.tll.client.ui.field.FieldGroup;
 import com.tll.client.validate.ErrorHandlerBuilder;
 import com.tll.client.validate.ErrorHandlerDelegate;
-import com.tll.common.data.ModelPayload;
 import com.tll.common.model.Model;
 import com.tll.common.msg.Msg;
 
@@ -70,7 +69,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 			// TODO convert to model
 			
 			// persist
-			//mQuoteBundle.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE_BUNDLE));
+			//mQuoteBundle.setId(PocModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
 			// server-side persist
 			String userId = PocModelCache.get().getUser().getId();
 			Poc.getUserDataService().addBundleForUser(userId, /*mQuoteBundle*/null, new AsyncCallback<ModelPayload>() {
@@ -120,7 +119,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 	public void show() {
 		super.show();
 		mcr = addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
-		//editPanel.setModel(PocModelFactory.get().buildQuoteBundle(null, null));
+		//editPanel.setModel(EntityFactory.get().buildQuoteBundle(null, null));
 		DeferredCommand.addCommand(new FocusCommand(fieldPanel.getFocusable(), true));
 	}
 }

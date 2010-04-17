@@ -16,14 +16,12 @@ import javax.validation.ValidatorFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.tll.dao.IEntityDao;
-import com.tll.model.IEntityAssembler;
-import com.tll.service.IService;
+import com.tabulaw.dao.IEntityDao;
 
 /**
  * @author jpk
  */
-public abstract class AbstractEntityService implements IService {
+public abstract class AbstractEntityService {
 
 	protected final Log log;
 
@@ -33,11 +31,6 @@ public abstract class AbstractEntityService implements IService {
 	protected final IEntityDao dao;
 
 	/**
-	 * The entity assembler.
-	 */
-	protected final IEntityAssembler entityAssembler;
-
-	/**
 	 * The jsr-303 validation factory.
 	 */
 	private final ValidatorFactory validationFactory;
@@ -45,14 +38,12 @@ public abstract class AbstractEntityService implements IService {
 	/**
 	 * Constructor
 	 * @param dao
-	 * @param entityAssembler
 	 * @param validationFactory
 	 */
-	public AbstractEntityService(IEntityDao dao, IEntityAssembler entityAssembler, ValidatorFactory validationFactory) {
+	public AbstractEntityService(IEntityDao dao, ValidatorFactory validationFactory) {
 		super();
 		this.log = LogFactory.getLog(getClass());
 		this.dao = dao;
-		this.entityAssembler = entityAssembler;
 		this.validationFactory = validationFactory;
 	}
 

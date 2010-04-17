@@ -13,7 +13,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.db4o.ObjectContainer;
 import com.google.inject.Injector;
-import com.tll.server.IBootstrapHandler;
 
 /**
  * Db4oBootstrapper

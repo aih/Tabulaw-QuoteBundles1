@@ -5,13 +5,14 @@
  */
 package com.tabulaw.common.data.rpc;
 
-import com.tll.common.data.IModelRelatedRequest;
+import com.tll.IDescriptorProvider;
+import com.tll.IMarshalable;
 
 /**
  * Holds the search term(s) of sought documents.
  * @author jpk
  */
-public class DocSearchRequest implements IModelRelatedRequest {
+public class DocSearchRequest implements IMarshalable, IDescriptorProvider {
 
 	public static enum DocDataProvider {
 		GOOGLE_SCHOLAR;

@@ -24,10 +24,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.tabulaw.common.model.PocModelFactory;
+import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.server.convert.IFileConverter;
 import com.tabulaw.server.convert.IFileConverter.FileType;
-import com.tll.common.model.Model;
 import com.tll.util.StringUtil;
 
 /**
@@ -90,7 +90,7 @@ public class DocUploadServlet extends HttpServlet {
 						String docHash = fconverted.getName();
 						String docTitle = docHash; // for now
 						Date docDate = new Date();
-						Model mDoc = PocModelFactory.get().buildDoc(docTitle, docHash, docDate);
+						DocRef mDoc = EntityFactory.get().buildDoc(docTitle, docHash, docDate);
 						String sdoc = DocUtils.serializeDocument(mDoc);
 
 						// localize converted doc html

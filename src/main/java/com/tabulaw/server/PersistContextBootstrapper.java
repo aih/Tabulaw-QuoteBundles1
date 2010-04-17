@@ -11,8 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.inject.Injector;
-import com.tll.server.IBootstrapHandler;
-import com.tll.server.rpc.entity.PersistContext;
 
 /**
  * @author jpk

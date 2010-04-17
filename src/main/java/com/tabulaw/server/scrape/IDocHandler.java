@@ -11,7 +11,7 @@ import java.util.List;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
-import com.tll.common.model.Model;
+import com.tabulaw.common.model.DocRef;
 
 /**
  * API for remote doc search and remote doc screen scraping.
@@ -52,5 +52,5 @@ public interface IDocHandler {
 	 * @param rawHtml doc html as gotten from the source
 	 * @return cleaned up native version
 	 */
-	Model parseSingleDocument(String rawHtml);
+	DocRef parseSingleDocument(String rawHtml);
 }

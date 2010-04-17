@@ -3,10 +3,10 @@
  */
 package com.tabulaw.common.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -14,12 +14,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.userdetails.UserDetails;
 
-import com.tll.model.IEntity;
-import com.tll.model.IUserRef;
-import com.tll.model.NamedTimeStampEntity;
 import com.tll.schema.BusinessKeyDef;
 import com.tll.schema.BusinessObject;
 
@@ -27,8 +22,9 @@ import com.tll.schema.BusinessObject;
  * The user entity.
  * @author jpk
  */
-@BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress" }))
-public class User extends NamedTimeStampEntity implements UserDetails, IUserRef {
+@BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress"
+}))
+public class User extends TimeStampEntity implements IUserRef {
 
 	private static final long serialVersionUID = -6126885590318834318L;
 
@@ -37,6 +33,8 @@ public class User extends NamedTimeStampEntity implements UserDetails, IUserRef 
 	public static final int MAXLEN_PASSWORD = 255;
 
 	public static final String SUPERUSER = "jpk";
+
+	private String name;
 
 	private String emailAddress;
 
@@ -48,21 +46,35 @@ public class User extends NamedTimeStampEntity implements UserDetails, IUserRef 
 
 	private Date expires;
 
-	private Set<Authority> authorities = new LinkedHashSet<Authority>(3);
+	// NOTE make sure this is non-final for gwt rpc
+	private ArrayList<Authority> authorities;
 
-	public Class<? extends IEntity> entityClass() {
-		return User.class;
+	/**
+	 * Constructor
+	 */
+	public User() {
+		super();
+		authorities = new ArrayList<Authority>(3);
+	}
+
+	@Override
+	public EntityType getEntityType() {
+		return EntityType.USER;
 	}
 
 	@Length(max = MAXLEN_NAME)
-	@Override
 	public String getName() {
 		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@NotEmpty
 	@Email
 	@Length(max = MAXLEN_EMAIL_ADDRESS)
+	@Override
 	public String getEmailAddress() {
 		return emailAddress;
 	}
@@ -121,8 +133,12 @@ public class User extends NamedTimeStampEntity implements UserDetails, IUserRef 
 	 * @return authorities
 	 */
 	@Valid
-	public Set<Authority> getAuthoritys() {
+	public List<Authority> getAuthorities() {
 		return authorities;
+	}
+
+	public void setAuthorities(Collection<Authority> authorities) {
+		this.authorities = new ArrayList<Authority>(authorities);
 	}
 
 	/**
@@ -131,57 +147,33 @@ public class User extends NamedTimeStampEntity implements UserDetails, IUserRef 
 	 * @return true if this user is "in" the given role, false otherwise.
 	 */
 	public boolean inRole(String role) {
-		final Set<Authority> as = getAuthoritys();
-		if(as == null) return false;
-		for(final Authority a : as) {
+		if(authorities == null) return false;
+		for(final Authority a : authorities) {
 			if(a.equals(role)) return true;
 		}
 		return false;
 	}
 
-	/**
-	 * @param authorities the authorities to set
-	 */
-	public void setAuthoritys(Set<Authority> authorities) {
-		this.authorities = authorities;
-	}
-
-	public Authority getAuthority(Object pk) {
-		return findEntityInCollection(authorities, pk);
-	}
-
 	public Authority getAuthority(String nme) {
-		return findNamedEntityInCollection(authorities, nme);
+		for(Authority a : authorities) {
+			if(a.getName().equals(nme)) return a;
+		}
+		return null;
 	}
 
 	public void addAuthority(Authority authority) {
-		addEntityToCollection(authorities, authority);
-	}
-
-	public void addAuthorities(Collection<Authority> clc) {
-		addEntitiesToCollection(clc, authorities);
+		authorities.add(authority);
 	}
 
 	public void removeAuthority(Authority authority) {
-		removeEntityFromCollection(authorities, authority);
-	}
-
-	public void removeAuthorities(Collection<Authority> clc) {
-		clearEntityCollection(authorities);
+		authorities.remove(authority);
 	}
 
 	public int getNumAuthorities() {
-		return getCollectionSize(authorities);
+		return authorities.size();
 	}
 
-	/**
-	 * Acegi implementation must not return null
-	 * @return array of granted authorities
-	 */
-	public GrantedAuthority[] getAuthorities() {
-		return authorities == null ? new Authority[0] : authorities.toArray(new Authority[authorities.size()]);
-	}
-
+	@Override
 	public String getUsername() {
 		return getEmailAddress();
 	}

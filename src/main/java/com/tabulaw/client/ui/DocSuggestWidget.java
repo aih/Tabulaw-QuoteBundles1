@@ -30,8 +30,8 @@ import com.tabulaw.common.data.rpc.DocFetchPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
-import com.tabulaw.common.model.PocEntityType;
-import com.tabulaw.common.model.PocModelFactory;
+import com.tabulaw.common.model.EntityType;
+import com.tabulaw.common.model.EntityFactory;
 import com.tll.client.data.rpc.IRpcHandler;
 import com.tll.client.data.rpc.RpcCommand;
 import com.tll.client.data.rpc.RpcEvent;
@@ -193,9 +193,9 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 								return;
 							}
 							final Model mNewDoc =
-									PocModelFactory.get().buildCaseDoc(caseDoc.getTitle(), result.getLocalUrl(), new Date(), null,
+									EntityFactory.get().buildCaseDoc(caseDoc.getTitle(), result.getLocalUrl(), new Date(), null,
 											caseDoc.getCitation(), caseDoc.getUrl(), null);
-							mNewDoc.setId(PocModelCache.get().getNextId(PocEntityType.DOCUMENT));
+							mNewDoc.setId(PocModelCache.get().getNextId(EntityType.DOCUMENT));
 
 							// persist the new doc and propagate through app
 							PocModelCache.get().persist(mNewDoc, DocSuggestWidget.this);

@@ -7,9 +7,10 @@ package com.tabulaw.common.data.rpc;
 
 import java.util.List;
 
+import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.common.model.User;
 import com.tll.common.data.Payload;
 import com.tll.common.data.Status;
-import com.tll.common.model.Model;
 
 /**
  * AdminContextPayload - Payload for initializing the client-side admin context.
@@ -20,9 +21,9 @@ public class UserContextPayload extends Payload {
 	/**
 	 * The logged in user or the user for this http session.
 	 */
-	private Model user;
+	private User user;
 
-	private List<Model> bundles;
+	private List<QuoteBundle> bundles;
 
 	/**
 	 * Constructor
@@ -42,22 +43,22 @@ public class UserContextPayload extends Payload {
 	/**
 	 * @return the user
 	 */
-	public Model getUser() {
+	public User getUser() {
 		return user;
 	}
 
-	public void setUser(Model user) {
+	public void setUser(User user) {
 		this.user = user;
 	}
 
 	/**
 	 * @return The defined quote bundles and the referenced qoutes for the user.
 	 */
-	public List<Model> getBundles() {
+	public List<QuoteBundle> getBundles() {
 		return bundles;
 	}
 
-	public void setBundles(List<Model> bundles) {
+	public void setBundles(List<QuoteBundle> bundles) {
 		this.bundles = bundles;
 	}
 }

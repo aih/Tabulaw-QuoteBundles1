@@ -14,7 +14,7 @@ import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.common.model.PocEntityType;
+import com.tabulaw.common.model.EntityType;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.common.model.CopyCriteria;
@@ -33,9 +33,9 @@ public class PocModelCache {
 		return instance;
 	}
 
-	private final HashMap<PocEntityType, List<Model>> cache = new HashMap<PocEntityType, List<Model>>();
+	private final HashMap<EntityType, List<Model>> cache = new HashMap<EntityType, List<Model>>();
 
-	private final HashMap<PocEntityType, Comparator<Model>> comparators = new HashMap<PocEntityType, Comparator<Model>>();
+	private final HashMap<EntityType, Comparator<Model>> comparators = new HashMap<EntityType, Comparator<Model>>();
 
 	/**
 	 * Constructor
@@ -43,11 +43,11 @@ public class PocModelCache {
 	private PocModelCache() {
 
 		// init cache
-		for(PocEntityType et : PocEntityType.values()) {
+		for(EntityType et : EntityType.values()) {
 			cache.put(et, new ArrayList<Model>());
 		}
 
-		comparators.put(PocEntityType.CASE, new Comparator<Model>() {
+		comparators.put(EntityType.CASE, new Comparator<Model>() {
 
 			@Override
 			public int compare(Model o1, Model o2) {
@@ -61,7 +61,7 @@ public class PocModelCache {
 			}
 		});
 
-		comparators.put(PocEntityType.DOCUMENT, new Comparator<Model>() {
+		comparators.put(EntityType.DOCUMENT, new Comparator<Model>() {
 
 			@Override
 			public int compare(Model o1, Model o2) {
@@ -71,7 +71,7 @@ public class PocModelCache {
 			}
 		});
 
-		comparators.put(PocEntityType.QUOTE, new Comparator<Model>() {
+		comparators.put(EntityType.QUOTE, new Comparator<Model>() {
 
 			@Override
 			public int compare(Model o1, Model o2) {
@@ -84,7 +84,7 @@ public class PocModelCache {
 			}
 		});
 
-		comparators.put(PocEntityType.QUOTE_BUNDLE, new Comparator<Model>() {
+		comparators.put(EntityType.QUOTE_BUNDLE, new Comparator<Model>() {
 
 			@Override
 			public int compare(Model o1, Model o2) {
@@ -109,7 +109,7 @@ public class PocModelCache {
 	 * @return The currently logged in user.
 	 */
 	public Model getUser() {
-		List<Model> list = cache.get(PocEntityType.USER);
+		List<Model> list = cache.get(EntityType.USER);
 		return list.size() < 1 ? null : list.get(0);
 	}
 
@@ -118,7 +118,7 @@ public class PocModelCache {
 	 * @param entityType the desired entity type
 	 * @return the next available id
 	 */
-	public String getNextId(PocEntityType entityType) {
+	public String getNextId(EntityType entityType) {
 		Log.error("ERROR: calling getNextId() for: " + entityType);
 		List<Model> mclc = cache.get(entityType);
 		int largest = 0;
@@ -152,7 +152,7 @@ public class PocModelCache {
 	 * @param etype the entity type
 	 * @return All existing entities of the given type.
 	 */
-	public List<Model> getAll(PocEntityType etype) {
+	public List<Model> getAll(EntityType etype) {
 		List<Model> list = cache.get(etype);
 		ArrayList<Model> rlist = new ArrayList<Model>(list.size());
 		for(Model m : list) {
@@ -189,7 +189,7 @@ public class PocModelCache {
 			}
 		}
 		else {
-			m.setId(getNextId((PocEntityType) m.getEntityType()));
+			m.setId(getNextId((EntityType) m.getEntityType()));
 		}
 
 		ModelChangeOp op = existing == null ? ModelChangeOp.ADDED : ModelChangeOp.UPDATED;
@@ -266,7 +266,7 @@ public class PocModelCache {
 	 * @param etype the entity type of which to remove all instances
 	 * @param source the sourcing widget that will source a model change event
 	 */
-	public void removeAll(PocEntityType etype, Widget source) {
+	public void removeAll(EntityType etype, Widget source) {
 		List<Model> list = cache.get(etype);
 		if(list == null || list.size() < 1) return;
 		ArrayList<Model> rlist = new ArrayList<Model>(list);
@@ -298,7 +298,7 @@ public class PocModelCache {
 	}
 
 	public Model getCaseDocByRemoteUrl(String remoteCaseUrl) {
-		List<Model> list = cache.get(PocEntityType.DOCUMENT);
+		List<Model> list = cache.get(EntityType.DOCUMENT);
 		for(Model m : list) {
 			try {
 				String surl = m.asString("caseRef.url");

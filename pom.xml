@@ -16,7 +16,9 @@
 		<gwt.compile.style>OBF</gwt.compile.style>
 		<gwt.log.level>INFO</gwt.log.level>
 		<gwt.compile.module>com.tabulaw.PocDev</gwt.compile.module>
+		
 		<db4o.version>7.4.121.14026</db4o.version>
+		<spring.version>2.5.6.SEC01</spring.version>
 		<springextensions.db4o.version>1.0.0e</springextensions.db4o.version>
 	</properties>
 
@@ -459,6 +461,66 @@
 			<version>2.2.1</version>
 		</dependency>
     
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+			<version>1.7.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sf.jsr107cache</groupId>
+					<artifactId>jsr107cache</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.guice</groupId>
+			<artifactId>guice</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency><!-- for guice 2.0 -->
+			<groupId>aopalliance</groupId>
+			<artifactId>aopalliance</artifactId>
+			<version>1.0</version>
+			<scope>runtime</scope>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${spring.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.aspectj</groupId>
+					<artifactId>aspectjrt</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.aspectj</groupId>
+					<artifactId>aspectjweaver</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+    
+    <dependency>
+			<groupId>com.tll</groupId>
+			<artifactId>tll-config</artifactId>
+			<version>${tll.version}</version>
+		</dependency>
+    <dependency>
+			<groupId>com.tll</groupId>
+			<artifactId>tll-mail</artifactId>
+			<version>${tll.version}</version>
+		</dependency>
+    
     <dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-core</artifactId>
@@ -467,31 +529,6 @@
 		<dependency>
 			<groupId>com.tll</groupId>
 			<artifactId>tll-schema</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-model</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-dao-api</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-dao-db4o</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-servlet</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-security</artifactId>
 			<version>${tll.version}</version>
 		</dependency>
 		
@@ -521,41 +558,6 @@
 			<version>${tll.version}</version>
 		</dependency>
 		
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-marshal</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-model</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-databind</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		-->
-		
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-listing</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-persist</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-login</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>

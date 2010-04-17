@@ -16,25 +16,23 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.ui.listing.AbstractListingConfig;
+import com.tabulaw.client.ui.listing.Column;
+import com.tabulaw.client.ui.listing.DataListingOperator;
+import com.tabulaw.client.ui.listing.IListingConfig;
+import com.tabulaw.client.ui.listing.ModelCellRenderer;
+import com.tabulaw.client.ui.listing.ModelPropertyFormatter;
 import com.tabulaw.client.view.DocumentViewInitializer;
 import com.tabulaw.common.data.rpc.DocListingPayload;
-import com.tabulaw.common.model.PocEntityType;
+import com.tabulaw.common.model.EntityType;
+import com.tabulaw.listhandler.InMemoryListHandler;
 import com.tll.client.data.rpc.RpcCommand;
-import com.tll.client.listing.AbstractListingConfig;
-import com.tll.client.listing.Column;
-import com.tll.client.listing.DataListingOperator;
-import com.tll.client.listing.IListingConfig;
-import com.tll.client.listing.ModelCellRenderer;
-import com.tll.client.listing.ModelPropertyFormatter;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
-import com.tll.client.ui.listing.ModelListingTable;
-import com.tll.client.ui.listing.ModelListingWidget;
 import com.tll.client.util.GlobalFormat;
 import com.tll.common.model.Model;
 import com.tll.dao.Sorting;
-import com.tll.listhandler.InMemoryListHandler;
 
 /**
  * Lists documents for a given user.
@@ -62,7 +60,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
 		@Override
 		public void onModelChangeEvent(ModelChangeEvent event) {
-			if(event.getModelKey() != null && event.getModelKey().getEntityType() == PocEntityType.DOCUMENT) {
+			if(event.getModelKey() != null && event.getModelKey().getEntityType() == EntityType.DOCUMENT) {
 				//super.onModelChangeEvent(event);
 				getOperator().refresh();
 			}
@@ -200,7 +198,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
 		@Override
 		public void refresh() {
-			getDataProvider().setList(PocModelCache.get().getAll(PocEntityType.DOCUMENT));
+			getDataProvider().setList(PocModelCache.get().getAll(EntityType.DOCUMENT));
 			super.refresh();
 		}
 	}

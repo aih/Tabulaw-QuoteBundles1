@@ -2,22 +2,16 @@ package com.tabulaw.common.model;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.security.GrantedAuthority;
 
 import com.tll.IMarshalable;
-import com.tll.model.EntityBase;
-import com.tll.model.IEntity;
-import com.tll.model.INamedEntity;
 import com.tll.schema.BusinessKeyDef;
 import com.tll.schema.BusinessObject;
 
 /**
- * Implementation of Acegi's
- * {@link org.springframework.security.GrantedAuthority} interface.
  * @author jpk
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Authority", properties = { Authority.FIELDNAME_AUTHORITY }))
-public class Authority extends EntityBase implements INamedEntity, GrantedAuthority {
+public class Authority extends EntityBase implements INamedEntity{
 
 	/**
 	 * AuthorityRoles
@@ -40,8 +34,9 @@ public class Authority extends EntityBase implements INamedEntity, GrantedAuthor
 	 */
 	private String authority;
 
-	public Class<? extends IEntity> entityClass() {
-		return Authority.class;
+	@Override
+	public EntityType getEntityType() {
+		return EntityType.AUTHORITY;
 	}
 
 	@NotEmpty
@@ -83,6 +78,7 @@ public class Authority extends EntityBase implements INamedEntity, GrantedAuthor
 		return true;
 	}
 
+	/*
 	@Override
 	public int compareTo(Object o) {
 		if(o != null && o instanceof GrantedAuthority) {
@@ -94,7 +90,8 @@ public class Authority extends EntityBase implements INamedEntity, GrantedAuthor
 		}
 		return -1;
 	}
-
+	*/
+	
 	@Override
 	public String descriptor() {
 		return getAuthority();

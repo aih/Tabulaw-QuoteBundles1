@@ -18,7 +18,6 @@ import com.google.inject.Injector;
 import com.tabulaw.server.convert.FileConverterDelegate;
 import com.tabulaw.server.convert.IFileConverter;
 import com.tabulaw.server.convert.OpenOfficeFileConverter;
-import com.tll.server.IBootstrapHandler;
 
 /**
  * Boots up needed resources to do uploaded doc to html conversions.

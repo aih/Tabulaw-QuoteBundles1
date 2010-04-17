@@ -18,9 +18,9 @@ import org.htmlcleaner.TagNode;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
-import com.tabulaw.common.model.PocModelFactory;
+import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.server.DocUtils;
-import com.tll.common.model.Model;
 import com.tll.util.StringUtil;
 
 /**
@@ -226,8 +226,8 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 	}
 	
 	@Override
-	public Model parseSingleDocument(String rawHtml) {
-		String parties = "", citation = "", year = "", docTitle = "", htmlContent = "";
+	public DocRef parseSingleDocument(String rawHtml) {
+		String parties = "", citation = "", syear = "", docTitle = "", htmlContent = "";
 		Date date = new Date();
 		
 		try {
@@ -260,7 +260,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 			if(dtlen > 4) {
 				String sub = citation.substring(dtlen - 4);
 				if(sub.startsWith("19") || sub.startsWith("20")) {
-					year = sub;
+					syear = sub;
 				}
 			}
 			
@@ -291,8 +291,13 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 			throw new IllegalArgumentException(e);
 		}
 		
-		Model doc = PocModelFactory.get().buildCaseDoc(docTitle, null, date, parties, citation, null, year);
-		doc.setString("htmlContent", htmlContent);
+		//Model doc = EntityFactory.get().buildCaseDoc(docTitle, null, date, parties, citation, null, year);
+		//doc.setString("htmlContent", htmlContent);
+		
+		int year = Integer.parseInt(syear);
+		CaseRef caseRef = new CaseRef(parties, citation, null, year);
+		DocRef doc = new DocRef(docTitle, null, date, caseRef, htmlContent);
+		
 		return doc;
 	}
 }

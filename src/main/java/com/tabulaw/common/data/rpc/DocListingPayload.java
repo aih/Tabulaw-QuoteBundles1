@@ -7,16 +7,16 @@ package com.tabulaw.common.data.rpc;
 
 import java.util.List;
 
+import com.tabulaw.common.model.DocRef;
 import com.tll.common.data.Payload;
 import com.tll.common.data.Status;
-import com.tll.common.model.Model;
 
 /**
  * @author jpk
  */
 public class DocListingPayload extends Payload {
 
-	private List<Model> cachedDocs;
+	private List<DocRef> cachedDocs;
 
 	public DocListingPayload() {
 		super();
@@ -27,12 +27,12 @@ public class DocListingPayload extends Payload {
 	 * @param status
 	 * @param cachedDocs
 	 */
-	public DocListingPayload(Status status, List<Model> cachedDocs) {
+	public DocListingPayload(Status status, List<DocRef> cachedDocs) {
 		super(status);
 		this.cachedDocs = cachedDocs;
 	}
 
-	public List<Model> getCachedDocs() {
+	public List<DocRef> getCachedDocs() {
 		return cachedDocs;
 	}
 }

@@ -15,6 +15,26 @@
 
 	<inherits name="com.allen_sauer.gwt.dnd.gwt-dnd" />
 
+  <source path="criteria">
+    <include name="CriteriaType.java" />
+  </source>
+  
+  <source path="dao">
+    <include name="Sorting.java" />
+    <include name="SortDir.java" />
+    <include name="SortColumn.java" />
+    <include name="SortColumnComparator.java" />
+  </source>
+
+	<source path="listhandler">
+		<include name="EmptyListException.java" />
+		<include name="IListHandler.java" />
+		<include name="AbstractListHandler.java" />
+		<include name="InMemoryListHandler.java" />
+		<include name="ListHandlerException.java" />
+		<include name="ListHandlerType.java" />
+	</source>
+	
 	<inherits name="com.tll.Rpc" />
 	<inherits name="com.tll.View" />
 	<inherits name="com.tll.Listing" />

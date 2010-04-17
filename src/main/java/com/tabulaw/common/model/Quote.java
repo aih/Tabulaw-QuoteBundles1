@@ -10,8 +10,6 @@ import javax.validation.Valid;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.tll.model.IEntity;
-import com.tll.model.TimeStampEntity;
 import com.tll.schema.Reference;
 
 /**
@@ -27,8 +25,8 @@ public class Quote extends TimeStampEntity {
 	private DocRef document;
 
 	@Override
-	public Class<? extends IEntity> entityClass() {
-		return Quote.class;
+	public EntityType getEntityType() {
+		return EntityType.QUOTE;
 	}
 
 	@NotEmpty

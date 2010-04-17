@@ -5,9 +5,6 @@
  */
 package com.tabulaw.common.model;
 
-import com.tll.model.EntityBase;
-import com.tll.model.IEntity;
-
 /**
  * @author jpk
  */
@@ -18,9 +15,31 @@ public class CaseRef extends EntityBase {
 	private String parties, citation, url;
 	private int year;
 
+	/**
+	 * Constructor
+	 */
+	public CaseRef() {
+		super();
+	}
+
+	/**
+	 * Constructor
+	 * @param parties
+	 * @param citation
+	 * @param url
+	 * @param year
+	 */
+	public CaseRef(String parties, String citation, String url, int year) {
+		super();
+		this.parties = parties;
+		this.citation = citation;
+		this.url = url;
+		this.year = year;
+	}
+
 	@Override
-	public Class<? extends IEntity> entityClass() {
-		return CaseRef.class;
+	public EntityType getEntityType() {
+		return EntityType.CASE;
 	}
 
 	public String getParties() {

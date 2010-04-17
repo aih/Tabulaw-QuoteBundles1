@@ -23,14 +23,13 @@ import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.MarkOverlay;
 import com.tabulaw.client.model.PocModelCache;
 import com.tabulaw.client.ui.DocumentViewer.ViewMode;
-import com.tabulaw.common.model.PocModelFactory;
+import com.tabulaw.common.model.EntityFactory;
 import com.tll.client.DOMExt;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.IViewChangeHandler;
 import com.tll.client.mvc.view.ViewChangeEvent;
-import com.tll.common.data.ModelPayload;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
 import com.tll.common.msg.Msg;
@@ -122,7 +121,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 		String serializedMark = mark.serialize();
 
 		// create the quote
-		Model quote = PocModelFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
+		Model quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
 		// server-side persist
 		Poc.getUserDataService().addQuoteToBundle(wDocQuoteBundle.getModel().getId(), quote,
 				new AsyncCallback<ModelPayload>() {
@@ -178,8 +177,8 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
 			String qbName = mDoc.asString("title");
 			String qbDesc = "Quote Bundle for " + qbName;
-			mQb = PocModelFactory.get().buildQuoteBundle(qbName, qbDesc);
-			mQb.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE_BUNDLE));
+			mQb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
+			mQb.setId(PocModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
 
 			Poc.setCurrentQuoteBundle(mQb);
 			// fire model change event
@@ -233,7 +232,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
 			String qbName = mDoc.asString("title");
 			String qbDesc = "Quote Bundle for " + qbName;
-			final Model mQb = PocModelFactory.get().buildQuoteBundle(qbName, qbDesc);
+			final Model mQb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
 			Poc.getUserDataService().addBundleForUser(userId, mQb, new AsyncCallback<ModelPayload>() {
 
 				@Override

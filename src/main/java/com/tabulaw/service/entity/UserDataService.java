@@ -16,13 +16,12 @@ import com.google.inject.Inject;
 import com.tabulaw.common.model.BundleUserBinding;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tll.criteria.Criteria;
-import com.tll.criteria.InvalidCriteriaException;
-import com.tll.dao.EntityExistsException;
-import com.tll.dao.EntityNotFoundException;
-import com.tll.dao.IEntityDao;
-import com.tll.dao.Sorting;
-import com.tll.model.IEntityAssembler;
+import com.tabulaw.criteria.Criteria;
+import com.tabulaw.criteria.InvalidCriteriaException;
+import com.tabulaw.dao.EntityExistsException;
+import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.dao.IEntityDao;
+import com.tabulaw.dao.Sorting;
 import com.tll.util.Comparator;
 
 /**
@@ -35,12 +34,11 @@ public class UserDataService extends AbstractEntityService {
 	/**
 	 * Constructor
 	 * @param dao
-	 * @param entityAssembler
 	 * @param validationFactory
 	 */
 	@Inject
-	public UserDataService(IEntityDao dao, IEntityAssembler entityAssembler, ValidatorFactory validationFactory) {
-		super(dao, entityAssembler, validationFactory);
+	public UserDataService(IEntityDao dao, ValidatorFactory validationFactory) {
+		super(dao, validationFactory);
 	}
 
 	@Transactional(readOnly = true)
@@ -222,9 +220,7 @@ public class UserDataService extends AbstractEntityService {
 	 */
 	@Transactional
 	public void addBundleUserBinding(long bundleId, long userId) throws EntityExistsException {
-		BundleUserBinding binding = entityAssembler.assembleEntity(BundleUserBinding.class, null);
-		binding.setBundleId(bundleId);
-		binding.setUserId(userId);
+		BundleUserBinding binding = new BundleUserBinding(bundleId, userId);
 		dao.persist(binding);
 	}
 

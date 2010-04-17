@@ -14,8 +14,6 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.tll.model.IEntity;
-import com.tll.model.NamedEntity;
 import com.tll.schema.BusinessKeyDef;
 import com.tll.schema.BusinessObject;
 
@@ -24,7 +22,7 @@ import com.tll.schema.BusinessObject;
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Doc Hash", properties = { "hash"
 }))
-public class DocRef extends NamedEntity {
+public class DocRef extends EntityBase {
 
 	private static final long serialVersionUID = -8257785916791525146L;
 
@@ -32,9 +30,35 @@ public class DocRef extends NamedEntity {
 	private Date date;
 	private CaseRef caseRef;
 
+	private transient String htmlContent;
+
+	/**
+	 * Constructor
+	 */
+	public DocRef() {
+		super();
+	}
+
+	/**
+	 * Constructor
+	 * @param title
+	 * @param hash
+	 * @param date
+	 * @param caseRef
+	 * @param htmlContent
+	 */
+	public DocRef(String title, String hash, Date date, CaseRef caseRef, String htmlContent) {
+		super();
+		this.title = title;
+		this.hash = hash;
+		this.date = date;
+		this.caseRef = caseRef;
+		this.htmlContent = htmlContent;
+	}
+
 	@Override
-	public Class<? extends IEntity> entityClass() {
-		return DocRef.class;
+	public EntityType getEntityType() {
+		return EntityType.DOCUMENT;
 	}
 
 	@NotEmpty
@@ -68,7 +92,6 @@ public class DocRef extends NamedEntity {
 
 	@NotEmpty
 	@Length(max = 128)
-	@Override
 	public String getName() {
 		return title;
 	}
@@ -84,5 +107,13 @@ public class DocRef extends NamedEntity {
 
 	public void setCaseRef(CaseRef caseRef) {
 		this.caseRef = caseRef;
+	}
+
+	public String getHtmlContent() {
+		return htmlContent;
+	}
+
+	public void setHtmlContent(String htmlContent) {
+		this.htmlContent = htmlContent;
 	}
 }

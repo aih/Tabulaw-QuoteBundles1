@@ -7,8 +7,6 @@ package com.tabulaw.common.model;
 
 import javax.validation.constraints.NotNull;
 
-import com.tll.model.EntityBase;
-import com.tll.model.IEntity;
 import com.tll.schema.BusinessKeyDef;
 import com.tll.schema.BusinessObject;
 
@@ -42,8 +40,8 @@ public class BundleUserBinding extends EntityBase {
 	}
 
 	@Override
-	public Class<? extends IEntity> entityClass() {
-		return BundleUserBinding.class;
+	public EntityType getEntityType() {
+		return EntityType.BUNDLE_USER_BINDING;
 	}
 
 	@NotNull

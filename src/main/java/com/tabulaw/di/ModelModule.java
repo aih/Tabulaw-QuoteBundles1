@@ -7,13 +7,9 @@ package com.tabulaw.di;
 
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
-import com.tabulaw.common.model.EntityAssembler;
-import com.tll.dao.db4o.Db4oEntityFactory;
+import com.tabulaw.dao.db4o.Db4oEntityFactory;
+import com.tabulaw.model.IEntityFactory;
 import com.tll.di.ValidationModule;
-import com.tll.model.EntityMetadata;
-import com.tll.model.IEntityAssembler;
-import com.tll.model.IEntityFactory;
-import com.tll.model.IEntityMetadata;
 import com.tll.schema.ISchemaInfo;
 import com.tll.schema.SchemaInfo;
 
@@ -25,7 +21,7 @@ public class ModelModule extends ValidationModule {
 	@Override
 	protected void configure() {
 		super.configure();
-		bind(IEntityMetadata.class).to(EntityMetadata.class).in(Scopes.SINGLETON);
+		//bind(IEntityMetadata.class).to(EntityMetadata.class).in(Scopes.SINGLETON);
 
 		bind(ISchemaInfo.class).to(SchemaInfo.class).in(Scopes.SINGLETON);
 
@@ -33,7 +29,7 @@ public class ModelModule extends ValidationModule {
 		bind(new TypeLiteral<IEntityFactory<?>>(){}).to(Db4oEntityFactory.class).in(Scopes.SINGLETON);
 
 		// IEntityAssembler
-		bind(IEntityAssembler.class).to(EntityAssembler.class).in(Scopes.SINGLETON);
+		//bind(IEntityAssembler.class).to(EntityAssembler.class).in(Scopes.SINGLETON);
 	}
 
 }

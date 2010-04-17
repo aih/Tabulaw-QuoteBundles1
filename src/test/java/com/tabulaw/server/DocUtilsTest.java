@@ -18,7 +18,7 @@ import java.util.Date;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.tabulaw.common.model.PocModelFactory;
+import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.server.DocUtils;
 import com.tll.common.model.Model;
 
@@ -31,7 +31,7 @@ public class DocUtilsTest {
 	
 	@Test(enabled = true)
 	public void testSerializeCaseDocModel() throws Exception {
-		Model m = PocModelFactory.get().buildCaseDoc("docTitle", "docHash", new Date(), "parties", "citation", "url", "year");
+		Model m = EntityFactory.get().buildCaseDoc("docTitle", "docHash", new Date(), "parties", "citation", "url", "year");
 		String s = DocUtils.serializeDocument(m);
 		
 		Calendar c = Calendar.getInstance();

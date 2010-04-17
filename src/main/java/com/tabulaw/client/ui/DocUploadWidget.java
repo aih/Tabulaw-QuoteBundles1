@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.model.PocModelCache;
 import com.tabulaw.common.data.dto.Doc;
-import com.tabulaw.common.model.PocModelFactory;
+import com.tabulaw.common.model.EntityFactory;
 import com.tll.client.data.rpc.RpcEvent;
 import com.tll.client.ui.RpcUiHandler;
 import com.tll.client.util.Fmt;
@@ -176,7 +176,7 @@ public class DocUploadWidget extends AbstractModelChangeAwareWidget implements H
 								doc.setHash(value);
 							}
 						}
-						Model mDoc = PocModelFactory.get().buildDoc(doc.getTitle(), doc.getHash(), doc.getDate());
+						Model mDoc = EntityFactory.get().buildDoc(doc.getTitle(), doc.getHash(), doc.getDate());
 						mdocs.add(mDoc);
 						msgs.add(new Msg("Document: '" + doc.getTitle() + "' uploaded.", MsgLevel.INFO));
 					}

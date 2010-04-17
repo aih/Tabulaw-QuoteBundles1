@@ -16,8 +16,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.tabulaw.common.model.PocModelFactory;
-import com.tll.common.model.Model;
+import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.EntityFactory;
 
 /**
  * @author jpk
@@ -49,29 +50,30 @@ public class DocUtils {
 		return dateFormat.format(date);
 	}
 
-	public static String serializeDocument(Model mDoc) {
+	public static String serializeDocument(DocRef doc) {
 		StringBuilder sb = new StringBuilder(1024);
 
 		// doc: "title", "hash",
 		sb.append("title:");
-		sb.append(mDoc.asString("title"));
+		sb.append(doc.getTitle());
 		sb.append("|date:");
-		sb.append(dateFormat.format(mDoc.getPropertyValue("date")));
+		sb.append(dateFormat.format(doc.getDate()));
 		sb.append("|hash:");
-		sb.append(mDoc.asString("hash"));
+		sb.append(doc.getHash());
 
-		if(mDoc.propertyExists("caseRef")) {
+		CaseRef caseRef = doc.getCaseRef();
+		if(caseRef != null) {
 			sb.insert(0, "[casedoc]");
 
 			// case: "parties", "citation", "url", "year", "date"
 			sb.append("|parties:");
-			sb.append(mDoc.asString("caseRef.parties"));
+			sb.append(caseRef.getParties());
 			sb.append("|citation:");
-			sb.append(mDoc.asString("caseRef.citation"));
+			sb.append(caseRef.getCitation());
 			sb.append("|url:");
-			sb.append(mDoc.asString("caseRef.url"));
+			sb.append(caseRef.getUrl());
 			sb.append("|year:");
-			sb.append(mDoc.asString("caseRef.year"));
+			sb.append(caseRef.getYear());
 		}
 		else {
 			// throw new IllegalStateException("Un-handled document model type");
@@ -84,7 +86,7 @@ public class DocUtils {
 		return sb.toString();
 	}
 
-	public static Model deserializeDocument(String s) {
+	public static DocRef deserializeDocument(String s) {
 		// check to see if we have a serializer first line
 		if(s.charAt(0) != '[') return null;
 
@@ -142,9 +144,9 @@ public class DocUtils {
 		}
 
 		if("casedoc".equals(type))
-			return PocModelFactory.get().buildCaseDoc(title, hash, date, parties, citation, url, year);
+			return EntityFactory.get().buildCaseDoc(title, hash, date, parties, citation, url, year);
 		else if("doc".equals(type))
-			return PocModelFactory.get().buildDoc(title, hash, date);
+			return EntityFactory.get().buildDoc(title, hash, date);
 		else
 			throw new IllegalArgumentException("Unhandled doc type: " + type);
 	}

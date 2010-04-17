@@ -26,10 +26,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.PocModelCache;
 import com.tabulaw.client.ui.QuoteBundleListingWidget.BOption;
-import com.tabulaw.common.model.PocEntityType;
+import com.tabulaw.common.model.EntityType;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
-import com.tll.common.data.ModelPayload;
 import com.tll.common.model.CopyCriteria;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
@@ -146,7 +145,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			// clone the dragged quote widget
 			Model mQuoteClone = draggedQuoteModel.copy(CopyCriteria.keepReferences());
 			
-			//mQuoteClone.setId(PocModelCache.get().getNextId(PocEntityType.QUOTE));
+			//mQuoteClone.setId(PocModelCache.get().getNextId(EntityType.QUOTE));
 			// server-side persist
 			String bundleId = targetQuoteBundleWidget.getModel().getId();
 			Poc.getUserDataService().addQuoteToBundle(bundleId, mQuoteClone, new AsyncCallback<ModelPayload>() {
@@ -277,7 +276,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		String qbName = option.getBundleName();
 
 		// replace just dropped option with quote bundle widget
-		Model mQuoteBundle = PocModelCache.get().get(new ModelKey(PocEntityType.QUOTE_BUNDLE, qbId, qbName));
+		Model mQuoteBundle = PocModelCache.get().get(new ModelKey(EntityType.QUOTE_BUNDLE, qbId, qbName));
 
 		insertQuoteBundleColumn(mQuoteBundle, 0);
 	}
@@ -314,7 +313,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		clearQuoteBundleColumns();
 
 		// populate
-		List<Model> mbundles = PocModelCache.get().getAll(PocEntityType.QUOTE_BUNDLE);
+		List<Model> mbundles = PocModelCache.get().getAll(EntityType.QUOTE_BUNDLE);
 		if(mbundles != null) {
 			for(int i = 0; i < mbundles.size(); i++) {
 				if(i < NUM_COLUMNS) {
@@ -413,7 +412,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
 		Model m = event.getModel();
-		if(m.getKey().getEntityType() == PocEntityType.QUOTE_BUNDLE) {
+		if(m.getKey().getEntityType() == EntityType.QUOTE_BUNDLE) {
 			if(event.getChangeOp() == ModelChangeOp.UPDATED) {
 				ModelKey key = m.getKey();
 				// look for the quote bundle in the pinned quote bundle widgets

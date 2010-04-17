@@ -25,12 +25,12 @@ import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.IDocService;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
+import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.server.DocUtils;
 import com.tabulaw.server.scrape.GoogleScholarDocHandler;
 import com.tabulaw.server.scrape.IDocHandler;
 import com.tll.common.data.Status;
-import com.tll.common.model.Model;
-import com.tll.common.model.PropertyPathException;
 import com.tll.common.msg.Msg.MsgAttr;
 import com.tll.common.msg.Msg.MsgLevel;
 import com.tll.server.rpc.RpcServlet;
@@ -69,7 +69,7 @@ public class DocService extends RpcServlet implements IDocService {
 	@Override
 	public DocListingPayload getCachedDocs() {
 		Status status = new Status();
-		ArrayList<Model> docList = new ArrayList<Model>();
+		ArrayList<DocRef> docList = new ArrayList<DocRef>();
 
 		File cproot;
 		try {
@@ -80,7 +80,7 @@ public class DocService extends RpcServlet implements IDocService {
 				File f = itr.next();
 				String s = FileUtils.readFileToString(f, "UTF-8");
 				s = s.trim();
-				Model mDoc = DocUtils.deserializeDocument(s);
+				DocRef mDoc = DocUtils.deserializeDocument(s);
 				if(mDoc != null) docList.add(mDoc);
 			}
 		}
@@ -163,16 +163,12 @@ public class DocService extends RpcServlet implements IDocService {
 				String fcontents = DocUtils.fetch(new URL(remoteDocUrl));
 
 				// parse
-				Model mDoc = handler.parseSingleDocument(fcontents);
-				mDoc.setString("caseRef.url", remoteDocUrl);
-				mDoc.setString("hash", filename);
-				String htmlContent = mDoc.asString("htmlContent");
-				try {
-					mDoc.clearPropertyValue("htmlContent");
-				}
-				catch(PropertyPathException e) {
-					throw new IllegalStateException();
-				}
+				DocRef mDoc = handler.parseSingleDocument(fcontents);
+				CaseRef caseRef = mDoc.getCaseRef();
+				caseRef.setUrl(remoteDocUrl);
+				mDoc.setHash(filename);
+				String htmlContent = mDoc.getHtmlContent();
+				mDoc.setHtmlContent(null); // clear it out
 
 				// cache (write to disk)
 				String sdoc = DocUtils.serializeDocument(mDoc);

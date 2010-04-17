@@ -7,9 +7,10 @@ package com.tabulaw.common.data.rpc;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.tll.common.data.ModelPayload;
+import com.tabulaw.common.data.ModelPayload;
+import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.QuoteBundle;
 import com.tll.common.data.Payload;
-import com.tll.common.model.Model;
 
 /**
  * Contract to persisting user related data to/from client.
@@ -24,7 +25,7 @@ public interface IUserDataService extends RemoteService {
 	 * @param bundle
 	 * @return
 	 */
-	ModelPayload saveBundleForUser(String userId, Model bundle);
+	ModelPayload saveBundleForUser(String userId, QuoteBundle bundle);
 	
 	/**
 	 * Adds a bundle for the given user.
@@ -32,7 +33,7 @@ public interface IUserDataService extends RemoteService {
 	 * @param bundle 
 	 * @return payload containing the persisted marshaled bundle
 	 */
-	ModelPayload addBundleForUser(String userId, Model bundle);
+	ModelPayload addBundleForUser(String userId, QuoteBundle bundle);
 	
 	/**
 	 * Deletes a bundle for the given user.
@@ -45,10 +46,10 @@ public interface IUserDataService extends RemoteService {
 	/**
 	 * Adds a quote to the bundle
 	 * @param bundleId id of the bundle to which the quote will be added
-	 * @param mQuote quote to add
+	 * @param quote quote to add
 	 * @return the persisted and marshaled quote
 	 */
-	ModelPayload addQuoteToBundle(String bundleId, Model mQuote);
+	ModelPayload addQuoteToBundle(String bundleId, Quote quote);
 	
 	/**
 	 * @param bundleId id of the bundle containing the quote to remove.

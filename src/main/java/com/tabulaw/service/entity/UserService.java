@@ -10,46 +10,34 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContext;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.providers.dao.UserCache;
-import org.springframework.security.providers.encoding.Md5PasswordEncoder;
-import org.springframework.security.providers.encoding.PasswordEncoder;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.UserDetailsService;
-import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
 import com.tabulaw.common.model.Authority;
+import com.tabulaw.common.model.IEntity;
+import com.tabulaw.common.model.IUserRef;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.Authority.AuthorityRoles;
-import com.tll.criteria.Criteria;
-import com.tll.criteria.InvalidCriteriaException;
-import com.tll.criteria.QueryParam;
-import com.tll.dao.EntityExistsException;
-import com.tll.dao.EntityNotFoundException;
-import com.tll.dao.IEntityDao;
-import com.tll.model.IEntity;
-import com.tll.model.IEntityAssembler;
-import com.tll.model.IUserRef;
-import com.tll.model.NameKey;
+import com.tabulaw.criteria.Criteria;
+import com.tabulaw.criteria.InvalidCriteriaException;
+import com.tabulaw.criteria.QueryParam;
+import com.tabulaw.dao.EntityExistsException;
+import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.dao.IEntityDao;
+import com.tabulaw.model.NameKey;
+import com.tabulaw.service.ChangeUserCredentialsFailedException;
+import com.tabulaw.service.IForgotPasswordHandler;
 import com.tll.schema.PropertyType;
-import com.tll.service.ChangeUserCredentialsFailedException;
-import com.tll.service.IForgotPasswordHandler;
 
 /**
  * Manages the persistence of {@link User}s.
  * @author jpk
  */
-public class UserService extends AbstractEntityService implements UserDetailsService, IForgotPasswordHandler  {
+public class UserService extends AbstractEntityService implements IForgotPasswordHandler  {
 	
 	private static final Log log = LogFactory.getLog(UserService.class);
 
-	private static PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
+	//private static PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
 	
 	/**
 	 * @param password
@@ -59,7 +47,10 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 	 */
 	public static String encodePassword(String password, Object salt) throws IllegalArgumentException {
 		if(StringUtils.isEmpty(password)) throw new IllegalArgumentException("Can't encode an empty password");
-		return passwordEncoder.encodePassword(password, salt);
+		//return passwordEncoder.encodePassword(password, salt);
+		
+		// TODO make more robust
+		return Integer.toString(password.hashCode());
 	}
 
 	/**
@@ -73,25 +64,26 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 			throws IllegalArgumentException {
 		if(StringUtils.isEmpty(rawPasswordToCheck)) throw new IllegalArgumentException("Empty raw password specified");
 		if(StringUtils.isEmpty(encPassword)) throw new IllegalArgumentException("Empty encoded password specified");
-		return passwordEncoder.isPasswordValid(encPassword, rawPasswordToCheck, salt);
+		//return passwordEncoder.isPasswordValid(encPassword, rawPasswordToCheck, salt);
+		
+		// TODO make more robust
+		return Integer.toString(rawPasswordToCheck.hashCode()).equals(encPassword);
 	}
 
 	// private final AclProviderManager aclProviderManager;
 
-	private final UserCache userCache;
+	//private final UserCache userCache;
 
 	/**
 	 * Constructor
 	 * @param dao
-	 * @param entityAssembler
 	 * @param vfactory
-	 * @param userCache
 	 */
 	@Inject
-	public UserService(IEntityDao dao, IEntityAssembler entityAssembler, ValidatorFactory vfactory, UserCache userCache) {
-		super(dao, entityAssembler, vfactory);
+	public UserService(IEntityDao dao, ValidatorFactory vfactory) {
+		super(dao, vfactory);
 		// this.aclProviderManager = aclProviderManager;
-		this.userCache = userCache;
+		//this.userCache = userCache;
 		init();
 	}
 	
@@ -129,7 +121,7 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 
 	@Transactional
 	public User create(String emailAddress, String password) throws ValidationException, EntityExistsException {
-		final User user = entityAssembler.assembleEntity(User.class, null);
+		final User user = new User();
 
 		String encPassword = null;
 		try {
@@ -167,23 +159,6 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 		return findByEmail(username);
 	}
 
-	/**
-	 * {@link UserDetailsService} implementation
-	 * @param username
-	 * @return the found user
-	 * @throws UsernameNotFoundException
-	 * @throws DataAccessException
-	 */
-	@Transactional(readOnly = true)
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
-		try {
-			return findByEmail(username);
-		}
-		catch(final EntityNotFoundException enfe) {
-			throw new UsernameNotFoundException("Username '" + username + "' not found");
-		}
-	}
-
 	@Transactional(readOnly = true)
 	private User findByEmail(String emailAddress) throws EntityNotFoundException {
 		User user;
@@ -204,7 +179,7 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 	@Transactional
 	public void purge(User user) throws EntityNotFoundException {
 		dao.purge(user);
-		updateSecurityContextIfNecessary(user.getUsername(), null, null, true);
+		//updateSecurityContextIfNecessary(user.getUsername(), null, null, true);
 	}
 
 	@Transactional(rollbackFor = {
@@ -225,7 +200,7 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 			// set the credentials
 			setCredentials(user.getId(), newUsername, encNewPassword);
 
-			updateSecurityContextIfNecessary(user.getUsername(), newUsername, newRawPassword, false);
+			//updateSecurityContextIfNecessary(user.getUsername(), newUsername, newRawPassword, false);
 		}
 		catch(final InvalidCriteriaException e) {
 			throw new IllegalArgumentException(
@@ -255,7 +230,7 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 			// set the credentials
 			setCredentials(userPk, username, encNewPassword);
 
-			updateSecurityContextIfNecessary(username, username, random, false);
+			//updateSecurityContextIfNecessary(username, username, random, false);
 
 			return random;
 		}
@@ -274,6 +249,7 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 		});
 	}
 
+	/*
 	private final void updateSecurityContextIfNecessary(final String originalUsername, final String newUsername,
 			final String newPassword, final boolean justRemove) {
 
@@ -303,4 +279,5 @@ public class UserService extends AbstractEntityService implements UserDetailsSer
 			log.info((justRemove ? "Removed" : "Reset") + " security context for user: " + originalUsername);
 		}
 	}
+	*/
 }

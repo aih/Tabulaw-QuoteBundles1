@@ -24,17 +24,17 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.PocModelCache;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
+import com.tabulaw.client.ui.login.IUserSessionHandler;
+import com.tabulaw.client.ui.login.UserSessionEvent;
 import com.tabulaw.client.view.DocumentView;
-import com.tabulaw.common.model.PocEntityType;
+import com.tabulaw.common.model.EntityType;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.UnloadViewRequest;
 import com.tll.client.mvc.view.ViewKey;
-import com.tll.client.ui.IUserSessionHandler;
 import com.tll.client.ui.SimpleHyperLink;
-import com.tll.client.ui.UserSessionEvent;
 import com.tll.common.model.Model;
 import com.tll.common.model.ModelKey;
 
@@ -166,7 +166,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			super.onModelChangeEvent(event);
 			if(event.getChangeOp() == ModelChangeOp.LOADED) {
 				Model m = event.getModel();
-				if(m.getKey().getEntityType() == PocEntityType.USER) {
+				if(m.getKey().getEntityType() == EntityType.USER) {
 					populate(m);
 				}
 			}
@@ -234,7 +234,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			@Override
 			public void onSubmit(SubmitEvent event) {
 				// clear out user state and fire user session end event w/o waiting for server response
-				PocModelCache.get().removeAll(PocEntityType.USER, liuWidget);
+				PocModelCache.get().removeAll(EntityType.USER, liuWidget);
 				userSessionHandler.onUserSessionEvent(new UserSessionEvent(false));
 			}
 		});
@@ -345,7 +345,7 @@ public class NavRowPanel extends AbstractNavPanel {
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
-		if(event.getChangeOp() == ModelChangeOp.DELETED && event.getModelKey().getEntityType() == PocEntityType.DOCUMENT) {
+		if(event.getChangeOp() == ModelChangeOp.DELETED && event.getModelKey().getEntityType() == EntityType.DOCUMENT) {
 			// remove open doc tab
 			boolean found = false;
 			int i = 0;
