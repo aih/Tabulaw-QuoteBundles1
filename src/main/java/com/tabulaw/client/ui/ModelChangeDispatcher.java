@@ -9,8 +9,8 @@ import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
-import com.tll.client.model.IModelChangeHandler;
-import com.tll.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.IModelChangeHandler;
+import com.tabulaw.client.model.ModelChangeEvent;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.IView;
 

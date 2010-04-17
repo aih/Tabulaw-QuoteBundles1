@@ -296,7 +296,8 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 		
 		int year = Integer.parseInt(syear);
 		CaseRef caseRef = new CaseRef(parties, citation, null, year);
-		DocRef doc = new DocRef(docTitle, null, date, caseRef, htmlContent);
+		DocRef doc = new DocRef(docTitle, null, date, caseRef);
+		doc.setHtmlContent(htmlContent);
 		
 		return doc;
 	}

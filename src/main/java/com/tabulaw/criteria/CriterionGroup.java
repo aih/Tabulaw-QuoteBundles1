@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.tabulaw.common.model.IEntity;
-import com.tabulaw.model.NameKey;
+import com.tabulaw.common.model.NameKey;
 import com.tll.model.bk.IBusinessKey;
 import com.tll.util.Comparator;
 import com.tll.util.DBType;
@@ -118,7 +118,7 @@ public class CriterionGroup implements ICriterion, Iterable<ICriterion> {
 	 * @return this for method chaining
 	 */
 	public CriterionGroup addCriterion(Class<? extends IEntity> entityType, Object pk) {
-		addCriterion(IEntity.PK_FIELDNAME, pk, Comparator.EQUALS, true);
+		addCriterion(IEntity.ID_FIELDNAME, pk, Comparator.EQUALS, true);
 		return this;
 	}
 
@@ -141,7 +141,7 @@ public class CriterionGroup implements ICriterion, Iterable<ICriterion> {
 	 * @param isCaseSensitive
 	 * @return this for method chaining
 	 */
-	public CriterionGroup addCriterion(NameKey<?> nameKey, boolean isCaseSensitive) {
+	public CriterionGroup addCriterion(NameKey nameKey, boolean isCaseSensitive) {
 		return addCriterion(nameKey.getNameProperty(), nameKey.getName(), Comparator.EQUALS, isCaseSensitive);
 	}
 
@@ -155,7 +155,7 @@ public class CriterionGroup implements ICriterion, Iterable<ICriterion> {
 	 */
 	public CriterionGroup addCriterion(String relatedPropertyName, Class<? extends IEntity> relatedEntityType,
 			Object foreignKey) {
-		final String fkname = relatedPropertyName + "." + IEntity.PK_FIELDNAME;
+		final String fkname = relatedPropertyName + "." + IEntity.ID_FIELDNAME;
 		if(foreignKey == null) {
 			return addCriterion(fkname, DBType.NULL, Comparator.IS, false);
 		}

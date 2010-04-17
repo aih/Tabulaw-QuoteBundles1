@@ -7,11 +7,10 @@ import org.springframework.dao.DataAccessException;
 
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.INamedEntity;
+import com.tabulaw.common.model.NameKey;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
-import com.tabulaw.model.NameKey;
 import com.tll.model.bk.IBusinessKey;
-import com.tll.schema.IQueryParam;
 
 /**
  * IEntityDao - DAO definition for {@link IEntity}s.
@@ -26,12 +25,12 @@ public interface IEntityDao {
 	 * Loads a single entity specified by a primary key.
 	 * @param <E> entity type
 	 * @param entityType the entity type class
-	 * @param pk the primary key
+	 * @param id entity id
 	 * @return the entity
 	 * @throws EntityNotFoundException
 	 * @throws DataAccessException
 	 */
-	<E extends IEntity> E load(Class<E> entityType, Object pk) throws EntityNotFoundException, DataAccessException;
+	<E extends IEntity> E load(Class<E> entityType, String id) throws EntityNotFoundException, DataAccessException;
 
 	/**
 	 * Loads a single entity specified by a business key.
@@ -45,7 +44,6 @@ public interface IEntityDao {
 
 	/**
 	 * Loads the named entity by a given name.
-	 * @param <N> named entity type
 	 * @param nameKey the name key
 	 * @return the never <code>null</code> named entity (unless an exception is
 	 *         thrown).
@@ -54,7 +52,7 @@ public interface IEntityDao {
 	 *         given name key.
 	 * @throws DataAccessException
 	 */
-	<N extends INamedEntity> N load(NameKey<N> nameKey) throws EntityNotFoundException, NonUniqueResultException,
+	INamedEntity load(NameKey nameKey) throws EntityNotFoundException, NonUniqueResultException,
 	DataAccessException;
 
 	/**
@@ -107,11 +105,11 @@ public interface IEntityDao {
 	 * Physical deletion of an entity identified by the given primary key.
 	 * @param <E> entity type 
 	 * @param entityType entity class
-	 * @param pk The primary key uniquely identifying the entity to be deleted
+	 * @param id
 	 * @throws EntityNotFoundException
 	 * @throws DataAccessException
 	 */
-	<E extends IEntity> void purge(Class<E> entityType, Object pk) throws EntityNotFoundException, DataAccessException;
+	<E extends IEntity> void purge(Class<E> entityType, String id) throws EntityNotFoundException, DataAccessException;
 
 	/**
 	 * Physical deletion of all entities specified in the input. Use this method
@@ -151,23 +149,6 @@ public interface IEntityDao {
 	DataAccessException;
 
 	/**
-	 * Generic criteria driven search method.
-	 * <p>
-	 * The results may either be scalar (non-entity result elements) or entity
-	 * based depending on the given criteria.
-	 * @param <E> The entity type
-	 * @param criteria The criteria. May NOT be <code>null</code>.
-	 * @param sorting The sorting directive. May be <code>null</code>.
-	 * @return A never <code>null</code> list of matching search results which may
-	 *         be empty if no matching results are found.
-	 * @throws InvalidCriteriaException When the criteria is <code>null</code> or
-	 *         found to be invalid.
-	 * @throws DataAccessException
-	 */
-	<E extends IEntity> List<SearchResult> find(Criteria<E> criteria, Sorting sorting)
-	throws InvalidCriteriaException, DataAccessException;
-
-	/**
 	 * Returns a list of entities that satisfy the given id list. This method will
 	 * return an empty list if no entities match the criteria.
 	 * @param <E> The entity type
@@ -177,7 +158,7 @@ public interface IEntityDao {
 	 * @return List of entities or empty list if none found
 	 * @throws DataAccessException
 	 */
-	<E extends IEntity> List<E> findByPrimaryKeys(Class<E> entityType, Collection<?> ids, Sorting sorting)
+	<E extends IEntity> List<E> findByIds(Class<E> entityType, Collection<String> ids, Sorting sorting)
 	throws DataAccessException;
 
 	/**
@@ -192,10 +173,10 @@ public interface IEntityDao {
 	 *         found to be invalid.
 	 * @throws DataAccessException
 	 */
-	<E extends IEntity> List<?> getPrimaryKeys(Criteria<E> criteria, Sorting sorting)
+	<E extends IEntity> List<String> getIds(Criteria<E> criteria, Sorting sorting)
 	throws InvalidCriteriaException,
 	DataAccessException;
-
+	
 	/**
 	 * Returns a sub-set of results using record set paging.
 	 * @param <E> The entity type
@@ -211,16 +192,7 @@ public interface IEntityDao {
 	 *         <code>null</code>.
 	 * @throws DataAccessException
 	 */
-	<E extends IEntity> IPageResult<SearchResult> getPage(Criteria<E> criteria, Sorting sorting,
+	<E extends IEntity> IPageResult<E> getPage(Criteria<E> criteria, Sorting sorting,
 			int offset, int pageSize)
 			throws InvalidCriteriaException, DataAccessException;
-
-	/**
-	 * Executes a non-select named query.
-	 * @param queryName
-	 * @param params
-	 * @return The number of affected entities.
-	 * @throws DataAccessException
-	 */
-	int executeQuery(String queryName, IQueryParam[] params) throws DataAccessException;
 }

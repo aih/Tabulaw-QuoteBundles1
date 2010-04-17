@@ -4,15 +4,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.criteria.Criteria;
-import com.tabulaw.dao.SearchResult;
 import com.tabulaw.dao.Sorting;
 
 /**
  * Abstract search supporting list handler class. All search supporting list
  * handler implementations should derive from this class.
  * @author jpk
+ * @param <T> 
  */
-public abstract class SearchListHandler extends AbstractListHandler<SearchResult> {
+public abstract class SearchListHandler<T> extends AbstractListHandler<T> {
 
 	protected final Log LOG = LogFactory.getLog(this.getClass());
 

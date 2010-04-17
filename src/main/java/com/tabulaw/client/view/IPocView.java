@@ -6,7 +6,7 @@
 package com.tabulaw.client.view;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.tll.client.model.IModelChangeHandler;
+import com.tabulaw.client.model.IModelChangeHandler;
 import com.tll.client.mvc.view.IView;
 import com.tll.client.mvc.view.IViewInitializer;
 

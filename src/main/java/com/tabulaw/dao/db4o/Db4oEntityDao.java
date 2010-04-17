@@ -32,7 +32,7 @@ import com.google.inject.Inject;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.INamedEntity;
 import com.tabulaw.common.model.ITimeStampEntity;
-import com.tabulaw.common.model.IVersionSupport;
+import com.tabulaw.common.model.NameKey;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.Criterion;
 import com.tabulaw.criteria.CriterionGroup;
@@ -43,15 +43,13 @@ import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
 import com.tabulaw.dao.IPageResult;
 import com.tabulaw.dao.NonUniqueResultException;
-import com.tabulaw.dao.SearchResult;
 import com.tabulaw.dao.SortColumn;
 import com.tabulaw.dao.Sorting;
-import com.tabulaw.model.NameKey;
+import com.tabulaw.model.IEntityTypeResolver;
 import com.tll.model.bk.BusinessKeyFactory;
 import com.tll.model.bk.BusinessKeyPropertyException;
 import com.tll.model.bk.IBusinessKey;
 import com.tll.model.bk.NonUniqueBusinessKeyException;
-import com.tll.schema.IQueryParam;
 import com.tll.util.DBType;
 import com.tll.util.DateRange;
 import com.tll.util.PropertyPath;
@@ -60,7 +58,6 @@ import com.tll.util.PropertyPath;
  * Db4oEntityDao
  * @author jpk
  */
-@SuppressWarnings( { "unchecked", "serial" })
 public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 
 	private static void registerCallbacks(ObjectContainer oc) {
@@ -77,6 +74,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	 * @author jpk
 	 */
 	static class Timestamper implements EventListener4 {
+
 		static final Log log = LogFactory.getLog(Timestamper.class);
 
 		private final boolean creating;
@@ -105,34 +103,39 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	 * @author jpk
 	 */
 	static class Versioner implements EventListener4 {
+
 		static final Log log = LogFactory.getLog(Versioner.class);
 
 		@Override
 		public void onEvent(Event4 e, EventArgs args) {
 			final ObjectEventArgs queryArgs = ((ObjectEventArgs) args);
 			final Object o = queryArgs.object();
-			if(o instanceof IVersionSupport) {
-				final long cv = ((IVersionSupport) o).getVersion();
-				((IVersionSupport) o).setVersion(cv + 1);
+			if(o instanceof IEntity) {
+				final long cv = ((IEntity) o).getVersion();
+				((IEntity) o).setVersion(cv + 1);
 				log.debug("Versioned entity: " + o);
 			}
 		}
 
 	} // Versioner
 
-	private final IDb4oNamedQueryTranslator nqt;
+	private final IEntityTypeResolver entityTypeResolver;
+
+	private final BusinessKeyFactory businessKeyFactory;
 
 	/**
 	 * Constructor
 	 * @param container The required db4o object container
-	 * @param namedQueryTranslator optional named query translator to handle named
-	 *        query based queries
+	 * @param entityTypeResolver
+	 * @param businessKeyFactory
 	 */
 	@Inject
-	public Db4oEntityDao(ObjectContainer container, IDb4oNamedQueryTranslator namedQueryTranslator) {
+	public Db4oEntityDao(ObjectContainer container, IEntityTypeResolver entityTypeResolver,
+			BusinessKeyFactory businessKeyFactory) {
 		super();
-		this.nqt = namedQueryTranslator;
 		setObjectContainer(container);
+		this.entityTypeResolver = entityTypeResolver;
+		this.businessKeyFactory = businessKeyFactory;
 	}
 
 	@Override
@@ -142,79 +145,47 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		return t;
 	}
 
-	@Override
-	public int executeQuery(String queryName, IQueryParam[] params) throws DataAccessException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public <E extends IEntity> List<SearchResult> find(Criteria<E> criteria, Sorting sorting)
-	throws InvalidCriteriaException, DataAccessException {
-		/*
-		if(criteria == null) {
-			throw new InvalidCriteriaException("No criteria specified.");
-		}
-		if(criteria.getCriteriaType() == null) {
-			throw new InvalidCriteriaException("A criteria type must be specified.");
-		}
-		final List<E> list = findEntities(criteria, sorting);
-
-		// transform list
-		// TODO handle case where we want a sub-set of properties (a tuple scalar)
-		return transformEntityList(list, null);
-		*/
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public <E extends IEntity> List<E> findByPrimaryKeys(Class<E> entityType, final Collection<?> ids, Sorting sorting)
-	throws DataAccessException {
-		return getDb4oTemplate().query(new Predicate<E>(entityType) {
-
-			@Override
-			public boolean match(E candidate) {
-				return ids.contains((candidate.getId()));
-			}
-		});
-	}
-
+	@SuppressWarnings( { "unchecked"
+	})
 	@Override
 	public <E extends IEntity> List<E> findEntities(Criteria<E> criteria, final Sorting sorting)
-	throws InvalidCriteriaException, DataAccessException {
+			throws InvalidCriteriaException, DataAccessException {
 		if(criteria == null) throw new InvalidCriteriaException("No criteria specified.");
 
 		final Query query = getDb4oTemplate().query();
 
 		if(criteria.getCriteriaType().isQuery()) {
-			if(nqt == null) throw new InvalidCriteriaException("No db4o named query translator specified.");
-			nqt.translateNamedQuery(criteria.getNamedQueryDefinition(), criteria.getQueryParams(), query);
+			// if(nqt == null) throw new
+			// InvalidCriteriaException("No db4o named query translator specified.");
+			// nqt.translateNamedQuery(criteria.getNamedQueryDefinition(),
+			// criteria.getQueryParams(), query);
+			throw new InvalidCriteriaException("Named queries not supported");
 		}
-		else {
-			query.constrain(criteria.getEntityClass());
-			final CriterionGroup pg = criteria.getPrimaryGroup();
-			if(pg != null && pg.isSet()) {
-				for(final ICriterion ic : pg) {
-					if(ic.isGroup()) throw new InvalidCriteriaException("Nested criterion groups are not supported");
-					if(!ic.isSet()) throw new InvalidCriteriaException("criterion not set");
-					final Criterion ctn = (Criterion) ic;
-					final Object checkValue = ctn.getValue();
-					final String pname = ctn.getPropertyName();
+		query.constrain(criteria.getEntityClass());
+		final CriterionGroup pg = criteria.getPrimaryGroup();
+		if(pg != null && pg.isSet()) {
+			for(final ICriterion ic : pg) {
+				if(ic.isGroup()) throw new InvalidCriteriaException("Nested criterion groups are not supported");
+				if(!ic.isSet()) throw new InvalidCriteriaException("criterion not set");
+				final Criterion ctn = (Criterion) ic;
+				final Object checkValue = ctn.getValue();
+				final String pname = ctn.getPropertyName();
 
-					Query pquery;
-					if(pname.indexOf('.') > 0) {
-						pquery = query;
-						// descend one time for each node in the pname (which may be a dot
-						// notated property path)
-						final PropertyPath path = new PropertyPath(pname);
-						for(final String node : path.nodes()) {
-							pquery = pquery.descend(node);
-						}
+				Query pquery;
+				if(pname.indexOf('.') > 0) {
+					pquery = query;
+					// descend one time for each node in the pname (which may be a dot
+					// notated property path)
+					final PropertyPath path = new PropertyPath(pname);
+					for(final String node : path.nodes()) {
+						pquery = pquery.descend(node);
 					}
-					else {
-						pquery = query.descend(pname);
-					}
+				}
+				else {
+					pquery = query.descend(pname);
+				}
 
-					switch(ctn.getComparator()) {
+				switch(ctn.getComparator()) {
 					case BETWEEN: {
 						Object min, max;
 						if(checkValue instanceof NumberRange) {
@@ -264,8 +235,8 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 						else if(checkValue instanceof String) {
 							// assume comma-delimited string
 							arr =
-								org.springframework.util.ObjectUtils.toObjectArray(org.springframework.util.StringUtils
-										.commaDelimitedListToStringArray((String) checkValue));
+									org.springframework.util.ObjectUtils.toObjectArray(org.springframework.util.StringUtils
+											.commaDelimitedListToStringArray((String) checkValue));
 						}
 						else {
 							throw new InvalidCriteriaException(
@@ -312,8 +283,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 					case STARTS_WITH:
 						pquery.constrain(checkValue).startsWith(ctn.isCaseSensitive());
 						break;
-					} // comparator switch
-				}
+				} // comparator switch
 			}
 		}
 
@@ -340,7 +310,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 
 	@Override
 	public <E extends IEntity> E findEntity(Criteria<E> criteria) throws InvalidCriteriaException,
-	EntityNotFoundException, NonUniqueResultException, DataAccessException {
+			EntityNotFoundException, NonUniqueResultException, DataAccessException {
 		final List<E> list = findEntities(criteria, null);
 		if(list == null || list.size() < 1) {
 			throw new EntityNotFoundException("No matching entity found.");
@@ -353,25 +323,11 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	}
 
 	@Override
-	public <E extends IEntity> List<?> getPrimaryKeys(Criteria<E> criteria, Sorting sorting)
-	throws InvalidCriteriaException, DataAccessException {
-		final List<E> list = findEntities(criteria, sorting);
-		if(list == null) {
-			return null;
-		}
-		final ArrayList<Long> idlist = new ArrayList<Long>();
-		for(final E e : list) {
-			idlist.add(e.getId());
-		}
-		return idlist;
-	}
-
-	@Override
-	public <E extends IEntity> IPageResult<SearchResult> getPage(Criteria<E> criteria, Sorting sorting, int offset,
-			int pageSize) throws InvalidCriteriaException, DataAccessException {
-		List<SearchResult> elist = find(criteria, sorting);
+	public <E extends IEntity> IPageResult<E> getPage(Criteria<E> criteria, Sorting sorting, int offset, int pageSize)
+			throws InvalidCriteriaException, DataAccessException {
+		List<E> elist = findEntities(criteria, sorting);
 		if(elist == null) {
-			elist = new ArrayList<SearchResult>();
+			elist = new ArrayList<E>();
 		}
 		final int size = elist.size();
 		if(size >= 1) {
@@ -385,11 +341,11 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 			}
 			elist = elist.subList(fi, li);
 		}
-		final List<SearchResult> subList = elist;
-		return new IPageResult<SearchResult>() {
+		final List<E> subList = elist;
+		return new IPageResult<E>() {
 
 			@Override
-			public List<SearchResult> getPageList() {
+			public List<E> getPageList() {
 				return subList;
 			}
 
@@ -407,10 +363,12 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	 * @param key The key that identifies the entity to be loaded
 	 * @return All matching entities
 	 */
-	private <E extends IEntity> E loadByPredicate(Predicate<E> p, Object key) throws EntityNotFoundException, DataAccessException {
+	@SuppressWarnings("unchecked")
+	private <E extends IEntity> E loadByPredicate(Predicate<E> p, Object key) throws EntityNotFoundException,
+			DataAccessException {
 		final List<E> list = getDb4oTemplate().query(p);
 		if(list == null || list.size() < 1) {
-			final String msg = "No matching entity found for key: [" + key +  ']';
+			final String msg = "No matching entity found for key: [" + key + ']';
 			logger.debug(msg);
 			throw new EntityNotFoundException(msg);
 		}
@@ -423,35 +381,43 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		return list.get(0);
 	}
 
+	@SuppressWarnings("serial")
 	@Override
-	public <E extends IEntity> E load(Class<E> entityType, final Object key) throws EntityNotFoundException, DataAccessException {
-		logger.debug("Loading entity by PK: " + key);
+	public <E extends IEntity> E load(Class<E> entityType, final String id) throws EntityNotFoundException,
+			DataAccessException {
+		logger.debug("Loading entity by Id: " + id);
 		return loadByPredicate(new Predicate<E>(entityType) {
 
 			@Override
 			public boolean match(E candidate) {
-				return candidate.getId().equals(key);
+				return candidate.getKey().getId().equals(id);
 			}
-		}, key);
+		}, id);
 	}
 
+	@SuppressWarnings("serial")
 	@Override
 	public <E extends IEntity> E load(final IBusinessKey<E> key) throws EntityNotFoundException, DataAccessException {
 		return loadByPredicate(new Predicate<E>(key.getType()) {
 
 			@Override
 			public boolean match(E candidate) {
-				// TODO supply IEntityMetadata to BusinesKeyFactory
-				BusinessKeyFactory bkf = new BusinessKeyFactory(/*new EntityMetadata()*/null);
-				return bkf.equals(candidate, key);
+				return businessKeyFactory.equals(candidate, key);
 			}
 		}, key);
 	}
 
+	@SuppressWarnings( {
+		"unchecked", "serial"
+	})
 	@Override
-	public <N extends INamedEntity> N load(final NameKey<N> nameKey) throws EntityNotFoundException,
-	NonUniqueResultException, DataAccessException {
-		return loadByPredicate(new Predicate<N>(nameKey.getType()) {
+	public INamedEntity load(final NameKey nameKey) throws EntityNotFoundException, NonUniqueResultException,
+			DataAccessException {
+		Class<?> entityClass = entityTypeResolver.resolveEntityClass(nameKey.getEntityType());
+		if(!INamedEntity.class.isAssignableFrom(entityClass)) {
+			throw new IllegalArgumentException();
+		}
+		return loadByPredicate(new Predicate<INamedEntity>((Class<INamedEntity>) entityClass) {
 
 			@Override
 			public boolean match(INamedEntity candidate) {
@@ -460,6 +426,9 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		}, nameKey);
 	}
 
+	@SuppressWarnings( {
+		"unchecked", "serial"
+	})
 	@Override
 	public <E extends IEntity> List<E> loadAll(Class<E> entityType) throws DataAccessException {
 		final List<E> list = getDb4oTemplate().query(new Predicate<E>(entityType) {
@@ -472,9 +441,11 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		return list;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <E extends IEntity> E persist(E entity) throws EntityExistsException, DataAccessException {
 		logger.debug("Persisting entity: " + entity);
+
 		// must check for business key uniqueness first!
 		try {
 			final List<E> list = (List<E>) loadAll(entity.getClass());
@@ -493,9 +464,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 					}
 				}
 			}
-			// TODO supply IEntityMetadata to BusinesKeyFactory
-			BusinessKeyFactory bkf = new BusinessKeyFactory(/*new EntityMetadata()*/null);
-			bkf.isBusinessKeyUnique(mlist);
+			businessKeyFactory.isBusinessKeyUnique(mlist);
 		}
 		catch(final NonUniqueBusinessKeyException e) {
 			throw new EntityExistsException(e.getMessage());
@@ -503,7 +472,9 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		catch(final BusinessKeyPropertyException e) {
 			throw new IllegalStateException(e);
 		}
+
 		getDb4oTemplate().store(entity);
+
 		return entity;
 	}
 
@@ -520,13 +491,14 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	@Override
 	public <E extends IEntity> void purge(E entity) throws EntityNotFoundException, DataAccessException {
 		logger.debug("Purging entity: " + entity);
-		purge(entity.getClass(), entity.getId());
+		purge(entity.getClass(), entity.getKey().getId());
 	}
 
 	@Override
-	public <E extends IEntity> void purge(Class<E> entityType, Object pk) throws EntityNotFoundException, DataAccessException {
-		final E existing = load(entityType, pk);
-		if(existing == null) throw new EntityNotFoundException("Entity of primary key: " + pk + " not found for purging");
+	public <E extends IEntity> void purge(Class<E> entityType, String id) throws EntityNotFoundException,
+			DataAccessException {
+		final E existing = load(entityType, id);
+		if(existing == null) throw new EntityNotFoundException("Entity of id: " + id + " not found for purging");
 		getDb4oTemplate().delete(existing);
 		getDb4oTemplate().purge(existing);
 	}
@@ -538,6 +510,35 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 				purge(e);
 			}
 		}
+	}
+
+	@SuppressWarnings( {
+		"unchecked", "serial"
+	})
+	@Override
+	public <E extends IEntity> List<E> findByIds(Class<E> entityType, final Collection<String> ids, Sorting sorting)
+			throws DataAccessException {
+		return getDb4oTemplate().query(new Predicate<E>(entityType) {
+
+			@Override
+			public boolean match(E candidate) {
+				return ids.contains((candidate.getKey().getId()));
+			}
+		});
+	}
+
+	@Override
+	public <E extends IEntity> List<String> getIds(Criteria<E> criteria, Sorting sorting)
+			throws InvalidCriteriaException, DataAccessException {
+		final List<E> list = findEntities(criteria, sorting);
+		if(list == null) {
+			return null;
+		}
+		final ArrayList<String> idlist = new ArrayList<String>();
+		for(final E e : list) {
+			idlist.add(e.getKey().getId());
+		}
+		return idlist;
 	}
 
 }

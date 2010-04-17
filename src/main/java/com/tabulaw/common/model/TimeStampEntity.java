@@ -15,6 +15,24 @@ public abstract class TimeStampEntity extends EntityBase {
 
 	private Date dateCreated, dateModified;
 
+	/**
+	 * Constructor
+	 */
+	public TimeStampEntity() {
+		super();
+	}
+
+	/**
+	 * Constructor
+	 * @param dateCreated
+	 * @param dateModified
+	 */
+	public TimeStampEntity(Date dateCreated, Date dateModified) {
+		super();
+		setDateCreated(dateCreated);
+		setDateModified(dateModified);
+	}
+
 	/*
 	 * NOTE: we don't enforce a <code>null</code> check since the
 	 * {@link EntityTimeStamper} handles it automatically. I.e.: this is a managed

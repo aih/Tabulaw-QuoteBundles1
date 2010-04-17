@@ -41,8 +41,7 @@ public class UserDataServiceRpc extends RpcServlet implements IUserDataService {
 		ModelPayload payload = new ModelPayload(status);
 
 		try {
-			long lUserId = Long.valueOf(userId);
-			bundle = userDataService.addBundleForUser(lUserId, bundle);
+			bundle = userDataService.addBundleForUser(userId, bundle);
 
 			payload.setModel(bundle);
 			status.addMsg("Bundle created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
@@ -74,8 +73,7 @@ public class UserDataServiceRpc extends RpcServlet implements IUserDataService {
 		ModelPayload payload = new ModelPayload(status);
 
 		try {
-			long lBundleId = Long.valueOf(bundleId);
-			quote = userDataService.addQuoteToBundle(lBundleId, quote);
+			quote = userDataService.addQuoteToBundle(bundleId, quote);
 			payload.setModel(quote);
 			status.addMsg("Quote added.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
@@ -106,9 +104,7 @@ public class UserDataServiceRpc extends RpcServlet implements IUserDataService {
 		Payload payload = new Payload(status);
 
 		try {
-			long lUserId = Long.valueOf(userId);
-			long lBundleId = Long.valueOf(bundleId);
-			userDataService.deleteBundleForUser(lUserId, lBundleId);
+			userDataService.deleteBundleForUser(userId, bundleId);
 			status.addMsg("Bundle deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
@@ -135,9 +131,7 @@ public class UserDataServiceRpc extends RpcServlet implements IUserDataService {
 		Payload payload = new Payload(status);
 
 		try {
-			long lBundleId = Long.valueOf(bundleId);
-			long lQuoteId = Long.valueOf(quoteId);
-			userDataService.removeQuoteFromBundle(lBundleId, lQuoteId, deleteQuote);
+			userDataService.removeQuoteFromBundle(bundleId, quoteId, deleteQuote);
 			status.addMsg("Quote removed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
@@ -164,8 +158,7 @@ public class UserDataServiceRpc extends RpcServlet implements IUserDataService {
 		ModelPayload payload = new ModelPayload(status);
 
 		try {
-			long lUserId = Long.valueOf(userId);
-			qb = userDataService.saveBundleForUser(lUserId, qb);
+			qb = userDataService.saveBundleForUser(userId, qb);
 			payload.setModel(qb);
 			status.addMsg("Bundle saved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}

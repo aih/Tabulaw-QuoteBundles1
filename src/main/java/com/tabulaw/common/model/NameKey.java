@@ -1,14 +1,13 @@
-package com.tabulaw.model;
+package com.tabulaw.common.model;
 
-import com.tll.key.AbstractKey;
+import com.tll.IDescriptorProvider;
 
 /**
  * NameKey - Simple entity key that holds an entity name and also identifies the
  * field by which that name is retrieved from the entity.
- * @param <T> key type
  * @author jpk
  */
-public class NameKey<T> extends AbstractKey<T> {
+public class NameKey implements IDescriptorProvider {
 
 	private static final long serialVersionUID = -3217664978174156618L;
 
@@ -25,32 +24,42 @@ public class NameKey<T> extends AbstractKey<T> {
 	private String name;
 
 	/**
-	 * Constructor
-	 * @param entityClass
+	 * The entity type.
 	 */
-	public NameKey(Class<T> entityClass) {
-		this(entityClass, null, DEFAULT_FIELDNAME);
+	private final String entityType;
+
+	/**
+	 * Constructor
+	 * @param entityType
+	 */
+	public NameKey(String entityType) {
+		this(entityType, null, DEFAULT_FIELDNAME);
 	}
 
 	/**
 	 * Constructor
-	 * @param entityClass
+	 * @param entityType
 	 * @param name
 	 */
-	public NameKey(Class<T> entityClass, String name) {
-		this(entityClass, name, DEFAULT_FIELDNAME);
+	public NameKey(String entityType, String name) {
+		this(entityType, name, DEFAULT_FIELDNAME);
 	}
 
 	/**
 	 * Constructor
-	 * @param entityClass
-	 * @param name
+	 * @param entityType
 	 * @param propertyName
+	 * @param name
 	 */
-	public NameKey(Class<T> entityClass, String name, String propertyName) {
-		super(entityClass);
-		setName(name);
+	public NameKey(String entityType, String propertyName, String name) {
+		if(entityType == null) throw new NullPointerException();
+		this.entityType = entityType;
 		setNameProperty(propertyName);
+		setName(name);
+	}
+
+	public String getEntityType() {
+		return entityType;
 	}
 
 	public String getName() {
@@ -74,7 +83,6 @@ public class NameKey<T> extends AbstractKey<T> {
 	 */
 	public final void setNameProperty(String nameProperty) {
 		if(nameProperty == null) throw new IllegalArgumentException("A field name must be specified");
-		this.nameProperty = nameProperty;
 	}
 
 	@Override
@@ -82,12 +90,10 @@ public class NameKey<T> extends AbstractKey<T> {
 		return getNameProperty() + ": " + getName();
 	}
 
-	@Override
 	public void clear() {
 		this.name = null;
 	}
 
-	@Override
 	public boolean isSet() {
 		return name != null;
 	}

@@ -7,56 +7,58 @@ package com.tabulaw.client.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import com.allen_sauer.gwt.log.client.Log;
+import org.mortbay.log.Log;
+
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityType;
-import com.tll.client.model.ModelChangeEvent;
-import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
-import com.tll.common.model.CopyCriteria;
-import com.tll.common.model.Model;
-import com.tll.common.model.ModelKey;
+import com.tabulaw.common.model.IEntity;
+import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.User;
 import com.tll.util.ObjectUtil;
 
 /**
  * @author jpk
  */
-public class PocModelCache {
+public class ClientModelCache {
 
-	private static final PocModelCache instance = new PocModelCache();
+	private static final ClientModelCache instance = new ClientModelCache();
 
-	public static PocModelCache get() {
+	public static ClientModelCache get() {
 		return instance;
 	}
 
-	private final HashMap<EntityType, List<Model>> cache = new HashMap<EntityType, List<Model>>();
+	private final HashMap<EntityType, List<IEntity>> cache = new HashMap<EntityType, List<IEntity>>();
 
-	private final HashMap<EntityType, Comparator<Model>> comparators = new HashMap<EntityType, Comparator<Model>>();
+	//private final HashMap<EntityType, Comparator<? extends IEntity>> comparators = new HashMap<EntityType, Comparator<? extends IEntity>>();
 
 	/**
 	 * Constructor
 	 */
-	private PocModelCache() {
+	private ClientModelCache() {
 
 		// init cache
 		for(EntityType et : EntityType.values()) {
-			cache.put(et, new ArrayList<Model>());
+			cache.put(et, new ArrayList<IEntity>());
 		}
 
-		comparators.put(EntityType.CASE, new Comparator<Model>() {
+		/*
+		comparators.put(EntityType.CASE, new Comparator<CaseRef>() {
 
 			@Override
-			public int compare(Model o1, Model o2) {
-				int year1 = Integer.valueOf(o1.asString("year"));
-				int year2 = Integer.valueOf(o2.asString("year"));
+			public int compare(CaseRef o1, CaseRef o2) {
+				int year1 = o1.getYear();
+				int year2 = o2.getYear();
 				if(year1 > year2) return 1;
 				if(year2 > year1) return -1;
-				String c1 = o1.asString("citation");
-				String c2 = o2.asString("citation");
+				String c1 = o1.getCitation();
+				String c2 = o2.getCitation();
 				return c1.compareTo(c2);
 			}
 		});
@@ -93,6 +95,8 @@ public class PocModelCache {
 				return name1.compareTo(name2);
 			}
 		});
+		*/
+
 	} // constructor
 	
 	/**
@@ -100,7 +104,7 @@ public class PocModelCache {
 	 * <p>No model change event is fired.
 	 */
 	public void clear() {
-		for(List<Model> list : cache.values()) {
+		for(List<?> list : cache.values()) {
 			list.clear();
 		}
 	}
@@ -108,9 +112,9 @@ public class PocModelCache {
 	/**
 	 * @return The currently logged in user.
 	 */
-	public Model getUser() {
-		List<Model> list = cache.get(EntityType.USER);
-		return list.size() < 1 ? null : list.get(0);
+	public User getUser() {
+		List<?> list = cache.get(EntityType.USER);
+		return list.size() < 1 ? null : (User) list.get(0);
 	}
 
 	/**
@@ -118,16 +122,18 @@ public class PocModelCache {
 	 * @param entityType the desired entity type
 	 * @return the next available id
 	 */
+	/*
 	public String getNextId(EntityType entityType) {
 		Log.error("ERROR: calling getNextId() for: " + entityType);
-		List<Model> mclc = cache.get(entityType);
+		List<? extends IEntity> mclc = cache.get(entityType);
 		int largest = 0;
-		for(Model m : mclc) {
-			int id = Integer.parseInt(m.getId());
+		for(IEntity m : mclc) {
+			int id = m.getId();
 			if(id > largest) largest = id;
 		}
 		return Integer.toString(largest + 1);
 	}
+	*/
 
 	/**
 	 * Gets the model identified by the given key.
@@ -138,11 +144,11 @@ public class PocModelCache {
 	 * @return the found model.
 	 * @throws IllegalArgumentException When the model can't be found.
 	 */
-	public Model get(ModelKey key) {
-		List<Model> list = cache.get(key.getEntityType());
-		for(Model m : list) {
+	public IEntity get(ModelKey key) {
+		List<? extends IEntity> list = cache.get(key.getEntityType());
+		for(IEntity m : list) {
 			if(m.getKey().equals(key)) {
-				return m.copy(CopyCriteria.keepReferences());
+				return m.clone();
 			}
 		}
 		throw new IllegalArgumentException("Model of key: " + key + " not found in datastore.");
@@ -152,18 +158,23 @@ public class PocModelCache {
 	 * @param etype the entity type
 	 * @return All existing entities of the given type.
 	 */
-	public List<Model> getAll(EntityType etype) {
-		List<Model> list = cache.get(etype);
-		ArrayList<Model> rlist = new ArrayList<Model>(list.size());
-		for(Model m : list) {
-			rlist.add(m);
+	public List<IEntity> getAll(EntityType etype) {
+		List<? extends IEntity> list = cache.get(etype);
+		ArrayList<IEntity> rlist = new ArrayList<IEntity>(list.size());
+		for(IEntity m : list) {
+			rlist.add(m.clone());
 		}
+		/*
 		if(rlist.size() > 1) {
-			Comparator<Model> cmp = comparators.get(etype);
-			if(cmp != null) {
-				Collections.sort(rlist, cmp);
-			}
+			Collections.sort(rlist, new Comparator<IEntity>() {
+				
+				@Override
+				public int compare(IEntity o1, IEntity o2) {
+					return o1.compareTo(o2);
+				}
+			});
 		}
+		*/
 		return rlist;
 	}
 
@@ -175,13 +186,13 @@ public class PocModelCache {
 	 * @param source optional source widget when specified, a model change event
 	 *        is fired on it
 	 */
-	public void persist(Model m, Widget source) {
-		List<Model> list = cache.get(m.getEntityType());
+	public void persist(IEntity m, Widget source) {
+		List<IEntity> list = cache.get(m.getEntityType());
 
-		Model existing = null;
+		IEntity existing = null;
 
-		if(m.getId() != null) {
-			for(Model em : list) {
+		if(!m.isNew()) {
+			for(IEntity em : list) {
 				if(em.getKey().equals(m.getKey())) {
 					existing = em;
 					break;
@@ -189,7 +200,8 @@ public class PocModelCache {
 			}
 		}
 		else {
-			m.setId(getNextId((EntityType) m.getEntityType()));
+			Log.warn("No id set for just persisted entity: " + m);
+			//m.setId(getNextId((EntityType) m.getEntityType()));
 		}
 
 		ModelChangeOp op = existing == null ? ModelChangeOp.ADDED : ModelChangeOp.UPDATED;
@@ -198,7 +210,7 @@ public class PocModelCache {
 			list.remove(existing);
 		}
 
-		Model copy = m.copy(CopyCriteria.keepReferences());
+		IEntity copy = m.clone();
 		list.add(copy);
 
 		// fire model change event
@@ -211,8 +223,8 @@ public class PocModelCache {
 	 * NO model change event will be fired.
 	 * @param clc collection containing model data to persist
 	 */
-	public void persistAll(Collection<Model> clc) {
-		for(Model m : clc) {
+	public void persistAll(Collection<? extends IEntity> clc) {
+		for(IEntity m : clc) {
 			persist(m, null);
 		}
 	}
@@ -224,8 +236,8 @@ public class PocModelCache {
 	 * @param clc collection containing model data to persist
 	 * @param source the sourcing widget that will source a model change event
 	 */
-	public void persistAll(Collection<Model> clc, Widget source) {
-		for(Model m : clc) {
+	public void persistAll(Collection<? extends IEntity> clc, Widget source) {
+		for(IEntity m : clc) {
 			persist(m, source);
 		}
 	}
@@ -240,10 +252,10 @@ public class PocModelCache {
 	 * @return The deleted model or <code>null</code> if the model was not
 	 *         deleted.
 	 */
-	public Model remove(ModelKey key, Widget source) {
-		List<Model> set = cache.get(key.getEntityType());
-		Model t = null;
-		for(Model m : set) {
+	public IEntity remove(ModelKey key, Widget source) {
+		List<IEntity> set = cache.get(key.getEntityType());
+		IEntity t = null;
+		for(IEntity m : set) {
 			if(m.getKey().equals(key)) {
 				t = m;
 				break;
@@ -267,10 +279,10 @@ public class PocModelCache {
 	 * @param source the sourcing widget that will source a model change event
 	 */
 	public void removeAll(EntityType etype, Widget source) {
-		List<Model> list = cache.get(etype);
+		List<IEntity> list = cache.get(etype);
 		if(list == null || list.size() < 1) return;
-		ArrayList<Model> rlist = new ArrayList<Model>(list);
-		for(Model m : rlist) {
+		ArrayList<IEntity> rlist = new ArrayList<IEntity>(list);
+		for(IEntity m : rlist) {
 			if(list.remove(m)) {
 				// fire model change event
 				if(source != null) source.fireEvent(new ModelChangeEvent(ModelChangeOp.DELETED, m, null));
@@ -288,25 +300,22 @@ public class PocModelCache {
 	 * @param q2
 	 * @return <code>true</code> if they are business key equal
 	 */
-	public boolean compareQuotes(Model q1, Model q2) {
-		Model doc1 = q1.relatedOne("document").getModel();
-		Model doc2 = q2.relatedOne("document").getModel();
+	public boolean compareQuotes(Quote q1, Quote q2) {
+		DocRef doc1 = q1.getDocument();
+		DocRef doc2 = q2.getDocument();
 		if(doc1.getKey().equals(doc2.getKey())) {
-			return ObjectUtil.equals(q1.asString("quote"), q2.asString("quote"));
+			return ObjectUtil.equals(q1.getQuote(), q2.getQuote());
 		}
 		return false;
 	}
 
-	public Model getCaseDocByRemoteUrl(String remoteCaseUrl) {
-		List<Model> list = cache.get(EntityType.DOCUMENT);
-		for(Model m : list) {
-			try {
-				String surl = m.asString("caseRef.url");
-				if(surl != null && surl.equals(remoteCaseUrl)) return m;
-			}
-			catch(IllegalArgumentException e) {
-				// ok - continue
-			}
+	public DocRef getCaseDocByRemoteUrl(String remoteCaseUrl) {
+		List<IEntity> list = cache.get(EntityType.DOCUMENT);
+		for(IEntity m : list) {
+			CaseRef caseRef = ((DocRef)m).getCaseRef();
+			if(caseRef == null) continue;
+			String surl = caseRef.getUrl();
+			if(surl != null && surl.equals(remoteCaseUrl)) return (DocRef) m;
 		}
 		return null;
 	}

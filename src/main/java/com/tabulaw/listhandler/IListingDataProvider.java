@@ -3,10 +3,11 @@ package com.tabulaw.listhandler;
 import java.util.Collection;
 import java.util.List;
 
+import com.tabulaw.common.model.IEntity;
+import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.IPageResult;
-import com.tabulaw.dao.SearchResult;
 import com.tabulaw.dao.Sorting;
 
 /**
@@ -23,12 +24,13 @@ public interface IListingDataProvider {
 
 	/**
 	 * Retrieves a list of matching results for the given criteria.
+	 * @param <E> 
 	 * @param criteria
 	 * @param sorting
 	 * @return list of result elements or an empty list if no matches are found.
 	 * @throws InvalidCriteriaException
 	 */
-	List<SearchResult> find(Criteria<?> criteria, Sorting sorting) throws InvalidCriteriaException;
+	<E> List<E> find(Criteria<?> criteria, Sorting sorting) throws InvalidCriteriaException;
 
 	/**
 	 * Retrieves the primary keys of the entities that match the given criteria.
@@ -38,7 +40,7 @@ public interface IListingDataProvider {
 	 *         results are found.
 	 * @throws InvalidCriteriaException
 	 */
-	List<?> getPrimaryKeys(Criteria<?> criteria, Sorting sorting) throws InvalidCriteriaException;
+	List<ModelKey> getKeys(Criteria<?> criteria, Sorting sorting) throws InvalidCriteriaException;
 
 	/**
 	 * Retrieves entities from a collection of primary keys.
@@ -49,10 +51,11 @@ public interface IListingDataProvider {
 	 *        of the results is "undefined".
 	 * @return list of matching entities.
 	 */
-	<E> List<E> getEntitiesFromIds(Class<E> entityClass, Collection<?> pks, Sorting sorting);
+	<E extends IEntity> List<E> getEntitiesFromIds(Class<E> entityClass, Collection<?> pks, Sorting sorting);
 
 	/**
 	 * Returns a page of matching results for the given criteria.
+	 * @param <E> 
 	 * @param criteria
 	 * @param sorting
 	 * @param offset
@@ -60,6 +63,6 @@ public interface IListingDataProvider {
 	 * @return the page result
 	 * @throws InvalidCriteriaException
 	 */
-	IPageResult<SearchResult> getPage(Criteria<?> criteria, Sorting sorting, int offset, int pageSize)
+	<E> IPageResult<E> getPage(Criteria<?> criteria, Sorting sorting, int offset, int pageSize)
 			throws InvalidCriteriaException;
 }

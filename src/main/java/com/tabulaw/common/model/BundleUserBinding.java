@@ -19,7 +19,7 @@ public class BundleUserBinding extends EntityBase {
 
 	private static final long serialVersionUID = -4676769373977438262L;
 
-	private Long bundleId, userId;
+	private String bundleId, userId;
 
 	/**
 	 * Constructor
@@ -33,10 +33,15 @@ public class BundleUserBinding extends EntityBase {
 	 * @param bundleId
 	 * @param userId
 	 */
-	public BundleUserBinding(Long bundleId, Long userId) {
+	public BundleUserBinding(String bundleId, String userId) {
 		super();
 		this.bundleId = bundleId;
 		this.userId = userId;
+	}
+
+	@Override
+	public IEntity clone() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -44,21 +49,26 @@ public class BundleUserBinding extends EntityBase {
 		return EntityType.BUNDLE_USER_BINDING;
 	}
 
+	@Override
+	protected String getId() {
+		return Integer.toString(bundleId.hashCode()) + '|' + Integer.toString(bundleId.hashCode());
+	}
+
 	@NotNull
-	public Long getBundleId() {
+	public String getBundleId() {
 		return bundleId;
 	}
 
-	public void setBundleId(Long bundleId) {
+	public void setBundleId(String bundleId) {
 		this.bundleId = bundleId;
 	}
 
 	@NotNull
-	public Long getUserId() {
+	public String getUserId() {
 		return userId;
 	}
 
-	public void setUserId(Long userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 }

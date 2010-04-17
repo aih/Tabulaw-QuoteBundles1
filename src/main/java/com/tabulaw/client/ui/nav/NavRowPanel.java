@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.TabBar;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.Poc;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
 import com.tabulaw.client.ui.login.UserSessionEvent;
@@ -234,7 +234,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			@Override
 			public void onSubmit(SubmitEvent event) {
 				// clear out user state and fire user session end event w/o waiting for server response
-				PocModelCache.get().removeAll(EntityType.USER, liuWidget);
+				ClientModelCache.get().removeAll(EntityType.USER, liuWidget);
 				userSessionHandler.onUserSessionEvent(new UserSessionEvent(false));
 			}
 		});

@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.tabulaw.client.Poc;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ClientModelCache;
 import com.tll.client.model.IHasModel;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.common.data.Payload;
@@ -213,8 +213,8 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		if(addToThisBundleModel && mQuoteBundle != null) mQuoteBundle.relatedMany("quotes").insert(mQuote, 0);
 		if(persist) {
 			// add the quote updating the bundle quote refs too
-			PocModelCache.get().persist(mQuote, this);
-			PocModelCache.get().persist(mQuoteBundle, this);
+			ClientModelCache.get().persist(mQuote, this);
+			ClientModelCache.get().persist(mQuoteBundle, this);
 		}
 		// add to the ui
 		Q qw = getNewQuoteWidget(mQuote);
@@ -251,8 +251,8 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 							}
 							else {
 								// delete the quote updating the bundle quote refs too
-								if(deleteQuote) PocModelCache.get().remove(mQuote.getKey(), AbstractQuoteBundleWidget.this);
-								PocModelCache.get().persist(mQuoteBundle, AbstractQuoteBundleWidget.this);
+								if(deleteQuote) ClientModelCache.get().remove(mQuote.getKey(), AbstractQuoteBundleWidget.this);
+								ClientModelCache.get().persist(mQuoteBundle, AbstractQuoteBundleWidget.this);
 							}
 						}
 						

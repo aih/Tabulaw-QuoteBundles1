@@ -23,14 +23,14 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.Resources;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.view.DocumentViewInitializer;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocFetchPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
-import com.tabulaw.common.model.EntityType;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 import com.tll.client.data.rpc.IRpcHandler;
 import com.tll.client.data.rpc.RpcCommand;
@@ -39,7 +39,6 @@ import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.ui.RpcUiHandler;
 import com.tll.client.ui.msg.Msgs;
-import com.tll.common.model.Model;
 import com.tll.common.msg.Msg;
 
 /**
@@ -167,7 +166,7 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 				final CaseDocSearchResult caseDoc = ((DocSuggestion) event.getSelectedItem()).doc;
 				final String docRemoteUrl = caseDoc.getUrl();
 				Log.debug("Checking for client cache of docRemoteUrl: " + docRemoteUrl);
-				Model mDoc = PocModelCache.get().getCaseDocByRemoteUrl(docRemoteUrl);
+				DocRef mDoc = ClientModelCache.get().getCaseDocByRemoteUrl(docRemoteUrl);
 				if(mDoc == null) {
 					Log.debug("Fetching remote doc: " + docRemoteUrl);
 
@@ -192,20 +191,22 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 								Msgs.post(result.getStatus().getMsgs(Msg.MsgAttr.EXCEPTION.flag), docSuggestBox);
 								return;
 							}
-							final Model mNewDoc =
+							final DocRef mNewDoc =
 									EntityFactory.get().buildCaseDoc(caseDoc.getTitle(), result.getLocalUrl(), new Date(), null,
 											caseDoc.getCitation(), caseDoc.getUrl(), null);
-							mNewDoc.setId(PocModelCache.get().getNextId(EntityType.DOCUMENT));
+							
+							// TODO do we need to set a doc id here?
+							//mNewDoc.setId(ClientModelCache.get().getNextId(EntityType.DOCUMENT));
 
 							// persist the new doc and propagate through app
-							PocModelCache.get().persist(mNewDoc, DocSuggestWidget.this);
+							ClientModelCache.get().persist(mNewDoc, DocSuggestWidget.this);
 
 							DeferredCommand.addCommand(new Command() {
 
 								@Override
 								public void execute() {
 									// show the doc (letting the model change event finish first)
-									final DocumentViewInitializer dvi = new DocumentViewInitializer(mNewDoc.getKey());
+									final DocumentViewInitializer dvi = new DocumentViewInitializer(mNewDoc.getModelKey());
 									ViewManager.get().dispatch(new ShowViewRequest(dvi));
 								}
 							});
@@ -214,7 +215,7 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 					}.execute();
 				}
 				else {
-					final DocumentViewInitializer dvi = new DocumentViewInitializer(mDoc.getKey());
+					final DocumentViewInitializer dvi = new DocumentViewInitializer(mDoc.getModelKey());
 					DeferredCommand.addCommand(new Command() {
 
 						@Override

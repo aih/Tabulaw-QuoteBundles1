@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.ui.QuoteBundleListingWidget.BOption;
 import com.tabulaw.common.model.EntityType;
 import com.tll.client.model.ModelChangeEvent;
@@ -145,7 +145,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			// clone the dragged quote widget
 			Model mQuoteClone = draggedQuoteModel.copy(CopyCriteria.keepReferences());
 			
-			//mQuoteClone.setId(PocModelCache.get().getNextId(EntityType.QUOTE));
+			//mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE));
 			// server-side persist
 			String bundleId = targetQuoteBundleWidget.getModel().getId();
 			Poc.getUserDataService().addQuoteToBundle(bundleId, mQuoteClone, new AsyncCallback<ModelPayload>() {
@@ -276,7 +276,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		String qbName = option.getBundleName();
 
 		// replace just dropped option with quote bundle widget
-		Model mQuoteBundle = PocModelCache.get().get(new ModelKey(EntityType.QUOTE_BUNDLE, qbId, qbName));
+		Model mQuoteBundle = ClientModelCache.get().get(new ModelKey(EntityType.QUOTE_BUNDLE, qbId, qbName));
 
 		insertQuoteBundleColumn(mQuoteBundle, 0);
 	}
@@ -313,7 +313,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		clearQuoteBundleColumns();
 
 		// populate
-		List<Model> mbundles = PocModelCache.get().getAll(EntityType.QUOTE_BUNDLE);
+		List<Model> mbundles = ClientModelCache.get().getAll(EntityType.QUOTE_BUNDLE);
 		if(mbundles != null) {
 			for(int i = 0; i < mbundles.size(); i++) {
 				if(i < NUM_COLUMNS) {

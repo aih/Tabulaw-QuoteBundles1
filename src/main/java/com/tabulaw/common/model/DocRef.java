@@ -22,7 +22,7 @@ import com.tll.schema.BusinessObject;
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Doc Hash", properties = { "hash"
 }))
-public class DocRef extends EntityBase {
+public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEntity {
 
 	private static final long serialVersionUID = -8257785916791525146L;
 
@@ -45,15 +45,24 @@ public class DocRef extends EntityBase {
 	 * @param hash
 	 * @param date
 	 * @param caseRef
-	 * @param htmlContent
 	 */
-	public DocRef(String title, String hash, Date date, CaseRef caseRef, String htmlContent) {
+	public DocRef(String title, String hash, Date date, CaseRef caseRef) {
 		super();
 		this.title = title;
 		this.hash = hash;
 		this.date = date;
 		this.caseRef = caseRef;
-		this.htmlContent = htmlContent;
+	}
+
+	@Override
+	protected String getId() {
+		return hash;
+	}
+
+	@Override
+	public DocRef clone() {
+		Date cdate = date == null ? null : new Date(date.getTime());
+		return new DocRef(title, hash, cdate, caseRef == null ? null : caseRef.clone());
 	}
 
 	@Override
@@ -96,6 +105,11 @@ public class DocRef extends EntityBase {
 		return title;
 	}
 
+	@Override
+	public void setName(String name) {
+		setTitle(name);
+	}
+
 	/**
 	 * Optional case ref.
 	 * @return the case ref if specified
@@ -115,5 +129,10 @@ public class DocRef extends EntityBase {
 
 	public void setHtmlContent(String htmlContent) {
 		this.htmlContent = htmlContent;
+	}
+
+	@Override
+	public int compareTo(DocRef o) {
+		return title != null && o.title != null ? title.compareTo(o.title) : 0;
 	}
 }

@@ -11,7 +11,7 @@ import com.tll.INameValueProvider;
  * EntityType
  * @author jpk
  */
-public enum EntityType implements IEntityType, INameValueProvider<String> {
+public enum EntityType implements INameValueProvider<String> {
 
 	AUTHORITY("Authority"),
 	USER("User"),

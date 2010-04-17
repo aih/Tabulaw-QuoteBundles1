@@ -3,21 +3,22 @@ package com.tabulaw.listhandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.tabulaw.common.model.IEntity;
+import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
-import com.tabulaw.dao.SearchResult;
 import com.tabulaw.dao.Sorting;
 
 /**
  * Search supporting list handler implementation based on an id list.
  * @author jpk
  */
-public final class PrimaryKeyListHandler extends SearchListHandler {
+public final class ModelKeyListHandler extends SearchListHandler<ModelKey> {
 
 	/**
 	 * The id list - list of entity pks matching the search criteria.
 	 */
-	private List<?> pks;
+	private List<ModelKey> pks;
 
 	/**
 	 * Constructor
@@ -26,12 +27,12 @@ public final class PrimaryKeyListHandler extends SearchListHandler {
 	 * @param criteria The criteria used to generate the underlying list
 	 * @param sorting
 	 */
-	PrimaryKeyListHandler(IListingDataProvider dataProvider, Criteria<?> criteria, Sorting sorting) {
+	ModelKeyListHandler(IListingDataProvider dataProvider, Criteria<?> criteria, Sorting sorting) {
 		super(dataProvider, criteria, sorting);
 	}
 
 	public ListHandlerType getListHandlerType() {
-		return ListHandlerType.IDLIST;
+		return ListHandlerType.MODELKEY_LIST;
 	}
 
 	public int size() {
@@ -39,7 +40,7 @@ public final class PrimaryKeyListHandler extends SearchListHandler {
 	}
 
 	@Override
-	public List<SearchResult> getElements(int offset, int pageSize, Sorting sort) throws IndexOutOfBoundsException,
+	public List<ModelKey> getElements(int offset, int pageSize, Sorting sort) throws IndexOutOfBoundsException,
 	EmptyListException, ListHandlerException {
 
 		assert this.sorting != null;
@@ -47,7 +48,7 @@ public final class PrimaryKeyListHandler extends SearchListHandler {
 		// if sorting differs, re-execute search
 		if(sort != null && !sort.equals(this.sorting) || (sort == null && this.sorting != null)) {
 			try {
-				pks = dataProvider.getPrimaryKeys(criteria, sort);
+				pks = dataProvider.getKeys(criteria, sort);
 			}
 			catch(final InvalidCriteriaException e) {
 				throw new ListHandlerException(e.getMessage());
@@ -64,15 +65,15 @@ public final class PrimaryKeyListHandler extends SearchListHandler {
 		// adjust the end index if it exceeds the bounds of the id list
 		if(ei > size - 1) ei = size - 1;
 
-		final List<?> subids = pks.subList(offset, ei);
+		final List<ModelKey> subids = pks.subList(offset, ei);
 
-		final List<?> list = dataProvider.getEntitiesFromIds(criteria.getEntityClass(), subids, sort);
+		final List<? extends IEntity> list = dataProvider.getEntitiesFromIds(criteria.getEntityClass(), subids, sort);
 		if(list == null || list.size() != subids.size()) {
 			throw new ListHandlerException("id and entity count mismatch");
 		}
-		final List<SearchResult> slist = new ArrayList<SearchResult>(list.size());
-		for(final Object e : list) {
-			slist.add(new SearchResult(e));
+		final List<ModelKey> slist = new ArrayList<ModelKey>(list.size());
+		for(final IEntity e : list) {
+			slist.add(e.getKey());
 		}
 		return slist;
 	}

@@ -5,19 +5,19 @@ import java.util.List;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.IPageResult;
-import com.tabulaw.dao.SearchResult;
 import com.tabulaw.dao.Sorting;
 
 /**
  * Search supporting list handler implementation for pageable result sets.
  * @author jpk
+ * @param <T> 
  */
-public final class PagingSearchListHandler extends SearchListHandler {
+public final class PagingSearchListHandler<T> extends SearchListHandler<T> {
 
 	/**
 	 * The current page of results
 	 */
-	private IPageResult<SearchResult> page;
+	private IPageResult<T> page;
 
 	/**
 	 * Constructor
@@ -34,7 +34,7 @@ public final class PagingSearchListHandler extends SearchListHandler {
 		return ListHandlerType.PAGE;
 	}
 
-	public List<SearchResult> getElements(int offset, int pageSize, Sorting sort) throws IndexOutOfBoundsException,
+	public List<T> getElements(int offset, int pageSize, Sorting sort) throws IndexOutOfBoundsException,
 	EmptyListException, ListHandlerException {
 
 		try {

@@ -20,10 +20,10 @@ public class ModelKey implements IDescriptorProvider, IMarshalable, Serializable
 	/**
 	 * The entity type.
 	 */
-	private IEntityType type;
+	private String type;
 
 	/**
-	 * The entity id.
+	 * The entity identifier.
 	 */
 	private String id;
 
@@ -42,23 +42,30 @@ public class ModelKey implements IDescriptorProvider, IMarshalable, Serializable
 	/**
 	 * Constructor
 	 * @param type the entity type
-	 * @param id the entity id
-	 * @param name the optional entity name
+	 * @param id the entity identifier
 	 */
-	public ModelKey(IEntityType type, String id, String name) {
+	public ModelKey(String type, String id) {
+		this(type, id, null);
+	}
+
+	/**
+	 * Constructor
+	 * @param type the entity type
+	 * @param id the entity identifier
+	 * @param name optional name
+	 */
+	public ModelKey(String type, String id, String name) {
 		setEntityType(type);
 		setId(id);
 		setName(name);
 	}
 
-	public IEntityType getEntityType() {
+	public String getEntityType() {
 		return type;
 	}
 
-	public void setEntityType(IEntityType type) {
-		if(type == null) {
-			throw new IllegalArgumentException("Null entity type");
-		}
+	public void setEntityType(String type) {
+		if(type == null) throw new NullPointerException();
 		this.type = type;
 	}
 
@@ -79,9 +86,7 @@ public class ModelKey implements IDescriptorProvider, IMarshalable, Serializable
 	}
 
 	public void clear() {
-		type = null;
-		id = null;
-		name = null;
+		id = name = null;
 	}
 
 	public boolean isSet() {
@@ -90,7 +95,7 @@ public class ModelKey implements IDescriptorProvider, IMarshalable, Serializable
 
 	@Override
 	public String descriptor() {
-		return isSet() ? (name != null) ? type.descriptor() + " '" + name + '\'' : type.descriptor() : "-unset-";
+		return isSet() ? (name != null) ? type + " '" + name + '\'' : type : "-unset-";
 	}
 
 	@Override

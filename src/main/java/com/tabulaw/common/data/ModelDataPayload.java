@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.IEntityType;
 import com.tll.common.data.Payload;
 import com.tll.common.data.Status;
 
@@ -23,7 +22,7 @@ public class ModelDataPayload extends Payload {
 	/**
 	 * Map of entity lists keyed by the entity type.
 	 */
-	protected Map<IEntityType, List<IEntity>> entityMap;
+	protected Map<String, List<IEntity>> entityMap;
 
 	/**
 	 * Set of entity prototypes
@@ -45,11 +44,11 @@ public class ModelDataPayload extends Payload {
 		super(status);
 	}
 
-	public Map<IEntityType, List<IEntity>> getEntityMap() {
+	public Map<String, List<IEntity>> getEntityMap() {
 		return entityMap;
 	}
 
-	public void setEntityMap(Map<IEntityType, List<IEntity>> entityMap) {
+	public void setEntityMap(Map<String, List<IEntity>> entityMap) {
 		this.entityMap = entityMap;
 	}
 

@@ -12,7 +12,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ClientModelCache;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.common.model.Model;
@@ -108,7 +108,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 		for(int i = 0; i < quotePanel.getWidgetCount(); i++) {
 			Widget w = quotePanel.getWidget(i);
 			if(w instanceof QuoteEditWidget) {
-				if(PocModelCache.get().compareQuotes(mQuote, ((QuoteEditWidget) w).getModel())) {
+				if(ClientModelCache.get().compareQuotes(mQuote, ((QuoteEditWidget) w).getModel())) {
 					return true;
 				}
 			}

@@ -7,7 +7,6 @@ import java.util.List;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
-import com.tabulaw.dao.SearchResult;
 import com.tabulaw.dao.Sorting;
 import com.tll.IPropertyValueProvider;
 import com.tll.util.CollectionUtil;
@@ -48,7 +47,6 @@ public abstract class ListHandlerFactory {
 
 	/**
 	 * Creates a criteria based list handler.
-	 * @param <E>
 	 * @param criteria
 	 * @param sorting
 	 * @param type
@@ -63,26 +61,27 @@ public abstract class ListHandlerFactory {
 	 *         specified but mal-formed.
 	 * @throws IllegalStateException when the list handler type is un-supported.
 	 */
-	public static <E extends IEntity> IListHandler<SearchResult> create(Criteria<E> criteria, Sorting sorting,
+	public static IListHandler<?> create(Criteria<?> criteria, Sorting sorting,
 			ListHandlerType type, IListingDataProvider dataProvider) throws InvalidCriteriaException, EmptyListException,
 			ListHandlerException, IllegalStateException {
 
-		SearchListHandler slh = null;
+		SearchListHandler<?> slh = null;
 
 		switch(type) {
 
 		case IN_MEMORY:
-			return create(dataProvider.find(criteria, null), sorting);
+			//return create(dataProvider.find(criteria, null), sorting);
+			throw new UnsupportedOperationException();
 
-		case IDLIST:
+		case MODELKEY_LIST:
 			if(criteria.getCriteriaType().isQuery()) {
 				throw new InvalidCriteriaException("Id list handling does not support query based criteria");
 			}
-			slh = new PrimaryKeyListHandler(dataProvider, criteria, sorting);
+			slh = new ModelKeyListHandler(dataProvider, criteria, sorting);
 			break;
 
 		case PAGE:
-			slh = new PagingSearchListHandler(dataProvider, criteria, sorting);
+			slh = new PagingSearchListHandler<IEntity>(dataProvider, criteria, sorting);
 			break;
 
 		default:

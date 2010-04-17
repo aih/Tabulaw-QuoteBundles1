@@ -8,7 +8,7 @@ package com.tabulaw.common.model;
 /**
  * @author jpk
  */
-public class CaseRef extends EntityBase {
+public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 
 	private static final long serialVersionUID = 6628199715132440622L;
 
@@ -35,6 +35,16 @@ public class CaseRef extends EntityBase {
 		this.citation = citation;
 		this.url = url;
 		this.year = year;
+	}
+	
+	@Override
+	protected String getId() {
+		return url;
+	}
+
+	@Override
+	public CaseRef clone() {
+		return new CaseRef(parties, citation, url, year);
 	}
 
 	@Override
@@ -72,5 +82,15 @@ public class CaseRef extends EntityBase {
 
 	public void setYear(int year) {
 		this.year = year;
+	}
+
+	@Override
+	public int compareTo(CaseRef o) {
+		if(year > o.year) return 1;
+		if(o.year > year) return -1;
+		if(citation != null && o.citation != null) {
+			return citation.compareTo(o.citation);
+		}
+		return 0;
 	}
 }

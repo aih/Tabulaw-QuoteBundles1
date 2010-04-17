@@ -13,7 +13,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.client.Poc;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ClientModelCache;
 import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.ui.Dialog;
 import com.tll.client.ui.FocusCommand;
@@ -69,9 +69,9 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 			// TODO convert to model
 			
 			// persist
-			//mQuoteBundle.setId(PocModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
+			//mQuoteBundle.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
 			// server-side persist
-			String userId = PocModelCache.get().getUser().getId();
+			String userId = ClientModelCache.get().getUser().getId();
 			Poc.getUserDataService().addBundleForUser(userId, /*mQuoteBundle*/null, new AsyncCallback<ModelPayload>() {
 				
 				@Override
@@ -82,7 +82,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 					}
 					else {
 						Model persistedQuoteBundle = result.getModel();
-						PocModelCache.get().persist(persistedQuoteBundle, AddQuoteBundleDialog.this);
+						ClientModelCache.get().persist(persistedQuoteBundle, AddQuoteBundleDialog.this);
 						
 						// default set the current quote bundle if not set yet
 						Poc.setCurrentQuoteBundle(persistedQuoteBundle);

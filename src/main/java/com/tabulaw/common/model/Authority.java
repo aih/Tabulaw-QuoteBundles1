@@ -11,7 +11,7 @@ import com.tll.schema.BusinessObject;
  * @author jpk
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Authority", properties = { Authority.FIELDNAME_AUTHORITY }))
-public class Authority extends EntityBase implements INamedEntity{
+public class Authority extends EntityBase implements INamedEntity, Comparable<Authority> {
 
 	/**
 	 * AuthorityRoles
@@ -33,6 +33,32 @@ public class Authority extends EntityBase implements INamedEntity{
 	 * I.e. the role.
 	 */
 	private String authority;
+	
+	/**
+	 * Constructor
+	 */
+	public Authority() {
+		super();
+	}
+
+	/**
+	 * Constructor
+	 * @param authority
+	 */
+	public Authority(String authority) {
+		super();
+		setAuthority(authority);
+	}
+
+	@Override
+	public Authority clone() {
+		return new Authority(authority);
+	}
+
+	@Override
+	protected String getId() {
+		return authority;
+	}
 
 	@Override
 	public EntityType getEntityType() {
@@ -78,22 +104,13 @@ public class Authority extends EntityBase implements INamedEntity{
 		return true;
 	}
 
-	/*
 	@Override
-	public int compareTo(Object o) {
-		if(o != null && o instanceof GrantedAuthority) {
-			final String rhsRole = ((GrantedAuthority) o).getAuthority();
-			if(rhsRole == null) {
-				return -1;
-			}
-			return authority.compareTo(rhsRole);
-		}
-		return -1;
+	public int compareTo(Authority o) {
+		return authority.compareTo(o.authority);
 	}
-	*/
 	
 	@Override
 	public String descriptor() {
 		return getAuthority();
-	}
+	}	
 }

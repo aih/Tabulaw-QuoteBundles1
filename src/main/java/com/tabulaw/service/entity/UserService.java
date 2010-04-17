@@ -14,31 +14,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
 import com.tabulaw.common.model.Authority;
-import com.tabulaw.common.model.IEntity;
+import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IUserRef;
+import com.tabulaw.common.model.NameKey;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.Authority.AuthorityRoles;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
-import com.tabulaw.criteria.QueryParam;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
-import com.tabulaw.model.NameKey;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
 import com.tabulaw.service.IForgotPasswordHandler;
-import com.tll.schema.PropertyType;
 
 /**
  * Manages the persistence of {@link User}s.
  * @author jpk
  */
-public class UserService extends AbstractEntityService implements IForgotPasswordHandler  {
-	
+public class UserService extends AbstractEntityService implements IForgotPasswordHandler {
+
 	private static final Log log = LogFactory.getLog(UserService.class);
 
-	//private static PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
-	
+	// private static PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
+
 	/**
 	 * @param password
 	 * @param salt
@@ -47,8 +45,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 */
 	public static String encodePassword(String password, Object salt) throws IllegalArgumentException {
 		if(StringUtils.isEmpty(password)) throw new IllegalArgumentException("Can't encode an empty password");
-		//return passwordEncoder.encodePassword(password, salt);
-		
+		// return passwordEncoder.encodePassword(password, salt);
+
 		// TODO make more robust
 		return Integer.toString(password.hashCode());
 	}
@@ -64,15 +62,16 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 			throws IllegalArgumentException {
 		if(StringUtils.isEmpty(rawPasswordToCheck)) throw new IllegalArgumentException("Empty raw password specified");
 		if(StringUtils.isEmpty(encPassword)) throw new IllegalArgumentException("Empty encoded password specified");
-		//return passwordEncoder.isPasswordValid(encPassword, rawPasswordToCheck, salt);
-		
+		// return passwordEncoder.isPasswordValid(encPassword, rawPasswordToCheck,
+		// salt);
+
 		// TODO make more robust
 		return Integer.toString(rawPasswordToCheck.hashCode()).equals(encPassword);
 	}
 
 	// private final AclProviderManager aclProviderManager;
 
-	//private final UserCache userCache;
+	// private final UserCache userCache;
 
 	/**
 	 * Constructor
@@ -83,15 +82,14 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	public UserService(IEntityDao dao, ValidatorFactory vfactory) {
 		super(dao, vfactory);
 		// this.aclProviderManager = aclProviderManager;
-		//this.userCache = userCache;
+		// this.userCache = userCache;
 		init();
 	}
-	
+
 	@Transactional
 	public void init() {
 		// stub anon user if not alreay specified
 		User anonUser = new User();
-		anonUser.setId(1L);
 		Authority a = new Authority();
 		a.setAuthority(AuthorityRoles.ROLE_USER.name());
 		a = new Authority();
@@ -144,8 +142,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		user.setLocked(false);
 
 		// set the role as user by default
-		user.addAuthority(dao.load(new NameKey<Authority>(Authority.class, AuthorityRoles.ROLE_USER.toString(),
-				Authority.FIELDNAME_AUTHORITY)));
+		user.addAuthority((Authority) dao.load(new NameKey(EntityType.AUTHORITY.name(),
+				AuthorityRoles.ROLE_USER.toString(), Authority.FIELDNAME_AUTHORITY)));
 
 		dao.persist(user);
 
@@ -179,7 +177,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	@Transactional
 	public void purge(User user) throws EntityNotFoundException {
 		dao.purge(user);
-		//updateSecurityContextIfNecessary(user.getUsername(), null, null, true);
+		// updateSecurityContextIfNecessary(user.getUsername(), null, null, true);
 	}
 
 	@Transactional(rollbackFor = {
@@ -198,9 +196,10 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 			final String encNewPassword = encodePassword(newRawPassword, newUsername);
 
 			// set the credentials
-			setCredentials(user.getId(), newUsername, encNewPassword);
+			setCredentialsById(user.getKey().getId(), newUsername, encNewPassword);
 
-			//updateSecurityContextIfNecessary(user.getUsername(), newUsername, newRawPassword, false);
+			// updateSecurityContextIfNecessary(user.getUsername(), newUsername,
+			// newRawPassword, false);
 		}
 		catch(final InvalidCriteriaException e) {
 			throw new IllegalArgumentException(
@@ -216,37 +215,40 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		ChangeUserCredentialsFailedException.class, RuntimeException.class
 	})
 	@Override
-	public String resetPassword(Object userPk) throws ChangeUserCredentialsFailedException {
+	public String resetPassword(String userId) throws ChangeUserCredentialsFailedException {
 
 		try {
 			// get the user
-			final User user = dao.load(User.class, userPk);
-			final String username = user.getUsername();
+			final User user = dao.load(User.class, userId);
+			final String username = user.getEmailAddress();
 
 			// encode the new password
 			final String random = RandomStringUtils.randomAlphanumeric(8);
 			final String encNewPassword = encodePassword(random, username);
 
 			// set the credentials
-			setCredentials(userPk, username, encNewPassword);
+			setCredentials(userId, username, encNewPassword);
 
-			//updateSecurityContextIfNecessary(username, username, random, false);
+			// updateSecurityContextIfNecessary(username, username, random, false);
 
 			return random;
 		}
 		catch(final EntityNotFoundException nfe) {
-			throw new ChangeUserCredentialsFailedException("Unable to re-set user password: User of id: " + userPk
+			throw new ChangeUserCredentialsFailedException("Unable to re-set user password: User of id: " + userId
 					+ " not found");
 		}
 
 	}
 
-	private void setCredentials(Object pk, String newUsername, String encNewPassword) {
+	private void setCredentialsById(String id, String newUsername, String encNewPassword) {
+		/*
 		dao.executeQuery("user.setCredentials", new QueryParam[] {
 			new QueryParam(IEntity.PK_FIELDNAME, PropertyType.STRING, pk),
 			new QueryParam("username", PropertyType.STRING, newUsername),
 			new QueryParam("password", PropertyType.STRING, encNewPassword)
 		});
+		*/
+		throw new UnsupportedOperationException();
 	}
 
 	/*

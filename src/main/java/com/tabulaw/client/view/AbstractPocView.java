@@ -7,7 +7,7 @@ package com.tabulaw.client.view;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.Widget;
-import com.tll.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ModelChangeEvent;
 import com.tll.client.mvc.view.AbstractView;
 import com.tll.client.mvc.view.IViewInitializer;
 

@@ -7,6 +7,8 @@ package com.tabulaw.client.ui;
 
 import java.util.List;
 
+import org.springframework.ui.Model;
+
 import com.allen_sauer.gwt.dnd.client.DragEndEvent;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
@@ -21,17 +23,19 @@ import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.MarkOverlay;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ClientModelCache;
+import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.DocumentViewer.ViewMode;
+import com.tabulaw.common.data.ModelPayload;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
+import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.common.model.Quote;
 import com.tll.client.DOMExt;
-import com.tll.client.model.ModelChangeEvent;
-import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.IViewChangeHandler;
 import com.tll.client.mvc.view.ViewChangeEvent;
-import com.tll.common.model.Model;
-import com.tll.common.model.ModelKey;
 import com.tll.common.msg.Msg;
 import com.tll.schema.PropertyType;
 
@@ -133,7 +137,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 							Notifier.get().post(msgs);
 						}
 						else {
-							Model persistedQuote = result.getModel();
+							Quote persistedQuote = (Quote) result.getModel();
 							
 							String serializedMark2 = persistedQuote.asString("serializedMark");
 							MarkOverlay mark3 = MarkOverlay.deserialize(wDocViewer.getDocBody(), serializedMark2);
@@ -178,11 +182,11 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 			String qbName = mDoc.asString("title");
 			String qbDesc = "Quote Bundle for " + qbName;
 			mQb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
-			mQb.setId(PocModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
+			mQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
 
 			Poc.setCurrentQuoteBundle(mQb);
 			// fire model change event
-			PocModelCache.get().persist(mQb, this);
+			ClientModelCache.get().persist(mQb, this);
 			*/
 		}
 		if(crntQbKey == null || !crntQbKey.equals(mQb.getKey())) {
@@ -216,7 +220,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 		}
 	}
 
-	public void setDocument(Model mDoc) {
+	public void setDocument(DocRef mDoc) {
 		String frameId = wDocViewer.getFrameId();
 		if(frameId != null) {
 			TextSelectApi.shutdown(frameId);
@@ -228,7 +232,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 		TextSelectApi.init(wDocViewer.getFrameId());
 		
 		if(Poc.getCurrentQuoteBundle() == null) {
-			String userId = PocModelCache.get().getUser().getId();
+			String userId = ClientModelCache.get().getUser().getId();
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
 			String qbName = mDoc.asString("title");
 			String qbDesc = "Quote Bundle for " + qbName;
@@ -247,7 +251,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 						// fire model change event from the portal to ensure this view sees
 						// the ensuing model change event
 						// which will then trigger maybeSetCurrentQuoteBundle()..
-						PocModelCache.get().persist(persistedQb, Poc.getPortal());
+						ClientModelCache.get().persist(persistedQb, Poc.getPortal());
 					}
 				}
 

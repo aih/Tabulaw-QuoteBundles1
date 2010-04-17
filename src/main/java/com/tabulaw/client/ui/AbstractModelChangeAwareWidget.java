@@ -7,9 +7,9 @@ package com.tabulaw.client.ui;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
-import com.tll.client.model.IHasModelChangeHandlers;
-import com.tll.client.model.IModelChangeHandler;
-import com.tll.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.IHasModelChangeHandlers;
+import com.tabulaw.client.model.IModelChangeHandler;
+import com.tabulaw.client.model.ModelChangeEvent;
 
 /**
  * Base class for widgets that source and/or accept {@link ModelChangeEvent}s.

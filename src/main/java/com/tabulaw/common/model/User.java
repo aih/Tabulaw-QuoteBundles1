@@ -57,9 +57,59 @@ public class User extends TimeStampEntity implements IUserRef {
 		authorities = new ArrayList<Authority>(3);
 	}
 
+	/**
+	 * Constructor
+	 * @param dateCreated
+	 * @param dateModified
+	 * @param name
+	 * @param emailAddress
+	 * @param password
+	 * @param locked
+	 * @param enabled
+	 * @param expires
+	 * @param authorities
+	 */
+	public User(Date dateCreated, Date dateModified, String name, String emailAddress, String password, boolean locked, boolean enabled, Date expires,
+			ArrayList<Authority> authorities) {
+		super(dateCreated, dateModified);
+		this.name = name;
+		this.emailAddress = emailAddress;
+		this.password = password;
+		this.locked = locked;
+		this.enabled = enabled;
+		this.expires = expires;
+		this.authorities = authorities;
+	}
+
+	@Override
+	public String getUserRefId() {
+		return getId();
+	}
+
+	@Override
+	public User clone() {
+		Date dc = getDateCreated();
+		if(dc != null) dc = new Date(dc.getTime());
+		
+		Date dm = getDateModified();
+		if(dm != null) dm = new Date(dm.getTime());
+		
+		ArrayList<Authority> cauth = authorities == null ? null : new ArrayList<Authority>(authorities.size());
+		for(Authority a : authorities) {
+			cauth.add(a.clone());
+		}
+		
+		return new User(dc, dm, name, emailAddress, password, locked, enabled, expires, cauth);
+	}
+
 	@Override
 	public EntityType getEntityType() {
 		return EntityType.USER;
+	}
+
+	@Override
+	protected String getId() {
+		return emailAddress;
 	}
 
 	@Length(max = MAXLEN_NAME)
@@ -74,7 +124,6 @@ public class User extends TimeStampEntity implements IUserRef {
 	@NotEmpty
 	@Email
 	@Length(max = MAXLEN_EMAIL_ADDRESS)
-	@Override
 	public String getEmailAddress() {
 		return emailAddress;
 	}
@@ -171,11 +220,6 @@ public class User extends TimeStampEntity implements IUserRef {
 
 	public int getNumAuthorities() {
 		return authorities.size();
-	}
-
-	@Override
-	public String getUsername() {
-		return getEmailAddress();
 	}
 
 	public void setUsername(String username) {

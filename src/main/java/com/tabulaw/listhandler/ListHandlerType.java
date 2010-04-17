@@ -7,7 +7,7 @@ package com.tabulaw.listhandler;
  */
 public enum ListHandlerType {
 	IN_MEMORY,
-	IDLIST,
+	MODELKEY_LIST,
 	PAGE;
 
 	/**
@@ -15,7 +15,7 @@ public enum ListHandlerType {
 	 * @return true/false
 	 */
 	public boolean isSearchBased() {
-		return this == ListHandlerType.IDLIST || this == ListHandlerType.PAGE;
+		return this == ListHandlerType.MODELKEY_LIST || this == ListHandlerType.PAGE;
 	}
 
 }

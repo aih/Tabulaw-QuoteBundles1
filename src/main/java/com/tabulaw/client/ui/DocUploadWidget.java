@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.common.data.dto.Doc;
 import com.tabulaw.common.model.EntityFactory;
 import com.tll.client.data.rpc.RpcEvent;
@@ -181,7 +181,7 @@ public class DocUploadWidget extends AbstractModelChangeAwareWidget implements H
 						msgs.add(new Msg("Document: '" + doc.getTitle() + "' uploaded.", MsgLevel.INFO));
 					}
 					// persist and propagate
-					PocModelCache.get().persistAll(mdocs, DocUploadWidget.this);
+					ClientModelCache.get().persistAll(mdocs, DocUploadWidget.this);
 					ValueChangeEvent.fire(DocUploadWidget.this, "success");
 					DeferredCommand.addCommand(new Command() {
 						

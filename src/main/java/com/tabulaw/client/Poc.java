@@ -10,7 +10,9 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ClientModelCache;
+import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.Portal;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
@@ -28,14 +30,12 @@ import com.tabulaw.common.data.rpc.IUserContextServiceAsync;
 import com.tabulaw.common.data.rpc.IUserDataService;
 import com.tabulaw.common.data.rpc.IUserDataServiceAsync;
 import com.tabulaw.common.data.rpc.UserContextPayload;
-import com.tll.client.model.ModelChangeEvent;
-import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.common.model.User;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.StaticViewInitializer;
 import com.tll.client.mvc.view.ViewClass;
-import com.tll.common.model.CopyCriteria;
-import com.tll.common.model.Model;
 
 /**
  * Poc
@@ -57,7 +57,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	/**
 	 * The sole current quote bundle.
 	 */
-	private static Model currentQuoteBundle;
+	private static QuoteBundle currentQuoteBundle;
 	
 	static {
 		docService = (IDocServiceAsync) GWT.create(IDocService.class);
@@ -89,22 +89,22 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	/**
 	 * @return The current quote bundle ref.
 	 */
-	public static Model getCurrentQuoteBundle() {
-		return currentQuoteBundle == null ? null : currentQuoteBundle.copy(CopyCriteria.keepReferences());
+	public static QuoteBundle getCurrentQuoteBundle() {
+		return currentQuoteBundle;
 	}
 
 	/**
 	 * Sets the current quote bundle ref.
 	 * <p>
 	 * Fires a {@link ModelChangeEvent} when successful.
-	 * @param mQuoteBundle non-null
+	 * @param bundle non-null
 	 * @return <code>true</code> if the current quote bundle ref was actually
 	 *         updated and a model change event was fired.
 	 */
-	public static boolean setCurrentQuoteBundle(Model mQuoteBundle) {
-		if(mQuoteBundle == null) throw new NullPointerException();
-		if(currentQuoteBundle == null || !currentQuoteBundle.getKey().equals(mQuoteBundle)) {
-			currentQuoteBundle = mQuoteBundle;
+	public static boolean setCurrentQuoteBundle(QuoteBundle bundle) {
+		if(bundle == null) throw new NullPointerException();
+		if(currentQuoteBundle == null || !currentQuoteBundle.equals(bundle)) {
+			currentQuoteBundle = bundle;
 			getNavRow().getCrntQuoteBudleWidget().update();
 			return true;
 		}
@@ -130,7 +130,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 			
 			@Override
 			public void onSuccess(UserContextPayload result) {
-				Model liu = result.getUser();
+				User liu = result.getUser();
 				if(liu == null) {
 					// not logged in
 					showLoginPanel();
@@ -142,12 +142,12 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					ViewManager.get().loadView(new StaticViewInitializer(QuoteBundlesView.klas));
 					
 					// cache user (i.e. the user context) and notify
-					PocModelCache.get().persist(liu, null);
+					ClientModelCache.get().persist(liu, null);
 					getPortal().fireEvent(new ModelChangeEvent(ModelChangeOp.LOADED, liu, null));
 
 					// load up user bundles
-					List<Model> userBundles = result.getBundles();
-					PocModelCache.get().persistAll(userBundles, getPortal());
+					List<QuoteBundle> userBundles = result.getBundles();
+					ClientModelCache.get().persistAll(userBundles, getPortal());
 					
 					// show doc listing view by default
 					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
@@ -222,7 +222,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		ViewManager.get().clear();
 		getNavRow().clear();
 		getNavCol().clear();
-		PocModelCache.get().clear();
+		ClientModelCache.get().clear();
 		currentQuoteBundle = null;
 	}
 

@@ -9,7 +9,6 @@ import javax.servlet.ServletContext;
 import net.sf.ehcache.CacheManager;
 
 import com.google.inject.Inject;
-import com.tabulaw.model.IEntityFactory;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 import com.tll.mail.MailManager;
@@ -33,7 +32,6 @@ public final class PersistContext {
 
 	private final MailManager mailManager;
 	private final ISchemaInfo schemaInfo;
-	private final IEntityFactory<?> entityFactory;
 	private final IExceptionHandler exceptionHandler;
 	private final CacheManager cacheManager;
 
@@ -44,20 +42,18 @@ public final class PersistContext {
 	 * Constructor
 	 * @param mailManager
 	 * @param schemaInfo
-	 * @param entityFactory
 	 * @param exceptionHandler
 	 * @param cacheManager
 	 * @param userService
 	 * @param userDataService
 	 */
 	@Inject
-	public PersistContext(MailManager mailManager, ISchemaInfo schemaInfo, IEntityFactory<?> entityFactory,
+	public PersistContext(MailManager mailManager, ISchemaInfo schemaInfo, 
 			IExceptionHandler exceptionHandler, CacheManager cacheManager, UserService userService,
 			UserDataService userDataService) {
 		super();
 		this.mailManager = mailManager;
 		this.schemaInfo = schemaInfo;
-		this.entityFactory = entityFactory;
 		this.exceptionHandler = exceptionHandler;
 		this.cacheManager = cacheManager;
 
@@ -71,10 +67,6 @@ public final class PersistContext {
 
 	public ISchemaInfo getSchemaInfo() {
 		return schemaInfo;
-	}
-
-	public IEntityFactory<?> getEntityFactory() {
-		return entityFactory;
 	}
 
 	public IExceptionHandler getExceptionHandler() {

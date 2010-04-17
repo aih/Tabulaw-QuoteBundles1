@@ -15,7 +15,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.ui.listing.AbstractListingConfig;
 import com.tabulaw.client.ui.listing.Column;
 import com.tabulaw.client.ui.listing.DataListingOperator;
@@ -116,7 +116,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 						event.stopPropagation();
 						String docref = rowData.asString("title");
 						if(Window.confirm("Delete document '" + docref + "'?")) {
-							Model deleted = PocModelCache.get().remove(rowData.getKey(), table);
+							Model deleted = ClientModelCache.get().remove(rowData.getKey(), table);
 							if(deleted != null) {
 								operator.refresh();
 							}
@@ -198,7 +198,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
 		@Override
 		public void refresh() {
-			getDataProvider().setList(PocModelCache.get().getAll(EntityType.DOCUMENT));
+			getDataProvider().setList(ClientModelCache.get().getAll(EntityType.DOCUMENT));
 			super.refresh();
 		}
 	}
@@ -217,7 +217,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 				@Override
 				protected void handleSuccess(DocListingPayload result) {
 					super.handleSuccess(result);
-					PocModelCache.get().persistAll(result.getCachedDocs());
+					ClientModelCache.get().persistAll(result.getCachedDocs());
 					operator = new Operator();
 					listingWidget.getTable().setCellRenderer(new CellRenderer());
 					listingWidget.setOperator(operator);
