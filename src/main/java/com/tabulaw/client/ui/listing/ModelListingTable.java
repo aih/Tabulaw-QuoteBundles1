@@ -8,36 +8,31 @@ package com.tabulaw.client.ui.listing;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.tll.common.model.Model;
-import com.tll.common.model.ModelKey;
+import org.springframework.ui.Model;
+
+import com.tabulaw.common.model.IModelKeyProvider;
+import com.tabulaw.common.model.ModelKey;
 
 /**
  * A table whose rows are {@link Model}s and, consequently, identifiable by a
  * unique key: {@link ModelKey}.
+ * @param <T> model key provider type
  * @author jpk
  */
-public class ModelListingTable extends ListingTable<Model> {
+public class ModelListingTable<T extends IModelKeyProvider> extends ListingTable<T> {
 
 	/**
-	 * The row data comprised of {@link Model} instances for each listing
-	 * element row.
+	 * The row data comprised of {@link Model} instances for each listing element
+	 * row.
 	 */
-	protected final List<Model> rowDataList = new ArrayList<Model>();
-
-	/**
-	 * Constructor - Uses {@link ModelCellRenderer} as the cell renderer.
-	 * @param config
-	 */
-	public ModelListingTable(IListingConfig<Model> config) {
-		super(config, new ModelCellRenderer());
-	}
+	protected final List<T> rowDataList = new ArrayList<T>();
 
 	/**
 	 * Constructor
 	 * @param config
 	 * @param cellRenderer
 	 */
-	public ModelListingTable(IListingConfig<Model> config, ITableCellRenderer<Model> cellRenderer) {
+	public ModelListingTable(IListingConfig config, ITableCellRenderer<T> cellRenderer) {
 		super(config, cellRenderer);
 	}
 
@@ -47,7 +42,7 @@ public class ModelListingTable extends ListingTable<Model> {
 	 * @return ModelKey
 	 */
 	protected ModelKey getRowKey(int row) {
-		return getRowData(row).getKey();
+		return getRowData(row).getModelKey();
 	}
 
 	/**
@@ -55,7 +50,7 @@ public class ModelListingTable extends ListingTable<Model> {
 	 * @param row 0-based table row num (considers the header row).
 	 * @return the model row data
 	 */
-	protected Model getRowData(int row) {
+	protected T getRowData(int row) {
 		return rowDataList.get(row - 1);
 	}
 
@@ -67,7 +62,7 @@ public class ModelListingTable extends ListingTable<Model> {
 	 */
 	protected int getRowIndex(ModelKey rowKey) {
 		for(int i = 0; i < rowDataList.size(); i++) {
-			final ModelKey rdlKey = rowDataList.get(i).getKey();
+			final ModelKey rdlKey = rowDataList.get(i).getModelKey();
 			if(rdlKey.equals(rowKey)) return i + 1; // account for header row
 		}
 		// can't find
@@ -75,7 +70,7 @@ public class ModelListingTable extends ListingTable<Model> {
 	}
 
 	@Override
-	protected void setRowData(int rowIndex, int rowNum, Model rowData, boolean overwriteOnNull) {
+	protected void setRowData(int rowIndex, int rowNum, T rowData, boolean overwriteOnNull) {
 		assert rowIndex >= 1; // min index is one after the header row!
 		super.setRowData(rowIndex, rowNum, rowData, overwriteOnNull);
 		final int dindex = rowIndex - 1;
@@ -89,13 +84,13 @@ public class ModelListingTable extends ListingTable<Model> {
 	}
 
 	@Override
-	protected int addRow(Model rowData) {
+	protected int addRow(T rowData) {
 		rowDataList.add(rowData);
 		return super.addRow(rowData);
 	}
 
 	@Override
-	protected void updateRow(int rowIndex, Model rowData) {
+	protected void updateRow(int rowIndex, T rowData) {
 		rowDataList.set(rowIndex - 1, rowData);
 		super.updateRow(rowIndex, rowData);
 	}
@@ -110,7 +105,7 @@ public class ModelListingTable extends ListingTable<Model> {
 	 * Applies model data to a given row in the UI only and does not alter the
 	 * underlying row data.
 	 */
-	protected void applyModeltoUi(int rowIndex, Model mdata) {
+	protected void applyModeltoUi(int rowIndex, T mdata) {
 		super.setRowData(rowIndex, -1, mdata, true);
 		getRowFormatter().addStyleName(rowIndex, Styles.UPDATED);
 	}

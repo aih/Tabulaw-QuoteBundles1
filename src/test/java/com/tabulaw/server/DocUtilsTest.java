@@ -18,9 +18,9 @@ import java.util.Date;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
-import com.tabulaw.server.DocUtils;
-import com.tll.common.model.Model;
 
 /**
  * Tests {@link DocUtils} methods.
@@ -31,7 +31,7 @@ public class DocUtilsTest {
 	
 	@Test(enabled = true)
 	public void testSerializeCaseDocModel() throws Exception {
-		Model m = EntityFactory.get().buildCaseDoc("docTitle", "docHash", new Date(), "parties", "citation", "url", "year");
+		DocRef m = EntityFactory.get().buildCaseDoc("docTitle", "docHash", new Date(), "parties", "citation", "url", "year");
 		String s = DocUtils.serializeDocument(m);
 		
 		Calendar c = Calendar.getInstance();
@@ -55,17 +55,18 @@ public class DocUtilsTest {
 		String snow = c.get(Calendar.MONTH) + 1 + "/" + c.get(Calendar.DATE) + "/" + c.get(Calendar.YEAR);  
 		String sized = "[casedoc]title:docTitle|date:" + snow + "|hash:docHash|parties:parties|citation:citation|url:url|year:year|\n";
 		
-		Model m = DocUtils.deserializeDocument(sized);
+		DocRef m = DocUtils.deserializeDocument(sized);
 		
-		Assert.assertEquals(m.asString("title"), "docTitle");
-		Assert.assertEquals(m.getPropertyValue("date"), date);
-		Assert.assertEquals(m.asString("hash"), "docHash");
+		Assert.assertEquals(m.getTitle(), "docTitle");
+		Assert.assertEquals(m.getDate(), date);
+		Assert.assertEquals(m.getHash(), "docHash");
 		
 		// case related
-		Assert.assertEquals(m.asString("caseRef.parties"), "parties");
-		Assert.assertEquals(m.asString("caseRef.citation"), "citation");
-		Assert.assertEquals(m.asString("caseRef.url"), "url");
-		Assert.assertEquals(m.asString("caseRef.year"), "year");
+		CaseRef caseRef = m.getCaseRef();
+		Assert.assertEquals(caseRef.getParties(), "parties");
+		Assert.assertEquals(caseRef.getCitation(), "citation");
+		Assert.assertEquals(caseRef.getUrl(), "url");
+		Assert.assertEquals(caseRef.getYear(), "year");
 	}
 
 	/**

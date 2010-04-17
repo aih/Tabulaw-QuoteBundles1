@@ -10,7 +10,7 @@ import com.tll.ITypeDescriptorProvider;
  * IEntity - Fundamental type for all [server side] entities.
  * @author jpk
  */
-public interface IEntity extends Serializable, Cloneable, IMarshalable, IDescriptorProvider, ITypeDescriptorProvider {
+public interface IEntity extends Serializable, Cloneable, IMarshalable, IModelKeyProvider, IDescriptorProvider, ITypeDescriptorProvider {
 
 	static final String ID_FIELDNAME = "id";
 
@@ -29,11 +29,6 @@ public interface IEntity extends Serializable, Cloneable, IMarshalable, IDescrip
 	 * @param id
 	 */
 	void setId(String id);
-
-	/**
-	 * @return globally unique key identifying this entity instance.
-	 */
-	//ModelKey getKey();
 
 	/**
 	 * @return <code>true</code> if the entity has not yet been persisted.

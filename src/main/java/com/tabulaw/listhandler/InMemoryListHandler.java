@@ -37,10 +37,6 @@ public class InMemoryListHandler<T> extends AbstractListHandler<T> {
 		setList(rows);
 	}
 
-	public final ListHandlerType getListHandlerType() {
-		return ListHandlerType.IN_MEMORY;
-	}
-	
 	/**
 	 * Sets or resets the managed row list.
 	 * @param rows non-<code>null</code>

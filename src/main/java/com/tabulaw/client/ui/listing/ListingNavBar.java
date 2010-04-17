@@ -113,7 +113,7 @@ IListingHandler<R> {
 	 * @param config Must be specified.
 	 * @param addRowHandler Optional handler that handles row adding
 	 */
-	public ListingNavBar(IListingConfig<R> config, IAddRowDelegate addRowHandler) {
+	public ListingNavBar(IListingConfig config, IAddRowDelegate addRowHandler) {
 		super();
 		assert config != null;
 

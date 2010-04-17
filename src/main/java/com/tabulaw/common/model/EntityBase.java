@@ -31,12 +31,10 @@ public abstract class EntityBase implements IEntity {
 	@Override
 	public abstract IEntity clone();
 
-	/*
 	@Override
-	public final ModelKey getKey() {
+	public ModelKey getModelKey() {
 		return new ModelKey(getEntityType().name(), getId());
 	}
-	*/
 
 	@Managed
 	@Override

@@ -10,10 +10,9 @@ import com.tabulaw.dao.Sorting;
 /**
  * IListingConfig - The listing configuration definition encompassing
  * non-runtime listing attributes.
- * @param <R> The listing row data type
  * @author jpk
  */
-public interface IListingConfig<R> {
+public interface IListingConfig {
 
 	public static final int DEFAULT_PAGE_SIZE = 25;
 

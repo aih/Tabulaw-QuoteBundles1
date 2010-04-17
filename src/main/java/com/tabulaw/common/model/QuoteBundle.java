@@ -53,6 +53,13 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 	public void setId(String id) {
 		this.id = id;
 	}
+	
+	@Override
+	public final ModelKey getModelKey() {
+		ModelKey mk = super.getModelKey();
+		mk.setName(getName());
+		return mk;
+	}
 
 	@Override
 	public QuoteBundle clone() {

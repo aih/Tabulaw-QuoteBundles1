@@ -24,7 +24,7 @@ import com.tll.schema.BusinessObject;
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress"
 }))
-public class User extends TimeStampEntity implements IUserRef {
+public class User extends TimeStampEntity implements IUserRef, INamedEntity {
 
 	private static final long serialVersionUID = -6126885590318834318L;
 
@@ -80,6 +80,13 @@ public class User extends TimeStampEntity implements IUserRef {
 	}
 
 	@Override
+	public final ModelKey getModelKey() {
+		ModelKey mk = super.getModelKey();
+		mk.setName(getName());
+		return mk;
+	}
+
+	@Override
 	public String getId() {
 		return emailAddress;
 	}
@@ -109,11 +116,13 @@ public class User extends TimeStampEntity implements IUserRef {
 		return EntityType.USER;
 	}
 
+	@Override
 	@Length(max = MAXLEN_NAME)
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}

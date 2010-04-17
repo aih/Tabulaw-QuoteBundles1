@@ -60,6 +60,13 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 	}
 
 	@Override
+	public final ModelKey getModelKey() {
+		ModelKey mk = super.getModelKey();
+		mk.setName(getName());
+		return mk;
+	}
+
+	@Override
 	public EntityType getEntityType() {
 		return EntityType.AUTHORITY;
 	}

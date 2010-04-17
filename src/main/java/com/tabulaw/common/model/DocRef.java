@@ -66,6 +66,13 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	}
 
 	@Override
+	public final ModelKey getModelKey() {
+		ModelKey mk = super.getModelKey();
+		mk.setName(getName());
+		return mk;
+	}
+
+	@Override
 	public DocRef clone() {
 		Date cdate = date == null ? null : new Date(date.getTime());
 		return new DocRef(title, hash, cdate, caseRef == null ? null : caseRef.clone());

@@ -15,11 +15,6 @@ import com.tabulaw.dao.Sorting;
 public interface IListHandler<T> {
 
 	/**
-	 * @return The {@link ListHandlerType}. This is the implementation type.
-	 */
-	ListHandlerType getListHandlerType();
-
-	/**
 	 * Fetches a chunk of list data based on the given list index (offset from
 	 * start) and the corres. number of elements to retrieve (the page size).
 	 * @param offset 0-based index of the underlying list at which fetching

@@ -41,10 +41,6 @@ public abstract class DecoratedListHandler<T, V> implements IDecoratedListHandle
 		setWrappedHandler(listHandler);
 	}
 
-	public ListHandlerType getListHandlerType() {
-		return (listHandler == null) ? null : listHandler.getListHandlerType();
-	}
-
 	public IListHandler<T> getWrappedHandler() {
 		return listHandler;
 	}

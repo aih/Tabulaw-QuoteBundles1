@@ -5,6 +5,8 @@
  */
 package com.tabulaw.client.ui;
 
+import java.util.List;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -16,23 +18,25 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
+import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.listing.AbstractListingConfig;
 import com.tabulaw.client.ui.listing.Column;
 import com.tabulaw.client.ui.listing.DataListingOperator;
 import com.tabulaw.client.ui.listing.IListingConfig;
-import com.tabulaw.client.ui.listing.ModelCellRenderer;
-import com.tabulaw.client.ui.listing.ModelPropertyFormatter;
+import com.tabulaw.client.ui.listing.ITableCellRenderer;
+import com.tabulaw.client.ui.listing.ModelListingTable;
+import com.tabulaw.client.ui.listing.ModelListingWidget;
 import com.tabulaw.client.view.DocumentViewInitializer;
 import com.tabulaw.common.data.rpc.DocListingPayload;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityType;
+import com.tabulaw.dao.Sorting;
 import com.tabulaw.listhandler.InMemoryListHandler;
 import com.tll.client.data.rpc.RpcCommand;
-import com.tll.client.model.ModelChangeEvent;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
+import com.tll.client.util.Fmt;
 import com.tll.client.util.GlobalFormat;
-import com.tll.common.model.Model;
-import com.tll.dao.Sorting;
 
 /**
  * Lists documents for a given user.
@@ -40,7 +44,7 @@ import com.tll.dao.Sorting;
  */
 public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
-	static class DocListing extends ModelListingWidget<DocumentsListingWidget.Table> /*implements IRpcHandler*/ {
+	static class DocListing extends ModelListingWidget<DocRef, DocumentsListingWidget.Table> /*implements IRpcHandler*/ {
 
 		//final RpcUiHandler rpcui;
 		
@@ -60,7 +64,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
 		@Override
 		public void onModelChangeEvent(ModelChangeEvent event) {
-			if(event.getModelKey() != null && event.getModelKey().getEntityType() == EntityType.DOCUMENT) {
+			if(event.getModelKey() != null && event.getModelKey().getEntityType().equals(EntityType.DOCUMENT.name())) {
 				//super.onModelChangeEvent(event);
 				getOperator().refresh();
 			}
@@ -74,10 +78,10 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		*/
 	}
 
-	static class Table extends ModelListingTable {
+	static class Table extends ModelListingTable<DocRef> {
 
-		public Table(IListingConfig<Model> config) {
-			super(config);
+		public Table(IListingConfig config) {
+			super(config, null);
 		}
 
 		@Override
@@ -101,38 +105,44 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		}
 	}
 
-	class CellRenderer extends ModelCellRenderer {
+	class CellRenderer implements ITableCellRenderer<DocRef> {
 		
 		@Override
-		public void renderCell(int rowIndex, final int cellIndex, final Model rowData, Column column,
+		public void renderCell(int rowIndex, final int cellIndex, final DocRef rowData, Column column,
 				final HTMLTable table) {
-			if(cellIndex == 2) {
-				Image img = new Image("images/trash.gif", 0, 0, 10, 11);
-				img.setTitle("Delete document..");
-				img.addClickHandler(new ClickHandler() {
+			switch(cellIndex) {
+				case 0:
+					table.setText(rowIndex, cellIndex, rowData.getTitle());
+					break;
+				case 1:
+					String sdate = Fmt.format(rowData.getDate(), GlobalFormat.DATE);
+					table.setText(rowIndex, cellIndex, sdate);
+					break;
+				case 2: {
+					Image img = new Image("images/trash.gif", 0, 0, 10, 11);
+					img.setTitle("Delete document..");
+					img.addClickHandler(new ClickHandler() {
 
-					@Override
-					public void onClick(ClickEvent event) {
-						event.stopPropagation();
-						String docref = rowData.asString("title");
-						if(Window.confirm("Delete document '" + docref + "'?")) {
-							Model deleted = ClientModelCache.get().remove(rowData.getKey(), table);
-							if(deleted != null) {
-								operator.refresh();
+						@Override
+						public void onClick(ClickEvent event) {
+							event.stopPropagation();
+							String docref = rowData.getTitle();
+							if(Window.confirm("Delete document '" + docref + "'?")) {
+								DocRef deleted = (DocRef) ClientModelCache.get().remove(rowData.getModelKey(), table);
+								if(deleted != null) {
+									operator.refresh();
+								}
 							}
 						}
-					}
-				});
-				table.setWidget(rowIndex, cellIndex, img);
-			}
-			else {
-				String cv = ModelPropertyFormatter.pformat(rowData, column.getPropertyName(), column.getFormat());
-				table.setHTML(rowIndex, cellIndex, cv == null ? getValueForNull() : cv);
+					});
+					table.setWidget(rowIndex, cellIndex, img);
+					break;
+				}
 			}
 		}
 	} // CellRenderer
 	
-	static class ListingConfig extends AbstractListingConfig<Model> {
+	static class ListingConfig extends AbstractListingConfig {
 
 		static final Sorting defaultSorting = new Sorting("title");
 
@@ -159,7 +169,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		}
 	} // ListingConfig
 
-	static final IListingConfig<Model> config = new ListingConfig();
+	static final IListingConfig config = new ListingConfig();
 
 	private Operator operator;
 
@@ -190,15 +200,16 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		listingWidget.onModelChangeEvent(event);
 	}
 	
-	public static class Operator extends DataListingOperator<Model, InMemoryListHandler<Model>> {
+	public static class Operator extends DataListingOperator<DocRef, InMemoryListHandler<DocRef>> {
 
 		public Operator() {
-			super(config.getPageSize(), new InMemoryListHandler<Model>(), config.getDefaultSorting());
+			super(config.getPageSize(), new InMemoryListHandler<DocRef>(), config.getDefaultSorting());
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void refresh() {
-			getDataProvider().setList(ClientModelCache.get().getAll(EntityType.DOCUMENT));
+			getDataProvider().setList((List<DocRef>)ClientModelCache.get().getAll(EntityType.DOCUMENT));
 			super.refresh();
 		}
 	}

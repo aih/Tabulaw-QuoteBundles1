@@ -116,7 +116,7 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 	 * @param config
 	 * @param cellRenderer 
 	 */
-	public ListingTable(IListingConfig<R> config, ITableCellRenderer<R> cellRenderer) {
+	public ListingTable(IListingConfig config, ITableCellRenderer<R> cellRenderer) {
 		super();
 		sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);
 		addClickHandler(this);
@@ -127,7 +127,6 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 	/**
 	 * Initializes the table.
 	 */
-	@SuppressWarnings("unchecked")
 	protected void initialize(IListingConfig config, ITableCellRenderer<R> cellRndrer) {
 		assert config != null;
 
@@ -291,7 +290,7 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 		}
 	}
 
-	private void addHeaderRow(IListingConfig<R> config) {
+	private void addHeaderRow(IListingConfig config) {
 		final int numCols = columns.length;
 
 		resize(1, numCols);

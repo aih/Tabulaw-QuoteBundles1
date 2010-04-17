@@ -5,27 +5,29 @@
  */
 package com.tabulaw.client.ui.listing;
 
-import com.tll.client.model.IModelChangeHandler;
-import com.tll.client.model.ModelChangeEvent;
-import com.tll.common.model.Model;
-import com.tll.common.model.ModelKey;
+import com.tabulaw.client.model.IModelChangeHandler;
+import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.common.model.IModelKeyProvider;
+import com.tabulaw.common.model.ModelKey;
 
 /**
  * ModelListingWidget - Listing Widget dedicated to handling Model type data.
- * @param <T> the model table type
+ * @param <R> model key provider type
+ * @param <T> model listing table type
  * @author jpk
  */
-public class ModelListingWidget<T extends ModelListingTable> extends ListingWidget<Model, T>
-implements IModelChangeHandler {
+public class ModelListingWidget<R extends IModelKeyProvider, T extends ModelListingTable<R>> 
+extends ListingWidget<R, T> implements IModelChangeHandler {
 
 	/**
 	 * Constructor
-	 * @param listingId 
-	 * @param listingElementName 
+	 * @param listingId
+	 * @param listingElementName
 	 * @param table
 	 * @param navBar
 	 */
-	public ModelListingWidget(String listingId, String listingElementName, T table, ListingNavBar<Model> navBar) {
+	public ModelListingWidget(String listingId, String listingElementName, T table,
+			ListingNavBar<R> navBar) {
 		super(listingId, listingElementName, table, navBar);
 	}
 
@@ -43,7 +45,7 @@ implements IModelChangeHandler {
 	 * @param row 0-based table row num (considers the header row).
 	 * @return Model
 	 */
-	public Model getRowData(int row) {
+	public R getRowData(int row) {
 		return table.getRowData(row);
 	}
 
@@ -63,29 +65,30 @@ implements IModelChangeHandler {
 	 * NOTE: This method is <em>not</em> automatically invoked.
 	 * @param event
 	 */
+	@SuppressWarnings("unchecked")
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		switch(event.getChangeOp()) {
-		case ADDED:
-			addRow(event.getModel());
-			break;
-		case UPDATED: {
-			final ModelKey mkey = event.getModel().getKey();
-			final int rowIndex = getRowIndex(mkey);
-			if(rowIndex != -1) {
-				assert rowIndex > 0; // header row
-				table.applyModeltoUi(rowIndex, event.getModel());
+			case ADDED:
+				addRow((R) event.getModel());
+				break;
+			case UPDATED: {
+				final ModelKey mkey = event.getModelKey();
+				final int rowIndex = getRowIndex(mkey);
+				if(rowIndex != -1) {
+					assert rowIndex > 0; // header row
+					table.applyModeltoUi(rowIndex, (R) event.getModel());
+				}
+				break;
 			}
-			break;
-		}
-		case DELETED: {
-			final ModelKey modelRef = event.getModelKey();
-			final int rowIndex = getRowIndex(modelRef);
-			if(rowIndex != -1) {
-				assert rowIndex > 0; // header row
-				markRowDeleted(rowIndex, true);
+			case DELETED: {
+				final ModelKey modelRef = event.getModelKey();
+				final int rowIndex = getRowIndex(modelRef);
+				if(rowIndex != -1) {
+					assert rowIndex > 0; // header row
+					markRowDeleted(rowIndex, true);
+				}
+				break;
 			}
-			break;
-		}
 		}
 	}
 }

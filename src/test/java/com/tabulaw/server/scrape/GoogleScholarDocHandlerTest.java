@@ -19,10 +19,9 @@ import com.tabulaw.common.data.dto.CaseDoc;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
+import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.server.DocUtils;
-import com.tabulaw.server.scrape.GoogleScholarDocHandler;
-import com.tabulaw.server.scrape.IDocHandler;
-import com.tll.common.model.Model;
 import com.tll.util.ClassUtil;
 
 /**
@@ -100,12 +99,13 @@ public class GoogleScholarDocHandlerTest {
 		
 		GoogleScholarDocHandler docHandler = new GoogleScholarDocHandler();
 		
-		Model caseDoc = docHandler.parseSingleDocument(raw);
+		DocRef caseDoc = docHandler.parseSingleDocument(raw);
+		CaseRef caseRef = caseDoc.getCaseRef();
 		
-		String docTitle = caseDoc.asString("title");
-		String caseCitation = caseDoc.asString("caseRef.citation");
-		String caseYear = caseDoc.asString("caseRef.year");
-		String caseParties = caseDoc.asString("caseRef.parties");
+		String docTitle = caseDoc.getTitle();
+		String caseCitation = caseRef.getCitation();
+		int caseYear = caseRef.getYear();
+		String caseParties = caseRef.getParties();
 		
 		Assert.assertEquals(docTitle, "Board of Supervisors of James City Cty. v. Rowe");
 		Assert.assertEquals(caseParties, "Board of Supervisors of James City Cty. v. Rowe");
@@ -123,7 +123,7 @@ public class GoogleScholarDocHandlerTest {
 		
 		String rawHtml = DocUtils.fetch(url);
 		
-		Model caseDoc = docHandler.parseSingleDocument(rawHtml);
+		DocRef caseDoc = docHandler.parseSingleDocument(rawHtml);
 		System.out.println(caseDoc);
 	}
 }

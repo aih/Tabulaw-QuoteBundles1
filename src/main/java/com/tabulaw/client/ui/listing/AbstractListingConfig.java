@@ -8,11 +8,10 @@ package com.tabulaw.client.ui.listing;
 import com.tabulaw.dao.Sorting;
 
 /**
- * AbstractListingConfig - Base class for {@link IListingConfig} impls.
- * @param <R> The row data type
+ * Base class for {@link IListingConfig} impls.
  * @author jpk
  */
-public abstract class AbstractListingConfig<R> implements IListingConfig<R> {
+public abstract class AbstractListingConfig implements IListingConfig {
 
 	private final String listingElementName;
 	private final String[] modelProps;
