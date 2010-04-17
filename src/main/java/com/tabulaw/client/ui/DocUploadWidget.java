@@ -27,12 +27,12 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.common.data.dto.Doc;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 import com.tll.client.data.rpc.RpcEvent;
 import com.tll.client.ui.RpcUiHandler;
 import com.tll.client.util.Fmt;
 import com.tll.client.util.GlobalFormat;
-import com.tll.common.model.Model;
 import com.tll.common.msg.Msg;
 import com.tll.common.msg.Msg.MsgLevel;
 import com.tll.util.StringUtil;
@@ -157,7 +157,7 @@ public class DocUploadWidget extends AbstractModelChangeAwareWidget implements H
 				else {
 					sresult = sresult.substring(startIndex + 7, endIndex);
 					String[] sdocs = sresult.split(",");
-					ArrayList<Model> mdocs = new ArrayList<Model>(sdocs.length);
+					ArrayList<DocRef> mdocs = new ArrayList<DocRef>(sdocs.length);
 					final ArrayList<Msg> msgs = new ArrayList<Msg>(sdocs.length);
 					for(String sdoc : sdocs) {
 						String[] nvs = sdoc.split("\\|");
@@ -176,7 +176,7 @@ public class DocUploadWidget extends AbstractModelChangeAwareWidget implements H
 								doc.setHash(value);
 							}
 						}
-						Model mDoc = EntityFactory.get().buildDoc(doc.getTitle(), doc.getHash(), doc.getDate());
+						DocRef mDoc = EntityFactory.get().buildDoc(doc.getTitle(), doc.getHash(), doc.getDate());
 						mdocs.add(mDoc);
 						msgs.add(new Msg("Document: '" + doc.getTitle() + "' uploaded.", MsgLevel.INFO));
 					}

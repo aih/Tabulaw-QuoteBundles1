@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.tabulaw.common.data.ListingOp;
-import com.tll.dao.Sorting;
+import com.tabulaw.dao.Sorting;
 
 /**
  * ListingEvent - Fired when listing data is retrieved or updated for a targeted

@@ -7,10 +7,10 @@ package com.tabulaw.client.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-
-import org.mortbay.log.Log;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -36,8 +36,6 @@ public class ClientModelCache {
 
 	private final HashMap<EntityType, List<IEntity>> cache = new HashMap<EntityType, List<IEntity>>();
 
-	//private final HashMap<EntityType, Comparator<? extends IEntity>> comparators = new HashMap<EntityType, Comparator<? extends IEntity>>();
-
 	/**
 	 * Constructor
 	 */
@@ -47,55 +45,6 @@ public class ClientModelCache {
 		for(EntityType et : EntityType.values()) {
 			cache.put(et, new ArrayList<IEntity>());
 		}
-
-		/*
-		comparators.put(EntityType.CASE, new Comparator<CaseRef>() {
-
-			@Override
-			public int compare(CaseRef o1, CaseRef o2) {
-				int year1 = o1.getYear();
-				int year2 = o2.getYear();
-				if(year1 > year2) return 1;
-				if(year2 > year1) return -1;
-				String c1 = o1.getCitation();
-				String c2 = o2.getCitation();
-				return c1.compareTo(c2);
-			}
-		});
-
-		comparators.put(EntityType.DOCUMENT, new Comparator<Model>() {
-
-			@Override
-			public int compare(Model o1, Model o2) {
-				String title1 = o1.asString("title");
-				String title2 = o2.asString("title");
-				return title1.compareTo(title2);
-			}
-		});
-
-		comparators.put(EntityType.QUOTE, new Comparator<Model>() {
-
-			@Override
-			public int compare(Model o1, Model o2) {
-				String docTitle1 = o1.asString("document.title");
-				String docTitle2 = o2.asString("document.title");
-				int rcmp = docTitle1.compareTo(docTitle2);
-				if(rcmp != 0) return rcmp;
-				// TODO sort by mark!
-				return rcmp;
-			}
-		});
-
-		comparators.put(EntityType.QUOTE_BUNDLE, new Comparator<Model>() {
-
-			@Override
-			public int compare(Model o1, Model o2) {
-				String name1 = o1.getName();
-				String name2 = o2.getName();
-				return name1.compareTo(name2);
-			}
-		});
-		*/
 
 	} // constructor
 	
@@ -118,24 +67,6 @@ public class ClientModelCache {
 	}
 
 	/**
-	 * Provides the next available id for use in creating new entities.
-	 * @param entityType the desired entity type
-	 * @return the next available id
-	 */
-	/*
-	public String getNextId(EntityType entityType) {
-		Log.error("ERROR: calling getNextId() for: " + entityType);
-		List<? extends IEntity> mclc = cache.get(entityType);
-		int largest = 0;
-		for(IEntity m : mclc) {
-			int id = m.getId();
-			if(id > largest) largest = id;
-		}
-		return Integer.toString(largest + 1);
-	}
-	*/
-
-	/**
 	 * Gets the model identified by the given key.
 	 * <p>
 	 * A copy of the model is made retaining reference type relations to other
@@ -147,7 +78,7 @@ public class ClientModelCache {
 	public IEntity get(ModelKey key) {
 		List<? extends IEntity> list = cache.get(key.getEntityType());
 		for(IEntity m : list) {
-			if(m.getKey().equals(key)) {
+			if(m.getId().equals(key.getId())) {
 				return m.clone();
 			}
 		}
@@ -158,23 +89,22 @@ public class ClientModelCache {
 	 * @param etype the entity type
 	 * @return All existing entities of the given type.
 	 */
-	public List<IEntity> getAll(EntityType etype) {
+	@SuppressWarnings("unchecked")
+	public List<?> getAll(EntityType etype) {
 		List<? extends IEntity> list = cache.get(etype);
 		ArrayList<IEntity> rlist = new ArrayList<IEntity>(list.size());
 		for(IEntity m : list) {
 			rlist.add(m.clone());
 		}
-		/*
 		if(rlist.size() > 1) {
-			Collections.sort(rlist, new Comparator<IEntity>() {
+			Collections.sort(rlist, new Comparator<Object>() {
 				
 				@Override
-				public int compare(IEntity o1, IEntity o2) {
-					return o1.compareTo(o2);
+				public int compare(Object o1, Object o2) {
+					return ((Comparable<Object>) o1).compareTo(o2);
 				}
 			});
 		}
-		*/
 		return rlist;
 	}
 
@@ -193,15 +123,11 @@ public class ClientModelCache {
 
 		if(!m.isNew()) {
 			for(IEntity em : list) {
-				if(em.getKey().equals(m.getKey())) {
+				if(em.getId().equals(m.getId())) {
 					existing = em;
 					break;
 				}
 			}
-		}
-		else {
-			Log.warn("No id set for just persisted entity: " + m);
-			//m.setId(getNextId((EntityType) m.getEntityType()));
 		}
 
 		ModelChangeOp op = existing == null ? ModelChangeOp.ADDED : ModelChangeOp.UPDATED;
@@ -256,7 +182,7 @@ public class ClientModelCache {
 		List<IEntity> set = cache.get(key.getEntityType());
 		IEntity t = null;
 		for(IEntity m : set) {
-			if(m.getKey().equals(key)) {
+			if(m.getId().equals(key.getId())) {
 				t = m;
 				break;
 			}
@@ -303,7 +229,7 @@ public class ClientModelCache {
 	public boolean compareQuotes(Quote q1, Quote q2) {
 		DocRef doc1 = q1.getDocument();
 		DocRef doc2 = q2.getDocument();
-		if(doc1.getKey().equals(doc2.getKey())) {
+		if(doc1.getId().equals(doc2.getId())) {
 			return ObjectUtil.equals(q1.getQuote(), q2.getQuote());
 		}
 		return false;

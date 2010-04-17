@@ -8,10 +8,10 @@ package com.tabulaw.client.ui.listing;
 import java.util.List;
 
 import com.tabulaw.common.data.ListingOp;
-import com.tll.dao.Sorting;
-import com.tll.listhandler.EmptyListException;
-import com.tll.listhandler.IListHandler;
-import com.tll.listhandler.ListHandlerException;
+import com.tabulaw.dao.Sorting;
+import com.tabulaw.listhandler.EmptyListException;
+import com.tabulaw.listhandler.IListHandler;
+import com.tabulaw.listhandler.ListHandlerException;
 
 /**
  * DataListingOperator - {@link IListingOperator} based on an existing

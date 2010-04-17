@@ -5,12 +5,22 @@
  */
 package com.tabulaw.common.model;
 
+import com.tll.schema.BusinessKeyDef;
+import com.tll.schema.BusinessObject;
+
 /**
  * @author jpk
  */
+@BusinessObject(businessKeys = @BusinessKeyDef(name = "Url", properties = { "url"
+}))
 public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 
 	private static final long serialVersionUID = 6628199715132440622L;
+
+	/**
+	 * Surrogate primary key.
+	 */
+	private String id;
 
 	private String parties, citation, url;
 	private int year;
@@ -36,10 +46,15 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		this.url = url;
 		this.year = year;
 	}
-	
+
 	@Override
-	protected String getId() {
-		return url;
+	public String getId() {
+		return id;
+	}
+
+	@Override
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	@Override
@@ -85,6 +100,27 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) return true;
+		if(!super.equals(obj)) return false;
+		if(getClass() != obj.getClass()) return false;
+		CaseRef other = (CaseRef) obj;
+		if(url == null) {
+			if(other.url != null) return false;
+		}
+		else if(!url.equals(other.url)) return false;
+		return true;
+	}
+
+	@Override
 	public int compareTo(CaseRef o) {
 		if(year > o.year) return 1;
 		if(o.year > year) return -1;
@@ -93,4 +129,5 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		}
 		return 0;
 	}
+
 }

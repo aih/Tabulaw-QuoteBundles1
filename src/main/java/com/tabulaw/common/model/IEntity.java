@@ -13,32 +13,43 @@ import com.tll.ITypeDescriptorProvider;
 public interface IEntity extends Serializable, Cloneable, IMarshalable, IDescriptorProvider, ITypeDescriptorProvider {
 
 	static final String ID_FIELDNAME = "id";
-	
+
 	/**
 	 * @return The entity type.
 	 */
 	EntityType getEntityType();
+
+	/**
+	 * @return the id.
+	 */
+	String getId();
 	
 	/**
-	 * @return The key uniquely identifying the entity.
+	 * Set the id.
+	 * @param id
 	 */
-	ModelKey getKey();
+	void setId(String id);
+
+	/**
+	 * @return globally unique key identifying this entity instance.
+	 */
+	//ModelKey getKey();
 
 	/**
 	 * @return <code>true</code> if the entity has not yet been persisted.
 	 */
 	boolean isNew();
-	
+
 	/**
 	 * @return the version
 	 */
-	long getVersion();
+	int getVersion();
 
 	/**
 	 * @param version the version to set
 	 */
-	void setVersion(long version);
-	
+	void setVersion(int version);
+
 	/**
 	 * @return A distinct partially deep copy.
 	 */

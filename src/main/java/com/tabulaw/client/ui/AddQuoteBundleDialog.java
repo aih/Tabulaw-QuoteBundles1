@@ -14,7 +14,9 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
-import com.tll.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.common.data.ModelPayload;
+import com.tabulaw.common.model.QuoteBundle;
 import com.tll.client.ui.Dialog;
 import com.tll.client.ui.FocusCommand;
 import com.tll.client.ui.edit.EditEvent;
@@ -24,7 +26,6 @@ import com.tll.client.ui.edit.EditEvent.EditOp;
 import com.tll.client.ui.field.FieldGroup;
 import com.tll.client.validate.ErrorHandlerBuilder;
 import com.tll.client.validate.ErrorHandlerDelegate;
-import com.tll.common.model.Model;
 import com.tll.common.msg.Msg;
 
 /**
@@ -66,13 +67,16 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 		if(event.getOp() == EditOp.ADD) {
 			FieldGroup fieldGroup = event.getContent();
 			
-			// TODO convert to model
+			String qbName = (String) fieldGroup.getFieldWidget("name").getValue();
+			String qbDesc = (String) fieldGroup.getFieldWidget("description").getValue();
+			
+			QuoteBundle qb = new QuoteBundle(qbName, qbDesc, null);
 			
 			// persist
 			//mQuoteBundle.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
 			// server-side persist
 			String userId = ClientModelCache.get().getUser().getId();
-			Poc.getUserDataService().addBundleForUser(userId, /*mQuoteBundle*/null, new AsyncCallback<ModelPayload>() {
+			Poc.getUserDataService().addBundleForUser(userId, qb, new AsyncCallback<ModelPayload>() {
 				
 				@Override
 				public void onSuccess(ModelPayload result) {
@@ -81,7 +85,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 						Notifier.get().post(msgs);
 					}
 					else {
-						Model persistedQuoteBundle = result.getModel();
+						QuoteBundle persistedQuoteBundle = (QuoteBundle) result.getModel();
 						ClientModelCache.get().persist(persistedQuoteBundle, AddQuoteBundleDialog.this);
 						
 						// default set the current quote bundle if not set yet

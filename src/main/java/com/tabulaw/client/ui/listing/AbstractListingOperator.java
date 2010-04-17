@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.common.data.ListingOp;
-import com.tll.dao.Sorting;
+import com.tabulaw.dao.Sorting;
 
 /**
  * AbstractListingOperator

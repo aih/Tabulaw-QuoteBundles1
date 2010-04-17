@@ -6,7 +6,7 @@
 package com.tabulaw.client.ui;
 
 import com.google.gwt.user.client.Window;
-import com.tll.common.model.Model;
+import com.tabulaw.common.model.Quote;
 
 /**
  * Widget holding quote data for editing eligible for drag and drop ops.
@@ -19,7 +19,7 @@ public class QuoteEditWidget extends AbstractQuoteWidget {
 	 * @param parentQuoteBundleWidget
 	 * @param mQuote
 	 */
-	public QuoteEditWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget, Model mQuote) {
+	public QuoteEditWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget, Quote mQuote) {
 		super(parentQuoteBundleWidget, mQuote);
 	}
 
@@ -43,6 +43,6 @@ public class QuoteEditWidget extends AbstractQuoteWidget {
 
 	@Override
 	protected void handleXClick() {
-		parentQuoteBundleWidget.removeQuote(mQuote, true, false);
+		parentQuoteBundleWidget.removeQuote(quote, true, false);
 	}
 }

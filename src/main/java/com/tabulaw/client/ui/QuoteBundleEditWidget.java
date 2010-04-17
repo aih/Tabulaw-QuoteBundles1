@@ -13,9 +13,10 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
-import com.tll.client.model.ModelChangeEvent;
-import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
-import com.tll.common.model.Model;
+import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.QuoteBundle;
 
 /**
  * Supports editing capabilty for a quote bundle.
@@ -72,7 +73,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 		}
 
 		@Override
-		public void setModel(Model mQuoteBundle) {
+		public void setModel(QuoteBundle mQuoteBundle) {
 			super.setModel(mQuoteBundle);
 			current.setTitle("Set as current");
 			close.setTitle("Close");
@@ -94,7 +95,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 	}
 
 	@Override
-	protected QuoteEditWidget getNewQuoteWidget(Model mQuote) {
+	protected QuoteEditWidget getNewQuoteWidget(Quote mQuote) {
 		return new QuoteEditWidget(this, mQuote);
 	}
 	
@@ -104,7 +105,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 	 * @param mQuote the quote model to check
 	 * @return true/false
 	 */
-	public boolean hasQuote(Model mQuote) {
+	public boolean hasQuote(Quote mQuote) {
 		for(int i = 0; i < quotePanel.getWidgetCount(); i++) {
 			Widget w = quotePanel.getWidget(i);
 			if(w instanceof QuoteEditWidget) {

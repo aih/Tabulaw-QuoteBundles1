@@ -196,7 +196,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 			final String encNewPassword = encodePassword(newRawPassword, newUsername);
 
 			// set the credentials
-			setCredentialsById(user.getKey().getId(), newUsername, encNewPassword);
+			setCredentialsById(user.getId(), newUsername, encNewPassword);
 
 			// updateSecurityContextIfNecessary(user.getUsername(), newUsername,
 			// newRawPassword, false);

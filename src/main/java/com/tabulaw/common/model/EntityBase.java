@@ -14,8 +14,8 @@ public abstract class EntityBase implements IEntity {
 	 * At object creation, a version of <code>-1</code> is assigined indicating a
 	 * <em>transient</em> (not persisted yet) entity.
 	 */
-	private long version = -1;
-
+	private int version = -1;
+	
 	/**
 	 * Constructor
 	 */
@@ -28,27 +28,24 @@ public abstract class EntityBase implements IEntity {
 		return getEntityType().descriptor();
 	}
 
-	/**
-	 * @return The entity impl dependent identifier token.
-	 */
-	protected abstract String getId();
-
 	@Override
 	public abstract IEntity clone();
 
+	/*
 	@Override
 	public final ModelKey getKey() {
 		return new ModelKey(getEntityType().name(), getId());
 	}
+	*/
 
 	@Managed
 	@Override
-	public final long getVersion() {
+	public final int getVersion() {
 		return version;
 	}
 
 	@Override
-	public final void setVersion(long version) {
+	public final void setVersion(int version) {
 		this.version = version;
 	}
 
@@ -62,11 +59,35 @@ public abstract class EntityBase implements IEntity {
 	 */
 	@Override
 	public String descriptor() {
-		return typeDesc() + " (" + getKey() + ")";
+		return typeDesc() + " (" + getId() + ")";
 	}
 
 	@Override
 	public String toString() {
-		return typeDesc() + ", key: " + getKey() + ", version: " + getVersion();
+		return typeDesc() + ", key: " + getId() + ", version: " + getVersion();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		String id = getId();
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) return true;
+		if(obj == null) return false;
+		if(getClass() != obj.getClass()) return false;
+		EntityBase other = (EntityBase) obj;
+		String id = getId(), otherId = other.getId();
+		if(id == null) {
+			if(otherId != null) return false;
+		}
+		else if(!id.equals(otherId)) return false;
+		return true;
+	}
+	
 }

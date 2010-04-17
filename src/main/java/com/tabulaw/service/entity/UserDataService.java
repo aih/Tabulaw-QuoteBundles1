@@ -69,6 +69,7 @@ public class UserDataService extends AbstractEntityService {
 	 */
 	@Transactional
 	public QuoteBundle saveBundleForUser(String userId, QuoteBundle bundle) {
+		if(userId == null) throw new NullPointerException();
 
 		validate(bundle);
 
@@ -76,12 +77,16 @@ public class UserDataService extends AbstractEntityService {
 
 		// clear out existing
 		if(!isNew) {
-			dao.purge(QuoteBundle.class, bundle.getKey().getId());
+			if(bundle.getId() == null) throw new IllegalArgumentException();
+			dao.purge(QuoteBundle.class, bundle.getId());
 		}
 		List<Quote> existingQuotes = bundle.getQuotes();
 		if(existingQuotes != null) {
 			for(Quote eq : existingQuotes) {
-				if(!eq.isNew()) dao.purge(eq);
+				if(!eq.isNew()) {
+					if(eq.getId() == null) throw new IllegalArgumentException();
+					dao.purge(eq);
+				}
 			}
 		}
 
@@ -99,7 +104,7 @@ public class UserDataService extends AbstractEntityService {
 		}
 
 		// create binding if this is a new bundle
-		if(isNew) addBundleUserBinding(bundle.getKey().getId(), userId);
+		if(isNew) addBundleUserBinding(bundle.getId(), userId);
 
 		return persistedBundle;
 	}
@@ -144,12 +149,15 @@ public class UserDataService extends AbstractEntityService {
 		if(!bundle.isNew()) throw new IllegalArgumentException("Bundle already added.");
 		validate(bundle);
 		QuoteBundle persistedBundle = dao.persist(bundle);
-		addBundleUserBinding(persistedBundle.getKey().getId(), userId);
+		addBundleUserBinding(persistedBundle.getId(), userId);
 		return persistedBundle;
 	}
 
 	/**
 	 * Deletes a quote bundle and its association to the given user.
+	 * <p>
+	 * <b>WARNING:</b> any referenced quotes under the bundle will be orphaned if they do
+	 * not belong to any other bundles!
 	 * @param userId
 	 * @param bundleId
 	 * @throws EntityNotFoundException When either the user or bundle can't be
@@ -193,12 +201,13 @@ public class UserDataService extends AbstractEntityService {
 	 *         bundle
 	 */
 	@Transactional
-	public void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote) throws EntityNotFoundException {
+	public void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote)
+			throws EntityNotFoundException {
 		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);
 		Quote tormv = null;
 		if(qb.getQuotes() != null) {
 			for(Quote q : qb.getQuotes()) {
-				if(q.getKey().getId().equals(quoteId)) {
+				if(q.getId().equals(quoteId)) {
 					tormv = q;
 					break;
 				}

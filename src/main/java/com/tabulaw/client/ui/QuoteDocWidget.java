@@ -1,6 +1,6 @@
 package com.tabulaw.client.ui;
 
-import com.tll.common.model.Model;
+import com.tabulaw.common.model.Quote;
 
 /**
  * Quote widgtet that is <code>Mark</code> aware.
@@ -13,7 +13,7 @@ public class QuoteDocWidget extends AbstractQuoteWidget {
 	 * @param parentQuoteBundleWidget
 	 * @param mQuote
 	 */
-	public QuoteDocWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget, Model mQuote) {
+	public QuoteDocWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget, Quote mQuote) {
 		super(parentQuoteBundleWidget, mQuote);
 	}
 
@@ -38,7 +38,7 @@ public class QuoteDocWidget extends AbstractQuoteWidget {
 	@Override
 	protected void handleXClick() {
 		// remove from bundle and permanantly delete the quote
-		parentQuoteBundleWidget.removeQuote(mQuote, true, true);
+		parentQuoteBundleWidget.removeQuote(quote, true, true);
 		
 	}
 }

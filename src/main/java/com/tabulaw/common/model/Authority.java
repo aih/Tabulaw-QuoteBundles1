@@ -8,9 +8,13 @@ import com.tll.schema.BusinessKeyDef;
 import com.tll.schema.BusinessObject;
 
 /**
+ * A defined user role called authority.
+ * <p>
+ * NOTE: The authority property is the id.
  * @author jpk
  */
-@BusinessObject(businessKeys = @BusinessKeyDef(name = "Authority", properties = { Authority.FIELDNAME_AUTHORITY }))
+@BusinessObject(businessKeys = @BusinessKeyDef(name = "Authority", properties = { Authority.FIELDNAME_AUTHORITY
+}))
 public class Authority extends EntityBase implements INamedEntity, Comparable<Authority> {
 
 	/**
@@ -22,7 +26,7 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 		ROLE_USER,
 		ROLE_ANONYMOUS;
 	}
-	
+
 	static final long serialVersionUID = -4601781277584062384L;
 
 	public static final String FIELDNAME_AUTHORITY = "authority";
@@ -33,7 +37,7 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 	 * I.e. the role.
 	 */
 	private String authority;
-	
+
 	/**
 	 * Constructor
 	 */
@@ -56,13 +60,19 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 	}
 
 	@Override
-	protected String getId() {
-		return authority;
+	public EntityType getEntityType() {
+		return EntityType.AUTHORITY;
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return EntityType.AUTHORITY;
+	public String getId() {
+		return getAuthority();
+	}
+
+	@Override
+	public void setId(String id) {
+		// the authority id the id
+		throw new UnsupportedOperationException();
 	}
 
 	@NotEmpty
@@ -81,6 +91,16 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 
 	public void setName(String name) {
 		setAuthority(name);
+	}
+
+	@Override
+	public int compareTo(Authority o) {
+		return authority.compareTo(o.authority);
+	}
+
+	@Override
+	public String descriptor() {
+		return getAuthority();
 	}
 
 	@Override
@@ -104,13 +124,4 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 		return true;
 	}
 
-	@Override
-	public int compareTo(Authority o) {
-		return authority.compareTo(o.authority);
-	}
-	
-	@Override
-	public String descriptor() {
-		return getAuthority();
-	}	
 }

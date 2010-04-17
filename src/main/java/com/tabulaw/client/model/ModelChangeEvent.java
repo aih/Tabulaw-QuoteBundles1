@@ -56,7 +56,7 @@ public final class ModelChangeEvent extends GwtEvent<IModelChangeHandler> {
 	}
 
 	public ModelKey getModelKey() {
-		return model == null ? modelKey : model.getKey();
+		return model == null ? modelKey : new ModelKey(model.getEntityType().name(), model.getId());
 	}
 
 	@Override

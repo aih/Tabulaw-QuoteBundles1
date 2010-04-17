@@ -18,6 +18,7 @@ import com.tll.schema.BusinessKeyDef;
 import com.tll.schema.BusinessObject;
 
 /**
+ * NOTE: No surrogate primary key is needed here.
  * @author jpk
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Doc Hash", properties = { "hash"
@@ -55,8 +56,13 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	}
 
 	@Override
-	protected String getId() {
+	public String getId() {
 		return hash;
+	}
+
+	@Override
+	public void setId(String id) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -135,4 +141,26 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	public int compareTo(DocRef o) {
 		return title != null && o.title != null ? title.compareTo(o.title) : 0;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((hash == null) ? 0 : hash.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) return true;
+		if(!super.equals(obj)) return false;
+		if(getClass() != obj.getClass()) return false;
+		DocRef other = (DocRef) obj;
+		if(hash == null) {
+			if(other.hash != null) return false;
+		}
+		else if(!hash.equals(other.hash)) return false;
+		return true;
+	}
+
 }

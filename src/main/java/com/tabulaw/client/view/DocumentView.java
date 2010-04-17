@@ -8,17 +8,17 @@ package com.tabulaw.client.view;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.model.PocModelCache;
+import com.tabulaw.client.model.ClientModelCache;
+import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.DocumentHighlightWidget;
 import com.tabulaw.client.ui.ModelChangeDispatcher;
-import com.tll.client.model.ModelChangeEvent;
-import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.ModelKey;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.UnloadViewRequest;
 import com.tll.client.mvc.view.ViewClass;
 import com.tll.client.mvc.view.ViewOptions;
-import com.tll.common.model.Model;
-import com.tll.common.model.ModelKey;
 
 /**
  * Displays a single document allowing quote/bundle editing.
@@ -97,11 +97,11 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 	protected void doRefresh() {
 		// fetch the mDoc
 		assert docKey != null;
-		Model mDocument = PocModelCache.get().get(docKey);
+		DocRef mDocument = (DocRef) ClientModelCache.get().get(docKey);
 		docWidget.setDocument(mDocument);
 
-		// set the doc key name to the document's title
-		docKey.setName(mDocument.asString("title"));
+		// set the doc key name to the document's name (title)
+		docKey.setName(mDocument.getName());
 	}
 
 	@Override

@@ -6,8 +6,8 @@
 package com.tabulaw.client.ui.nav;
 
 import com.tabulaw.client.view.DocumentViewInitializer;
+import com.tabulaw.common.model.ModelKey;
 import com.tll.client.mvc.view.IViewInitializer;
-import com.tll.common.model.ModelKey;
 
 /**
  * Routes to an open document when clicked.
@@ -23,7 +23,7 @@ public class DocumentViewNavButton extends AbstractNavButton {
 		public static final String DOC = "doc";
 	} // Styles
 
-	private ModelKey documentKey;
+	private final ModelKey documentKey;
 
 	/**
 	 * Constructor

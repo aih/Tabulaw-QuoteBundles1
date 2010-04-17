@@ -25,13 +25,15 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
+import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.QuoteBundleListingWidget.BOption;
+import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.model.EntityType;
-import com.tll.client.model.ModelChangeEvent;
-import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
-import com.tll.common.model.CopyCriteria;
-import com.tll.common.model.Model;
-import com.tll.common.model.ModelKey;
+import com.tabulaw.common.model.IEntity;
+import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.QuoteBundle;
 import com.tll.common.msg.Msg;
 
 /**
@@ -129,10 +131,10 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 				return;
 			}
 
-			Model draggedQuoteModel = draggedQuoteWidget.getModel();
+			Quote draggedQuoteModel = draggedQuoteWidget.getModel();
 			// ModelKey draggedQuoteModelKey = draggedQuoteModel.getKey();
 
-			String dscQuote = draggedQuoteModel.asString("document.title");
+			String dscQuote = draggedQuoteModel.getDocument().getTitle();
 			String dscBundle = targetQuoteBundleWidget.getModel().getName();
 
 			// does the quote already exist in the target bundle?
@@ -143,7 +145,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			}
 
 			// clone the dragged quote widget
-			Model mQuoteClone = draggedQuoteModel.copy(CopyCriteria.keepReferences());
+			Quote mQuoteClone = draggedQuoteModel.clone();
 			
 			//mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE));
 			// server-side persist
@@ -157,7 +159,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 						Notifier.get().post(msgs);
 					}
 					else {
-						Model persistedQuote = result.getModel();
+						Quote persistedQuote = (Quote) result.getModel();
 						targetQuoteBundleWidget.addQuote(persistedQuote, true);
 	
 						//String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
@@ -276,7 +278,8 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		String qbName = option.getBundleName();
 
 		// replace just dropped option with quote bundle widget
-		Model mQuoteBundle = ClientModelCache.get().get(new ModelKey(EntityType.QUOTE_BUNDLE, qbId, qbName));
+		QuoteBundle mQuoteBundle =
+				(QuoteBundle) ClientModelCache.get().get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), qbId, qbName));
 
 		insertQuoteBundleColumn(mQuoteBundle, 0);
 	}
@@ -294,7 +297,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		// remove just added quote bundle widget and replace with bundle option to
 		// options panel
 		quoteBundleWidget.removeFromParent();
-		Model mQuoteBundle = quoteBundleWidget.getModel();
+		QuoteBundle mQuoteBundle = quoteBundleWidget.getModel();
 		addQuoteBundleOption(mQuoteBundle);
 
 		//String msg = quoteBundleWidget.getModel().descriptor() + " closed.";
@@ -308,12 +311,13 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		return qbListingWidget;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void refresh() {
 		clearBundleOptions();
 		clearQuoteBundleColumns();
 
 		// populate
-		List<Model> mbundles = ClientModelCache.get().getAll(EntityType.QUOTE_BUNDLE);
+		List<QuoteBundle> mbundles = (List<QuoteBundle>) ClientModelCache.get().getAll(EntityType.QUOTE_BUNDLE);
 		if(mbundles != null) {
 			for(int i = 0; i < mbundles.size(); i++) {
 				if(i < NUM_COLUMNS) {
@@ -351,7 +355,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 * @param mQuoteBundle
 	 * @return new added option
 	 */
-	private BOption addQuoteBundleOption(Model mQuoteBundle) {
+	private BOption addQuoteBundleOption(QuoteBundle mQuoteBundle) {
 		BOption option = new BOption(mQuoteBundle.getId(), mQuoteBundle.getName());
 		qbListingWidget.getOptionsPanel().addOption(option);
 		bundleOptionController.makeDraggable(option);
@@ -363,7 +367,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 * listing is un-affected.
 	 * @param mQuoteBundle
 	 */
-	private void insertQuoteBundleColumn(final Model mQuoteBundle, int index) {
+	private void insertQuoteBundleColumn(final QuoteBundle mQuoteBundle, int index) {
 		Log.debug("Inserting quote bundle col widget for: " + mQuoteBundle);
 		final QuoteBundleEditWidget qbw = new QuoteBundleEditWidget(quoteController);
 		qbw.setModel(mQuoteBundle);
@@ -393,12 +397,12 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		}
 	}
 
-	private void removeQuoteBundleColumn(Model mQuoteBundle) {
+	private void removeQuoteBundleColumn(QuoteBundle mQuoteBundle) {
 		// identify the quote bundle widget
-		ModelKey rmKey = mQuoteBundle.getKey();
+		String rmId = mQuoteBundle.getId();
 		for(int i = 0; i < columns.getWidgetCount(); i++) {
 			QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) columns.getWidget(i);
-			if(qbw.getModel().getKey().equals(rmKey)) {
+			if(qbw.getModel().getId().equals(rmId)) {
 				VerticalPanelDropController quoteDropController = qbDropBindings.remove(qbw);
 				quoteController.unregisterDropController(quoteDropController);
 				// TODO makeNotDraggable the child quotes too ???
@@ -411,23 +415,23 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
-		Model m = event.getModel();
-		if(m.getKey().getEntityType() == EntityType.QUOTE_BUNDLE) {
+		IEntity m = event.getModel();
+		if(m.getEntityType() == EntityType.QUOTE_BUNDLE) {
+			QuoteBundle qb = (QuoteBundle) m;
 			if(event.getChangeOp() == ModelChangeOp.UPDATED) {
-				ModelKey key = m.getKey();
+				String id = m.getId();
 				// look for the quote bundle in the pinned quote bundle widgets
 				for(int i = 0; i < columns.getWidgetCount(); i++) {
 					QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) columns.getWidget(i);
-					Model qbm = qbw.getModel();
-					if(qbm.getKey().equals(key)) {
-						qbw.sync(m);
+					QuoteBundle qbm = qbw.getModel();
+					if(qbm.getId().equals(id)) {
+						qbw.sync(qb);
 					}
 				}
 			}
 			if(event.getChangeOp() == ModelChangeOp.ADDED) {
-				Model mQuoteBundle = event.getModel();
 				// add and pin directly
-				pinQuoteBundle(addQuoteBundleOption(mQuoteBundle));
+				pinQuoteBundle(addQuoteBundleOption(qb));
 				//Notifier.get().info("'" + mQuoteBundle.descriptor() + "' added.");
 			}
 		}

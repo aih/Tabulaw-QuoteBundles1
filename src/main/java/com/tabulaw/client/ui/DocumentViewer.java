@@ -21,8 +21,7 @@ import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
-import com.tll.client.model.IHasModel;
-import com.tll.common.model.Model;
+import com.tabulaw.common.model.DocRef;
 
 /**
  * Displays a single document either statically (default) or in a rich text area
@@ -35,7 +34,7 @@ import com.tll.common.model.Model;
  * set to read-only mode.
  * @author jpk
  */
-public class DocumentViewer extends Composite implements IHasModel, DoubleClickHandler, HasValueChangeHandlers<DocumentViewer.ViewMode> {
+public class DocumentViewer extends Composite implements DoubleClickHandler, HasValueChangeHandlers<DocumentViewer.ViewMode> {
 
 	public static enum ViewMode {
 		EDIT,
@@ -117,7 +116,7 @@ public class DocumentViewer extends Composite implements IHasModel, DoubleClickH
 
 	private PushButton btnSave, btnCancel;
 
-	private Model mDocument;
+	private DocRef mDocument;
 
 	/**
 	 * Constructor
@@ -142,7 +141,7 @@ public class DocumentViewer extends Composite implements IHasModel, DoubleClickH
 		initWidget(pnl);
 	}
 
-	public Model getModel() {
+	public DocRef getModel() {
 		return mDocument;
 	}
 
@@ -151,7 +150,7 @@ public class DocumentViewer extends Composite implements IHasModel, DoubleClickH
 	 *         document model data has not been set.
 	 */
 	public String getFrameId() {
-		return mDocument == null ? null : "docframe_" + Integer.toString(mDocument.getKey().hashCode());
+		return mDocument == null ? null : "docframe_" + mDocument.getId();
 	}
 	
 	/**
@@ -168,18 +167,18 @@ public class DocumentViewer extends Composite implements IHasModel, DoubleClickH
 	 * Sets the document model data.
 	 * @param mDocument
 	 */
-	public void setModel(Model mDocument) {
+	public void setModel(DocRef mDocument) {
 		if(mDocument == null) throw new NullPointerException();
 		this.mDocument = mDocument;
 
 		// header
-		String html = mDocument.asString("title");
+		String html = mDocument.getTitle();
 		header.html.setHTML("<p>" + html + "</p>");
 		header.html.setTitle("Double click to edit");
 
 		// doc content
 		frame.getElement().setId(getFrameId());
-		String hash = mDocument.asString("hash");
+		String hash = mDocument.getHash();
 		Log.debug("Setting document content in iframe for doc: " + hash);
 		frame.setUrl("doc?id=" + hash);
 	}

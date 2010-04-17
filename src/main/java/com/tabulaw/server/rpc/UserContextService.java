@@ -44,7 +44,7 @@ public class UserContextService extends RpcServlet implements IUserContextServic
 		payload.setUser(user);
 
 		// get the user's quote bundles
-		List<QuoteBundle> bundles = pc.getUserDataService().getBundlesForUser(user.getKey().getId());
+		List<QuoteBundle> bundles = pc.getUserDataService().getBundlesForUser(user.getId());
 		if(bundles != null) {
 			payload.setBundles(bundles);
 		}

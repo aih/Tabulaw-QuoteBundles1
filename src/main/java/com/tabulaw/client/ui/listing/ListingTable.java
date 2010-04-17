@@ -22,10 +22,10 @@ import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.tabulaw.dao.SortColumn;
+import com.tabulaw.dao.SortDir;
+import com.tabulaw.dao.Sorting;
 import com.tll.client.ui.SimpleHyperLink;
-import com.tll.dao.SortColumn;
-import com.tll.dao.SortDir;
-import com.tll.dao.Sorting;
 
 /**
  * ListingTable - ListingWidget specific HTML table.

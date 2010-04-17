@@ -23,20 +23,22 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
+import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
 import com.tabulaw.client.ui.login.UserSessionEvent;
 import com.tabulaw.client.view.DocumentView;
 import com.tabulaw.common.model.EntityType;
-import com.tll.client.model.ModelChangeEvent;
-import com.tll.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tabulaw.common.model.IEntity;
+import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.common.model.User;
 import com.tll.client.mvc.ViewManager;
 import com.tll.client.mvc.view.ShowViewRequest;
 import com.tll.client.mvc.view.UnloadViewRequest;
 import com.tll.client.mvc.view.ViewKey;
 import com.tll.client.ui.SimpleHyperLink;
-import com.tll.common.model.Model;
-import com.tll.common.model.ModelKey;
 
 /**
  * The top nav row.
@@ -80,7 +82,7 @@ public class NavRowPanel extends AbstractNavPanel {
 	public static class CurrentQuoteBundleDisplayWidget extends AbstractModelChangeAwareWidget {
 
 		private final HTML html = new HTML();
-		private ModelKey crntQbKey;
+		private String crntQbId;
 
 		public CurrentQuoteBundleDisplayWidget() {
 			super();
@@ -88,12 +90,12 @@ public class NavRowPanel extends AbstractNavPanel {
 		}
 
 		public void update() {
-			Model cqb = Poc.getCurrentQuoteBundle();
+			QuoteBundle cqb = Poc.getCurrentQuoteBundle();
 			if(cqb != null) {
-				ModelKey key = cqb.getKey();
-				if(!key.equals(crntQbKey)) {
-					this.crntQbKey = key;
-					html.setHTML("<p><span class=\"echo\">Current Quote Bundle:</span>" + key.getName() + "</p>");
+				String id = cqb.getId();
+				if(!id.equals(crntQbId)) {
+					this.crntQbId = id;
+					html.setHTML("<p><span class=\"echo\">Current Quote Bundle:</span>" + cqb.getName() + "</p>");
 				}
 			}
 		}
@@ -103,10 +105,10 @@ public class NavRowPanel extends AbstractNavPanel {
 			super.onModelChangeEvent(event);
 			update();
 		}
-		
+
 		public void clear() {
 			html.setHTML("");
-			crntQbKey = null;
+			crntQbId = null;
 		}
 
 	} // CurrentQuoteBundleDisplayWidget
@@ -153,10 +155,10 @@ public class NavRowPanel extends AbstractNavPanel {
 			initWidget(frmLogout);
 		}
 
-		public void populate(Model mUser) {
-			welcomeText.setText("Welcome " + mUser.asString("name") + '!');
+		public void populate(User mUser) {
+			welcomeText.setText("Welcome " + mUser.getName() + '!');
 		}
-		
+
 		public void clear() {
 			welcomeText.setText("");
 		}
@@ -165,9 +167,9 @@ public class NavRowPanel extends AbstractNavPanel {
 		public void onModelChangeEvent(ModelChangeEvent event) {
 			super.onModelChangeEvent(event);
 			if(event.getChangeOp() == ModelChangeOp.LOADED) {
-				Model m = event.getModel();
-				if(m.getKey().getEntityType() == EntityType.USER) {
-					populate(m);
+				IEntity m = event.getModel();
+				if(m.getEntityType() == EntityType.USER) {
+					populate((User) m);
 				}
 			}
 		}
@@ -196,14 +198,15 @@ public class NavRowPanel extends AbstractNavPanel {
 	private final FlowPanel panel = new FlowPanel();
 
 	private boolean handlingViewChange;
-	
+
 	/**
-	 * Clears out the nav row resetting its state to that of page refresh state. 
+	 * Clears out the nav row resetting its state to that of page refresh state.
 	 */
 	public void clear() {
-		while(openDocTabs.getTabCount() > 0) openDocTabs.removeTab(0);
+		while(openDocTabs.getTabCount() > 0)
+			openDocTabs.removeTab(0);
 		openDocNavButtons.clear();
-		
+
 		crntQuoteBudleWidget.clear();
 		liuWidget.clear();
 	}
@@ -233,7 +236,8 @@ public class NavRowPanel extends AbstractNavPanel {
 
 			@Override
 			public void onSubmit(SubmitEvent event) {
-				// clear out user state and fire user session end event w/o waiting for server response
+				// clear out user state and fire user session end event w/o waiting for
+				// server response
 				ClientModelCache.get().removeAll(EntityType.USER, liuWidget);
 				userSessionHandler.onUserSessionEvent(new UserSessionEvent(false));
 			}
@@ -345,7 +349,7 @@ public class NavRowPanel extends AbstractNavPanel {
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
-		if(event.getChangeOp() == ModelChangeOp.DELETED && event.getModelKey().getEntityType() == EntityType.DOCUMENT) {
+		if(event.getChangeOp() == ModelChangeOp.DELETED && EntityType.DOCUMENT.name().equals(event.getModelKey().getEntityType())) {
 			// remove open doc tab
 			boolean found = false;
 			int i = 0;

@@ -11,11 +11,12 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
-import com.tll.client.model.IHasModel;
-import com.tll.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.common.model.EntityType;
+import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.QuoteBundle;
 import com.tll.common.data.Payload;
-import com.tll.common.model.Model;
-import com.tll.common.model.ModelKey;
 import com.tll.common.msg.Msg;
 
 /**
@@ -24,7 +25,7 @@ import com.tll.common.msg.Msg;
  * @param <H> the quote bundle {@link Header} widget type.
  * @author jpk
  */
-public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H extends AbstractQuoteBundleWidget.Header> extends VerticalPanel implements IHasModel {
+public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H extends AbstractQuoteBundleWidget.Header> extends VerticalPanel {
 
 	static class Styles {
 
@@ -56,7 +57,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 
 		protected final HTML htmlHeader;
 
-		protected Model mQuoteBundle;
+		protected QuoteBundle mQuoteBundle;
 
 		/**
 		 * Constructor
@@ -75,9 +76,9 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		 * Sets the quote bundle model updating the UI.
 		 * @param mQuoteBundle the quote bundle model data
 		 */
-		public void setModel(Model mQuoteBundle) {
+		public void setModel(QuoteBundle mQuoteBundle) {
 			String name = mQuoteBundle.getName();
-			String desc = mQuoteBundle.asString("description");
+			String desc = mQuoteBundle.getDescription();
 			String h1 = "<p class=\"" + Styles.ECHO + "\">Quote Bundle</p>";
 			String h2 = "<p class=\"" + Styles.NAME + "\">" + (name == null ? "" : name) + "</p>";
 			String h3 =
@@ -113,7 +114,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 
 	protected QuotesPanel quotePanel = new QuotesPanel();
 
-	protected Model mQuoteBundle;
+	protected QuoteBundle mQuoteBundle;
 
 	private PickupDragController dragController;
 
@@ -147,10 +148,9 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 * @param mQuote the quote model data
 	 * @return A newly created <Q>type.
 	 */
-	protected abstract Q getNewQuoteWidget(Model mQuote);
+	protected abstract Q getNewQuoteWidget(Quote mQuote);
 
-	@Override
-	public final Model getModel() {
+	public final QuoteBundle getModel() {
 		return mQuoteBundle;
 	}
 
@@ -159,14 +159,13 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 * provided model data.
 	 * @param mQuoteBundle
 	 */
-	@Override
-	public final void setModel(Model mQuoteBundle) {
+	public final void setModel(QuoteBundle mQuoteBundle) {
 		header.setModel(mQuoteBundle);
 		clearQuotesFromUi();
 		if(mQuoteBundle != null) {
-			List<Model> mQuotes = mQuoteBundle.relatedMany("quotes").getModelList();
+			List<Quote> mQuotes = mQuoteBundle.getQuotes();
 			if(mQuotes != null) {
-				for(Model mQuote : mQuotes) {
+				for(Quote mQuote : mQuotes) {
 					addQuote(mQuote, false, false);
 				}
 			}
@@ -195,7 +194,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 *        event)?
 	 * @return The added quote widget
 	 */
-	public Q addQuote(Model mQuote, boolean persist) {
+	public Q addQuote(Quote mQuote, boolean persist) {
 		return addQuote(mQuote, persist, true);
 	}
 
@@ -208,9 +207,10 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 *        instance?
 	 * @return the added quote widget
 	 */
-	protected Q addQuote(Model mQuote, boolean persist, boolean addToThisBundleModel) {
+	protected Q addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
 		// add the quote ref to the quote bundle
-		if(addToThisBundleModel && mQuoteBundle != null) mQuoteBundle.relatedMany("quotes").insert(mQuote, 0);
+		if(addToThisBundleModel && mQuoteBundle != null) 
+			mQuoteBundle.getQuotes().add(0, mQuote);
 		if(persist) {
 			// add the quote updating the bundle quote refs too
 			ClientModelCache.get().persist(mQuote, this);
@@ -233,10 +233,10 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 * @return the widget of the removed quote
 	 */
 	@SuppressWarnings("unchecked")
-	public Q removeQuote(final Model mQuote, boolean persist, final boolean deleteQuote) {
-		int index = getQuoteWidgetIndex(mQuote.getKey());
+	public Q removeQuote(final Quote mQuote, boolean persist, final boolean deleteQuote) {
+		int index = getQuoteWidgetIndex(mQuote.getId());
 		if(index != -1) {
-			if(mQuoteBundle.relatedMany("quotes").remove(mQuote.getKey())) {
+			if(mQuoteBundle.getQuotes().remove(mQuote)) {
 				if(persist) {
 					// server-side persist
 					String bundleId = mQuoteBundle.getId();
@@ -251,7 +251,8 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 							}
 							else {
 								// delete the quote updating the bundle quote refs too
-								if(deleteQuote) ClientModelCache.get().remove(mQuote.getKey(), AbstractQuoteBundleWidget.this);
+								ModelKey mk = new ModelKey(EntityType.QUOTE.name(), mQuote.getId());
+								if(deleteQuote) ClientModelCache.get().remove(mk, AbstractQuoteBundleWidget.this);
 								ClientModelCache.get().persist(mQuoteBundle, AbstractQuoteBundleWidget.this);
 							}
 						}
@@ -317,15 +318,15 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	/**
 	 * Resolves the index at which the quote widget referencing the model having
 	 * the given key resides.
-	 * @param quoteKey
+	 * @param quoteId
 	 * @return the index or <code>-1</code> if not found
 	 */
-	protected final int getQuoteWidgetIndex(ModelKey quoteKey) {
+	protected final int getQuoteWidgetIndex(String quoteId) {
 		int siz = quotePanel.getWidgetCount();
 		for(int i = 0; i < siz; i++) {
 			AbstractQuoteWidget qw = (AbstractQuoteWidget) quotePanel.getWidget(i);
-			Model m = qw.getModel();
-			if(m.getKey().equals(quoteKey)) return i;
+			Quote m = qw.getModel();
+			if(m.getId().equals(quoteId)) return i;
 		}
 		return -1;
 	}
@@ -350,18 +351,18 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 * given. No model change event is fired.
 	 * @param mQuoteBundleToSyncTo
 	 */
-	protected final void sync(Model mQuoteBundleToSyncTo) {
-		List<Model> existingQuotes = mQuoteBundle.relatedMany("quotes").getModelList();
-		List<Model> changedQuotes = mQuoteBundleToSyncTo.relatedMany("quotes").getModelList();
+	protected final void sync(QuoteBundle mQuoteBundleToSyncTo) {
+		List<Quote> existingQuotes = mQuoteBundle.getQuotes();
+		List<Quote> changedQuotes = mQuoteBundleToSyncTo.getQuotes();
 		// IMPT: remove quotes first so highlighting works against a *clean* dom!
-		for(Model mexisting : existingQuotes) {
-			if(Model.findInCollection(changedQuotes, mexisting.getKey()) == null) {
+		for(Quote mexisting : existingQuotes) {
+			if(!changedQuotes.contains(mexisting)) {
 				// quote to remove
 				removeQuote(mexisting, false, false);
 			}
 		}
-		for(Model mchanged : changedQuotes) {
-			if(Model.findInCollection(existingQuotes, mchanged.getKey()) == null) {
+		for(Quote mchanged : changedQuotes) {
+			if(!existingQuotes.contains(mchanged)) {
 				// quote to add
 				addQuote(mchanged, false);
 			}

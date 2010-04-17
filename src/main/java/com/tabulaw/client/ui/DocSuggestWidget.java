@@ -32,6 +32,8 @@ import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
+import com.tabulaw.common.model.EntityType;
+import com.tabulaw.common.model.ModelKey;
 import com.tll.client.data.rpc.IRpcHandler;
 import com.tll.client.data.rpc.RpcCommand;
 import com.tll.client.data.rpc.RpcEvent;
@@ -206,7 +208,8 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 								@Override
 								public void execute() {
 									// show the doc (letting the model change event finish first)
-									final DocumentViewInitializer dvi = new DocumentViewInitializer(mNewDoc.getModelKey());
+									ModelKey mk = new ModelKey(EntityType.DOCUMENT.name(), mNewDoc.getId());
+									final DocumentViewInitializer dvi = new DocumentViewInitializer(mk);
 									ViewManager.get().dispatch(new ShowViewRequest(dvi));
 								}
 							});
@@ -215,7 +218,8 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 					}.execute();
 				}
 				else {
-					final DocumentViewInitializer dvi = new DocumentViewInitializer(mDoc.getModelKey());
+					ModelKey mk = new ModelKey(EntityType.DOCUMENT.name(), mDoc.getId());
+					final DocumentViewInitializer dvi = new DocumentViewInitializer(mk);
 					DeferredCommand.addCommand(new Command() {
 
 						@Override

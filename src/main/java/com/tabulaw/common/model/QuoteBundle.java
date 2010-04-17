@@ -6,7 +6,6 @@
 package com.tabulaw.common.model;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
@@ -18,6 +17,8 @@ import org.hibernate.validator.constraints.Length;
 public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 
 	private static final long serialVersionUID = -6606826756860275551L;
+
+	private String id;
 
 	private String name, description;
 
@@ -32,40 +33,40 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 
 	/**
 	 * Constructor
-	 * @param dateCreated
-	 * @param dateModified
 	 * @param name
 	 * @param description
 	 * @param quotes
 	 */
-	public QuoteBundle(Date dateCreated, Date dateModified, String name, String description, List<Quote> quotes) {
-		super(dateCreated, dateModified);
+	public QuoteBundle(String name, String description, List<Quote> quotes) {
+		super();
+		this.name = name;
+		this.description = description;
+		this.quotes = quotes;
 	}
-	
+
+	@Override
+	public String getId() {
+		return id;
+	}
+
+	@Override
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	@Override
 	public QuoteBundle clone() {
-		Date dc = getDateCreated();
-		if(dc != null) dc = new Date(dc.getTime());
-		
-		Date dm = getDateModified();
-		if(dm != null) dm = new Date(dm.getTime());
-		
 		ArrayList<Quote> cquotes = new ArrayList<Quote>(quotes == null ? 0 : quotes.size());
 		for(Quote q : quotes) {
 			cquotes.add(q.clone());
 		}
-		
-		return new QuoteBundle(dc, dm, name, description, cquotes);
+
+		return new QuoteBundle(name, description, cquotes);
 	}
 
 	@Override
 	public EntityType getEntityType() {
 		return EntityType.QUOTE_BUNDLE;
-	}
-
-	@Override
-	protected String getId() {
-		return name;
 	}
 
 	public String getName() {
@@ -91,5 +92,26 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) return true;
+		if(obj == null) return false;
+		if(getClass() != obj.getClass()) return false;
+		QuoteBundle other = (QuoteBundle) obj;
+		if(id == null) {
+			if(other.id != null) return false;
+		}
+		else if(!id.equals(other.id)) return false;
+		return true;
 	}
 }

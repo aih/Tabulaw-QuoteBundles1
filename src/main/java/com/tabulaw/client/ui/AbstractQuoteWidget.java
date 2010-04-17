@@ -14,16 +14,16 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
-import com.tll.client.model.IHasModel;
+import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.Quote;
 import com.tll.client.ui.ImageContainer;
-import com.tll.common.model.Model;
-import com.tll.common.model.RelatedOneProperty;
 
 /**
  * Base class for widgets displaying quotes.
  * @author jpk
  */
-public abstract class AbstractQuoteWidget extends Composite implements IHasModel, ClickHandler {
+public abstract class AbstractQuoteWidget extends Composite implements ClickHandler {
 
 	static class Styles {
 
@@ -121,7 +121,7 @@ public abstract class AbstractQuoteWidget extends Composite implements IHasModel
 	
 	protected boolean draggable;
 
-	protected Model mQuote;
+	protected Quote quote;
 
 	/**
 	 * Constructor
@@ -152,11 +152,11 @@ public abstract class AbstractQuoteWidget extends Composite implements IHasModel
 	/**
 	 * Constructor
 	 * @param parentQuoteBundleWidget
-	 * @param mQuote
+	 * @param quote
 	 */
-	public AbstractQuoteWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget, Model mQuote) {
+	public AbstractQuoteWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget, Quote quote) {
 		this(parentQuoteBundleWidget);
-		setModel(mQuote);
+		setModel(quote);
 	}
 
 	public final AbstractQuoteBundleWidget<?, ?> getParentQuoteBundleWidget() {
@@ -167,32 +167,29 @@ public abstract class AbstractQuoteWidget extends Composite implements IHasModel
 		return dragHandle;
 	}
 
-	@Override
-	public final Model getModel() {
-		return mQuote;
+	public final Quote getModel() {
+		return quote;
 	}
 
-	public void setModel(Model mQuote) {
-		this.mQuote = mQuote;
+	public void setModel(Quote quote) {
+		this.quote = quote;
 		
-		String title, subtitle = "", quote = mQuote.asString("quote");
-		title = mQuote.asString("document.title");
+		String title, subtitle = "", quoteText = quote.getQuote();
+		DocRef doc = quote.getDocument();
+		title = doc.getTitle();
 		
 		// case doc?
-		// TODO this is a hack! bail on Model - its fucked
-		RelatedOneProperty caseRefProp = mQuote.relatedOne("caseRef");
-		Model caseRef = caseRefProp == null ? null : caseRefProp.getModel();
-		
+		CaseRef caseRef = doc.getCaseRef();
 		if(caseRef != null) {
-			String parties = mQuote.asString("document.caseRef.parties");
+			String parties = caseRef.getParties();
 			if(parties != null && parties.length() > 0 && !"null".equals(parties)) {
 				title = parties;
 			}
-			subtitle = mQuote.asString("document.caseRef.citation");
+			subtitle = caseRef.getCitation();
 		}
 		
 		citeBlock.set(title, subtitle);
-		quoteBlock.set(quote);
+		quoteBlock.set(quoteText);
 	}
 	
 	/**

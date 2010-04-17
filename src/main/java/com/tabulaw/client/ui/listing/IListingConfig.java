@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.ui.listing;
 
-import com.tll.dao.Sorting;
+import com.tabulaw.dao.Sorting;
 
 /**
  * IListingConfig - The listing configuration definition encompassing

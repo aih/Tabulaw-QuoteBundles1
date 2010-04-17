@@ -5,8 +5,7 @@
  */
 package com.tabulaw.client.ui.listing;
 
-import com.tll.dao.Sorting;
-
+import com.tabulaw.dao.Sorting;
 
 /**
  * AbstractListingConfig - Base class for {@link IListingConfig} impls.
@@ -28,8 +27,7 @@ public abstract class AbstractListingConfig<R> implements IListingConfig<R> {
 	 * @param cols
 	 * @param defaultSorting
 	 */
-	public AbstractListingConfig(String listingElementName, String[] modelProps, Column[] cols,
-			Sorting defaultSorting) {
+	public AbstractListingConfig(String listingElementName, String[] modelProps, Column[] cols, Sorting defaultSorting) {
 		this(listingElementName, modelProps, cols, defaultSorting, DEFAULT_PAGE_SIZE);
 	}
 
@@ -41,8 +39,8 @@ public abstract class AbstractListingConfig<R> implements IListingConfig<R> {
 	 * @param defaultSorting
 	 * @param pageSize
 	 */
-	public AbstractListingConfig(String listingElementName, String[] modelProps, Column[] cols,
-			Sorting defaultSorting, int pageSize) {
+	public AbstractListingConfig(String listingElementName, String[] modelProps, Column[] cols, Sorting defaultSorting,
+			int pageSize) {
 		super();
 		this.listingElementName = listingElementName;
 		this.modelProps = modelProps;

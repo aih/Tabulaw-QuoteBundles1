@@ -19,7 +19,7 @@ import com.tll.schema.BusinessKeyDef;
 import com.tll.schema.BusinessObject;
 
 /**
- * The user entity.
+ * The user entity. NOTE: no surrogate primary key is needed here.
  * @author jpk
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress"
@@ -59,8 +59,6 @@ public class User extends TimeStampEntity implements IUserRef {
 
 	/**
 	 * Constructor
-	 * @param dateCreated
-	 * @param dateModified
 	 * @param name
 	 * @param emailAddress
 	 * @param password
@@ -69,9 +67,9 @@ public class User extends TimeStampEntity implements IUserRef {
 	 * @param expires
 	 * @param authorities
 	 */
-	public User(Date dateCreated, Date dateModified, String name, String emailAddress, String password, boolean locked, boolean enabled, Date expires,
-			ArrayList<Authority> authorities) {
-		super(dateCreated, dateModified);
+	public User(String name, String emailAddress, String password, boolean locked,
+			boolean enabled, Date expires, ArrayList<Authority> authorities) {
+		super();
 		this.name = name;
 		this.emailAddress = emailAddress;
 		this.password = password;
@@ -82,34 +80,33 @@ public class User extends TimeStampEntity implements IUserRef {
 	}
 
 	@Override
+	public String getId() {
+		return emailAddress;
+	}
+
+	@Override
+	public void setId(String id) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public String getUserRefId() {
 		return getId();
 	}
 
 	@Override
 	public User clone() {
-		Date dc = getDateCreated();
-		if(dc != null) dc = new Date(dc.getTime());
-		
-		Date dm = getDateModified();
-		if(dm != null) dm = new Date(dm.getTime());
-		
 		ArrayList<Authority> cauth = authorities == null ? null : new ArrayList<Authority>(authorities.size());
 		for(Authority a : authorities) {
 			cauth.add(a.clone());
 		}
-		
-		return new User(dc, dm, name, emailAddress, password, locked, enabled, expires, cauth);
+
+		return new User(name, emailAddress, password, locked, enabled, expires, cauth);
 	}
 
 	@Override
 	public EntityType getEntityType() {
 		return EntityType.USER;
-	}
-
-	@Override
-	protected String getId() {
-		return emailAddress;
 	}
 
 	@Length(max = MAXLEN_NAME)
@@ -245,4 +242,26 @@ public class User extends TimeStampEntity implements IUserRef {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((emailAddress == null) ? 0 : emailAddress.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) return true;
+		if(!super.equals(obj)) return false;
+		if(getClass() != obj.getClass()) return false;
+		User other = (User) obj;
+		if(emailAddress == null) {
+			if(other.emailAddress != null) return false;
+		}
+		else if(!emailAddress.equals(other.emailAddress)) return false;
+		return true;
+	}
+
 }
