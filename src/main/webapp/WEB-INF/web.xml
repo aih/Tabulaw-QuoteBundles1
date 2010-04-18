@@ -1,111 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-	version="2.5">
-	
-  <display-name>Tabulaw</display-name>
-  <description>Tabulaw application</description>
-  
-  <context-param>
-    <description>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+
+	<display-name>Tabulaw</display-name>
+	<description>Tabulaw application</description>
+
+	<context-param>
+		<description>
       Dependency Injection modules (class names) that collectively bootstrap the application.
       This context param is processed by com.tll.server.Bootstrapper.
     </description>
-    <param-name>di.modules</param-name>
-    <param-value>
+		<param-name>di.modules</param-name>
+		<param-value>
 	    com.tll.di.MailModule
-		  com.tll.tabulaw.di.ExceptionHandlerModule
-    	com.tll.tabulaw.di.ModelModule
-    	com.tll.tabulaw.di.Db4oDaoModule
-    	com.tll.tabulaw.di.EntityServiceFactoryModule
-    	com.tll.tabulaw.di.MarshalModule
-    	com.tll.tabulaw.di.PersistContextModule
-    	com.tll.tabulaw.di.TabulawSecurityModule
+		  com.tabulaw.di.ExceptionHandlerModule
+    	com.tabulaw.di.ModelModule
+    	com.tabulaw.di.Db4oDaoModule
+    	com.tabulaw.di.PersistContextModule
     </param-value>
-  </context-param>
-  
-  <context-param>
-    <description>
+	</context-param>
+
+	<context-param>
+		<description>
       Declaration of the application dependency injection handlers (class names).
       These handlers are passed the constructed "dependency injector" providing 
       an hook to alter the servlet context.
     </description>
-    <param-name>di.handlers</param-name>
-    <param-value>
+		<param-name>di.handlers</param-name>
+		<param-value>
     	com.tabulaw.server.Db4oBootstrapper
     	com.tabulaw.server.PersistContextBootstrapper
-    	com.tll.server.SecurityContextBootstrapper
     	com.tabulaw.server.FileConverterBootstrapper
     </param-value>
-  </context-param>
+	</context-param>
 
-  <session-config>
-    <session-timeout>30</session-timeout>
-  </session-config>
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
 
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
-	
-  <listener>
-    <listener-class>com.tll.server.Bootstrapper</listener-class>
-  </listener>
 
-  <filter>
-    <filter-name>WebClientCacheFilter</filter-name>
-    <filter-class>com.tll.server.filter.WebClientCacheFilter</filter-class>
-    <init-param>
-      <param-name>oneDayCacheFileExts</param-name>
-      <param-value>.js .css .gif .jpg .png</param-value>
-    </init-param>
-  </filter>
-  <filter-mapping>
-    <filter-name>WebClientCacheFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  
-  <servlet>
-    <servlet-name>remoteLoggerServiceImpl</servlet-name>
-    <servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>remoteLoggerServiceImpl</servlet-name>
-    <url-pattern>/poc/gwt-log</url-pattern>
-  </servlet-mapping>
+	<listener>
+		<listener-class>com.tabulaw.server.Bootstrapper</listener-class>
+	</listener>
 
-  <servlet>
-    <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>com.tll.server.servlet.LoginServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>LoginServlet</servlet-name>
-    <url-pattern>/login</url-pattern>
-  </servlet-mapping>
-  
-  <servlet>
-    <servlet-name>LogoutServlet</servlet-name>
-    <servlet-class>com.tll.server.servlet.LogoutServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>LogoutServlet</servlet-name>
-    <url-pattern>/logout</url-pattern>
-  </servlet-mapping>
+	<filter>
+		<filter-name>AuthenticationProcessingFilter</filter-name>
+		<filter-class>com.tabulaw.server.filter.AuthenticationProcessingFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthenticationProcessingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
-  <servlet>
-    <servlet-name>ForgotPasswordService</servlet-name>
-    <servlet-class>com.tll.server.rpc.ForgotPasswordService</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>ForgotPasswordService</servlet-name>
-    <url-pattern>/forgotPassword</url-pattern>
-  </servlet-mapping>
-	
+	<filter>
+		<filter-name>WebClientCacheFilter</filter-name>
+		<filter-class>com.tabulaw.server.filter.WebClientCacheFilter</filter-class>
+		<init-param>
+			<param-name>oneDayCacheFileExts</param-name>
+			<param-value>.js .css .gif .jpg .png</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>WebClientCacheFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>remoteLoggerServiceImpl</servlet-name>
+		<servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>remoteLoggerServiceImpl</servlet-name>
+		<url-pattern>/poc/gwt-log</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>LoginServlet</servlet-name>
+		<servlet-class>com.tabulaw.server.LoginServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LoginServlet</servlet-name>
+		<url-pattern>/login</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>LogoutServlet</servlet-name>
+		<servlet-class>com.tabulaw.server.LogoutServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LogoutServlet</servlet-name>
+		<url-pattern>/logout</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ForgotPasswordService</servlet-name>
+		<servlet-class>com.tabulaw.server.rpc.ForgotPasswordService</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ForgotPasswordService</servlet-name>
+		<url-pattern>/forgotPassword</url-pattern>
+	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>UserContextService</servlet-name>
 		<servlet-class>com.tabulaw.server.rpc.UserContextService</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>UserContextService</servlet-name>
 		<url-pattern>/poc/userContext</url-pattern>
@@ -115,7 +118,7 @@
 		<servlet-name>UserDataServiceRpc</servlet-name>
 		<servlet-class>com.tabulaw.server.rpc.UserDataServiceRpc</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>UserDataServiceRpc</servlet-name>
 		<url-pattern>/poc/userData</url-pattern>
@@ -125,7 +128,7 @@
 		<servlet-name>DocUploadServlet</servlet-name>
 		<servlet-class>com.tabulaw.server.DocUploadServlet</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>DocUploadServlet</servlet-name>
 		<url-pattern>/poc/docupload</url-pattern>
@@ -135,7 +138,7 @@
 		<servlet-name>DocViewServlet</servlet-name>
 		<servlet-class>com.tabulaw.server.DocViewServlet</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>DocViewServlet</servlet-name>
 		<url-pattern>/doc/*</url-pattern>
@@ -145,7 +148,7 @@
 		<servlet-name>DocService</servlet-name>
 		<servlet-class>com.tabulaw.server.rpc.DocService</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>DocService</servlet-name>
 		<url-pattern>/poc/doc</url-pattern>

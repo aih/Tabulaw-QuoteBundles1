@@ -7,4 +7,10 @@ package com.tabulaw.common.model;
 public interface IUserRef {
 
 	String getUserRefId();
+	
+	String getPassword();
+	
+	String getName();
+	
+	String getEmailAddress();
 }

@@ -4,13 +4,16 @@ import java.io.Serializable;
 
 import com.tll.IDescriptorProvider;
 import com.tll.IMarshalable;
+import com.tll.IPropertyValueProvider;
 import com.tll.ITypeDescriptorProvider;
 
 /**
  * IEntity - Fundamental type for all [server side] entities.
  * @author jpk
  */
-public interface IEntity extends Serializable, Cloneable, IMarshalable, IModelKeyProvider, IDescriptorProvider, ITypeDescriptorProvider {
+public interface IEntity 
+extends Serializable, Cloneable, IMarshalable, IModelKeyProvider, 
+IDescriptorProvider, ITypeDescriptorProvider, IPropertyValueProvider {
 
 	static final String ID_FIELDNAME = "id";
 

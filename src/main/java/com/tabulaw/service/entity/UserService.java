@@ -158,7 +158,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	}
 
 	@Transactional(readOnly = true)
-	private User findByEmail(String emailAddress) throws EntityNotFoundException {
+	public User findByEmail(String emailAddress) throws EntityNotFoundException {
 		User user;
 		try {
 			final Criteria<User> criteria = new Criteria<User>(User.class);

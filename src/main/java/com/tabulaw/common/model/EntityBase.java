@@ -87,5 +87,12 @@ public abstract class EntityBase implements IEntity {
 		else if(!id.equals(otherId)) return false;
 		return true;
 	}
-	
+
+	/*
+	 * Sub-classes may override.
+	 */
+	@Override
+	public Object getPropertyValue(String propertyPath) {
+		throw new UnsupportedOperationException();
+	}
 }

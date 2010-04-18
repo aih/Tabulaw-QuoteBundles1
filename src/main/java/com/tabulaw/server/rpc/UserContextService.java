@@ -49,7 +49,7 @@ public class UserContextService extends RpcServlet implements IUserContextServic
 			payload.setBundles(bundles);
 		}
 
-		status.addMsg("Admin Context retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		status.addMsg("User Context retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		return payload;
 	}
 }

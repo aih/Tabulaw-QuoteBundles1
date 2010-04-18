@@ -113,14 +113,21 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 
 	/**
 	 * Constructor
-	 * @param config
-	 * @param cellRenderer 
 	 */
-	public ListingTable(IListingConfig config, ITableCellRenderer<R> cellRenderer) {
+	public ListingTable() {
 		super();
 		sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);
 		addClickHandler(this);
 		addHandler(this, KeyDownEvent.getType());
+	}
+
+	/**
+	 * Constructor
+	 * @param config
+	 * @param cellRenderer 
+	 */
+	public ListingTable(IListingConfig config, ITableCellRenderer<R> cellRenderer) {
+		this();
 		initialize(config, cellRenderer);
 	}
 
@@ -132,8 +139,6 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 
 		this.columns = config.getColumns();
 		this.cellRenderer = cellRndrer;
-		assert columns != null && cellRenderer != null;
-
 		this.ignoreCaseWhenSorting = config.isIgnoreCaseWhenSorting();
 
 		int rn = -1;

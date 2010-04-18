@@ -29,6 +29,13 @@ public class ModelListingTable<T extends IModelKeyProvider> extends ListingTable
 
 	/**
 	 * Constructor
+	 */
+	public ModelListingTable() {
+		super();
+	}
+
+	/**
+	 * Constructor
 	 * @param config
 	 * @param cellRenderer
 	 */

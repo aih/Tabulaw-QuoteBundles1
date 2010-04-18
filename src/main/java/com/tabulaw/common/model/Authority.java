@@ -131,4 +131,9 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 		return true;
 	}
 
+	@Override
+	public Object getPropertyValue(String propertyPath) {
+		if(FIELDNAME_AUTHORITY.equals(propertyPath)) return getAuthority();
+		return null;
+	}
 }

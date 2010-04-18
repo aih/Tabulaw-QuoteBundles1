@@ -98,7 +98,7 @@ public class LoginPanel extends Composite implements IHasUserSessionHandlers, IH
 
 		form = new FormPanel();
 		form.setStyleName("loginForm");
-		form.setAction(formAction + "j_spring_security_check");
+		form.setAction(formAction/* + "j_spring_security_check"*/);
 		form.setMethod(FormPanel.METHOD_POST);
 
 		final VerticalPanel vert = new VerticalPanel();

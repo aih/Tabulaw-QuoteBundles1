@@ -170,4 +170,21 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 		return true;
 	}
 
+	@Override
+	public Object getPropertyValue(String propertyPath) {
+		
+		if("title".equals(propertyPath) || "name".equals(propertyPath)) {
+			return getTitle();
+		}
+		
+		if("hash".equals(propertyPath)) {
+			return getHash();
+		}
+		
+		if("date".equals(propertyPath)) {
+			return getHash();
+		}
+		
+		return null;
+	}
 }

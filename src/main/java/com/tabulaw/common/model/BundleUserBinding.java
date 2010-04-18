@@ -106,5 +106,4 @@ public class BundleUserBinding extends EntityBase {
 		else if(!userId.equals(other.userId)) return false;
 		return true;
 	}
-
 }

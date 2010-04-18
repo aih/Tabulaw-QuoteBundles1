@@ -34,7 +34,7 @@ public class ClientModelCache {
 		return instance;
 	}
 
-	private final HashMap<EntityType, List<IEntity>> cache = new HashMap<EntityType, List<IEntity>>();
+	private final HashMap<String, List<IEntity>> cache = new HashMap<String, List<IEntity>>();
 
 	/**
 	 * Constructor
@@ -43,7 +43,7 @@ public class ClientModelCache {
 
 		// init cache
 		for(EntityType et : EntityType.values()) {
-			cache.put(et, new ArrayList<IEntity>());
+			cache.put(et.name(), new ArrayList<IEntity>());
 		}
 
 	} // constructor
@@ -62,7 +62,7 @@ public class ClientModelCache {
 	 * @return The currently logged in user.
 	 */
 	public User getUser() {
-		List<?> list = cache.get(EntityType.USER);
+		List<?> list = cache.get(EntityType.USER.name());
 		return list.size() < 1 ? null : (User) list.get(0);
 	}
 
@@ -91,7 +91,7 @@ public class ClientModelCache {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<?> getAll(EntityType etype) {
-		List<? extends IEntity> list = cache.get(etype);
+		List<? extends IEntity> list = cache.get(etype.name());
 		ArrayList<IEntity> rlist = new ArrayList<IEntity>(list.size());
 		for(IEntity m : list) {
 			rlist.add(m.clone());
@@ -117,7 +117,7 @@ public class ClientModelCache {
 	 *        is fired on it
 	 */
 	public void persist(IEntity m, Widget source) {
-		List<IEntity> list = cache.get(m.getEntityType());
+		List<IEntity> list = cache.get(m.getEntityType().name());
 
 		IEntity existing = null;
 
@@ -205,7 +205,7 @@ public class ClientModelCache {
 	 * @param source the sourcing widget that will source a model change event
 	 */
 	public void removeAll(EntityType etype, Widget source) {
-		List<IEntity> list = cache.get(etype);
+		List<IEntity> list = cache.get(etype.name());
 		if(list == null || list.size() < 1) return;
 		ArrayList<IEntity> rlist = new ArrayList<IEntity>(list);
 		for(IEntity m : rlist) {

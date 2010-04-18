@@ -51,6 +51,13 @@ public class AddQuoteBundlePanel extends AbstractFieldPanel<FlowPanel> {
 		}
 	}
 	
+	private final FlowPanel panel = new FlowPanel();
+	
+	public AddQuoteBundlePanel() {
+		super();
+		initWidget(panel);
+	}
+
 	@Override
 	protected FieldGroup generateFieldGroup() {
 		return new FieldProvider().getFieldGroup();
