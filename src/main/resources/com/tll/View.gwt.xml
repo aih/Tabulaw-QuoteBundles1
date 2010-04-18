@@ -1,0 +1,6 @@
+<module>
+  <inherits name="com.tll.UI" />
+
+  <stylesheet src="css/view.css" />
+  <stylesheet src="css/viewpath.css" />  
+</module>

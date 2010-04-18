@@ -64,10 +64,11 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 	@Override
 	public QuoteBundle clone() {
 		ArrayList<Quote> cquotes = new ArrayList<Quote>(quotes == null ? 0 : quotes.size());
-		for(Quote q : quotes) {
-			cquotes.add(q.clone());
+		if(quotes != null) {
+			for(Quote q : quotes) {
+				cquotes.add(q.clone());
+			}
 		}
-
 		return new QuoteBundle(name, description, cquotes);
 	}
 

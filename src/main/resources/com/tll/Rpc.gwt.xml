@@ -1,0 +1,10 @@
+<module>
+	<inherits name="com.tll.ClientCore" />
+
+	<stylesheet src="css/status.css" />
+
+  <source path="client" />
+  
+  <source path="common" />
+  
+</module>

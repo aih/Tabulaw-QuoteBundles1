@@ -1,0 +1,12 @@
+<module>
+  <inherits name="com.google.gwt.user.User" />
+  <inherits name="com.tll.Core" />
+
+  <!-- client exclusive source path -->
+  <source path="client" />
+
+  <!-- shared (client/server) source path -->
+  <source path="common" />
+
+  <public path="public" />
+</module>

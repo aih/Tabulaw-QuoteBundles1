@@ -90,6 +90,34 @@
 				-->  
 				<directory>src/main/java</directory>
 				<includes>
+					<include>**/key/IKey.java</include>
+					<include>**/IProvider.java</include>
+					<include>**/IPropertyValueProvider.java</include>
+					<include>**/INameValueProvider.java</include>
+					<include>**/IDescriptorProvider.java</include>
+					<include>**/ITypeDescriptorProvider.java</include>
+					<include>**/IMarshalable.java</include>
+					<include>**/ApplicationException.java</include>
+			    <include>**/util/Binding.java</include>
+			    <include>**/util/BindingRefSet.java</include>
+			    <include>**/util/Comparator.java</include>
+			    <include>**/util/DataPoint.java</include>
+			    <include>**/util/DateRange.java</include>
+			    <include>**/util/DBType.java</include>
+			    <include>**/util/FNum.java</include>
+			    <include>**/util/ObjectUtil.java</include>
+			    <include>**/util/PropertyPath.java</include>
+			    <include>**/util/RefSet.java</include>
+			    <include>**/util/StringUtil.java</include>
+  
+					<include>**/schema/AbstractSchemaProperty.java</include>
+					<include>**/schema/IPropertyMetadataProvider.java</include>
+					<include>**/schema/IPropertyNameProvider.java</include>
+					<include>**/schema/ISchemaProperty.java</include>
+					<include>**/schema/PropertyMetadata.java</include>
+					<include>**/schema/PropertyType.java</include>
+					<include>**/schema/IQueryParam.java</include>
+  				
   				<include>**/criteria/CriteriaType.java</include>
   				<include>**/dao/SortColumn.java</include>
   				<include>**/dao/SortDir.java</include>
@@ -486,6 +514,17 @@
 		</dependency>
 
 		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.0.0.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>4.0.0.GA</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.google.code.guice</groupId>
 			<artifactId>guice</artifactId>
 			<version>2.0</version>
@@ -535,43 +574,6 @@
 			<version>${tll.version}</version>
 		</dependency>
     
-    <dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-core</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-schema</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-core</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-ui</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-view</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-field</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tll</groupId>
-			<artifactId>tll-client-rpc</artifactId>
-			<version>${tll.version}</version>
-		</dependency>
-		
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>

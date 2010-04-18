@@ -1,0 +1,20 @@
+.viewpath {
+	text-align: left;
+	font-weight: bold;
+	margin: 2px;
+}
+
+.viewpath p,.viewpath a {
+	font-size: 10px;
+}
+
+.viewpath a {
+	border-bottom: 1px dotted;
+}
+
+.viewpath .spacer {
+	font-size: 100%;
+	margin-top: 3px;
+	margin-left: 3px;
+	margin-right: 3px;
+}

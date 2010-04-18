@@ -1,0 +1,13 @@
+<module>
+
+  <source path="schema">
+    <include name="AbstractSchemaProperty.java" />
+    <include name="IPropertyMetadataProvider.java" />
+    <include name="IPropertyNameProvider.java" />
+    <include name="ISchemaProperty.java" />
+    <include name="PropertyMetadata.java" />
+    <include name="PropertyType.java" />
+    <include name="IQueryParam.java" />
+  </source>
+
+</module>

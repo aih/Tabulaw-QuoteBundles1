@@ -1,0 +1,14 @@
+<module>
+  <inherits name="com.tll.Schema" />
+  <inherits name="com.tll.UI" />
+  
+  <replace-with class="com.tll.client.ui.field.impl.FieldLabelImplIE">
+    <when-type-is class="com.tll.client.ui.field.impl.FieldLabelImpl" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+    </any>
+  </replace-with>
+
+  <stylesheet src="css/field.css" />
+  
+</module>

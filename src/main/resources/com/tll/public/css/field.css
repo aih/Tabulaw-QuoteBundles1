@@ -1,0 +1,174 @@
+@CHARSET "ISO-8859-1";
+
+label {
+  color: blue;
+  cursor: pointer;
+  cursor: hand;
+  white-space: nowrap;
+}
+
+.fld {
+  
+}
+
+.fldtitle {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.fld .tbox {
+  padding: 1px;
+  margin: 0 1px 0 0;
+  border: 1px solid gray;
+}
+
+.fld .gwt-ListBox {
+  padding: 0 !important; /* this makes it equal in height to text boxes! */
+}
+
+/* checkbox and radio specific label styling */
+.cbrb label {
+  margin-left: 4px;
+}
+
+label .rqd {
+  color: red;
+  font-size: 14px;
+}
+
+.active input,.active select,.active textarea {
+	border-color: blue !important;
+  background-color: #EFF3FF;
+}
+
+.error input,.error select,.error textarea {
+  border-color: red !important;
+  background-color: #FFDFDF;
+}
+
+.dirty input,.dirty select,.dirty textarea {
+  border-color: #CC6600 !important;
+  background-color: #FFFFCF !important;
+}
+
+.fld .icon {
+  cursor: pointer;
+  display: inline;
+}
+
+label.ro, .ro label {
+  cursor: default !important;
+}
+
+.ro .fld, .ro label {
+  margin-right: 10px;
+ }
+
+/* radio field grid styling (GridRenderer grid style) */
+.fradioGrid {
+  
+}
+
+.fradioGrid td {
+  padding: 0 2px;
+}
+
+/* field panel styles */
+.fpnl {
+  
+}
+
+.fpnl .gwt-DisclosurePanel .header td {
+  font-weight: bold;
+}
+
+/* FlowPanelFieldComposer styles */
+.fldc {
+  margin: 1px;
+}
+
+.fldc a {
+  display: block;
+}
+
+.frow {
+  margin-top: .2em;
+  margin-bottom: .2em;
+  /*width: 100%;*/
+}
+
+.frow .cbrb input {
+  margin: 3px 0 0 6px;
+}
+
+/* GridFieldComposer styles */
+.fgrid {
+  
+}
+
+.fgrid .cell-lbl {
+  vertical-align: top;
+}
+
+.fgrid .cell-fld {
+  padding: 0 0 2px 10px;
+}
+
+/* TabbedIndexedFieldPanel */
+.tifp {
+  
+}
+
+.tifp .empty {
+  padding: 2em;
+}
+
+.tifp .gwt-TabBar .gwt-TabBarItem .delbtn {
+  display: none;
+}
+
+.tifp .gwt-TabBar .gwt-TabBarItem-selected .delbtn {
+  background-color: transparent !important;
+  display: block;
+}
+
+.tifp .gwt-TabBar .gwt-TabBarItem-selected * {
+  font-weight: bold;
+}
+
+.tifp .toolbar {
+  background-color: transparent;
+  height: inherit !important;
+}
+
+.tifp .button-up,.tifp .button-up-hovering,.tifp .button-up-disabled {
+  padding: 0;
+}
+
+.tifp .button-down,.tifp .button-down-hovering,.tifp .button-down-disabled {
+  padding: 0;
+}
+
+.tifp .button-up {
+  border-color: transparent;
+}
+
+.tifp .button-up-hovering {
+  background-color: white;
+}
+
+.tifp .button-up-disabled {
+  border-color: transparent;
+}
+
+.tifp .button-down {
+  border-color: transparent;
+}
+
+.tifp .button-down-hovering {
+  border-color: transparent;
+}
+
+.tifp .button-down-disabled {
+  border-color: transparent;
+}
