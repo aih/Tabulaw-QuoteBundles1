@@ -3,8 +3,8 @@
 	
 	<inherits name="com.allen_sauer.gwt.log.gwt-log-OFF" />
 
-	<inherits name="com.tll.tabulaw.Poc" />
+	<inherits name="com.tabulaw.Poc" />
 
-	<entry-point class="com.tll.tabulaw.client.Poc" />
+	<entry-point class="com.tabulaw.client.Poc" />
 
 </module>

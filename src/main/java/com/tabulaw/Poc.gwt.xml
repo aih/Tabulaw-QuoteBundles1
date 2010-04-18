@@ -35,12 +35,11 @@
 		<include name="ListHandlerType.java" />
 	</source>
 	
-	<inherits name="com.tll.Rpc" />
 	<inherits name="com.tll.View" />
-	<inherits name="com.tll.Listing" />
-	<inherits name="com.tll.Databind" />
-	<inherits name="com.tll.Login" />
+	<inherits name="com.tll.Field" />
+	<inherits name="com.tll.Rpc" />
 
+	<stylesheet src="css/tableview.css" />
 	<stylesheet src="../css/poc.css" />
 
 	<source path="client" />

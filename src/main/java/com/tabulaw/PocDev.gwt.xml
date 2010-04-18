@@ -9,8 +9,8 @@
 	<set-property name="log_RemoteLogger" value="DISABLED" />
 	<set-property name="log_WindowLogger" value="DISABLED" />
 
-	<inherits name="com.tll.tabulaw.Poc" />
+	<inherits name="com.tabulaw.Poc" />
 
-	<entry-point class="com.tll.tabulaw.client.Poc" />
+	<entry-point class="com.tabulaw.client.Poc" />
 
 </module>
