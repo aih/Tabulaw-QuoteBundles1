@@ -17,7 +17,7 @@
 		<gwt.log.level>INFO</gwt.log.level>
 		<gwt.compile.module>com.tabulaw.PocDev</gwt.compile.module>
 		
-		<db4o.version>7.4.121.14026</db4o.version>
+		<db4o.version>7.13-SNAPSHOT</db4o.version>
 		<spring.version>2.5.6.SEC01</spring.version>
 		<springextensions.db4o.version>1.0.0e</springextensions.db4o.version>
 		<aspectj.version>1.6.5</aspectj.version>
@@ -46,7 +46,11 @@
 			<url>http://tll.googlecode.com/svn/mavenrepo/</url>
 		</repository>
 		-->
-		<repository>
+    <repository>
+      <id>source.db4o</id>
+      <url>http://source.db4o.com/maven</url>
+    </repository>
+  	<repository>
 			<id>htmlcleaner</id>
 			<url>http://goodworkalan.com/m2/repository/net/sourceforge</url>
 		</repository>
@@ -490,8 +494,8 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>db4o</groupId>
-			<artifactId>db4o</artifactId>
+			<groupId>com.db4o</groupId>
+			<artifactId>db4o-full-java5</artifactId>
 			<version>${db4o.version}</version>
 		</dependency>
 		<dependency>
