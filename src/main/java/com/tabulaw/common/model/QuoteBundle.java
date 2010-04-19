@@ -63,13 +63,17 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 
 	@Override
 	public QuoteBundle clone() {
-		ArrayList<Quote> cquotes = new ArrayList<Quote>(quotes == null ? 0 : quotes.size());
+		ArrayList<Quote> cquotes = null;
 		if(quotes != null) {
+			cquotes = new ArrayList<Quote>(quotes.size());
 			for(Quote q : quotes) {
 				cquotes.add(q.clone());
 			}
 		}
-		return new QuoteBundle(name, description, cquotes);
+		QuoteBundle cln = new QuoteBundle(name, description, cquotes);
+		cln.id = id;
+		cloneTimestamping(cln);
+		return cln;
 	}
 
 	@Override
@@ -86,11 +90,21 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 	}
 
 	public List<Quote> getQuotes() {
+		if(quotes == null) quotes = new ArrayList<Quote>();
 		return quotes;
 	}
 
 	public void setQuotes(List<Quote> quotes) {
 		this.quotes = quotes;
+	}
+	
+	public void addQuote(Quote quote) {
+		getQuotes().add(quote);
+	}
+	
+	public boolean removeQuote(Quote quote) {
+		if(quotes == null) return false;
+		return quotes.remove(quote);
 	}
 
 	@Length(max = 4000)

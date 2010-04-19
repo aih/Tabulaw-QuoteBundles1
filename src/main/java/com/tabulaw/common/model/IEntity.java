@@ -8,12 +8,10 @@ import com.tabulaw.IPropertyValueProvider;
 import com.tabulaw.ITypeDescriptorProvider;
 
 /**
- * IEntity - Fundamental type for all [server side] entities.
+ * Contract for a particular model type usable for server and client side.
  * @author jpk
  */
-public interface IEntity 
-extends Serializable, Cloneable, IMarshalable, IModelKeyProvider, 
-IDescriptorProvider, ITypeDescriptorProvider, IPropertyValueProvider {
+public interface IEntity extends Serializable, Cloneable, IMarshalable, IModelKeyProvider, IDescriptorProvider, ITypeDescriptorProvider, IPropertyValueProvider {
 
 	static final String ID_FIELDNAME = "id";
 
@@ -26,7 +24,7 @@ IDescriptorProvider, ITypeDescriptorProvider, IPropertyValueProvider {
 	 * @return the id.
 	 */
 	String getId();
-	
+
 	/**
 	 * Set the id.
 	 * @param id
@@ -49,7 +47,8 @@ IDescriptorProvider, ITypeDescriptorProvider, IPropertyValueProvider {
 	void setVersion(int version);
 
 	/**
-	 * @return A distinct partially deep copy.
+	 * @return A distinct deep copy of all properties that are managed by this
+	 *         entity (those that are not referenced).
 	 */
 	IEntity clone();
 }

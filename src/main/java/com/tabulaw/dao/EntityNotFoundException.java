@@ -10,7 +10,7 @@ package com.tabulaw.dao;
  * EntityNotFoundException
  * @author jpk
  */
-public class EntityNotFoundException extends RuntimeException {
+public class EntityNotFoundException extends PersistenceException {
 
 	private static final long serialVersionUID = -7233687566073361502L;
 

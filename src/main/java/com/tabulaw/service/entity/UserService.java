@@ -88,32 +88,33 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 
 	@Transactional
 	public void init() {
-		// stub anon user if not alreay specified
-		User anonUser = new User();
-		Authority a = new Authority();
-		a.setAuthority(AuthorityRoles.ROLE_USER.name());
-		a = new Authority();
-		a.setAuthority(AuthorityRoles.ROLE_ADMINISTRATOR.name());
-		anonUser.addAuthority(a);
-		Date now = new Date();
-		anonUser.setDateCreated(now);
-		anonUser.setDateModified(now);
-		anonUser.setEmailAddress("anon@tabulaw.com");
-		anonUser.setPassword(encodePassword("anon", anonUser.getEmailAddress()));
-		anonUser.setEnabled(true);
-		anonUser.setLocked(false);
-		Calendar c = Calendar.getInstance();
-		c.setTime(now);
-		c.add(Calendar.YEAR, 1);
-		anonUser.setExpires(c.getTime());
-		anonUser.setName("Tabulaw Discovery User");
+		User anonUser = null;
 		try {
-			dao.persist(anonUser);
-			log.debug("Test anon user created.");
+			anonUser = dao.load(User.class, "anon@tabulaw.com");
+			log.debug("Test anon user retrieved.");
 		}
-		catch(EntityExistsException e) {
-			// ok
-			log.debug("Test anon user found to exist.");
+		catch(EntityNotFoundException e) {
+			// create the anon user
+			anonUser = new User();
+			Authority a = new Authority();
+			a.setAuthority(AuthorityRoles.ROLE_USER.name());
+			a = new Authority();
+			a.setAuthority(AuthorityRoles.ROLE_ADMINISTRATOR.name());
+			anonUser.addAuthority(a);
+			Date now = new Date();
+			anonUser.setDateCreated(now);
+			anonUser.setDateModified(now);
+			anonUser.setEmailAddress("anon@tabulaw.com");
+			anonUser.setPassword(encodePassword("anon", anonUser.getEmailAddress()));
+			anonUser.setEnabled(true);
+			anonUser.setLocked(false);
+			Calendar c = Calendar.getInstance();
+			c.setTime(now);
+			c.add(Calendar.YEAR, 1);
+			anonUser.setExpires(c.getTime());
+			anonUser.setName("Tabulaw Discovery User");
+			log.debug("Test anon user created.");
+			anonUser = dao.persist(anonUser);
 		}
 	}
 

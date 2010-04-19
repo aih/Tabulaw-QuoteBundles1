@@ -9,7 +9,7 @@ package com.tabulaw.dao;
 /**
  * @author jpk
  */
-public class EntityExistsException extends RuntimeException {
+public class EntityExistsException extends PersistenceException {
 
 	private static final long serialVersionUID = -7233687566073361502L;
 

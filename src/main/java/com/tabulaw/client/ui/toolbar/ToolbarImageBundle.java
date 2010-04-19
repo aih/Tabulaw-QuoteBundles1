@@ -19,6 +19,6 @@ public interface ToolbarImageBundle extends ClientBundle {
 	 * split
 	 * @return the split prototype
 	 */
-	@Source(value = "com/tabulaw/public/images/split.gif")
+	@Source(value = "../../../public/images/split.gif")
 	ImageResource split();
 }

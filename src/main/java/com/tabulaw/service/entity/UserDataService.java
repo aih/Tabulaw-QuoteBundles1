@@ -182,7 +182,7 @@ public class UserDataService extends AbstractEntityService {
 		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);
 		assert qb != null;
 		Quote persistedQuote = dao.persist(quote);
-		qb.getQuotes().add(quote);
+		qb.addQuote(persistedQuote);
 		dao.persist(qb);
 		return persistedQuote;
 	}
@@ -214,7 +214,7 @@ public class UserDataService extends AbstractEntityService {
 			}
 		}
 		if(tormv == null) throw new EntityNotFoundException("Quote: " + quoteId + " not found in bundle: " + bundleId);
-		qb.getQuotes().remove(tormv);
+		qb.removeQuote(tormv);
 		dao.persist(qb);
 		if(deleteQuote) {
 			dao.purge(tormv);

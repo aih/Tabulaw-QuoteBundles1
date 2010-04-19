@@ -18,13 +18,13 @@ public interface ListingTableImageBundle extends ClientBundle {
 	 * sort_asc
 	 * @return the image prototype
 	 */
-	@Source(value = "../../sort_asc.gif")
+	@Source(value = "../../../public/images/sort_asc.gif")
 	ImageResource sort_asc();
 
 	/**
 	 * sort_desc
 	 * @return the image prototype
 	 */
-	@Source(value = "../../sort_desc.gif")
+	@Source(value = "../../../public/images/sort_desc.gif")
 	ImageResource sort_desc();
 }

@@ -48,6 +48,10 @@
   </source>
   
   <source path="dao">
+		<include name="PersistenceException.java" />
+		<include name="EntityExistsException.java" />
+		<include name="EntityNotFoundException.java" />
+		<include name="NonUniqueResultException.java" />
     <include name="Sorting.java" />
     <include name="SortDir.java" />
     <include name="SortColumn.java" />
@@ -122,4 +126,7 @@
 	
 	<stylesheet src="css/poc.css" />
 	
+	<script src="js/goog.js" />
+	<script src="js/mark.js" />
+
 </module>

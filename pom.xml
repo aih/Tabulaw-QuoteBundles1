@@ -119,10 +119,16 @@
 					<include>**/schema/IQueryParam.java</include>
   				
   				<include>**/criteria/CriteriaType.java</include>
+  				
+  				<include>**/dao/PersistenceException.java</include>
+  				<include>**/dao/EntityExistsException.java</include>
+  				<include>**/dao/EntityNotFoundException.java</include>
+  				<include>**/dao/NonUniqueResultException.java</include>
   				<include>**/dao/SortColumn.java</include>
   				<include>**/dao/SortDir.java</include>
   				<include>**/dao/Sorting.java</include>
   				<include>**/dao/SortColumnComparator.java</include>
+  				
   				<include>**/listhandler/EmptyListException.java</include>
   				<include>**/listhandler/IListHandler.java</include>
   				<include>**/listhandler/AbstractListHandler.java</include>

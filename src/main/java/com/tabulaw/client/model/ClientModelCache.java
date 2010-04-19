@@ -21,6 +21,7 @@ import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.User;
+import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.util.ObjectUtil;
 
 /**
@@ -47,17 +48,18 @@ public class ClientModelCache {
 		}
 
 	} // constructor
-	
+
 	/**
 	 * Clears out the entire model cache.
-	 * <p>No model change event is fired.
+	 * <p>
+	 * No model change event is fired.
 	 */
 	public void clear() {
 		for(List<?> list : cache.values()) {
 			list.clear();
 		}
 	}
-	
+
 	/**
 	 * @return The currently logged in user.
 	 */
@@ -73,16 +75,19 @@ public class ClientModelCache {
 	 * model instances.
 	 * @param key
 	 * @return the found model.
-	 * @throws IllegalArgumentException When the model can't be found.
+	 * @throws IllegalArgumentException When the given key is not set
+	 * @throws EntityNotFoundException When the model can't be found
 	 */
-	public IEntity get(ModelKey key) {
+	public IEntity get(ModelKey key) throws IllegalArgumentException, EntityNotFoundException {
+		if(key == null) throw new NullPointerException();
+		if(!key.isSet()) throw new IllegalArgumentException("Key not set");
 		List<? extends IEntity> list = cache.get(key.getEntityType());
 		for(IEntity m : list) {
 			if(m.getId().equals(key.getId())) {
 				return m.clone();
 			}
 		}
-		throw new IllegalArgumentException("Model of key: " + key + " not found in datastore.");
+		throw new EntityNotFoundException("Model of key: " + key + " not found in datastore.");
 	}
 
 	/**
@@ -98,7 +103,7 @@ public class ClientModelCache {
 		}
 		if(rlist.size() > 1) {
 			Collections.sort(rlist, new Comparator<Object>() {
-				
+
 				@Override
 				public int compare(Object o1, Object o2) {
 					return ((Comparable<Object>) o1).compareTo(o2);
@@ -115,8 +120,13 @@ public class ClientModelCache {
 	 * @param m model to persist
 	 * @param source optional source widget when specified, a model change event
 	 *        is fired on it
+	 * @throws IllegalArgumentException When the entity has no id.
 	 */
-	public void persist(IEntity m, Widget source) {
+	public void persist(IEntity m, Widget source) throws IllegalArgumentException {
+		if(m == null) throw new NullPointerException();
+		if(m.getId() == null) {
+			throw new IllegalArgumentException("Entity '" + m + "' has no id");
+		}
 		List<IEntity> list = cache.get(m.getEntityType().name());
 
 		IEntity existing = null;
@@ -177,24 +187,25 @@ public class ClientModelCache {
 	 *        is fired on it
 	 * @return The deleted model or <code>null</code> if the model was not
 	 *         deleted.
+	 * @throws IllegalArgumentException When the given key is not set
+	 * @throws EntityNotFoundException When the entity to purge is not found
 	 */
-	public IEntity remove(ModelKey key, Widget source) {
-		List<IEntity> set = cache.get(key.getEntityType());
+	public IEntity remove(ModelKey key, Widget source) throws IllegalArgumentException, EntityNotFoundException {
+		if(key == null) throw new NullPointerException();
+		if(!key.isSet()) throw new IllegalArgumentException("Key not set");
+		List<IEntity> list = cache.get(key.getEntityType());
 		IEntity t = null;
-		for(IEntity m : set) {
+		for(IEntity m : list) {
 			if(m.getId().equals(key.getId())) {
 				t = m;
 				break;
 			}
 		}
-		if(t != null) {
-			if(set.remove(t)) {
-				// fire model change event
-				if(source != null) source.fireEvent(new ModelChangeEvent(ModelChangeOp.DELETED, t, null));
-				return t;
-			}
-		}
-		return null;
+		if(t == null) throw new EntityNotFoundException("Entity of key: '" + key + "' not found for purge.");
+		list.remove(t);
+		// fire model change event
+		if(source != null) source.fireEvent(new ModelChangeEvent(ModelChangeOp.DELETED, t, null));
+		return t;
 	}
 
 	/**
@@ -209,9 +220,13 @@ public class ClientModelCache {
 		if(list == null || list.size() < 1) return;
 		ArrayList<IEntity> rlist = new ArrayList<IEntity>(list);
 		for(IEntity m : rlist) {
-			if(list.remove(m)) {
-				// fire model change event
-				if(source != null) source.fireEvent(new ModelChangeEvent(ModelChangeOp.DELETED, m, null));
+			list.remove(m);
+		}
+		
+		// fire model change event(s)
+		if(source != null) {
+			for(IEntity e : rlist) {
+				source.fireEvent(new ModelChangeEvent(ModelChangeOp.DELETED, e, null));
 			}
 		}
 	}
@@ -238,7 +253,7 @@ public class ClientModelCache {
 	public DocRef getCaseDocByRemoteUrl(String remoteCaseUrl) {
 		List<IEntity> list = cache.get(EntityType.DOCUMENT);
 		for(IEntity m : list) {
-			CaseRef caseRef = ((DocRef)m).getCaseRef();
+			CaseRef caseRef = ((DocRef) m).getCaseRef();
 			if(caseRef == null) continue;
 			String surl = caseRef.getUrl();
 			if(surl != null && surl.equals(remoteCaseUrl)) return (DocRef) m;

@@ -13,41 +13,41 @@ public interface ViewToolbarClientBundle extends ClientBundle {
 	 * arrow_sm_right
 	 * @return the image prototype
 	 */
-	@Source(value = "com/tabulaw/public/images/arrow_sm_right.gif")
+	@Source(value = "../../../public/images/arrow_sm_right.gif")
 	ImageResource arrow_sm_right();
 
 	/**
 	 * arrow_sm_down
 	 * @return the image prototype
 	 */
-	@Source(value = "com/tabulaw/public/images/arrow_sm_down.gif")
+	@Source(value = "../../../public/images/arrow_sm_down.gif")
 	ImageResource arrow_sm_down();
 
 	/**
 	 * close
 	 * @return the image prototype
 	 */
-	@Source(value = "com/tabulaw/public/images/close.gif")
+	@Source(value = "../../../public/images/close.gif")
 	ImageResource close();
 
 	/**
 	 * external (11x11)
 	 * @return the image prototype
 	 */
-	@Source(value = "com/tabulaw/public/images/external.gif")
+	@Source(value = "../../../public/images/external.gif")
 	ImageResource external();
 
 	/**
 	 * permalink (11x11)
 	 * @return the image prototype
 	 */
-	@Source(value = "com/tabulaw/public/images/permalink.gif")
+	@Source(value = "../../../public/images/permalink.gif")
 	ImageResource permalink();
 
 	/**
 	 * refresh
 	 * @return the image prototype
 	 */
-	@Source(value = "com/tabulaw/public/images/refresh.gif")
+	@Source(value = "../../../public/images/refresh.gif")
 	ImageResource refresh();
 }

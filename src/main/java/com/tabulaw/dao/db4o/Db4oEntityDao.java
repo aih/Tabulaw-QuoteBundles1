@@ -65,7 +65,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	static class IdState {
 
 		private static final long serialVersionUID = 5319169153141045247L;
-		
+
 		/**
 		 * Holds the next primary key for root entity types.
 		 */
@@ -79,7 +79,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 			idMap.put(entityType, currentId);
 		}
 	}
-	
+
 	private static void registerCallbacks(ObjectContainer oc) {
 		final EventRegistry registry = EventRegistryFactory.forObjectContainer(oc);
 		registry.creating().addListener(new Timestamper(true));
@@ -138,6 +138,26 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		}
 
 	} // Versioner
+
+	/**
+	 * Takes the elements in the given collection and adds them to a new
+	 * {@link ArrayList} ensuring the elements exist in a natural (native) java
+	 * collection such that it may be eligible for gwt rpc.
+	 * @param <E>
+	 * @param clc
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	static <E> List<E> naturalize(Collection<E> clc) {
+		if(clc instanceof ArrayList) return (ArrayList<E>) clc;
+		ArrayList<E> list = new ArrayList<E>(clc == null ? 0 : clc.size());
+		if(clc != null) {
+			for(E e : clc) {
+				list.add(e);
+			}
+		}
+		return list;
+	}
 
 	private final IEntityTypeResolver entityTypeResolver;
 
@@ -321,13 +341,13 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 			}
 		}
 
-		return (List<E>) getDb4oTemplate().execute(new Db4oCallback() {
+		return naturalize((List<E>) getDb4oTemplate().execute(new Db4oCallback() {
 
 			@Override
 			public Object doInDb4o(ObjectContainer container) throws RuntimeException {
 				return query.execute();
 			}
-		});
+		}));
 	}
 
 	@Override
@@ -453,13 +473,13 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	})
 	@Override
 	public <E extends IEntity> List<E> loadAll(Class<E> entityType) throws DataAccessException {
-		final List<E> list = getDb4oTemplate().query(new Predicate<E>(entityType) {
+		final List<E> list = naturalize(getDb4oTemplate().query(new Predicate<E>(entityType) {
 
 			@Override
 			public boolean match(E candidate) {
 				return true;
 			}
-		});
+		}));
 		return list;
 	}
 
@@ -494,9 +514,11 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		catch(final BusinessKeyPropertyException e) {
 			throw new IllegalStateException(e);
 		}
-		
-		// NOTE: this doesn't handle any ancestor entities that my exist under this entity!
-		// the calling service is responsible for individually persisting child entities!
+
+		// NOTE: this doesn't handle any ancestor entities that my exist under this
+		// entity!
+		// the calling service is responsible for individually persisting child
+		// entities!
 		if(entity.isNew() && entity.getId() == null) {
 			Class<?> entityClass = entityTypeResolver.resolveEntityClass(entity.getEntityType().name());
 			String surrogatePk = this.generatePrimaryKey(entityClass);
@@ -548,13 +570,13 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	@Override
 	public <E extends IEntity> List<E> findByIds(Class<E> entityType, final Collection<String> ids, Sorting sorting)
 			throws DataAccessException {
-		return getDb4oTemplate().query(new Predicate<E>(entityType) {
+		return naturalize(getDb4oTemplate().query(new Predicate<E>(entityType) {
 
 			@Override
 			public boolean match(E candidate) {
 				return ids.contains((candidate.getId()));
 			}
-		});
+		}));
 	}
 
 	@Override
@@ -570,7 +592,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		}
 		return idlist;
 	}
-	
+
 	private String generatePrimaryKey(Class<?> clz) {
 		if(state == null) {
 			try {

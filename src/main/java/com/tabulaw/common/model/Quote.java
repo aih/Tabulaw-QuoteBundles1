@@ -68,7 +68,10 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	@Override
 	public Quote clone() {
 		// NOTE: keep the doc ref
-		return new Quote(quote, serializedMark, document);
+		Quote cln = new Quote(quote, serializedMark, document);
+		cln.id = id;
+		cloneTimestamping(cln);
+		return cln;
 	}
 
 	@Override

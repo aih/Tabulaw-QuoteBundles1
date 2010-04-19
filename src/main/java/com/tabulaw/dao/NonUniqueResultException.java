@@ -10,7 +10,7 @@ package com.tabulaw.dao;
  * NonUniqueResultException
  * @author jpk
  */
-public class NonUniqueResultException extends RuntimeException {
+public class NonUniqueResultException extends PersistenceException {
 
 	private static final long serialVersionUID = 2320378838257569253L;
 

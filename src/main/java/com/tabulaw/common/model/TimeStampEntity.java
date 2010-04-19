@@ -9,7 +9,7 @@ import com.tabulaw.schema.Managed;
  * is the create/modify date and the create/modify user.
  * @author jpk
  */
-public abstract class TimeStampEntity extends EntityBase {
+public abstract class TimeStampEntity extends EntityBase implements ITimeStampEntity {
 
 	private static final long serialVersionUID = 1800355868972602348L;
 
@@ -54,7 +54,12 @@ public abstract class TimeStampEntity extends EntityBase {
 
 	@Override
 	public IEntity clone() {
-		return null;
+		throw new UnsupportedOperationException();
+	}
+	
+	protected void cloneTimestamping(TimeStampEntity tse) {
+		tse.setDateCreated(dateCreated == null ? null : new Date(dateCreated.getTime()));
+		tse.setDateModified(dateModified == null ? null : new Date(dateModified.getTime()));
 	}
 
 	@Override

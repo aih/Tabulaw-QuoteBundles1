@@ -59,7 +59,9 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 
 	@Override
 	public CaseRef clone() {
-		return new CaseRef(parties, citation, url, year);
+		CaseRef cln = new CaseRef(parties, citation, url, year);
+		cln.id = id;
+		return cln;
 	}
 
 	@Override

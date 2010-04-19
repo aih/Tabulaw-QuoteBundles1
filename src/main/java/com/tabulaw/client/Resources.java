@@ -17,26 +17,9 @@ public interface Resources extends ClientBundle {
 
 	Resources INSTANCE = GWT.create(Resources.class);
 
-	@Source("com/tabulaw/public/images/note-icon.png")
+	@Source("../public/images/note-icon.png")
 	ImageResource searchImage();
 
-	@Source("com/tabulaw/public/images/pencil.gif")
+	@Source("../public/images/pencil.gif")
 	ImageResource pencil();
-
-	/*
-	@Source("cases/Buckley-v-Valeo.htm")
-	DataResource caseBuckley();
-
-	@Source("cases/CitizensUnited-v-FEC.htm")
-	DataResource caseCitizensUnited();
-
-	@Source("cases/FirstNatl-v-Belotti.htm")
-	DataResource caseFirstNatl();
-
-	@Source("cases/McConnell-v-FEC.htm")
-	DataResource caseMcConnell();
-
-	@Source("cases/Times-v-Sullivan.htm")
-	DataResource caseTimes();
-	*/
 }

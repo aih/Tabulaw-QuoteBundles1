@@ -108,7 +108,9 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity {
 			cauth.add(a.clone());
 		}
 
-		return new User(name, emailAddress, password, locked, enabled, expires, cauth);
+		User cln = new User(name, emailAddress, password, locked, enabled, expires, cauth);
+		cloneTimestamping(cln);
+		return cln;
 	}
 
 	@Override
