@@ -23,7 +23,13 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.Resources;
+import com.tabulaw.client.data.rpc.IRpcHandler;
+import com.tabulaw.client.data.rpc.RpcCommand;
+import com.tabulaw.client.data.rpc.RpcEvent;
 import com.tabulaw.client.model.ClientModelCache;
+import com.tabulaw.client.mvc.ViewManager;
+import com.tabulaw.client.mvc.view.ShowViewRequest;
+import com.tabulaw.client.ui.msg.Msgs;
 import com.tabulaw.client.view.DocumentViewInitializer;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocFetchPayload;
@@ -34,14 +40,7 @@ import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.ModelKey;
-import com.tll.client.data.rpc.IRpcHandler;
-import com.tll.client.data.rpc.RpcCommand;
-import com.tll.client.data.rpc.RpcEvent;
-import com.tll.client.mvc.ViewManager;
-import com.tll.client.mvc.view.ShowViewRequest;
-import com.tll.client.ui.RpcUiHandler;
-import com.tll.client.ui.msg.Msgs;
-import com.tll.common.msg.Msg;
+import com.tabulaw.common.msg.Msg;
 
 /**
  * Search as you type doc search widget.

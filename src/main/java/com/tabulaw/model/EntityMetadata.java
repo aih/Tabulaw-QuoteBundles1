@@ -6,9 +6,8 @@
 package com.tabulaw.model;
 
 import com.tabulaw.common.model.IEntity;
-import com.tll.model.IEntityMetadata;
-import com.tll.schema.Extended;
-import com.tll.schema.Root;
+import com.tabulaw.schema.Extended;
+import com.tabulaw.schema.Root;
 
 /**
  * IEntity's metadata definition.

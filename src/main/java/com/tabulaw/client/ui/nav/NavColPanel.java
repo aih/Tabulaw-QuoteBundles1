@@ -7,10 +7,10 @@ package com.tabulaw.client.ui.nav;
 
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.mvc.ViewManager;
+import com.tabulaw.client.mvc.view.ViewClass;
+import com.tabulaw.client.mvc.view.ViewKey;
 import com.tabulaw.client.view.IPocView;
-import com.tll.client.mvc.ViewManager;
-import com.tll.client.mvc.view.ViewClass;
-import com.tll.client.mvc.view.ViewKey;
 
 /**
  * Widget contained in the navCol.

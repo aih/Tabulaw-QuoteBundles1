@@ -11,12 +11,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
+import com.tabulaw.schema.ISchemaInfo;
 import com.tabulaw.server.PersistContext;
+import com.tabulaw.server.rpc.IExceptionHandler;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 import com.tll.mail.MailManager;
-import com.tll.schema.ISchemaInfo;
-import com.tll.server.rpc.IExceptionHandler;
 
 /**
  * @author jpk

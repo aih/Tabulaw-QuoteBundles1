@@ -9,8 +9,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.tll.client.ui.Dialog;
-import com.tll.client.ui.RpcUiHandler;
 
 /**
  * Shows the doc upload panel in a dialog box.

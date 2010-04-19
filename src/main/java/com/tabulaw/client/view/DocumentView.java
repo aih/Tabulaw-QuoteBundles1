@@ -11,14 +11,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tabulaw.client.mvc.ViewManager;
+import com.tabulaw.client.mvc.view.UnloadViewRequest;
+import com.tabulaw.client.mvc.view.ViewClass;
+import com.tabulaw.client.mvc.view.ViewOptions;
 import com.tabulaw.client.ui.DocumentHighlightWidget;
 import com.tabulaw.client.ui.ModelChangeDispatcher;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.ModelKey;
-import com.tll.client.mvc.ViewManager;
-import com.tll.client.mvc.view.UnloadViewRequest;
-import com.tll.client.mvc.view.ViewClass;
-import com.tll.client.mvc.view.ViewOptions;
 
 /**
  * Displays a single document allowing quote/bundle editing.

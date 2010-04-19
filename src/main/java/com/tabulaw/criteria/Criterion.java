@@ -1,6 +1,6 @@
 package com.tabulaw.criteria;
 
-import com.tll.util.Comparator;
+import com.tabulaw.util.Comparator;
 
 /**
  * Object representing a criterion definition. It contains the field name and

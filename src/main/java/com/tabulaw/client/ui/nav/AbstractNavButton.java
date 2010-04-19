@@ -9,7 +9,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.tll.client.mvc.view.IViewInitializer;
+import com.tabulaw.client.mvc.view.IViewInitializer;
 
 /**
  * Button like widget intended for use in a nav panel.

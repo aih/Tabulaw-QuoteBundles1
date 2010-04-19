@@ -6,7 +6,7 @@ package com.tabulaw.dao;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import com.tll.IPropertyValueProvider;
+import com.tabulaw.IPropertyValueProvider;
 
 /**
  * A {@link Comparator} based on a {@link SortColumn}.

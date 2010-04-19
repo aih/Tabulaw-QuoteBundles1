@@ -7,9 +7,9 @@ package com.tabulaw.common.data.rpc;
 
 import java.util.List;
 
+import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.data.Status;
 import com.tabulaw.common.model.DocRef;
-import com.tll.common.data.Payload;
-import com.tll.common.data.Status;
 
 /**
  * @author jpk

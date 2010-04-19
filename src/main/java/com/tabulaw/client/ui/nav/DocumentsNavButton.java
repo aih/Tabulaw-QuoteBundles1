@@ -5,9 +5,9 @@
  */
 package com.tabulaw.client.ui.nav;
 
+import com.tabulaw.client.mvc.view.IViewInitializer;
+import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.view.DocumentsView;
-import com.tll.client.mvc.view.IViewInitializer;
-import com.tll.client.mvc.view.StaticViewInitializer;
 
 /**
  * Shows the Document listing view when clicked.

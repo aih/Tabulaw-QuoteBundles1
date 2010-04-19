@@ -7,9 +7,9 @@ package com.tabulaw.common.data.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.common.data.ModelPayload;
+import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tll.common.data.Payload;
 
 /**
  * @author jpk

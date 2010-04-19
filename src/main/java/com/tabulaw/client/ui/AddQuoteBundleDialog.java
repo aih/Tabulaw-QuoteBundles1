@@ -15,18 +15,16 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.ui.edit.EditEvent;
+import com.tabulaw.client.ui.edit.FieldGroupEditPanel;
+import com.tabulaw.client.ui.edit.IEditHandler;
+import com.tabulaw.client.ui.edit.EditEvent.EditOp;
+import com.tabulaw.client.ui.field.FieldGroup;
+import com.tabulaw.client.validate.ErrorHandlerBuilder;
+import com.tabulaw.client.validate.ErrorHandlerDelegate;
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tll.client.ui.Dialog;
-import com.tll.client.ui.FocusCommand;
-import com.tll.client.ui.edit.EditEvent;
-import com.tll.client.ui.edit.FieldGroupEditPanel;
-import com.tll.client.ui.edit.IEditHandler;
-import com.tll.client.ui.edit.EditEvent.EditOp;
-import com.tll.client.ui.field.FieldGroup;
-import com.tll.client.validate.ErrorHandlerBuilder;
-import com.tll.client.validate.ErrorHandlerDelegate;
-import com.tll.common.msg.Msg;
+import com.tabulaw.common.msg.Msg;
 
 /**
  * Dialog for handling quote bundles to the app.

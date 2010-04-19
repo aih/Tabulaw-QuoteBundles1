@@ -10,20 +10,19 @@ import java.util.Map;
 
 import org.springframework.mail.MailSendException;
 
+import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.rpc.IForgotPasswordService;
 import com.tabulaw.common.model.IUserRef;
+import com.tabulaw.common.msg.Msg.MsgAttr;
+import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
 import com.tabulaw.service.IForgotPasswordHandler;
-import com.tll.common.data.Payload;
-import com.tll.common.data.Status;
-import com.tll.common.msg.Msg.MsgAttr;
-import com.tll.common.msg.Msg.MsgLevel;
+import com.tabulaw.util.StringUtil;
 import com.tll.mail.IMailContext;
 import com.tll.mail.MailManager;
 import com.tll.mail.MailRouting;
-import com.tll.server.rpc.RpcServlet;
-import com.tll.util.StringUtil;
 
 /**
  * ForgotPasswordService

@@ -8,8 +8,8 @@ package com.tabulaw.client.view;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.model.ModelChangeEvent;
-import com.tll.client.mvc.view.AbstractView;
-import com.tll.client.mvc.view.IViewInitializer;
+import com.tabulaw.client.mvc.view.AbstractView;
+import com.tabulaw.client.mvc.view.IViewInitializer;
 
 /**
  * AbstractPocView

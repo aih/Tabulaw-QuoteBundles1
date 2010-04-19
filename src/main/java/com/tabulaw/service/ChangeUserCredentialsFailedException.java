@@ -1,12 +1,10 @@
 package com.tabulaw.service;
 
-import com.tll.ApplicationException;
-
 /**
  * ChangeUserCredentialsFailedException
  * @author jpk
  */
-public class ChangeUserCredentialsFailedException extends ApplicationException {
+public class ChangeUserCredentialsFailedException extends Exception {
 
 	private static final long serialVersionUID = 1058479941139600488L;
 

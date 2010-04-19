@@ -2,8 +2,8 @@ package com.tabulaw.dao;
 
 import java.io.Serializable;
 
-import com.tll.IMarshalable;
-import com.tll.schema.IPropertyNameProvider;
+import com.tabulaw.IMarshalable;
+import com.tabulaw.schema.IPropertyNameProvider;
 
 /**
  * Represents a sort directive for a single "column".

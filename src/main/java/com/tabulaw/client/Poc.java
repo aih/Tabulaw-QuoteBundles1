@@ -13,6 +13,10 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tabulaw.client.mvc.ViewManager;
+import com.tabulaw.client.mvc.view.ShowViewRequest;
+import com.tabulaw.client.mvc.view.StaticViewInitializer;
+import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.Portal;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
@@ -32,10 +36,6 @@ import com.tabulaw.common.data.rpc.IUserDataServiceAsync;
 import com.tabulaw.common.data.rpc.UserContextPayload;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
-import com.tll.client.mvc.ViewManager;
-import com.tll.client.mvc.view.ShowViewRequest;
-import com.tll.client.mvc.view.StaticViewInitializer;
-import com.tll.client.mvc.view.ViewClass;
 
 /**
  * Poc

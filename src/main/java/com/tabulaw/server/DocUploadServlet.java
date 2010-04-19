@@ -28,7 +28,7 @@ import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.server.convert.IFileConverter;
 import com.tabulaw.server.convert.IFileConverter.FileType;
-import com.tll.util.StringUtil;
+import com.tabulaw.util.StringUtil;
 
 /**
  * Saves uploaded documents.

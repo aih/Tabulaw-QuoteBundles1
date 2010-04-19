@@ -8,7 +8,6 @@ import javax.servlet.ServletContext;
 
 import com.tabulaw.service.IForgotPasswordHandler;
 import com.tll.mail.MailManager;
-import com.tll.server.rpc.IExceptionHandler;
 
 /**
  * AppContext - An instance of this type is stored in the {@link ServletContext}

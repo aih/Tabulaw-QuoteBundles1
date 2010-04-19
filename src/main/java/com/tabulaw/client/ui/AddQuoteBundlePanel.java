@@ -7,12 +7,12 @@ package com.tabulaw.client.ui;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Focusable;
-import com.tll.client.ui.field.AbstractFieldGroupProvider;
-import com.tll.client.ui.field.AbstractFieldPanel;
-import com.tll.client.ui.field.FieldFactory;
-import com.tll.client.ui.field.FieldGroup;
-import com.tll.client.ui.field.FlowPanelFieldComposer;
-import com.tll.client.ui.field.IFieldRenderer;
+import com.tabulaw.client.ui.field.AbstractFieldGroupProvider;
+import com.tabulaw.client.ui.field.AbstractFieldPanel;
+import com.tabulaw.client.ui.field.FieldFactory;
+import com.tabulaw.client.ui.field.FieldGroup;
+import com.tabulaw.client.ui.field.FlowPanelFieldComposer;
+import com.tabulaw.client.ui.field.IFieldRenderer;
 
 
 /**

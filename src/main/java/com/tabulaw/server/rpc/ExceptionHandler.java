@@ -16,7 +16,6 @@ import com.google.inject.Inject;
 import com.tabulaw.di.ExceptionHandlerModule.OnErrorEmail;
 import com.tll.mail.MailManager;
 import com.tll.mail.NameEmail;
-import com.tll.server.rpc.IExceptionHandler;
 
 /**
  * ExceptionHandler - Emails exception notification emails.

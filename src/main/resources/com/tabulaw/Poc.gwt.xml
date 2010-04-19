@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+	<inherits name="com.google.gwt.user.User" />
+	<inherits name="com.google.gwt.http.HTTP" />
+
+	<!-- <inherits name="com.google.gwt.user.theme.standard.Standard"/> -->
+	<!-- <inherits name="com.google.gwt.user.theme.chrome.Chrome"/> -->
+	<!-- <inherits name="com.google.gwt.user.theme.dark.Dark"/>     -->
+
+  <!-- 
+		this suppress gwt rpc warnings
+		see: http://code.google.com/p/google-web-toolkit/issues/detail?id=4438 
+	-->
+	<extend-configuration-property name="rpc.blacklist" value="com.google.gwt.user.client.ui.*Collection"/>
+
+	<inherits name="com.allen_sauer.gwt.dnd.gwt-dnd" />
+
+	<source path="">
+		<include name="IProvider.java" />
+		<include name="IPropertyValueProvider.java" />
+		<include name="INameValueProvider.java" />
+		<include name="IDescriptorProvider.java" />
+		<include name="ITypeDescriptorProvider.java" />
+		<include name="IMarshalable.java" />
+	</source>
+	
+	<source path="util">
+		<include name="Comparator.java" />
+		<include name="DateRange.java" />
+		<include name="DBType.java" />
+		<include name="ObjectUtil.java" />
+		<include name="PropertyPath.java" />
+		<include name="StringUtil.java" />
+	</source>
+  
+  <source path="schema">
+    <include name="AbstractSchemaProperty.java" />
+    <include name="IPropertyMetadataProvider.java" />
+    <include name="IPropertyNameProvider.java" />
+    <include name="ISchemaProperty.java" />
+    <include name="PropertyMetadata.java" />
+    <include name="PropertyType.java" />
+    <include name="IQueryParam.java" />
+  </source>
+  
+  <source path="criteria">
+    <include name="CriteriaType.java" />
+  </source>
+  
+  <source path="dao">
+    <include name="Sorting.java" />
+    <include name="SortDir.java" />
+    <include name="SortColumn.java" />
+    <include name="SortColumnComparator.java" />
+  </source>
+
+	<source path="listhandler">
+		<include name="EmptyListException.java" />
+		<include name="IListHandler.java" />
+		<include name="AbstractListHandler.java" />
+		<include name="InMemoryListHandler.java" />
+		<include name="ListHandlerException.java" />
+		<include name="ListHandlerType.java" />
+	</source>
+	
+	<source path="client" />
+	<source path="common" />
+
+  <replace-with class="com.tabulaw.client.ui.impl.GlassPanelImplStandard">
+    <when-type-is class="com.tabulaw.client.ui.impl.GlassPanelImpl"/>
+    <when-property-is name="user.agent" value="opera"/>
+  </replace-with>
+
+  <replace-with class="com.tabulaw.client.ui.impl.GlassPanelImplStandard">
+    <when-type-is class="com.tabulaw.client.ui.impl.GlassPanelImpl"/>
+    <when-property-is name="user.agent" value="safari"/>
+  </replace-with>
+
+  <replace-with class="com.tabulaw.client.ui.impl.GlassPanelImplStandard">
+    <when-type-is class="com.tabulaw.client.ui.impl.GlassPanelImpl"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
+    </any>
+  </replace-with>
+
+  <replace-with class="com.tabulaw.client.ui.impl.GlassPanelImplStandard">
+    <when-type-is class="com.tabulaw.client.ui.impl.GlassPanelImpl"/>
+    <any>
+      <when-property-is name="user.agent" value="gecko1_8"/>
+      <when-property-is name="user.agent" value="gecko"/>
+    </any>
+  </replace-with>
+  
+  <replace-with class="com.tabulaw.client.ui.field.impl.FieldLabelImplIE">
+    <when-type-is class="com.tabulaw.client.ui.field.impl.FieldLabelImpl" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+    </any>
+  </replace-with>
+	
+  <!-- css reset (based on YUI) -->
+  <stylesheet src="css/reset.css" />
+
+  <stylesheet src="css/base.css" />
+  <stylesheet src="css/widget-gwt.css" />
+  <stylesheet src="css/widget-tll.css" />
+  
+  <stylesheet src="css/hnav.css" />
+  <stylesheet src="css/msg.css" />
+  <stylesheet src="css/options.css" />
+  <stylesheet src="css/toolbar.css" />
+	
+	<stylesheet src="css/tableview.css" />
+  
+  <stylesheet src="css/field.css" />
+	
+	<stylesheet src="css/status.css" />
+
+  <stylesheet src="css/view.css" />
+  <stylesheet src="css/viewpath.css" />  
+	
+	<stylesheet src="css/poc.css" />
+	
+</module>

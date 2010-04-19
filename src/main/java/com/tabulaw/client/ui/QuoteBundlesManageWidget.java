@@ -34,7 +34,7 @@ import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tll.common.msg.Msg;
+import com.tabulaw.common.msg.Msg;
 
 /**
  * Manages the editing of quote bundles via drag and drop.

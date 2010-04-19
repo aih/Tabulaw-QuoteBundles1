@@ -1,7 +1,7 @@
 package com.tabulaw.dao;
 
-import com.tll.IMarshalable;
-import com.tll.INameValueProvider;
+import com.tabulaw.IMarshalable;
+import com.tabulaw.INameValueProvider;
 
 /**
  * Sort direction enumeration.

@@ -5,10 +5,10 @@
  */
 package com.tabulaw.client.ui.nav;
 
+import com.tabulaw.client.mvc.view.IViewChangeHandler;
+import com.tabulaw.client.mvc.view.ViewChangeEvent;
+import com.tabulaw.client.mvc.view.ViewKey;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
-import com.tll.client.mvc.view.IViewChangeHandler;
-import com.tll.client.mvc.view.ViewChangeEvent;
-import com.tll.client.mvc.view.ViewKey;
 
 /**
  * A nav related widget relating to view navigation that recieves view change

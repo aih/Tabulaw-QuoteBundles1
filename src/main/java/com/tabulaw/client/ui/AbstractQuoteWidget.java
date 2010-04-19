@@ -17,7 +17,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
-import com.tll.client.ui.ImageContainer;
 
 /**
  * Base class for widgets displaying quotes.

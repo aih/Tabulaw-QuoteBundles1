@@ -19,11 +19,15 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.DOMExt;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.MarkOverlay;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tabulaw.client.mvc.ViewManager;
+import com.tabulaw.client.mvc.view.IViewChangeHandler;
+import com.tabulaw.client.mvc.view.ViewChangeEvent;
 import com.tabulaw.client.ui.DocumentViewer.ViewMode;
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.model.DocRef;
@@ -32,11 +36,7 @@ import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tll.client.DOMExt;
-import com.tll.client.mvc.ViewManager;
-import com.tll.client.mvc.view.IViewChangeHandler;
-import com.tll.client.mvc.view.ViewChangeEvent;
-import com.tll.common.msg.Msg;
+import com.tabulaw.common.msg.Msg;
 
 /**
  * Displays a document on the left and quote bundle on the right separated by a

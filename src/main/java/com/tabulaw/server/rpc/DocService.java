@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
+import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocFetchPayload;
 import com.tabulaw.common.data.rpc.DocListingPayload;
@@ -27,14 +28,12 @@ import com.tabulaw.common.data.rpc.IDocService;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.msg.Msg.MsgAttr;
+import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.server.DocUtils;
 import com.tabulaw.server.scrape.GoogleScholarDocHandler;
 import com.tabulaw.server.scrape.IDocHandler;
-import com.tll.common.data.Status;
-import com.tll.common.msg.Msg.MsgAttr;
-import com.tll.common.msg.Msg.MsgLevel;
-import com.tll.server.rpc.RpcServlet;
-import com.tll.util.StringUtil;
+import com.tabulaw.util.StringUtil;
 
 /**
  * Back-end support for rpc document tasks.

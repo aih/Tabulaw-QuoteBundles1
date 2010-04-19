@@ -10,12 +10,12 @@ import javax.validation.ConstraintViolationException;
 
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.model.IEntity;
+import com.tabulaw.common.msg.Msg.MsgAttr;
+import com.tabulaw.common.msg.Msg.MsgLevel;
+import com.tabulaw.schema.ISchemaInfo;
+import com.tabulaw.schema.ISchemaProperty;
 import com.tabulaw.server.PersistContext;
-import com.tll.common.msg.Msg.MsgAttr;
-import com.tll.common.msg.Msg.MsgLevel;
-import com.tll.schema.ISchemaInfo;
-import com.tll.schema.ISchemaProperty;
-import com.tll.util.PropertyPath;
+import com.tabulaw.util.PropertyPath;
 
 /**
  * @author jpk

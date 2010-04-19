@@ -5,9 +5,9 @@
  */
 package com.tabulaw.client.ui.nav;
 
+import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.view.DocumentViewInitializer;
 import com.tabulaw.common.model.ModelKey;
-import com.tll.client.mvc.view.IViewInitializer;
 
 /**
  * Routes to an open document when clicked.

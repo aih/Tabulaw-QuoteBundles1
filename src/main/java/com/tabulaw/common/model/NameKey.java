@@ -1,6 +1,6 @@
 package com.tabulaw.common.model;
 
-import com.tll.IDescriptorProvider;
+import com.tabulaw.IDescriptorProvider;
 
 /**
  * NameKey - Simple entity key that holds an entity name and also identifies the

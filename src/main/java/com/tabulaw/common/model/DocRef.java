@@ -14,8 +14,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.tll.schema.BusinessKeyDef;
-import com.tll.schema.BusinessObject;
+import com.tabulaw.schema.BusinessKeyDef;
+import com.tabulaw.schema.BusinessObject;
 
 /**
  * NOTE: No surrogate primary key is needed here.

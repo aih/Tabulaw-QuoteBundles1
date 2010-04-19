@@ -10,7 +10,7 @@ import com.tabulaw.common.model.INamedEntity;
 import com.tabulaw.common.model.NameKey;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
-import com.tll.model.bk.IBusinessKey;
+import com.tabulaw.model.bk.IBusinessKey;
 
 /**
  * IEntityDao - DAO definition for {@link IEntity}s.

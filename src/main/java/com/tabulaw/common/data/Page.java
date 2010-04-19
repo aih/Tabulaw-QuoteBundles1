@@ -7,8 +7,8 @@ package com.tabulaw.common.data;
 
 import java.util.List;
 
+import com.tabulaw.IMarshalable;
 import com.tabulaw.dao.Sorting;
-import com.tll.IMarshalable;
 
 /**
  * Encapsulates page data for an associated listing.

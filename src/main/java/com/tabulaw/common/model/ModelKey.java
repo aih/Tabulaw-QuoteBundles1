@@ -7,8 +7,8 @@ package com.tabulaw.common.model;
 
 import java.io.Serializable;
 
-import com.tll.IDescriptorProvider;
-import com.tll.IMarshalable;
+import com.tabulaw.IDescriptorProvider;
+import com.tabulaw.IMarshalable;
 
 /**
  * ModelKey

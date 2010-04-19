@@ -12,12 +12,12 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tll.common.data.Payload;
-import com.tll.common.msg.Msg;
+import com.tabulaw.common.msg.Msg;
 
 /**
  * Widget that displays a quote bundle.

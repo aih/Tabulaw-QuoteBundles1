@@ -4,7 +4,7 @@
 package com.tabulaw.common.data.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.tll.common.data.Payload;
+import com.tabulaw.common.data.Payload;
 
 /**
  * IForgotPasswordServiceAsync

@@ -1,6 +1,6 @@
 package com.tabulaw.dao;
 
-import com.tll.IMarshalable;
+import com.tabulaw.IMarshalable;
 
 /**
  * Construct representing a hierarchical sorting directive.

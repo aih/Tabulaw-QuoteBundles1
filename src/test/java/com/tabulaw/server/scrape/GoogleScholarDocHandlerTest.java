@@ -22,7 +22,7 @@ import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.server.DocUtils;
-import com.tll.util.ClassUtil;
+import com.tabulaw.util.ClassUtil;
 
 /**
  * Tests {@link GoogleScholarDocHandler}
@@ -36,7 +36,7 @@ public class GoogleScholarDocHandlerTest {
 		
 		String raw;
 		try {
-			URL url = ClassUtil.getResource("com/tll/tabulaw/server/scrape/testGoogleScholarSearchResults.htm");
+			URL url = ClassUtil.getResource("com/tabulaw/server/scrape/testGoogleScholarSearchResults.htm");
 			File f = new File(url.toURI());
 			raw = FileUtils.readFileToString(f, "UTF-8");
 		}
@@ -86,7 +86,7 @@ public class GoogleScholarDocHandlerTest {
 		
 		String raw;
 		try {
-			URL url = getClass().getClassLoader().getResource("com/tll/tabulaw/server/scrape/gsdoc.htm");
+			URL url = getClass().getClassLoader().getResource("com/tabulaw/server/scrape/gsdoc.htm");
 			File f = new File(url.toURI());
 			raw = FileUtils.readFileToString(f, "UTF-8");
 		}

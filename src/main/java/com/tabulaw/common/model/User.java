@@ -15,8 +15,8 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.tll.schema.BusinessKeyDef;
-import com.tll.schema.BusinessObject;
+import com.tabulaw.schema.BusinessKeyDef;
+import com.tabulaw.schema.BusinessObject;
 
 /**
  * The user entity. NOTE: no surrogate primary key is needed here.

@@ -21,7 +21,7 @@ import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.server.DocUtils;
-import com.tll.util.StringUtil;
+import com.tabulaw.util.StringUtil;
 
 /**
  * @author jpk

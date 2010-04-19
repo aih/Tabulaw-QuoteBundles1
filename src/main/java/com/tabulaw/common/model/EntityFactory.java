@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.tll.schema.PropertyMetadata;
-import com.tll.schema.PropertyType;
+import com.tabulaw.schema.PropertyMetadata;
+import com.tabulaw.schema.PropertyType;
 
 /**
  * Provides the mocked data backing the application.

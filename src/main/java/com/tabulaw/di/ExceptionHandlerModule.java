@@ -19,11 +19,11 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.tabulaw.server.rpc.ExceptionHandler;
+import com.tabulaw.server.rpc.IExceptionHandler;
 import com.tll.config.Config;
 import com.tll.config.IConfigAware;
 import com.tll.config.IConfigKey;
 import com.tll.mail.NameEmail;
-import com.tll.server.rpc.IExceptionHandler;
 
 /**
  * @author jpk

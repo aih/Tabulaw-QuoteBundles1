@@ -10,12 +10,12 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.mvc.view.IViewInitializer;
+import com.tabulaw.client.mvc.view.StaticViewInitializer;
+import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.ui.AddQuoteBundleDialog;
 import com.tabulaw.client.ui.QuoteBundlesManageWidget;
 import com.tabulaw.client.ui.nav.AbstractNavButton;
-import com.tll.client.mvc.view.IViewInitializer;
-import com.tll.client.mvc.view.StaticViewInitializer;
-import com.tll.client.mvc.view.ViewClass;
 
 /**
  * A view for managing existing doc bundles.

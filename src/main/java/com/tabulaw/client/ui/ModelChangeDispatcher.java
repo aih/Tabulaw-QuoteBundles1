@@ -11,8 +11,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
-import com.tll.client.mvc.ViewManager;
-import com.tll.client.mvc.view.IView;
+import com.tabulaw.client.mvc.ViewManager;
+import com.tabulaw.client.mvc.view.IView;
 
 /**
  * Responsible for dispatching model change events to the appropriate widgets.

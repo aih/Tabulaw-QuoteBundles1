@@ -1,11 +1,9 @@
 package com.tabulaw.listhandler;
 
-import com.tll.ApplicationException;
-
 /**
  * @author jpk
  */
-public class ListHandlerException extends ApplicationException {
+public class ListHandlerException extends Exception {
 
 	private static final long serialVersionUID = -2224092686334362770L;
 

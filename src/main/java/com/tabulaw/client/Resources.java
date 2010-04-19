@@ -17,10 +17,10 @@ public interface Resources extends ClientBundle {
 
 	Resources INSTANCE = GWT.create(Resources.class);
 
-	@Source("note-icon.png")
+	@Source("com/tabulaw/public/images/note-icon.png")
 	ImageResource searchImage();
 
-	@Source("pencil.gif")
+	@Source("com/tabulaw/public/images/pencil.gif")
 	ImageResource pencil();
 
 	/*

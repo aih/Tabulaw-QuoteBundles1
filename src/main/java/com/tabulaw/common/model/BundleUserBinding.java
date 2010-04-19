@@ -7,8 +7,8 @@ package com.tabulaw.common.model;
 
 import javax.validation.constraints.NotNull;
 
-import com.tll.schema.BusinessKeyDef;
-import com.tll.schema.BusinessObject;
+import com.tabulaw.schema.BusinessKeyDef;
+import com.tabulaw.schema.BusinessObject;
 
 /**
  * Associates a {@link QuoteBundle} to a {@link User}.

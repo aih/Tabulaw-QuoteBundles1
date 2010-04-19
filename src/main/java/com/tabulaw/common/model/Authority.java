@@ -3,9 +3,9 @@ package com.tabulaw.common.model;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.tll.IMarshalable;
-import com.tll.schema.BusinessKeyDef;
-import com.tll.schema.BusinessObject;
+import com.tabulaw.IMarshalable;
+import com.tabulaw.schema.BusinessKeyDef;
+import com.tabulaw.schema.BusinessObject;
 
 /**
  * A defined user role called authority.

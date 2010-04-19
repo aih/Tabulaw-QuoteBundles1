@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.tabulaw.common.model.IEntity;
-import com.tll.common.data.Payload;
-import com.tll.common.data.Status;
 
 /**
  * Construct to hold model data based on what is requested in model related

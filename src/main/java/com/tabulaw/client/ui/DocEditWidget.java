@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.RichTextArea.Formatter;
 import com.tabulaw.client.Resources;
-import com.tll.client.ui.toolbar.Toolbar;
+import com.tabulaw.client.ui.toolbar.Toolbar;
 
 
 /**

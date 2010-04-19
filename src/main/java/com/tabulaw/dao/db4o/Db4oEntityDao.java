@@ -48,13 +48,13 @@ import com.tabulaw.dao.NonUniqueResultException;
 import com.tabulaw.dao.SortColumn;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.model.IEntityTypeResolver;
-import com.tll.model.bk.BusinessKeyFactory;
-import com.tll.model.bk.BusinessKeyPropertyException;
-import com.tll.model.bk.IBusinessKey;
-import com.tll.model.bk.NonUniqueBusinessKeyException;
-import com.tll.util.DBType;
-import com.tll.util.DateRange;
-import com.tll.util.PropertyPath;
+import com.tabulaw.model.bk.BusinessKeyFactory;
+import com.tabulaw.model.bk.BusinessKeyPropertyException;
+import com.tabulaw.model.bk.IBusinessKey;
+import com.tabulaw.model.bk.NonUniqueBusinessKeyException;
+import com.tabulaw.util.DBType;
+import com.tabulaw.util.DateRange;
+import com.tabulaw.util.PropertyPath;
 
 /**
  * Db4oEntityDao

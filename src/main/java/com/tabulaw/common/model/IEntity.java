@@ -2,10 +2,10 @@ package com.tabulaw.common.model;
 
 import java.io.Serializable;
 
-import com.tll.IDescriptorProvider;
-import com.tll.IMarshalable;
-import com.tll.IPropertyValueProvider;
-import com.tll.ITypeDescriptorProvider;
+import com.tabulaw.IDescriptorProvider;
+import com.tabulaw.IMarshalable;
+import com.tabulaw.IPropertyValueProvider;
+import com.tabulaw.ITypeDescriptorProvider;
 
 /**
  * IEntity - Fundamental type for all [server side] entities.

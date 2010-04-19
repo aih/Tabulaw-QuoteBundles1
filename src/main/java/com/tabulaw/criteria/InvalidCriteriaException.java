@@ -1,6 +1,5 @@
 package com.tabulaw.criteria;
 
-import com.tabulaw.common.model.IEntity;
 
 /**
  * Throw when {@link Criteria} derived instances are found to be invalid due to
@@ -25,14 +24,6 @@ public class InvalidCriteriaException extends CriteriaException {
 	 */
 	public InvalidCriteriaException(String message) {
 		super(message);
-	}
-
-	/**
-	 * Constructor
-	 * @param entityClass the entity class
-	 */
-	public InvalidCriteriaException(Class<? extends IEntity> entityClass) {
-		super("Invalid or empty criteria for %1", entityClass.getSimpleName());
 	}
 
 	/**

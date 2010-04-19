@@ -10,9 +10,9 @@ import javax.validation.Valid;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.tll.schema.BusinessKeyDef;
-import com.tll.schema.BusinessObject;
-import com.tll.schema.Reference;
+import com.tabulaw.schema.BusinessKeyDef;
+import com.tabulaw.schema.BusinessObject;
+import com.tabulaw.schema.Reference;
 
 /**
  * @author jpk

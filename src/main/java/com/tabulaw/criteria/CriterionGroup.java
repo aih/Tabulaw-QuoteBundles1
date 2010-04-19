@@ -10,10 +10,10 @@ import java.util.Set;
 
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.NameKey;
-import com.tll.model.bk.IBusinessKey;
-import com.tll.util.Comparator;
-import com.tll.util.DBType;
-import com.tll.util.DateRange;
+import com.tabulaw.model.bk.IBusinessKey;
+import com.tabulaw.util.Comparator;
+import com.tabulaw.util.DBType;
+import com.tabulaw.util.DateRange;
 
 /**
  * CriterionGroup

@@ -2,7 +2,7 @@ package com.tabulaw.common.model;
 
 import java.util.Date;
 
-import com.tll.schema.Managed;
+import com.tabulaw.schema.Managed;
 
 /**
  * An entity that contains audit information. The information currently stored

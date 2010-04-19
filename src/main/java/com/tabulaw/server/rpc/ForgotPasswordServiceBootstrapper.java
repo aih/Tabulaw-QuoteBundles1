@@ -14,7 +14,6 @@ import com.google.inject.Injector;
 import com.tabulaw.server.IBootstrapHandler;
 import com.tabulaw.service.IForgotPasswordHandler;
 import com.tll.mail.MailManager;
-import com.tll.server.rpc.IExceptionHandler;
 
 /**
  * ForgotPasswordServiceBootstrapper

@@ -5,7 +5,7 @@
 
 package com.tabulaw.common.data;
 
-import com.tll.INameValueProvider;
+import com.tabulaw.INameValueProvider;
 
 /**
  * ListingOp - Defines the possible listing operations on a server-side listing.

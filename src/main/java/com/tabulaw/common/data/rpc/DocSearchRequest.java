@@ -5,8 +5,8 @@
  */
 package com.tabulaw.common.data.rpc;
 
-import com.tll.IDescriptorProvider;
-import com.tll.IMarshalable;
+import com.tabulaw.IDescriptorProvider;
+import com.tabulaw.IMarshalable;
 
 /**
  * Holds the search term(s) of sought documents.

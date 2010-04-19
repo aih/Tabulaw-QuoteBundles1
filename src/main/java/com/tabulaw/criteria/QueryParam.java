@@ -5,8 +5,8 @@
  */
 package com.tabulaw.criteria;
 
-import com.tll.schema.IQueryParam;
-import com.tll.schema.PropertyType;
+import com.tabulaw.schema.IQueryParam;
+import com.tabulaw.schema.PropertyType;
 
 
 /**

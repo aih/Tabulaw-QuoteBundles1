@@ -5,7 +5,7 @@
  */
 package com.tabulaw.common.model;
 
-import com.tll.INameValueProvider;
+import com.tabulaw.INameValueProvider;
 
 /**
  * EntityType

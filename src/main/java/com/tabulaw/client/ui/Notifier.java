@@ -8,10 +8,9 @@ package com.tabulaw.client.ui;
 import java.util.Collection;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.tll.client.ui.Position;
-import com.tll.client.ui.msg.MsgPopup;
-import com.tll.common.msg.Msg;
-import com.tll.common.msg.Msg.MsgLevel;
+import com.tabulaw.client.ui.msg.MsgPopup;
+import com.tabulaw.common.msg.Msg;
+import com.tabulaw.common.msg.Msg.MsgLevel;
 
 
 /**

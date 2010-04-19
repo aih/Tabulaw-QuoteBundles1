@@ -22,7 +22,7 @@ import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
 import com.tabulaw.dao.Sorting;
-import com.tll.util.Comparator;
+import com.tabulaw.util.Comparator;
 
 /**
  * Manages the persistence of user related data that is not part of the user

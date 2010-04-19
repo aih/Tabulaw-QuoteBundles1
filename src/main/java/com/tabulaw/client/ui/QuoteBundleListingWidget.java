@@ -6,7 +6,7 @@
 package com.tabulaw.client.ui;
 
 import com.google.gwt.user.client.ui.Composite;
-import com.tll.client.ui.option.Option;
+import com.tabulaw.client.ui.option.Option;
 
 /**
  * Displays quote bundles vertically by title.

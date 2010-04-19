@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.tabulaw.common.model.IEntity;
-import com.tll.schema.IQueryParam;
+import com.tabulaw.schema.IQueryParam;
 
 /**
  * Criteria - Holds fairly versatile criterion for querying entity data through

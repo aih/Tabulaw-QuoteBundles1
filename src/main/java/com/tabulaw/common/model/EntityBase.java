@@ -1,6 +1,6 @@
 package com.tabulaw.common.model;
 
-import com.tll.schema.Managed;
+import com.tabulaw.schema.Managed;
 
 /**
  * EntityBase - Base class for all entities.

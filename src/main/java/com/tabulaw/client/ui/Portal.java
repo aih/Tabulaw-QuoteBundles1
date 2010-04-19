@@ -6,8 +6,8 @@
 package com.tabulaw.client.ui;
 
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.tll.client.mvc.ViewManager;
-import com.tll.client.mvc.view.IView;
+import com.tabulaw.client.mvc.ViewManager;
+import com.tabulaw.client.mvc.view.IView;
 
 /**
  * This is the parent panel for {@link IView}s in the app.

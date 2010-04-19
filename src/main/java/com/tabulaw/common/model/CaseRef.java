@@ -5,8 +5,8 @@
  */
 package com.tabulaw.common.model;
 
-import com.tll.schema.BusinessKeyDef;
-import com.tll.schema.BusinessObject;
+import com.tabulaw.schema.BusinessKeyDef;
+import com.tabulaw.schema.BusinessObject;
 
 /**
  * @author jpk

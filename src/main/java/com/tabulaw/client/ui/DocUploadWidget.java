@@ -25,17 +25,16 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
+import com.tabulaw.client.data.rpc.RpcEvent;
 import com.tabulaw.client.model.ClientModelCache;
+import com.tabulaw.client.util.Fmt;
+import com.tabulaw.client.util.GlobalFormat;
 import com.tabulaw.common.data.dto.Doc;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
-import com.tll.client.data.rpc.RpcEvent;
-import com.tll.client.ui.RpcUiHandler;
-import com.tll.client.util.Fmt;
-import com.tll.client.util.GlobalFormat;
-import com.tll.common.msg.Msg;
-import com.tll.common.msg.Msg.MsgLevel;
-import com.tll.util.StringUtil;
+import com.tabulaw.common.msg.Msg;
+import com.tabulaw.common.msg.Msg.MsgLevel;
+import com.tabulaw.util.StringUtil;
 
 /**
  * Uploads documents to the tabulaw server.

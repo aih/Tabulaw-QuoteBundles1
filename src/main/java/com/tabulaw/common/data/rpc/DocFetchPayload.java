@@ -5,8 +5,8 @@
  */
 package com.tabulaw.common.data.rpc;
 
-import com.tll.common.data.Payload;
-import com.tll.common.data.Status;
+import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.data.Status;
 
 /**
  * Remote doc fetch payload.

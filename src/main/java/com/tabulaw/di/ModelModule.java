@@ -8,11 +8,10 @@ package com.tabulaw.di;
 import com.google.inject.Scopes;
 import com.tabulaw.model.EntityMetadata;
 import com.tabulaw.model.EntityTypeResolver;
+import com.tabulaw.model.IEntityMetadata;
 import com.tabulaw.model.IEntityTypeResolver;
-import com.tll.di.ValidationModule;
-import com.tll.model.IEntityMetadata;
-import com.tll.schema.ISchemaInfo;
-import com.tll.schema.SchemaInfo;
+import com.tabulaw.schema.ISchemaInfo;
+import com.tabulaw.schema.SchemaInfo;
 
 /**
  * @author jpk

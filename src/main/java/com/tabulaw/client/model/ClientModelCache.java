@@ -21,7 +21,7 @@ import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.User;
-import com.tll.util.ObjectUtil;
+import com.tabulaw.util.ObjectUtil;
 
 /**
  * @author jpk

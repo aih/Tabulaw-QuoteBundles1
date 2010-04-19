@@ -11,12 +11,12 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.mvc.view.StaticViewInitializer;
+import com.tabulaw.client.mvc.view.ViewClass;
+import com.tabulaw.client.mvc.view.ViewOptions;
 import com.tabulaw.client.ui.DocSuggestWidget;
 import com.tabulaw.client.ui.DocUploadDialog;
 import com.tabulaw.client.ui.DocumentsListingWidget;
-import com.tll.client.mvc.view.StaticViewInitializer;
-import com.tll.client.mvc.view.ViewClass;
-import com.tll.client.mvc.view.ViewOptions;
 
 
 /**
