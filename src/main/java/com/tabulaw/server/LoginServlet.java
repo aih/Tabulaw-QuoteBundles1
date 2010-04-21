@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.tabulaw.server.filter.AuthenticationProcessingFilter;
+
 /**
  * LoginServlet - Handles login submissions.
  * @author jpk
@@ -26,18 +28,15 @@ public class LoginServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws /* ServletException, */IOException {
 		HttpSession session = req.getSession(false);
-		assert session != null;
+		if(session == null) throw new IllegalStateException();
 		String msg = "";
 		boolean loginError = (req.getParameter("login_error") != null);
 		if(loginError) {
-			/*
-			AuthenticationException ae = (AuthenticationException) session
-					.getAttribute(AbstractProcessingFilter.SPRING_SECURITY_LAST_EXCEPTION_KEY);
+			Exception ae = (Exception) session.getAttribute(AuthenticationProcessingFilter.AUTH_EXCEPTION_KEY);
 			if(ae != null) {
 				// failed login (get error message)
 				msg = ae.getMessage();
 			}
-			*/
 		}
 		resp.setContentType("text/html");
 		resp.getWriter().write(msg);

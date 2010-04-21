@@ -34,7 +34,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 
 	private final AddQuoteBundlePanel fieldPanel = new AddQuoteBundlePanel();
 
-	private final FieldGroupEditPanel editPanel = new FieldGroupEditPanel(fieldPanel, true, false, false);
+	private final FieldGroupEditPanel editPanel = new FieldGroupEditPanel("Add", null, null, null, fieldPanel);
 
 	private HandlerRegistration mcr;
 
@@ -62,7 +62,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 	@Override
 	public void onEdit(EditEvent<FieldGroup> event) {
 		// persist the quote bundle
-		if(event.getOp() == EditOp.ADD) {
+		if(event.getOp() == EditOp.SAVE) {
 			FieldGroup fieldGroup = event.getContent();
 			
 			String qbName = (String) fieldGroup.getFieldWidget("name").getValue();

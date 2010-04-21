@@ -368,62 +368,67 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 		}
 	}
 
-	public final void applyPropertyMetadata(IPropertyMetadataProvider provider, boolean isNewModelData) {
+	@Override
+	public final void setPropertyMetadata(PropertyMetadata metadata) {
+		// requiredness
+		setRequired(metadata.isRequired() && !metadata.isManaged());
+
+		// maxlength
+		if(this instanceof IHasMaxLength) {
+			final int maxlen = metadata.getMaxLen();
+			((IHasMaxLength) this).setMaxLen(maxlen);
+		}
+
+		final GlobalFormat format = (this instanceof IHasFormat) ? ((IHasFormat) this).getFormat() : null;
+
+		// set the type coercion validator
+		switch(metadata.getPropertyType()) {
+		case STRING:
+		case ENUM:
+			// no type coercion validator needed
+			break;
+
+		case BOOL:
+			addValidator(BooleanValidator.INSTANCE);
+			break;
+
+		case DATE:
+			addValidator(DateValidator.get(format == null ? GlobalFormat.DATE : format));
+			break;
+
+		case INT:
+			addValidator(IntegerValidator.INSTANCE);
+			break;
+
+		case FLOAT:
+		case DOUBLE:
+			addValidator(new DecimalValidator(Fmt.getDecimalFormat(format == null ? GlobalFormat.DECIMAL : format)));
+			break;
+
+		case CHAR:
+			addValidator(CharacterValidator.INSTANCE);
+			break;
+
+		case LONG:
+			// TODO handle - intentional fall through
+		case STRING_MAP:
+			// TODO handle string map type coercion - intentional fall through
+		default:
+			throw new IllegalStateException("Unhandled property type: " + metadata.getPropertyType().name());
+		}
+	}
+
+	public final void applyPropertyMetadata(IPropertyMetadataProvider provider) {
 		// Log.debug("AbstractField.applyPropertyMetadata() for " + toString());
 		final PropertyMetadata metadata = provider.getPropertyMetadata(getPropertyName());
 		if(metadata == null) {
 			Log.warn("No property metadata found for field: " + toString());
 		}
 		else {
-			// requiredness
-			setRequired(metadata.isRequired() && !metadata.isManaged());
-
-			// maxlength
-			if(this instanceof IHasMaxLength) {
-				final int maxlen = metadata.getMaxLen();
-				((IHasMaxLength) this).setMaxLen(maxlen);
-			}
-
-			final GlobalFormat format = (this instanceof IHasFormat) ? ((IHasFormat) this).getFormat() : null;
-
-			// set the type coercion validator
-			switch(metadata.getPropertyType()) {
-			case STRING:
-			case ENUM:
-				// no type coercion validator needed
-				break;
-
-			case BOOL:
-				addValidator(BooleanValidator.INSTANCE);
-				break;
-
-			case DATE:
-				addValidator(DateValidator.get(format == null ? GlobalFormat.DATE : format));
-				break;
-
-			case INT:
-				addValidator(IntegerValidator.INSTANCE);
-				break;
-
-			case FLOAT:
-			case DOUBLE:
-				addValidator(new DecimalValidator(Fmt.getDecimalFormat(format == null ? GlobalFormat.DECIMAL : format)));
-				break;
-
-			case CHAR:
-				addValidator(CharacterValidator.INSTANCE);
-				break;
-
-			case LONG:
-				// TODO handle - intentional fall through
-			case STRING_MAP:
-				// TODO handle string map type coercion - intentional fall through
-			default:
-				throw new IllegalStateException("Unhandled property type: " + metadata.getPropertyType().name());
-			}
+			setPropertyMetadata(metadata);
 		}
 		// apply model new flag
-		validateIncrementally(!isNewModelData);
+		//validateIncrementally(!isNewModelData);
 	}
 
 	public final void removeValidator(Class<? extends IValidator> type) {
@@ -582,8 +587,8 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 	@Override
 	public void onBlur(BlurEvent event) {
 		removeStyleName(Styles.ACTIVE);
+		resolveError(ErrorDisplay.LOCAL.flag());	// clear out old first
 		if(incrValFlag) {
-			resolveError(ErrorDisplay.LOCAL.flag());	// clear out old first
 			try {
 				validate();
 				dirtyCheck();
@@ -592,6 +597,13 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 				handleError(e.getErrors());
 			}
 		}
+	}
+
+	@Override
+	public final String getFieldValue() {
+		Object value = getValue();
+		if(value == null) return "";
+		return value.toString();
 	}
 
 	@Override

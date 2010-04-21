@@ -80,13 +80,13 @@ body {
 	.navButton .text {
 	}
 	.navButton-bundles {
-		/*background: url(../images/quote-bundle-icon.png) left no-repeat transparent;*/
+		/*background: url(/images/quote-bundle-icon.png) left no-repeat transparent;*/
 	}
 	.navButton-docs {
-		/*background: url(../images/document-icon.png) left  no-repeat transparent;*/
+		/*background: url(/images/document-icon.png) left  no-repeat transparent;*/
 	}
 	.navButton-doc {
-		background: url(../images/document-icon.png) left no-repeat transparent;
+		background: url(/images/document-icon.png) left no-repeat transparent;
 		width: 60px;
 		font-size: 11px;
 		font-weight: normal;
@@ -100,7 +100,7 @@ body {
 		float: right;
 	}
 	.navButton-plus {
-		/*background: url(../images/plus-button.png) right no-repeat transparent;*/
+		/*background: url(/images/plus-button.png) right no-repeat transparent;*/
 		text-align: center;
 	}
 
@@ -158,7 +158,7 @@ body {
 	#navCol #qbListing .option {
 		border-bottom: 1px solid #BFBFBF;
 		padding-left: 10px;
-		background: url(../images/quote-bundle-icon.png) no-repeat left;
+		background: url(/images/quote-bundle-icon.png) no-repeat left;
 		overflow: hidden;
 	}
 	#navCol #qbListing .option span {
@@ -250,6 +250,18 @@ body {
 	font-weight: normal;
 	margin-right: 5px;
 }
+
+/* login panel */
+.login {
+}
+	.loginForm {
+	}
+	.loginGrid {
+	}
+	.login .userReg {
+	}
+	.login .lnkPanel {
+	}
 
 #portal {
 	/*debug*/

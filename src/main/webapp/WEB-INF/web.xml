@@ -49,6 +49,16 @@
 	<filter>
 		<filter-name>AuthenticationProcessingFilter</filter-name>
 		<filter-class>com.tabulaw.server.filter.AuthenticationProcessingFilter</filter-class>
+    <!-- 
+    <init-param>
+      <param-name>authenticationFailureUrl</param-name>
+      <param-value>/login?login_error=1</param-value>
+    </init-param>
+    <init-param>
+      <param-name>defaultTargetUrl</param-name>
+      <param-value>/login</param-value>
+    </init-param>
+    -->
 	</filter>
 	<filter-mapping>
 		<filter-name>AuthenticationProcessingFilter</filter-name>
@@ -96,29 +106,19 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>ForgotPasswordService</servlet-name>
-		<servlet-class>com.tabulaw.server.rpc.ForgotPasswordService</servlet-class>
+		<servlet-name>UserServiceRpc</servlet-name>
+		<servlet-class>com.tabulaw.server.rpc.UserServiceRpc</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>ForgotPasswordService</servlet-name>
-		<url-pattern>/forgotPassword</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>UserContextService</servlet-name>
-		<servlet-class>com.tabulaw.server.rpc.UserContextService</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>UserContextService</servlet-name>
+		<servlet-name>UserServiceRpc</servlet-name>
 		<url-pattern>/poc/userContext</url-pattern>
+		<url-pattern>/poc/usercred</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>UserDataServiceRpc</servlet-name>
 		<servlet-class>com.tabulaw.server.rpc.UserDataServiceRpc</servlet-class>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>UserDataServiceRpc</servlet-name>
 		<url-pattern>/poc/userData</url-pattern>
@@ -128,7 +128,6 @@
 		<servlet-name>DocUploadServlet</servlet-name>
 		<servlet-class>com.tabulaw.server.DocUploadServlet</servlet-class>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>DocUploadServlet</servlet-name>
 		<url-pattern>/poc/docupload</url-pattern>
@@ -138,7 +137,6 @@
 		<servlet-name>DocViewServlet</servlet-name>
 		<servlet-class>com.tabulaw.server.DocViewServlet</servlet-class>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>DocViewServlet</servlet-name>
 		<url-pattern>/doc/*</url-pattern>
@@ -148,7 +146,6 @@
 		<servlet-name>DocService</servlet-name>
 		<servlet-class>com.tabulaw.server.rpc.DocService</servlet-class>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>DocService</servlet-name>
 		<url-pattern>/poc/doc</url-pattern>

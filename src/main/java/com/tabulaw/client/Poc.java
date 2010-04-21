@@ -10,8 +10,8 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ClientModelCache;
+import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
@@ -31,6 +31,8 @@ import com.tabulaw.common.data.rpc.IDocService;
 import com.tabulaw.common.data.rpc.IDocServiceAsync;
 import com.tabulaw.common.data.rpc.IUserContextService;
 import com.tabulaw.common.data.rpc.IUserContextServiceAsync;
+import com.tabulaw.common.data.rpc.IUserCredentialsService;
+import com.tabulaw.common.data.rpc.IUserCredentialsServiceAsync;
 import com.tabulaw.common.data.rpc.IUserDataService;
 import com.tabulaw.common.data.rpc.IUserDataServiceAsync;
 import com.tabulaw.common.data.rpc.UserContextPayload;
@@ -48,6 +50,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	private static final IUserDataServiceAsync userDataService;
 
 	private static final IDocServiceAsync docService;
+	
+	private static IUserCredentialsServiceAsync userRegisterService;
 	
 	/**
 	 * Use this token to initialize GWT history tracking.
@@ -84,6 +88,16 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	 */
 	public static IDocServiceAsync getDocService() {
 		return docService;
+	}
+	
+	/**
+	 * @return The user register service.
+	 */
+	public static IUserCredentialsServiceAsync getUserRegisterService() {
+		if(userRegisterService == null) {
+			userRegisterService = (IUserCredentialsServiceAsync) GWT.create(IUserCredentialsService.class);
+		}
+		return userRegisterService;
 	}
 	
 	/**
@@ -165,7 +179,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	
 	private void showLoginPanel() {
 		if(loginPanel == null) {
-			loginPanel = new LoginPanel("/login/");
+			loginPanel = new LoginPanel();
 			loginPanel.addUserSessionHandler(new IUserSessionHandler() {
 				
 				@Override

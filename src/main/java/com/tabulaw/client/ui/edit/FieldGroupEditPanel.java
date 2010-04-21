@@ -16,14 +16,33 @@ public class FieldGroupEditPanel extends AbstractEditPanel<FieldGroup, AbstractF
 
 	/**
 	 * Constructor
-	 * @param fieldPanel
-	 * @param showCancelBtn
-	 * @param showDeleteBtn
-	 * @param showResetBtn
 	 */
-	public FieldGroupEditPanel(AbstractFieldPanel<?> fieldPanel, boolean showCancelBtn, boolean showDeleteBtn,
-			boolean showResetBtn) {
-		super(fieldPanel, showCancelBtn, showDeleteBtn, showResetBtn);
+	public FieldGroupEditPanel() {
+		super();
+	}
+
+	/**
+	 * Constructor
+	 * @param saveText
+	 * @param deleteText
+	 * @param cancelText
+	 * @param resetText
+	 * @param fieldPanel
+	 */
+	public FieldGroupEditPanel(String saveText, String deleteText, String cancelText, String resetText,
+			AbstractFieldPanel<?> fieldPanel) {
+		super(saveText, deleteText, cancelText, resetText, fieldPanel);
+	}
+
+	/**
+	 * Constructor
+	 * @param saveText
+	 * @param deleteText
+	 * @param cancelText
+	 * @param resetText
+	 */
+	public FieldGroupEditPanel(String saveText, String deleteText, String cancelText, String resetText) {
+		super(saveText, deleteText, cancelText, resetText);
 	}
 
 	@Override

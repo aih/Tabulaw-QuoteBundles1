@@ -76,6 +76,8 @@ import com.tabulaw.schema.PropertyType;
  * </pre>
  * @author jpk
  */
+// TODO eliminate this class and fetch all entity schema info (property
+// metatdata) from server when user context if gotten upon user login
 public class EntityFactory {
 
 	private static final EntityFactory instance = new EntityFactory();
@@ -116,25 +118,21 @@ public class EntityFactory {
 		metaQuote.put("tags", new PropertyMetadata(PropertyType.STRING, false, false, 255));
 		metaQuote.put("serializedMark", new PropertyMetadata(PropertyType.STRING, false, false, -1));
 
-		/*
-		String[][] quotes = new String[][] {
-			// id, doc_id, tags, quote
-			{ "1", "1", "1st Amendment", "More than a century ago the \"sober-minded Elihu Root\" advocated legislation that would prohibit political contributions by corporations in order to prevent \"`the great aggregations of wealth, from using their corporate funds, directly or indirectly,'\" to elect legislators who would \"`vote for their protection and the advancement of their interests as against those of the public.'\"" },
-			{ "2", "1", "1st Amendment, Government", "BCRA is the most recent federal" },
-			{ "3", "2", "1st Amendment", "Heed Their Rising Voices" },
-			{ "4", "3", "Climate, Political", "The District Judge denied the application for a three-judge court and directed that the case be transmitted to the Court of Appeals." },
-			{ "5", "3", "Climate, Political, Government", "The intricate statutory scheme adopted by Congress to regulate federal election campaigns includes restrictions 13 on political contributions and expenditures that apply broadly to all phases of and all participants in the election process." },
-			{ "6", "4", "Free Speech", "The basic premise underlying the Court�s ruling is its iteration, and constant reiteration, of the proposition that the First Amendment bars regulatory distinctions based on a speaker�s identity, including its �identity� as a corporation." },
-			{ "7", "5", "Political", "770 Appellants argued that � 8 violates the First Amendment, the Due Process and Equal Protection Clauses of the Fourteenth Amendment, and similar provisions of the Massachusetts Constitution." }, 
-		};
-		*/
-
 		// quote bundle metadata
 		HashMap<String, PropertyMetadata> metaQuoteBundle = new HashMap<String, PropertyMetadata>();
 		metadata.put(EntityType.QUOTE_BUNDLE, metaQuoteBundle);
 		metaQuoteBundle.put("name", new PropertyMetadata(PropertyType.STRING, false, true, 50));
 		metaQuoteBundle.put("description", new PropertyMetadata(PropertyType.STRING, false, false, 255));
 	} // constructor
+	
+	/**
+	 * Gets the entity metadata for a particular entity type.
+	 * @param entityType
+	 * @return map of property metadata keyed by property name
+	 */
+	public Map<String, PropertyMetadata> getEntityMetadata(EntityType entityType) {
+		return metadata.get(entityType);
+	}
 
 	/**
 	 * Creates a new entity instance of the given an entity type. <br>

@@ -560,9 +560,9 @@ public final class FieldGroup implements IField, Iterable<IField> {
 	}
 
 	@Override
-	public void applyPropertyMetadata(IPropertyMetadataProvider provider, boolean isNewModelData) {
+	public void applyPropertyMetadata(IPropertyMetadataProvider provider) {
 		for(final IField f : fields) {
-			f.applyPropertyMetadata(provider, isNewModelData);
+			f.applyPropertyMetadata(provider);
 		}
 	}
 

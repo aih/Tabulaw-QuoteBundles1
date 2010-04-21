@@ -15,14 +15,9 @@ import com.google.gwt.event.shared.GwtEvent;
 public final class EditEvent<T> extends GwtEvent<IEditHandler<T>> {
 
 	public static enum EditOp {
-		ADD,
-		UPDATE,
+		SAVE,
 		DELETE,
 		CANCEL;
-
-		public boolean isSave() {
-			return this == ADD || this == UPDATE;
-		}
 	}
 
 	/**
@@ -31,18 +26,8 @@ public final class EditEvent<T> extends GwtEvent<IEditHandler<T>> {
 	 * @param source 
 	 * @param added added content
 	 */
-	public static <T> void fireAdd(IHasEditHandlers<T> source, T added) {
-		source.fireEvent(new EditEvent<T>(EditOp.ADD, added));
-	}
-
-	/**
-	 * Fires an edit event signifying a request to update.
-	 * @param <T> edit content type
-	 * @param source 
-	 * @param updated updated content
-	 */
-	public static <T> void fireUpdate(IHasEditHandlers<T> source, T updated) {
-		source.fireEvent(new EditEvent<T>(EditOp.UPDATE, updated));
+	public static <T> void fireSave(IHasEditHandlers<T> source, T added) {
+		source.fireEvent(new EditEvent<T>(EditOp.SAVE, added));
 	}
 
 	/**

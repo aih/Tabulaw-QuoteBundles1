@@ -243,6 +243,7 @@
 			</plugin>
 
 			<!-- AspectJ bind @Transactional to Spring's trans handling framework -->
+			<!-- TODO TEMP 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>aspectj-maven-plugin</artifactId>
@@ -251,14 +252,6 @@
 					<source>1.6</source>
 					<target>1.6</target>
           <complianceLevel>1.6</complianceLevel>
-					<!-- NO: this places the tll-server classes into this project's target output dir!
-					<weaveDependencies>
-						<weaveDependency>
-							<groupId>com.tll</groupId>
-							<artifactId>tll-service</artifactId>
-						</weaveDependency>
-					</weaveDependencies>
-					-->
 					<aspectLibraries>
 						<aspectLibrary>
 							<groupId>org.springframework</groupId>
@@ -271,12 +264,12 @@
 						<id>aspectj-weave</id>
 						<goals>
 							<goal>compile</goal>
-							<!-- <goal>test-compile</goal> -->
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
-	
+			-->
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>

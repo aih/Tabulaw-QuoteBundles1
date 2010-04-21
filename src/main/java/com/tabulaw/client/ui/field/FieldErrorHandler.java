@@ -6,7 +6,9 @@
 package com.tabulaw.client.ui.field;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gwt.event.dom.client.MouseEvent;
 import com.google.gwt.event.dom.client.MouseOutEvent;
@@ -107,25 +109,16 @@ public class FieldErrorHandler extends PopupValidationFeedback implements IHover
 
 	@Override
 	public void clear(ErrorClassifier classifier) {
-		super.clear(classifier);
-		if(classifier != null && classifier.isServer()) {
-			// NOTE: to reset incr. validation, we iterate over all invalids
-			// irregardless of classification, since we don't have easy access
-			// to the field widget in this context
-			for(final IFieldWidget<?> fw : invalids.keySet()) {
-				fw.validateIncrementally(true);
-			}
+		//super.clear(classifier);
+		Set<IFieldWidget<?>> set = new HashSet<IFieldWidget<?>>(invalids.keySet());
+		for(final IFieldWidget<?> fw : set) {
+			doResolveError(fw, classifier);
 		}
 	}
 
 	@Override
 	public void clear() {
-		super.clear();
-		for(final IFieldWidget<?> fw : invalids.keySet()) {
-			trackHover(fw, invalids.get(fw), false);
-			fw.validateIncrementally(true);
-		}
-		invalids.clear();
+		clear(null);
 	}
 
 	@Override

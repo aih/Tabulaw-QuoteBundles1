@@ -26,6 +26,7 @@ import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
 import com.tabulaw.service.IForgotPasswordHandler;
+import com.tabulaw.util.CryptoUtil;
 
 /**
  * Manages the persistence of {@link User}s.
@@ -47,8 +48,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		if(StringUtils.isEmpty(password)) throw new IllegalArgumentException("Can't encode an empty password");
 		// return passwordEncoder.encodePassword(password, salt);
 
-		// TODO make more robust
-		return Integer.toString(password.hashCode());
+		return CryptoUtil.encrypt(password);
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		// salt);
 
 		// TODO make more robust
-		return Integer.toString(rawPasswordToCheck.hashCode()).equals(encPassword);
+		return CryptoUtil.encrypt(rawPasswordToCheck).equals(encPassword);
 	}
 
 	// private final AclProviderManager aclProviderManager;
@@ -118,6 +118,14 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		}
 	}
 
+	/**
+	 * Create a user.
+	 * @param emailAddress
+	 * @param password
+	 * @return
+	 * @throws ValidationException
+	 * @throws EntityExistsException
+	 */
 	@Transactional
 	public User create(String emailAddress, String password) throws ValidationException, EntityExistsException {
 		final User user = new User();

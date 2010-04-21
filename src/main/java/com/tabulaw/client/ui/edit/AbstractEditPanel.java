@@ -72,6 +72,11 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 		public static final String PORTAL = "portal";
 	}
 
+	private static final String DEFAULT_SAVE_TEXT = "Save";
+	private static final String DEFAULT_DELETE_TEXT = "Delete";
+	private static final String DEFAULT_CANCEL_TEXT = "Cancel";
+	private static final String DEFAULT_RESET_TEXT = "Reset";
+
 	/**
 	 * The composite's target widget
 	 */
@@ -82,7 +87,7 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 	/**
 	 * Contains the actual edit fields.
 	 */
-	protected final P fieldPanel;
+	protected P fieldPanel;
 
 	/**
 	 * Ref to the optional message display which is gotten from the error handler
@@ -95,37 +100,47 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 	 */
 	private final FlowPanel pnlButtonRow = new FlowPanel();
 
+	private String deleteText, cancelText, resetText;
+
 	private final Button btnSave;
 
 	private Button btnReset, btnDelete, btnCancel;
 
 	/**
 	 * Constructor
-	 * @param fieldPanel The required {@link AbstractFieldPanel}
-	 * @param showCancelBtn Show the cancel button? Causes a cancel edit event
-	 *        when clicked.
-	 * @param showDeleteBtn Show the delete button? Causes a delete edit event
-	 *        when clicked.
-	 * @param showResetBtn Show the reset button?
 	 */
-	public AbstractEditPanel(P fieldPanel, boolean showCancelBtn, boolean showDeleteBtn, boolean showResetBtn) {
-		super();
-		if(fieldPanel == null) throw new IllegalArgumentException("A field panel must be specified.");
-		this.fieldPanel = fieldPanel;
+	public AbstractEditPanel() {
+		this(null, null, null, null);
+	}
 
+	/**
+	 * Constructor
+	 * @param saveText Save button text (required)
+	 * @param deleteText Delete button text (optional). If <code>null</code>,
+	 *        delete button is not displayed.
+	 * @param cancelText Cancel button text (optional). If <code>null</code>,
+	 *        cancel button is not displayed.
+	 * @param resetText Reset button text (optional). If <code>null</code>, reset
+	 *        button is not displayed.
+	 */
+	public AbstractEditPanel(String saveText, String deleteText, String cancelText, String resetText) {
+		super();
 		portal.setStyleName(Styles.PORTAL);
-		portal.setWidget(fieldPanel);
 
 		pnlButtonRow.setStyleName(Styles.BTN_ROW);
 
-		// default to add mode
-		btnSave = new Button("Add", this);
+		if(saveText == null) saveText = DEFAULT_SAVE_TEXT;
+		btnSave = new Button(saveText, this);
 		btnSave.addStyleName(Styles.SAVE);
 		pnlButtonRow.add(btnSave);
 
-		showDeleteButton(showDeleteBtn);
+		this.deleteText = deleteText;
+		this.cancelText = cancelText;
+		this.resetText = resetText;
 
-		showCancelButton(showCancelBtn);
+		showDeleteButton(deleteText != null);
+		showCancelButton(cancelText != null);
+		showResetButton(resetText != null);
 
 		panel.add(portal);
 		panel.add(pnlButtonRow);
@@ -133,9 +148,36 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 
 		initWidget(panel);
 	}
-	
+
+	/**
+	 * Constructor
+	 * @param saveText Save button text (required)
+	 * @param deleteText Delete button text (optional). If <code>null</code>,
+	 *        delete button is not displayed.
+	 * @param cancelText Cancel button text (optional). If <code>null</code>,
+	 *        cancel button is not displayed.
+	 * @param resetText Reset button text (optional). If <code>null</code>, reset
+	 *        button is not displayed.
+	 * @param fieldPanel the field panel
+	 */
+	public AbstractEditPanel(String saveText, String deleteText, String cancelText, String resetText, P fieldPanel) {
+		this(saveText, deleteText, cancelText, resetText);
+		setFieldPanel(fieldPanel);
+	}
+
 	protected final Panel getPortal() {
 		return portal;
+	}
+
+	public final P getFieldPanel() {
+		return fieldPanel;
+	}
+
+	public final void setFieldPanel(P fieldPanel) {
+		if(fieldPanel == null) throw new IllegalArgumentException("A field panel must be specified.");
+		if(this.fieldPanel != null) throw new IllegalStateException("Field panel already set.");
+		this.fieldPanel = fieldPanel;
+		portal.setWidget(fieldPanel);
 	}
 
 	/**
@@ -153,47 +195,38 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 	}
 
 	public final void showResetButton(boolean show) {
-		if(btnReset == null) {
-			btnReset = new Button("Reset", this);
+		if(show && btnReset == null) {
+			if(resetText == null) resetText = DEFAULT_RESET_TEXT;
+			btnReset = new Button(resetText, this);
 			btnReset.addStyleName(Styles.RESET);
 			pnlButtonRow.add(btnReset);
 		}
-		btnReset.setVisible(show);
+		if(btnReset != null) btnReset.setVisible(show);
 	}
 
 	public final void showDeleteButton(boolean show) {
-		if(btnDelete == null) {
-			btnDelete = new Button("Delete", this);
+		if(show && btnDelete == null) {
+			if(deleteText == null) deleteText = DEFAULT_DELETE_TEXT;
+			btnDelete = new Button(deleteText, this);
 			btnDelete.addStyleName(Styles.DELETE);
 			pnlButtonRow.add(btnDelete);
 		}
-		btnDelete.setVisible(show);
+		if(btnDelete != null) btnDelete.setVisible(show);
 	}
 
 	public final void showCancelButton(boolean show) {
-		if(btnCancel == null) {
-			btnCancel = new Button("Cancel", this);
+		if(show && btnCancel == null) {
+			if(cancelText == null) cancelText = DEFAULT_CANCEL_TEXT;
+			btnCancel = new Button(cancelText, this);
 			btnCancel.addStyleName(Styles.CANCEL);
 			pnlButtonRow.add(btnCancel);
 		}
-		btnCancel.setVisible(show);
+		if(btnCancel != null) btnCancel.setVisible(show);
 	}
 
 	@Override
 	public final HandlerRegistration addEditHandler(IEditHandler<T> handler) {
 		return addHandler(handler, EditEvent.TYPE);
-	}
-
-	/**
-	 * Sets the edit mode to either add or update.
-	 * @param isAdd
-	 */
-	public void setEditMode(boolean isAdd) {
-		btnSave.setText(isAdd ? "Add" : "Update");
-	}
-
-	protected final boolean isAdd() {
-		return "Add".equals(btnSave.getText());
 	}
 
 	/**
@@ -227,23 +260,18 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 			errorHandler.handleError(new Error(classifier, fw, emsg), ErrorDisplay.ALL_FLAGS);
 		}
 	}
-	
+
 	/**
 	 * @return The edit content.
 	 */
 	protected abstract T getEditContent();
-	
+
 	public final void onClick(ClickEvent event) {
 		final Object sender = event.getSource();
 		if(sender == btnSave) {
 			T editContent = getEditContent();
 			if(editContent != null) {
-				if(isAdd()) {
-					EditEvent.fireAdd(this, editContent);
-				}
-				else {
-					EditEvent.fireUpdate(this, editContent);
-				}
+				EditEvent.fireSave(this, editContent);
 			}
 		}
 		else if(sender == btnReset) {

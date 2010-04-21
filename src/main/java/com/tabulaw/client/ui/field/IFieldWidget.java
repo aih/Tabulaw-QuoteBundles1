@@ -15,6 +15,7 @@ import com.tabulaw.client.convert.IHasConverter;
 import com.tabulaw.client.ui.IHasHelpText;
 import com.tabulaw.client.validate.IValidator;
 import com.tabulaw.schema.IPropertyNameProvider;
+import com.tabulaw.schema.PropertyMetadata;
 
 /**
  * IFieldWidget - A physical non-group field capable of display in the ui.
@@ -83,6 +84,14 @@ public interface IFieldWidget<V> extends IField, IPropertyNameProvider, HasValue
 	} // Styles
 
 	/**
+	 * This method behave's just like getValue() does but provides the value as a
+	 * string.
+	 * @return The field's value as a string.
+	 * @see IFieldWidget#getValue()
+	 */
+	String getFieldValue();
+
+	/**
 	 * Sets the property name for this field.
 	 * @param propName The property name
 	 */
@@ -120,4 +129,10 @@ public interface IFieldWidget<V> extends IField, IPropertyNameProvider, HasValue
 	 * @param fieldLabelContainer The desired ancestor {@link Widget}
 	 */
 	void setFieldLabelContainer(Widget fieldLabelContainer);
+
+	/**
+	 * Directly sets property metadata on this field widget.
+	 * @param metadata
+	 */
+	void setPropertyMetadata(PropertyMetadata metadata);
 }
