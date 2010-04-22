@@ -20,7 +20,7 @@ import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.Portal;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
-import com.tabulaw.client.ui.login.LoginPanel;
+import com.tabulaw.client.ui.login.LoginTopPanel;
 import com.tabulaw.client.ui.login.UserSessionEvent;
 import com.tabulaw.client.ui.nav.NavColPanel;
 import com.tabulaw.client.ui.nav.NavRowPanel;
@@ -137,7 +137,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		return (Portal) RootPanel.get("portal").getWidget(0);
 	}
 	
-	private LoginPanel loginPanel;
+	private LoginTopPanel loginPanel;
 	
 	private void getUserContext() {
 		userContextService.getUserContext(new AsyncCallback<UserContextPayload>() {
@@ -179,7 +179,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	
 	private void showLoginPanel() {
 		if(loginPanel == null) {
-			loginPanel = new LoginPanel();
+			loginPanel = new LoginTopPanel();
 			loginPanel.addUserSessionHandler(new IUserSessionHandler() {
 				
 				@Override

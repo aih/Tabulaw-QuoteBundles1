@@ -14,9 +14,6 @@
       <directory>target/${project.build.finalName}</directory>
       <outputDirectory>/</outputDirectory>
       <excludes>
-        <!-- HACK -->
-        <exclude>**/com/tll/common/**</exclude>
-        
         <exclude>**/*.java</exclude>
         <exclude>**/*.gwt.xml</exclude>
         <exclude>**/client/**</exclude>
@@ -25,15 +22,7 @@
       	
       	<exclude>**/lib/gwt-log*</exclude>
       	<exclude>**/lib/gwt-dnd*</exclude>
-      	<exclude>**/lib/tll-*</exclude>
       </excludes>
-		</fileSet>
-		<fileSet>
-      <directory>target/${project.build.finalName}/WEB-INF/lib</directory>
-      <outputDirectory>/WEB-INF/lib</outputDirectory>
-      <includes>
-      	<include>**/tll-server.jar</include>
-      </includes>
 		</fileSet>
 	</fileSets>
 	
