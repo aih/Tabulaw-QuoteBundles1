@@ -12,7 +12,7 @@
     </description>
 		<param-name>di.modules</param-name>
 		<param-value>
-	    com.tll.di.MailModule
+	    com.tabulaw.di.MailModule
 		  com.tabulaw.di.ExceptionHandlerModule
     	com.tabulaw.di.ModelModule
     	com.tabulaw.di.Db4oDaoModule
