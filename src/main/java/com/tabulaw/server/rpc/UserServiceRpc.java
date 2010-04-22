@@ -23,15 +23,15 @@ import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.mail.IMailContext;
+import com.tabulaw.mail.MailManager;
+import com.tabulaw.mail.MailRouting;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.RequestContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
 import com.tabulaw.service.entity.UserService;
 import com.tabulaw.util.StringUtil;
-import com.tll.mail.IMailContext;
-import com.tll.mail.MailManager;
-import com.tll.mail.MailRouting;
 
 /**
  * @author jpk

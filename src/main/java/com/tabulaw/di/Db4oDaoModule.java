@@ -35,10 +35,10 @@ import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
+import com.tabulaw.config.Config;
+import com.tabulaw.config.IConfigAware;
+import com.tabulaw.config.IConfigKey;
 import com.tabulaw.dao.IEntityDao;
-import com.tll.config.Config;
-import com.tll.config.IConfigAware;
-import com.tll.config.IConfigKey;
 
 /**
  * Db4oDaoModule

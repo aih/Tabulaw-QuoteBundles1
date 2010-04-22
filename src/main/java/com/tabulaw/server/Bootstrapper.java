@@ -18,9 +18,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
-import com.tll.config.Config;
-import com.tll.config.ConfigRef;
-import com.tll.config.IConfigAware;
+import com.tabulaw.config.Config;
+import com.tabulaw.config.ConfigRef;
+import com.tabulaw.config.IConfigAware;
 
 /**
  * Bootstrapper - Responsible for starting up and shutting down the app.

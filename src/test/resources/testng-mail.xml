@@ -1,0 +1,18 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="smbiz-mail-tests" verbose="5">
+  
+  <test name="mail">
+    <groups>
+      <run>
+        <include name="mail" />
+        <!-- currently, we can't send email from my current isp provider so skip the send related tests. -->
+        <exclude name="send" />
+      </run>
+    </groups>
+    <packages>
+      <package name="com.tll.mail" />
+    </packages>
+  </test>
+  
+</suite>

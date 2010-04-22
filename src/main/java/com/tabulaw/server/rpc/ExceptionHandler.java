@@ -14,8 +14,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.inject.Inject;
 import com.tabulaw.di.ExceptionHandlerModule.OnErrorEmail;
-import com.tll.mail.MailManager;
-import com.tll.mail.NameEmail;
+import com.tabulaw.mail.MailManager;
+import com.tabulaw.mail.NameEmail;
 
 /**
  * ExceptionHandler - Emails exception notification emails.

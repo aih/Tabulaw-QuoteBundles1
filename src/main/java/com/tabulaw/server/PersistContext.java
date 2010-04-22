@@ -9,11 +9,11 @@ import javax.servlet.ServletContext;
 import net.sf.ehcache.CacheManager;
 
 import com.google.inject.Inject;
+import com.tabulaw.mail.MailManager;
 import com.tabulaw.schema.ISchemaInfo;
 import com.tabulaw.server.rpc.IExceptionHandler;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
-import com.tll.mail.MailManager;
 
 /**
  * Servlet context scoped object providing necessary apis for gettin stuff done
