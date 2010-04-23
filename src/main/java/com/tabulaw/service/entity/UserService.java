@@ -67,8 +67,6 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		return CryptoUtil.encrypt(rawPasswordToCheck).equals(encPassword);
 	}
 
-	// private final AclProviderManager aclProviderManager;
-
 	// private final UserCache userCache;
 
 	/**
@@ -79,14 +77,11 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	@Inject
 	public UserService(IEntityDao dao, ValidatorFactory vfactory) {
 		super(dao, vfactory);
-		// this.aclProviderManager = aclProviderManager;
-		// this.userCache = userCache;
-		init();
 	}
 
 	@Transactional
 	public void init() {
-		
+
 		// stub authorities if not present
 		for(AuthorityRoles role : AuthorityRoles.values()) {
 			try {
@@ -119,7 +114,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 			c.add(Calendar.YEAR, 1);
 			adminUser.setExpires(c.getTime());
 			adminUser.setName("Tabulaw Administrator");
-			
+
 			dao.persist(adminUser);
 			log.debug("admin user created.");
 		}
@@ -186,7 +181,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		catch(EntityNotFoundException e) {
 			throw new EntityNotFoundException("No user with email address: '" + emailAddress + "' was found.");
 		}
-		
+
 		assert user != null;
 		return user;
 	}
@@ -198,39 +193,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	}
 
 	@Transactional(rollbackFor = {
-		ChangeUserCredentialsFailedException.class, RuntimeException.class
-	})
-	public void setCredentials(String username, String newUsername, String newRawPassword)
-			throws ChangeUserCredentialsFailedException {
-
-		try {
-			// get the user
-			final Criteria<User> criteria = new Criteria<User>(User.class);
-			criteria.getPrimaryGroup().addCriterion("emailAddress", username, true);
-			final User user = dao.findEntity(criteria);
-
-			// encode the new password
-			final String encNewPassword = encodePassword(newRawPassword, newUsername);
-
-			// set the credentials
-			setCredentialsById(user.getId(), newUsername, encNewPassword);
-
-			// updateSecurityContextIfNecessary(user.getUsername(), newUsername,
-			// newRawPassword, false);
-		}
-		catch(final InvalidCriteriaException e) {
-			throw new IllegalArgumentException(
-					"Unable to chnage user credentials due to an unexpected invalid criteria exception: " + e.getMessage(), e);
-		}
-		catch(final EntityNotFoundException nfe) {
-			throw new ChangeUserCredentialsFailedException("Unable to set user credentials: Username: '" + username
-					+ "' not found");
-		}
-	}
-
-	@Transactional(rollbackFor = {
-		ChangeUserCredentialsFailedException.class, RuntimeException.class
-	})
+		ChangeUserCredentialsFailedException.class, RuntimeException.class })
 	@Override
 	public String resetPassword(String userId) throws ChangeUserCredentialsFailedException {
 
@@ -244,7 +207,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 			final String encNewPassword = encodePassword(random, username);
 
 			// set the credentials
-			setCredentials(userId, username, encNewPassword);
+			user.setPassword(encNewPassword);
+			dao.persist(user);
 
 			// updateSecurityContextIfNecessary(username, username, random, false);
 
@@ -255,17 +219,6 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 					+ " not found");
 		}
 
-	}
-
-	private void setCredentialsById(String id, String newUsername, String encNewPassword) {
-		/*
-		dao.executeQuery("user.setCredentials", new QueryParam[] {
-			new QueryParam(IEntity.PK_FIELDNAME, PropertyType.STRING, pk),
-			new QueryParam("username", PropertyType.STRING, newUsername),
-			new QueryParam("password", PropertyType.STRING, encNewPassword)
-		});
-		*/
-		throw new UnsupportedOperationException();
 	}
 
 	/*
