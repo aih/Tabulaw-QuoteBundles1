@@ -20,9 +20,10 @@ import org.springextensions.db4o.Db4oTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.aspectj.AnnotationTransactionAspect;
 
-import com.db4o.Db4o;
+import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
-import com.db4o.config.Configuration;
+import com.db4o.config.CommonConfiguration;
+import com.db4o.config.EmbeddedConfiguration;
 import com.google.inject.AbstractModule;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
@@ -116,14 +117,15 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 	 * E.g.: setting updateDepth(...) and/or cascadeOnUpdate(...).
 	 * @param c
 	 */
-	protected void configureConfiguration(Configuration c) {
-		c.objectClass(Authority.class).updateDepth(1);
-		c.objectClass(User.class).updateDepth(2);
-		c.objectClass(CaseRef.class).updateDepth(1);
-		c.objectClass(DocRef.class).updateDepth(2);
-		c.objectClass(Quote.class).updateDepth(1);
-		c.objectClass(QuoteBundle.class).updateDepth(2);
-		c.objectClass(BundleUserBinding.class).updateDepth(1);
+	protected void configureConfiguration(EmbeddedConfiguration c) {
+		CommonConfiguration cc = c.common();
+		cc.objectClass(Authority.class).updateDepth(1);
+		cc.objectClass(User.class).updateDepth(2);
+		cc.objectClass(CaseRef.class).updateDepth(1);
+		cc.objectClass(DocRef.class).updateDepth(2);
+		cc.objectClass(Quote.class).updateDepth(1);
+		cc.objectClass(QuoteBundle.class).updateDepth(2);
+		cc.objectClass(BundleUserBinding.class).updateDepth(1);
 	}
 
 	/**
@@ -157,14 +159,14 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 		// Configuration (db4o)
 		// NOTE: we need to always generate a fresh instance to avoid db4o exception
 		// being thrown
-		bind(Configuration.class).toProvider(new Provider<Configuration>() {
+		bind(EmbeddedConfiguration.class).toProvider(new Provider<EmbeddedConfiguration>() {
 
 			@Override
-			public Configuration get() {
-				final Configuration c = Db4o.newConfiguration();
+			public EmbeddedConfiguration get() {
+				final EmbeddedConfiguration ec = Db4oEmbedded.newConfiguration();
 				// configure the db4o configuration
-				configureConfiguration(c);
-				return c;
+				configureConfiguration(ec);
+				return ec;
 			}
 
 		}).in(Scopes.NO_SCOPE);
@@ -177,12 +179,12 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 			URI db4oUri;
 
 			@Inject
-			Provider<Configuration> c;
+			Provider<EmbeddedConfiguration> c;
 
 			@Override
 			public ObjectContainer get() {
 				log.info("Creating db4o session for: " + db4oUri);
-				return Db4o.openFile(c.get(), db4oUri.getPath());
+				return Db4oEmbedded.openFile(c.get(), db4oUri.getPath());
 			}
 		}).in(Scopes.SINGLETON);
 

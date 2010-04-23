@@ -16,8 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 
-import com.tabulaw.util.ClassUtil;
-
 /**
  * DocViewServlet
  * @author jpk
@@ -33,13 +31,7 @@ public class DocViewServlet extends HttpServlet {
 			throw new ServletException("No doc id specified.");
 		}
 
-		File f;
-		try {
-			f = new File(ClassUtil.getResource(docId).toURI());
-		}
-		catch(Exception e) {
-			throw new ServletException("Unable to read doc file: " + e.getMessage(), e);
-		}
+		File f = DocUtils.getDocRef(docId);
 
 		String fstr = FileUtils.readFileToString(f, "UTF-8");
 		

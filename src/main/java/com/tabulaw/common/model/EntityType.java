@@ -15,6 +15,7 @@ public enum EntityType implements INameValueProvider<String> {
 
 	AUTHORITY("Authority"),
 	USER("User"),
+	USER_STATE("User State"),
 	
 	BUNDLE_USER_BINDING("Bundle User Binding"),
 	

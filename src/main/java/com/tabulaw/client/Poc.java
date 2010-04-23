@@ -22,6 +22,7 @@ import com.tabulaw.client.ui.Portal;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
 import com.tabulaw.client.ui.login.LoginTopPanel;
 import com.tabulaw.client.ui.login.UserSessionEvent;
+import com.tabulaw.client.ui.msg.GlobalMsgPanel;
 import com.tabulaw.client.ui.nav.NavColPanel;
 import com.tabulaw.client.ui.nav.NavRowPanel;
 import com.tabulaw.client.view.DocumentView;
@@ -38,6 +39,7 @@ import com.tabulaw.common.data.rpc.IUserDataServiceAsync;
 import com.tabulaw.common.data.rpc.UserContextPayload;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
+import com.tabulaw.common.model.UserState;
 
 /**
  * Poc
@@ -46,27 +48,26 @@ import com.tabulaw.common.model.User;
 public class Poc implements EntryPoint, IUserSessionHandler {
 
 	private static final IUserContextServiceAsync userContextService;
-	
+
 	private static IUserCredentialsServiceAsync userCredentialsService;
-	
+
 	private static final IUserDataServiceAsync userDataService;
 
 	private static final IDocServiceAsync docService;
-	
+
 	/**
 	 * Use this token to initialize GWT history tracking.
 	 */
 	public static final String INITIAL_HISTORY_TOKEN = "";
-	
-	/**
-	 * The sole current quote bundle.
-	 */
-	private static QuoteBundle currentQuoteBundle;
-	
+
+	private static final GlobalMsgPanel msgPanel;
+
 	static {
 		userContextService = (IUserContextServiceAsync) GWT.create(IUserContextService.class);
 		userDataService = (IUserDataServiceAsync) GWT.create(IUserDataService.class);
 		docService = (IDocServiceAsync) GWT.create(IDocService.class);
+
+		msgPanel = new GlobalMsgPanel();
 	}
 
 	/**
@@ -75,7 +76,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	public static IUserContextServiceAsync getUserContextService() {
 		return userContextService;
 	}
-	
+
 	/**
 	 * @return The user register service.
 	 */
@@ -85,46 +86,38 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		}
 		return userCredentialsService;
 	}
-	
+
 	/**
 	 * @return The user data service.
 	 */
 	public static IUserDataServiceAsync getUserDataService() {
 		return userDataService;
 	}
-	
+
 	/**
 	 * @return The doc service.
 	 */
 	public static IDocServiceAsync getDocService() {
 		return docService;
 	}
-	
-	/**
-	 * @return The current quote bundle ref.
-	 */
-	public static QuoteBundle getCurrentQuoteBundle() {
-		return currentQuoteBundle;
-	}
 
 	/**
-	 * Sets the current quote bundle ref.
-	 * <p>
-	 * Fires a {@link ModelChangeEvent} when successful.
-	 * @param bundle non-null
-	 * @return <code>true</code> if the current quote bundle ref was actually
-	 *         updated and a model change event was fired.
+	 * @return The sole global msg panel in the app. This is intended to be used
+	 *         freely by those who need it meaning it may be detached and attached
+	 *         in different parts of the DOM.
 	 */
-	public static boolean setCurrentQuoteBundle(QuoteBundle bundle) {
-		if(bundle == null) throw new NullPointerException();
-		if(currentQuoteBundle == null || !currentQuoteBundle.equals(bundle)) {
-			currentQuoteBundle = bundle;
-			getNavRow().getCrntQuoteBudleWidget().update();
-			return true;
-		}
-		return false;
+	public static GlobalMsgPanel unparkGlobalMsgPanel() {
+		msgPanel.removeFromParent();
+		return msgPanel;
 	}
-	
+
+	public static void parkGlobalMsgPanel() {
+		RootPanel mainCol = RootPanel.get("mainCol");
+		if(mainCol.getWidgetCount() == 2) {
+			mainCol.insert(msgPanel, 1);
+		}
+	}
+
 	public static NavRowPanel getNavRow() {
 		return (NavRowPanel) RootPanel.get("navRow").getWidget(0);
 	}
@@ -136,12 +129,12 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	public static Portal getPortal() {
 		return (Portal) RootPanel.get("portal").getWidget(0);
 	}
-	
+
 	private LoginTopPanel loginPanel;
-	
+
 	private void getUserContext() {
 		userContextService.getUserContext(new AsyncCallback<UserContextPayload>() {
-			
+
 			@Override
 			public void onSuccess(UserContextPayload result) {
 				User liu = result.getUser();
@@ -152,9 +145,13 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 				else {
 					hideLoginPanel();
 					
-					// ensure quote bundles view so it recieves model change events staying in sync!
-					ViewManager.get().loadView(new StaticViewInitializer(QuoteBundlesView.klas));
+					// attach the global msg panel in its native place
+					parkGlobalMsgPanel();
 					
+					// ensure quote bundles view so it recieves model change events
+					// staying in sync!
+					ViewManager.get().loadView(new StaticViewInitializer(QuoteBundlesView.klas));
+
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
 					getPortal().fireEvent(new ModelChangeEvent(ModelChangeOp.LOADED, liu, null));
@@ -162,26 +159,31 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// load up user bundles
 					List<QuoteBundle> userBundles = result.getBundles();
 					ClientModelCache.get().persistAll(userBundles, getPortal());
-					
+
+					// set user state
+					UserState userState = result.getUserState();
+					ClientModelCache.get().persist(userState, getPortal());
+
 					// show doc listing view by default
 					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
 				}
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
-				// assume not logged in 
-				// (this will happen when an AccessDeniedException is thrown for this RPC call)
+				// assume not logged in
+				// (this will happen when an AccessDeniedException is thrown for this
+				// RPC call)
 				showLoginPanel();
 			}
 		});
 	}
-	
+
 	private void showLoginPanel() {
 		if(loginPanel == null) {
 			loginPanel = new LoginTopPanel();
 			loginPanel.addUserSessionHandler(new IUserSessionHandler() {
-				
+
 				@Override
 				public void onUserSessionEvent(UserSessionEvent event) {
 					if(event.isStart()) {
@@ -196,7 +198,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		getPortal().setVisible(false);
 		RootPanel.get("portal").add(loginPanel);
 	}
-	
+
 	private void hideLoginPanel() {
 		if(loginPanel != null) {
 			loginPanel.removeFromParent();
@@ -206,13 +208,13 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		getNavRow().setVisible(true);
 		getNavCol().setVisible(true);
 	}
-	
+
 	public void onModuleLoad() {
 		Log.setUncaughtExceptionHandler();
 		History.newItem(INITIAL_HISTORY_TOKEN);
 
 		DeferredCommand.addCommand(new Command() {
-			
+
 			public void execute() {
 				populateViewClasses();
 				build();
@@ -221,7 +223,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		});
 
 		// TODO temp bypass logins
-		//ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
+		// ViewManager.get().dispatch(new ShowViewRequest(new
+		// StaticViewInitializer(DocumentsView.klas)));
 	}
 
 	@Override
@@ -231,13 +234,12 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 			showLoginPanel();
 		}
 	}
-	
+
 	private void clear() {
 		ViewManager.get().clear();
 		getNavRow().clear();
 		getNavCol().clear();
 		ClientModelCache.get().clear();
-		currentQuoteBundle = null;
 	}
 
 	private void build() {
@@ -262,13 +264,15 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		// create handler for displaying nav row/col content which is view specific
 		ViewManager.get().addViewChangeHandler(navColPanel);
 		ViewManager.get().addViewChangeHandler(navRowPanel);
-		
-		// pre-load quote bundles view so it recieves model change events staying in sync!
-		//ViewManager.get().loadView(new StaticViewInitializer(QuoteBundlesView.klas));
-		
+
+		// pre-load quote bundles view so it recieves model change events staying in
+		// sync!
+		// ViewManager.get().loadView(new
+		// StaticViewInitializer(QuoteBundlesView.klas));
+
 		// initialize the ui msg notifier
 		Notifier.init(navColPanel);
-		
+
 		// hide until user context gotten
 		portal.setVisible(false);
 		getNavRow().setVisible(false);

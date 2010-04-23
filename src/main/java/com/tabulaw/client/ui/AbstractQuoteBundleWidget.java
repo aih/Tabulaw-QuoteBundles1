@@ -210,7 +210,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	protected Q addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
 		// add the quote ref to the quote bundle
 		if(addToThisBundleModel && mQuoteBundle != null) 
-			mQuoteBundle.getQuotes().add(0, mQuote);
+			mQuoteBundle.insertQuote(mQuote, 0);
 		if(persist) {
 			// add the quote updating the bundle quote refs too
 			ClientModelCache.get().persist(mQuote, this);

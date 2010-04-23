@@ -20,7 +20,9 @@ import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
+import com.tabulaw.common.model.UserState;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.util.ObjectUtil;
 
@@ -66,6 +68,42 @@ public class ClientModelCache {
 	public User getUser() {
 		List<?> list = cache.get(EntityType.USER.name());
 		return list.size() < 1 ? null : (User) list.get(0);
+	}
+
+	/**
+	 * @return The current quote bundle as a function of the cached
+	 *         {@link UserState}.
+	 */
+	public QuoteBundle getCurrentQuoteBundle() {
+		List<?> list = cache.get(EntityType.USER.name());
+		UserState userState = list.size() < 1 ? null : (UserState) list.get(0);
+		if(userState == null) throw new IllegalStateException();
+		String bundleId = userState.getCurrentQuoteBundleId();
+		if(bundleId != null) {
+			return (QuoteBundle) get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), bundleId));
+		}
+		return null;
+	}
+
+	/**
+	 * Sets the current quote bundle for the logged in user.
+	 * <p>
+	 * <b>NOTE:</b> this method does not fire a model change event.
+	 * @param bundleId id of the quote bundle for which to set as current
+	 * @return <code>true</code> if the current quote bundle was set meaning the
+	 *         current value wasn't set or is different that that given
+	 */
+	public boolean setCurrentQuoteBundle(String bundleId) {
+		if(bundleId == null) throw new NullPointerException();
+		List<?> list = cache.get(EntityType.USER_STATE.name());
+		UserState userState = list.size() < 1 ? null : (UserState) list.get(0);
+		if(userState == null) throw new IllegalStateException();
+		String currentBundleId = userState.getCurrentQuoteBundleId();
+		if(currentBundleId == null || !currentBundleId.equals(bundleId)) {
+			userState.setCurrentQuoteBundleId(bundleId);
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -222,7 +260,7 @@ public class ClientModelCache {
 		for(IEntity m : rlist) {
 			list.remove(m);
 		}
-		
+
 		// fire model change event(s)
 		if(source != null) {
 			for(IEntity e : rlist) {
@@ -251,7 +289,7 @@ public class ClientModelCache {
 	}
 
 	public DocRef getCaseDocByRemoteUrl(String remoteCaseUrl) {
-		List<IEntity> list = cache.get(EntityType.DOCUMENT);
+		List<IEntity> list = cache.get(EntityType.DOCUMENT.name());
 		for(IEntity m : list) {
 			CaseRef caseRef = ((DocRef) m).getCaseRef();
 			if(caseRef == null) continue;

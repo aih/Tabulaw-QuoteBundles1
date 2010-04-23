@@ -165,9 +165,10 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 	 * @return <code>true</code> if the current quote bundle was changed
 	 */
 	private boolean maybeSetCurrentQuoteBundle() {
-		QuoteBundle mQb = Poc.getCurrentQuoteBundle();
+		QuoteBundle mQb = ClientModelCache.get().getCurrentQuoteBundle();
 		if(mQb == null) {
-			throw new IllegalStateException("No current qb set");
+			return false;
+			//throw new IllegalStateException("No current qb set");
 			/*
 			assert crntQbKey == null;
 			// auto-create a new quote bundle
@@ -225,7 +226,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 
 		TextSelectApi.init(wDocViewer.getFrameId());
 
-		if(Poc.getCurrentQuoteBundle() == null) {
+		if(ClientModelCache.get().getCurrentQuoteBundle() == null) {
 			String userId = ClientModelCache.get().getUser().getId();
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
 			String qbName = mDoc.getTitle();
@@ -241,7 +242,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 					}
 					else {
 						QuoteBundle persistedQb = (QuoteBundle) result.getModel();
-						Poc.setCurrentQuoteBundle(persistedQb);
+						ClientModelCache.get().setCurrentQuoteBundle(persistedQb.getId());
 						// fire model change event from the portal to ensure this view sees
 						// the ensuing model change event
 						// which will then trigger maybeSetCurrentQuoteBundle()..

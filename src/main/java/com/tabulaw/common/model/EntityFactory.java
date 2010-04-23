@@ -203,7 +203,7 @@ public class EntityFactory {
 		caseRef.setParties(parties);
 		caseRef.setCitation(citation);
 		caseRef.setUrl(url);
-		caseRef.setYear(Integer.parseInt(year));
+		if(year != null) caseRef.setYear(Integer.parseInt(year));
 		doc.setCaseRef(caseRef);
 
 		return doc;

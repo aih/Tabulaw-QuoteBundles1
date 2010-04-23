@@ -88,24 +88,13 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 
 	/**
 	 * Constructor
-	 * <p>
-	 * Default, Spring-Security based, form field names and form action.
 	 */
 	public LoginTopPanel() {
-		this("j_username", "j_password", "/login");
-	}
-
-	/**
-	 * Constructor
-	 * @param fldUsername name of the username field
-	 * @param fldPassword name of the password field
-	 * @param formAction path to which the form is submitted (e.g.: "/login") <br>
-	 *        <b>NOTE:</b> "j_spring_security_check" will then be appended
-	 */
-	public LoginTopPanel(String fldUsername, String fldPassword, String formAction) {
 		super();
 
-		msgPanel = new GlobalMsgPanel();
+		// grab the sole global msg panel for use by this panal for the duration of
+		// user login
+		msgPanel = Poc.unparkGlobalMsgPanel();
 
 		errorHandler = ErrorHandlerBuilder.build(true, true, msgPanel);
 
@@ -114,41 +103,44 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 
 		form = new FormPanel();
 		form.setStyleName(Styles.LOGIN_FORM);
-		form.setAction(formAction/* + "j_spring_security_check"*/);
+		form.setAction("/login");
 		form.setMethod(FormPanel.METHOD_POST);
 
 		btnSubmit = new Button("Login", new ClickHandler() {
 
-			@SuppressWarnings({
+			@SuppressWarnings( {
 				"synthetic-access", "unchecked"
 			})
 			@Override
 			public void onClick(ClickEvent event) {
 				switch(mode) {
 					case FORGOT_PASSWORD: {
-						IFieldWidget<String> femail = (IFieldWidget<String>) loginFieldPanel.getFieldGroup().getFieldWidget("userEmail");
+						IFieldWidget<String> femail =
+								(IFieldWidget<String>) loginFieldPanel.getFieldGroup().getFieldWidget("userEmail");
 						if(!femail.isValid()) {
-							msgPanel.add(new Msg("Your email address must be specified for password retrieval.", MsgLevel.ERROR), null);
+							msgPanel.add(new Msg("Your email address must be specified for password retrieval.", MsgLevel.ERROR),
+									null);
 							return;
 						}
 						String emailAddress = femail.getValue();
 						Poc.getUserRegisterService().requestPassword(emailAddress, new AsyncCallback<Payload>() {
-							
+
 							@Override
 							public void onSuccess(Payload result) {
+								switchMode(Mode.LOGIN);
 								msgPanel.add(result.getStatus().getMsgs(), null);
 							}
-							
+
 							@Override
 							public void onFailure(Throwable caught) {
-								msgPanel.add(new Msg("An error occurred while sending the email.", MsgLevel.ERROR), null);
+								switchMode(Mode.LOGIN);
+								msgPanel.add(new Msg("An error occurred while sending the reminder email.", MsgLevel.ERROR), null);
 							}
 						});
 						break;
 					}
 					case LOGIN:
 						if(loginFieldPanel.getFieldGroup().isValid()) {
-							//setVisible(false);
 							form.submit();
 						}
 						break;
@@ -159,7 +151,7 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 							String password = (String) fg.getFieldWidget("userPswd").getValue();
 							UserRegistrationRequest request = new UserRegistrationRequest(emailAddress, password);
 							Poc.getUserRegisterService().registerUser(request, new AsyncCallback<Payload>() {
-								
+
 								@Override
 								public void onSuccess(Payload result) {
 									Status status = result.getStatus();
@@ -171,7 +163,7 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 									switchMode(Mode.LOGIN);
 									if(msgs != null) msgPanel.add(msgs, null);
 								}
-								
+
 								@Override
 								public void onFailure(Throwable caught) {
 									msgPanel.add(new Msg("An error occurred while registering.", MsgLevel.ERROR), null);
@@ -241,7 +233,6 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 					return;
 				}
 				// unsuccessful login
-				setVisible(true);
 				Msg emsg = new Msg(event.getResults(), MsgLevel.ERROR);
 				msgPanel.add(emsg, null);
 			}
@@ -253,7 +244,6 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 		topPanel.addStyleName(Styles.LOGIN);
 		topPanel.add(msgPanel);
 		topPanel.add(form);
-		// topPanel.add(registerFieldPanel);
 		topPanel.add(opRowPanel);
 
 		initWidget(topPanel);
@@ -307,6 +297,7 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 				}
 				btnSubmit.setText("Register");
 				lnkTgl.setText("Cancel");
+				loginFieldPanel.getFieldGroup().clearValue();
 				break;
 			}
 		}

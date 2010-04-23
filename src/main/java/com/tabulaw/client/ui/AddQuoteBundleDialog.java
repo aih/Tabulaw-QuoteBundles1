@@ -87,7 +87,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 						ClientModelCache.get().persist(persistedQuoteBundle, AddQuoteBundleDialog.this);
 						
 						// default set the current quote bundle if not set yet
-						Poc.setCurrentQuoteBundle(persistedQuoteBundle);
+						ClientModelCache.get().setCurrentQuoteBundle(persistedQuoteBundle.getId());
 	
 						// defer the hide so the model change event bubble up in the dom since
 						// hide() removes the dialog from the dom

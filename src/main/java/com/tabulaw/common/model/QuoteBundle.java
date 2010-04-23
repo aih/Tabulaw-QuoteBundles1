@@ -6,9 +6,11 @@
 package com.tabulaw.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * NOTE: there are no natural business keys defined for quote bundles.
@@ -53,7 +55,7 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 	@Override
 	public final ModelKey getModelKey() {
 		ModelKey mk = super.getModelKey();
@@ -81,6 +83,8 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 		return EntityType.QUOTE_BUNDLE;
 	}
 
+	@NotEmpty
+	@Length(max = 255)
 	public String getName() {
 		return name;
 	}
@@ -89,22 +93,56 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 		this.name = name;
 	}
 
+	/**
+	 * @return A newly created list containing the referenced quotes in this
+	 *         bundle.
+	 */
 	public List<Quote> getQuotes() {
-		if(quotes == null) quotes = new ArrayList<Quote>();
-		return quotes;
+		if(quotes == null) return Collections.emptyList();
+		return new ArrayList<Quote>(quotes);
 	}
 
 	public void setQuotes(List<Quote> quotes) {
 		this.quotes = quotes;
 	}
-	
+
+	/**
+	 * Adds a qoute at the end of the quote list.
+	 * @param quote
+	 */
 	public void addQuote(Quote quote) {
-		getQuotes().add(quote);
+		if(quotes == null) quotes = new ArrayList<Quote>();
+		quotes.add(quote);
 	}
-	
+
+	/**
+	 * Inserts a qoute at the given index.
+	 * @param quote
+	 * @param index
+	 */
+	public void insertQuote(Quote quote, int index) {
+		if(quotes == null) quotes = new ArrayList<Quote>();
+		quotes.add(index, quote);
+	}
+
+	/**
+	 * Removes the given quote.
+	 * @param quote
+	 * @return <code>true</code> if the quote was removed
+	 */
 	public boolean removeQuote(Quote quote) {
 		if(quotes == null) return false;
 		return quotes.remove(quote);
+	}
+
+	/**
+	 * Removes a quote from the given index.
+	 * @param index
+	 * @return the removed quote or <code>null</code> if not found
+	 */
+	public Quote removeQuote(int index) {
+		if(quotes == null) return null;
+		return quotes.remove(index);
 	}
 
 	@Length(max = 4000)

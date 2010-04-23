@@ -6,6 +6,7 @@
 package com.tabulaw.server;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -44,6 +45,32 @@ public class DocUtils {
 						+ "</script>";
 
 		cssHighightStylesBlock = "<style type=\"text/css\">.highlight{background-color:yellow;}</style>";
+	}
+
+	/**
+	 * @return ref to the directory containing all cached docs on disk.
+	 */
+	public static File getDocDirRef() {
+		File f = new File("docs");
+		return f;
+	}
+
+	/**
+	 * Creates {@link File} instance given a doc id.
+	 * @param docId
+	 * @return new {@link File} instance pointing to the doc on disk
+	 * @throws IllegalArgumentException when the op fails
+	 */
+	public static File getDocRef(String docId) throws IllegalArgumentException {
+		File f = new File("docs/" + docId);
+		return f;
+		/*
+		try {
+		}
+		catch(URISyntaxException e) {
+			throw new IllegalStateException("Unable to get doc ref: " + e.getMessage(), e);
+		}
+		*/
 	}
 
 	public static String dateAsString(Date date) {

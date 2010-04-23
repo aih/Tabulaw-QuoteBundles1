@@ -5,6 +5,7 @@ package com.tabulaw.common.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -48,6 +49,12 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity {
 
 	// NOTE make sure this is non-final for gwt rpc
 	private ArrayList<Authority> authorities;
+	
+	/**
+	 * The id of the bundle the user set as current client-side.
+	 * This 
+	 */
+	private long currentQuoteBundleId;
 
 	/**
 	 * Constructor
@@ -175,7 +182,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity {
 	 * @return the locked
 	 */
 	@NotNull
-	public boolean getLocked() {
+	public boolean isLocked() {
 		return locked;
 	}
 
@@ -191,7 +198,8 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity {
 	 */
 	@Valid
 	public List<Authority> getAuthorities() {
-		return authorities;
+		if(authorities == null) return Collections.emptyList();
+		return new ArrayList<Authority>(authorities);
 	}
 
 	public void setAuthorities(Collection<Authority> authorities) {
@@ -234,16 +242,8 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity {
 		setEmailAddress(username);
 	}
 
-	public boolean isAccountNonExpired() {
-		return (new Date()).getTime() < (expires == null ? 0L : expires.getTime());
-	}
-
-	public boolean isAccountNonLocked() {
-		return !getLocked();
-	}
-
-	public boolean isCredentialsNonExpired() {
-		return true;
+	public boolean isExpired() {
+		return !((new Date()).getTime() < (expires == null ? 0L : expires.getTime()));
 	}
 
 	public boolean isEnabled() {

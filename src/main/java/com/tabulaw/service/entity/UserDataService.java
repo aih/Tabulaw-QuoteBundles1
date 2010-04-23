@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 import com.tabulaw.common.model.BundleUserBinding;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.common.model.UserState;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.EntityExistsException;
@@ -40,6 +41,16 @@ public class UserDataService extends AbstractEntityService {
 	public UserDataService(IEntityDao dao, ValidatorFactory validationFactory) {
 		super(dao, validationFactory);
 	}
+	
+	@Transactional(readOnly = true)
+	public UserState getUserState(String userId) throws EntityNotFoundException {
+		return dao.load(UserState.class, userId);
+	}
+	
+	@Transactional
+	public void saveUserState(UserState userState) throws EntityExistsException {
+		dao.persist(userState);
+	}
 
 	@Transactional(readOnly = true)
 	public List<QuoteBundle> getBundlesForUser(String userId) {
@@ -52,7 +63,8 @@ public class UserDataService extends AbstractEntityService {
 			for(BundleUserBinding b : bindings) {
 				bundleIds.add(b.getBundleId());
 			}
-			return dao.findByIds(QuoteBundle.class, bundleIds, new Sorting("name"));
+			List<QuoteBundle> list = dao.findByIds(QuoteBundle.class, bundleIds, new Sorting("name"));
+			return list;
 		}
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
@@ -229,6 +241,7 @@ public class UserDataService extends AbstractEntityService {
 	 */
 	@Transactional
 	public void addBundleUserBinding(String bundleId, String userId) throws EntityExistsException {
+		if(bundleId == null || userId == null) throw new NullPointerException();
 		BundleUserBinding binding = new BundleUserBinding(bundleId, userId);
 		dao.persist(binding);
 	}

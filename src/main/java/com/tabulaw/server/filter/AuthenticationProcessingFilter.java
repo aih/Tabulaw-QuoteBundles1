@@ -194,8 +194,23 @@ public final class AuthenticationProcessingFilter implements Filter {
 
 			User user = userService.findByEmail(authRequest.username);
 
+			// now check user flags and expiry
+			if(!user.isEnabled()) {
+				// disabled user
+				throw new Exception("You account is locked.");
+			}
+			
+			if(user.isExpired()) {
+				throw new Exception("Your account has expired.");
+			}
+			
+			if(!user.isLocked()) {
+				throw new Exception("Your account is locked.");
+			}
+			
 			// compare passwords
 			if(UserService.isPasswordValid(password, user.getPassword(), user.getEmailAddress())) {
+				
 				authRequest.principal = user;
 				return authRequest;
 			}

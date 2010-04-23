@@ -8,7 +8,6 @@ package com.tabulaw.server.rpc;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -70,10 +69,9 @@ public class DocService extends RpcServlet implements IDocService {
 		Status status = new Status();
 		ArrayList<DocRef> docList = new ArrayList<DocRef>();
 
-		File cproot;
 		try {
-			cproot = new File(getClass().getClassLoader().getResource("").toURI());
-			Iterator<File> itr = FileUtils.iterateFiles(cproot, new String[] { "htm", "html"
+			File docDir = DocUtils.getDocDirRef();
+			Iterator<File> itr = FileUtils.iterateFiles(docDir, new String[] { "htm", "html"
 			}, false);
 			while(itr.hasNext()) {
 				File f = itr.next();
@@ -83,10 +81,7 @@ public class DocService extends RpcServlet implements IDocService {
 				if(mDoc != null) docList.add(mDoc);
 			}
 		}
-		catch(URISyntaxException e) {
-			RpcServlet.exceptionToStatus(e, status);
-		}
-		catch(IOException e) {
+		catch(Exception e) {
 			RpcServlet.exceptionToStatus(e, status);
 		}
 

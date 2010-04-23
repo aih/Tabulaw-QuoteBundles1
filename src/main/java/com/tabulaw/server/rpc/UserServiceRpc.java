@@ -19,6 +19,7 @@ import com.tabulaw.common.data.rpc.UserRegistrationRequest;
 import com.tabulaw.common.model.IUserRef;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
+import com.tabulaw.common.model.UserState;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.dao.EntityExistsException;
@@ -59,6 +60,10 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		payload.setUser(user);
 
 		final PersistContext pc = (PersistContext) rc.getServletContext().getAttribute(PersistContext.KEY);
+		
+		// get the retained user state if there is one
+		UserState userState = pc.getUserDataService().getUserState(user.getId());
+		payload.setUserState(userState);
 		
 		// get the user's quote bundles
 		List<QuoteBundle> bundles = pc.getUserDataService().getBundlesForUser(user.getId());

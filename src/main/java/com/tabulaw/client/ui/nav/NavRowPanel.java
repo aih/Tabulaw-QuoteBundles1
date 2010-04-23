@@ -21,7 +21,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabBar;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
-import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -90,7 +89,7 @@ public class NavRowPanel extends AbstractNavPanel {
 		}
 
 		public void update() {
-			QuoteBundle cqb = Poc.getCurrentQuoteBundle();
+			QuoteBundle cqb = ClientModelCache.get().getCurrentQuoteBundle();
 			if(cqb != null) {
 				String id = cqb.getId();
 				if(!id.equals(crntQbId)) {

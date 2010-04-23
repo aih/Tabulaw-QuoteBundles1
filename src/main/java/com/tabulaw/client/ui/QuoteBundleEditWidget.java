@@ -11,7 +11,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -55,7 +54,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 
 				@Override
 				public void onClick(ClickEvent event) {
-					if(Poc.setCurrentQuoteBundle(mQuoteBundle)) {
+					if(ClientModelCache.get().setCurrentQuoteBundle(mQuoteBundle.getId())) {
 						Notifier.get().info("Current Quote Bundle set.");
 						// we need to notify other views of the current quote bundle change
 						// and we do it by firing a model change event
