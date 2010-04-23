@@ -685,6 +685,18 @@ public final class FieldGroup implements IField, Iterable<IField> {
 			throw new ValidationException(errors);
 		}
 	}
+	
+	public boolean isValid() {
+		if(errorHandler != null) errorHandler.clear();
+		try {
+			validate();
+			return true;
+		}
+		catch(ValidationException e) {
+			if(errorHandler != null) errorHandler.handleErrors(e.getErrors(), ErrorDisplay.ALL_FLAGS);
+		}
+		return false;
+	}
 
 	@Override
 	public IErrorHandler getErrorHandler() {

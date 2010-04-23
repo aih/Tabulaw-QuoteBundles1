@@ -31,9 +31,11 @@ public final class MultiSelectField<V> extends AbstractCollectionDataField<V> {
 
 		/**
 		 * Constructor
+		 * @param name
 		 */
-		public Impl() {
+		public Impl(String name) {
 			super(true);
+			setName(name);
 			addStyleName(Styles.TBOX);
 			addChangeHandler(this);
 		}
@@ -98,7 +100,7 @@ public final class MultiSelectField<V> extends AbstractCollectionDataField<V> {
 	 */
 	MultiSelectField(String name, String propName, String labelText, String helpText, Map<V, String> data) {
 		super(name, propName, labelText, helpText);
-		lb = new Impl();
+		lb = new Impl(name);
 		lb.addValueChangeHandler(this);
 		lb.addFocusHandler(this);
 		lb.addBlurHandler(this);

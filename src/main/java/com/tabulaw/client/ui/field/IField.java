@@ -100,6 +100,12 @@ public interface IField extends HasName, IWidgetRef, IHasErrorHandler {
 	 * @throws ValidationException When invalid
 	 */
 	void validate() throws ValidationException;
+	
+	/**
+	 * Validates and handles errors internally.
+	 * @return <code>true</code> if no validation errors exist.
+	 */
+	boolean isValid();
 
 	/**
 	 * Perform "incremental" validation during editing?

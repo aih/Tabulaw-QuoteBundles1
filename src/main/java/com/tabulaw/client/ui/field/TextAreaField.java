@@ -22,10 +22,12 @@ public class TextAreaField extends AbstractField<String> implements IHasMaxLengt
 
 		/**
 		 * Constructor
+		 * @param name
 		 */
-		public Impl() {
+		public Impl(String name) {
 			super();
 			addStyleName(Styles.TBOX);
+			setName(name);
 		}
 
 	}
@@ -44,7 +46,7 @@ public class TextAreaField extends AbstractField<String> implements IHasMaxLengt
 	 */
 	TextAreaField(String name, String propName, String labelText, String helpText, int numRows, int numCols) {
 		super(name, propName, labelText, helpText);
-		ta = new Impl();
+		ta = new Impl(name);
 		ta.addValueChangeHandler(this);
 		ta.addFocusHandler(this);
 		ta.addBlurHandler(this);

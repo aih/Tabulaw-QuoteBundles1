@@ -22,10 +22,12 @@ public final class CheckboxField extends AbstractField<Boolean> {
 
 		/**
 		 * Constructor
+		 * @param name
 		 * @param label
 		 */
-		public Impl(String label) {
+		public Impl(String name, String label) {
 			super(label);
+			setName(name);
 			setStyleName(Styles.CBRB);
 		}
 
@@ -59,7 +61,7 @@ public final class CheckboxField extends AbstractField<Boolean> {
 		super(name, propName, null, helpText);
 		setConverter(ToBooleanConverter.DEFAULT);
 		this.cblabelText = labelText;
-		cb = new Impl(cblabelText);
+		cb = new Impl(name, cblabelText);
 		cb.addFocusHandler(this);
 		cb.addBlurHandler(this);
 		cb.addValueChangeHandler(this);

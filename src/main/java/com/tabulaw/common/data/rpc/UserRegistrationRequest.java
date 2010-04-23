@@ -5,12 +5,18 @@
  */
 package com.tabulaw.common.data.rpc;
 
+import com.tabulaw.IMarshalable;
+
 /**
  * @author jpk
  */
-public class UserRegistrationRequest {
+public class UserRegistrationRequest implements IMarshalable {
 
 	private String emailAddress, password;
+
+	public UserRegistrationRequest() {
+		super();
+	}
 
 	public UserRegistrationRequest(String emailAddress, String password) {
 		super();

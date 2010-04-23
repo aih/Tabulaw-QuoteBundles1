@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.common.model.User;
+import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.entity.UserService;
@@ -31,7 +32,7 @@ public final class AuthenticationProcessingFilter implements Filter {
 
 	private static final Log log = LogFactory.getLog(AuthenticationProcessingFilter.class);
 
-	public static final String AUTH_EXCEPTION_KEY = "AuthenticationExcepiton";
+	public static final String AUTH_EXCEPTION_KEY = AuthenticationProcessingFilter.class.getName();
 
 	private static final String filterProcessesUrl = "/login";
 
@@ -123,7 +124,12 @@ public final class AuthenticationProcessingFilter implements Filter {
 				finalUrl = httpRequest.getContextPath() + "/login?login_error=1";
 			}
 
-			httpResponse.sendRedirect(httpResponse.encodeRedirectURL(finalUrl));
+			// http 302 client re-direct
+			//httpResponse.sendRedirect(httpResponse.encodeRedirectURL(finalUrl));
+			
+			// server side re-direct
+			request.getRequestDispatcher(finalUrl).forward(request, response);			
+			
 			return;
 		}
 
@@ -139,11 +145,18 @@ public final class AuthenticationProcessingFilter implements Filter {
 			uri = uri.substring(0, pathParamIndex);
 		}
 
+		boolean urlMatch;
 		if("".equals(request.getContextPath())) {
-			return uri.endsWith(filterProcessesUrl);
+			urlMatch = uri.endsWith(filterProcessesUrl);
+		}
+		else {
+			urlMatch = uri.endsWith(request.getContextPath() + filterProcessesUrl);
 		}
 
-		return uri.endsWith(request.getContextPath() + filterProcessesUrl);
+		if(!urlMatch) return false;
+
+		String qs = request.getQueryString();
+		return qs == null || qs.indexOf("login_error") == -1;
 	}
 
 	@Override
@@ -155,8 +168,8 @@ public final class AuthenticationProcessingFilter implements Filter {
 	}
 
 	public Authentication attemptAuthentication(HttpServletRequest request) throws Exception {
-		String username = request.getParameter("j_username");
-		String password = request.getParameter("j_password");
+		String username = request.getParameter("userEmail");
+		String password = request.getParameter("userPswd");
 
 		if(username == null) {
 			username = "";
@@ -174,17 +187,11 @@ public final class AuthenticationProcessingFilter implements Filter {
 		HttpSession session = request.getSession(false);
 		if(session == null) throw new IllegalStateException("No http session exists.");
 
-		// session.setAttribute(SPRING_SECURITY_LAST_USERNAME_KEY,
-		// TextUtils.escapeEntities(username));
-		session.setAttribute("lastUsername", username);
-
-		// Allow subclasses to set the "details" property
-		// setDetails(request, authRequest);
-
 		try {
 			// return this.getAuthenticationManager().authenticate(authRequest);
 			PersistContext persistContext = (PersistContext) session.getServletContext().getAttribute(PersistContext.KEY);
 			UserService userService = persistContext.getUserService();
+
 			User user = userService.findByEmail(authRequest.username);
 
 			// compare passwords
@@ -193,10 +200,14 @@ public final class AuthenticationProcessingFilter implements Filter {
 				return authRequest;
 			}
 
-			throw new Exception("Bad credentials");
+			// invalid password
+			// fall through
 		}
-		catch(RuntimeException re) {
-			throw new Exception(re);
+		catch(EntityNotFoundException e) {
+			// can't find given email address
+			// fall through
 		}
+
+		throw new Exception("Invalid login.");
 	}
 }

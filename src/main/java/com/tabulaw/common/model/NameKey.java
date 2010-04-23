@@ -16,7 +16,7 @@ public class NameKey implements IDescriptorProvider {
 	/**
 	 * The name used to identify the field that holds the name.
 	 */
-	private String nameProperty;
+	private String nameProperty = DEFAULT_FIELDNAME;
 
 	/**
 	 * The actual name value.
@@ -33,7 +33,7 @@ public class NameKey implements IDescriptorProvider {
 	 * @param entityType
 	 */
 	public NameKey(String entityType) {
-		this(entityType, null, DEFAULT_FIELDNAME);
+		this(entityType, DEFAULT_FIELDNAME, null);
 	}
 
 	/**
@@ -42,7 +42,7 @@ public class NameKey implements IDescriptorProvider {
 	 * @param name
 	 */
 	public NameKey(String entityType, String name) {
-		this(entityType, name, DEFAULT_FIELDNAME);
+		this(entityType, DEFAULT_FIELDNAME, name);
 	}
 
 	/**
@@ -83,6 +83,7 @@ public class NameKey implements IDescriptorProvider {
 	 */
 	public final void setNameProperty(String nameProperty) {
 		if(nameProperty == null) throw new IllegalArgumentException("A field name must be specified");
+		this.nameProperty = nameProperty;
 	}
 
 	@Override

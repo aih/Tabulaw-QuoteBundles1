@@ -58,7 +58,7 @@ public class FieldErrorHandler extends PopupValidationFeedback implements IHover
 	protected void doHandleError(Error error) {
 		super.doHandleError(error);
 		final Widget target = error.getTarget() == null ? null : error.getTarget().getWidget();
-		if(target != null) {
+		if(target instanceof IFieldWidget<?>) {
 			// handle styling
 			target.removeStyleName(Styles.DIRTY);
 			target.addStyleName(Styles.INVALID);

@@ -27,10 +27,12 @@ public final class TextField extends AbstractField<String> implements IHasMaxLen
 
 		/**
 		 * Constructor
+		 * @param name 
 		 */
-		public Impl() {
+		public Impl(String name) {
 			super();
 			addStyleName(Styles.TBOX);
+			setName(name);
 		}
 
 	}
@@ -52,7 +54,7 @@ public final class TextField extends AbstractField<String> implements IHasMaxLen
 	 */
 	TextField(String name, String propName, String labelText, String helpText, int visibleLength) {
 		super(name, propName, labelText, helpText);
-		tb = new Impl();
+		tb = new Impl(name);
 		setVisibleLen(visibleLength);
 		tb.addValueChangeHandler(this);
 		tb.addFocusHandler(this);

@@ -14,9 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
 import com.tabulaw.common.model.Authority;
-import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IUserRef;
-import com.tabulaw.common.model.NameKey;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.Authority.AuthorityRoles;
 import com.tabulaw.criteria.Criteria;
@@ -88,33 +86,42 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 
 	@Transactional
 	public void init() {
-		User anonUser = null;
+		
+		// stub authorities if not present
+		for(AuthorityRoles role : AuthorityRoles.values()) {
+			try {
+				dao.load(Authority.class, role.name());
+			}
+			catch(EntityNotFoundException e) {
+				dao.persist(new Authority(role.name()));
+			}
+		}
+
 		try {
-			anonUser = dao.load(User.class, "anon@tabulaw.com");
-			log.debug("Test anon user retrieved.");
+			// load admin account and create if not present
+			dao.load(User.class, "admin@tabulaw.com");
+			log.debug("Admin user retrieved.");
 		}
 		catch(EntityNotFoundException e) {
-			// create the anon user
-			anonUser = new User();
-			Authority a = new Authority();
-			a.setAuthority(AuthorityRoles.ROLE_USER.name());
-			a = new Authority();
-			a.setAuthority(AuthorityRoles.ROLE_ADMINISTRATOR.name());
-			anonUser.addAuthority(a);
+			// create the admin user
+			User adminUser = new User();
+			Authority adminAuth = dao.load(Authority.class, AuthorityRoles.ROLE_ADMINISTRATOR.name());
+			adminUser.addAuthority(adminAuth);
 			Date now = new Date();
-			anonUser.setDateCreated(now);
-			anonUser.setDateModified(now);
-			anonUser.setEmailAddress("anon@tabulaw.com");
-			anonUser.setPassword(encodePassword("anon", anonUser.getEmailAddress()));
-			anonUser.setEnabled(true);
-			anonUser.setLocked(false);
+			adminUser.setDateCreated(now);
+			adminUser.setDateModified(now);
+			adminUser.setEmailAddress("admin@tabulaw.com");
+			adminUser.setPassword(encodePassword("admin123", adminUser.getEmailAddress()));
+			adminUser.setEnabled(true);
+			adminUser.setLocked(false);
 			Calendar c = Calendar.getInstance();
 			c.setTime(now);
 			c.add(Calendar.YEAR, 1);
-			anonUser.setExpires(c.getTime());
-			anonUser.setName("Tabulaw Discovery User");
-			log.debug("Test anon user created.");
-			anonUser = dao.persist(anonUser);
+			adminUser.setExpires(c.getTime());
+			adminUser.setName("Tabulaw Administrator");
+			
+			dao.persist(adminUser);
+			log.debug("admin user created.");
 		}
 	}
 
@@ -151,8 +158,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		user.setLocked(false);
 
 		// set the role as user by default
-		user.addAuthority((Authority) dao.load(new NameKey(EntityType.AUTHORITY.name(),
-				AuthorityRoles.ROLE_USER.toString(), Authority.FIELDNAME_AUTHORITY)));
+		user.addAuthority(dao.load(Authority.class, AuthorityRoles.ROLE_ADMINISTRATOR.name()));
 
 		dao.persist(user);
 
@@ -175,11 +181,13 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 			user = dao.findEntity(criteria);
 		}
 		catch(final InvalidCriteriaException e) {
-			throw new IllegalArgumentException("Unexpected invalid criteria exception occurred");
+			throw new IllegalStateException("Unexpected invalid criteria exception occurred");
 		}
-		if(user == null) {
-			throw new EntityNotFoundException("User with username: " + emailAddress + " was not found.");
+		catch(EntityNotFoundException e) {
+			throw new EntityNotFoundException("No user with email address: '" + emailAddress + "' was found.");
 		}
+		
+		assert user != null;
 		return user;
 	}
 

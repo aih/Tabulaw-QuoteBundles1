@@ -20,7 +20,7 @@
 		<db4o.version>7.13-SNAPSHOT</db4o.version>
 		<spring.version>2.5.6.SEC01</spring.version>
 		<springextensions.db4o.version>1.0.0e</springextensions.db4o.version>
-		<aspectj.version>1.6.5</aspectj.version>
+		<aspectj.version>1.6.7</aspectj.version>
 	</properties>
 
 	<url>https://github.com/aih/Tabulaw-QuoteBundles1</url>
@@ -240,15 +240,17 @@
 			</plugin>
 
 			<!-- AspectJ bind @Transactional to Spring's trans handling framework -->
-			<!-- TODO TEMP 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>aspectj-maven-plugin</artifactId>
 				<configuration>
-					<showWeaveInfo>false</showWeaveInfo>
+					<showWeaveInfo>true</showWeaveInfo>
 					<source>1.6</source>
 					<target>1.6</target>
           <complianceLevel>1.6</complianceLevel>
+					<includes>
+						<include>com/tabulaw/service/entity/**</include>
+					</includes>
 					<aspectLibraries>
 						<aspectLibrary>
 							<groupId>org.springframework</groupId>
@@ -265,7 +267,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			-->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

@@ -38,9 +38,11 @@ public class DateField extends AbstractField<Date> implements IHasFormat {
 
 		/**
 		 * Constructor
+		 * @param name
 		 */
-		public Impl() {
+		public Impl(String name) {
 			super();
+			getTextBox().setName(name);
 			getTextBox().addStyleName(Styles.TBOX);
 			getTextBox().setVisibleLength(8);
 		}
@@ -105,7 +107,7 @@ public class DateField extends AbstractField<Date> implements IHasFormat {
 	 */
 	DateField(String name, String propName, String labelText, String helpText, GlobalFormat format) {
 		super(name, propName, labelText, helpText);
-		dbox = new Impl();
+		dbox = new Impl(name);
 		dbox.addValueChangeHandler(this);
 		dbox.addFocusHandler(this);
 		dbox.addBlurHandler(this);

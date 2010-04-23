@@ -30,9 +30,11 @@ public final class SelectField<V> extends AbstractDataField<V, V> {
 
 		/**
 		 * Constructor
+		 * @param name
 		 */
-		public Impl() {
+		public Impl(String name) {
 			super(false);
+			setName(name);
 			addStyleName(Styles.TBOX);
 			addChangeHandler(this);
 		}
@@ -98,7 +100,7 @@ public final class SelectField<V> extends AbstractDataField<V, V> {
 	 */
 	SelectField(String name, String propName, String labelText, String helpText, Map<V, String> data) {
 		super(name, propName, labelText, helpText);
-		lb = new Impl();
+		lb = new Impl(name);
 		lb.addValueChangeHandler(this);
 		lb.addFocusHandler(this);
 		lb.addBlurHandler(this);

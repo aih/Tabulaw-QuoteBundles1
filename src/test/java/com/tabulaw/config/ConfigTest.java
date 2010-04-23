@@ -65,7 +65,7 @@ public class ConfigTest {
 	 */
 	public void testDefaultLoading() throws Exception {
 		try {
-			Config config = Config.load();
+			Config config = Config.load(new ConfigRef("com/tabulaw/config/config.properties"));
 			assert !config.isEmpty() : "Config instance is empty";
 		}
 		catch(Throwable t) {
@@ -78,7 +78,7 @@ public class ConfigTest {
 	 * @throws Exception
 	 */
 	public void testInterpolation() throws Exception {
-		Config config = Config.load();
+		Config config = Config.load(new ConfigRef("com/tabulaw/config/config.properties"));
 
 		Iterator<?> itr = config.getKeys();
 		while(itr.hasNext()) {
@@ -96,7 +96,7 @@ public class ConfigTest {
 	 * @throws Exception
 	 */
 	public void testAllAsMap() throws Exception {
-		Config config = Config.load();
+		Config config = Config.load(new ConfigRef("com/tabulaw/config/config.properties"));
 
 		Map<String, String> map = config.asMap(null, null);
 		assert map != null;
@@ -113,7 +113,7 @@ public class ConfigTest {
 	 * @throws Exception
 	 */
 	public void testNestedAsMap() throws Exception {
-		Config config = Config.load();
+		Config config = Config.load(new ConfigRef("com/tabulaw/config/config.properties"));
 
 		Map<String, String> map = config.asMap("simple", "simple.");
 		assert map != null;
@@ -136,7 +136,7 @@ public class ConfigTest {
 	 * @throws Exception
 	 */
 	public void testSaveAllToFile() throws Exception {
-		Config config = Config.load();
+		Config config = Config.load(new ConfigRef("com/tabulaw/config/config.properties"));
 
 		File f = stubTestConfigOutputPropsFile();
 		config.saveAsPropFile(f, null, null);
@@ -166,7 +166,7 @@ public class ConfigTest {
 	 * @throws Exception
 	 */
 	public void testSaveSubsetToFile() throws Exception {
-		Config config = Config.load();
+		Config config = Config.load(new ConfigRef("com/tabulaw/config/config.properties"));
 
 		File f = stubTestConfigOutputPropsFile();
 		config.saveAsPropFile(f, "props.commas", "props.commas.");
@@ -190,7 +190,7 @@ public class ConfigTest {
 	 * @throws Exception
 	 */
 	public void testIntraConfigFileVariableInterpolation() throws Exception {
-		Config config = Config.load(new ConfigRef(), new ConfigRef("config2.properties"));
+		Config config = Config.load(new ConfigRef("com/tabulaw/config/config.properties"), new ConfigRef("com/tabulaw/config/config2.properties"));
 		String pv = config.getString("props.simple.propA");
 		String iipv = config.getString("props.intrainterpolated.propA");
 		assert iipv != null && iipv.equals(pv);
@@ -201,7 +201,7 @@ public class ConfigTest {
 	 * @throws Exception
 	 */
 	public void testConfigFiltering() throws Exception {
-		Config config = Config.load();
+		Config config = Config.load(new ConfigRef("com/tabulaw/config/config.properties"));
 
 		// create a filter to extract only those keys beginning with: 'props.simple'
 		IConfigFilter filter = new IConfigFilter() {
@@ -230,13 +230,13 @@ public class ConfigTest {
 	 * @throws Exception
 	 */
 	public void testConfigFileOverriding() throws Exception {
-		Config config = Config.load(new ConfigRef(), new ConfigRef("config2.properties"));
+		Config config = Config.load(new ConfigRef("com/tabulaw/config/config.properties"), new ConfigRef("com/tabulaw/config/config2.properties"));
 		String pv = config.getString("props.simple.propB");
 		assert "val2-overridden".equals(pv);
 	}
 
 	public void testLoadAll() throws Exception {
-		Config config = Config.load(new ConfigRef(true));
+		Config config = Config.load(new ConfigRef("com/tabulaw/config/config.properties", false, true));
 
 		for(String key : keys) {
 			assert config.getProperty(key) != null;

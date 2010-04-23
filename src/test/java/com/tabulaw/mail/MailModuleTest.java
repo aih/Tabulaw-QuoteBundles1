@@ -11,6 +11,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
 import com.tabulaw.config.Config;
+import com.tabulaw.config.ConfigRef;
 import com.tabulaw.di.MailModule;
 
 /**
@@ -25,7 +26,7 @@ public class MailModuleTest {
 	 * @throws Exception
 	 */
 	public void test() throws Exception {
-		Config c = Config.load();
+		Config c = Config.load(new ConfigRef("com/tabulaw/mail/config.properties"));
 		Injector i;
 		try {
 			i = Guice.createInjector(Stage.DEVELOPMENT, new MailModule(c));

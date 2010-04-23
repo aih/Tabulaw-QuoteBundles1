@@ -463,7 +463,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 
 			@Override
 			public boolean match(INamedEntity candidate) {
-				return nameKey.getNameProperty().equals(candidate.getName());
+				return nameKey.getName().equals(candidate.getName());
 			}
 		}, nameKey);
 	}

@@ -37,10 +37,12 @@ public final class SuggestField extends AbstractDataField<String, String> {
 
 		/**
 		 * Constructor
+		 * @param name
 		 */
-		public Impl() {
+		public Impl(String name) {
 			super(new MultiWordSuggestOracle());
 			addStyleName(Styles.TBOX);
+			setName(name);
 		}
 
 		@Override
@@ -114,7 +116,7 @@ public final class SuggestField extends AbstractDataField<String, String> {
 	 */
 	SuggestField(String name, String propName, String labelText, String helpText, Map<String, String> data) {
 		super(name, propName, labelText, helpText);
-		sb = new Impl();
+		sb = new Impl(name);
 		// fires when suggest box is manually edited
 		sb.addValueChangeHandler(this);
 

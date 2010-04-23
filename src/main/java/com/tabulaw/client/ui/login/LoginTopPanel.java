@@ -3,29 +3,36 @@
  */
 package com.tabulaw.client.ui.login;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
+import com.tabulaw.client.Poc;
 import com.tabulaw.client.data.rpc.IHasRpcHandlers;
 import com.tabulaw.client.data.rpc.IRpcHandler;
 import com.tabulaw.client.data.rpc.RpcEvent;
 import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.ui.SimpleHyperLink;
+import com.tabulaw.client.ui.field.FieldGroup;
+import com.tabulaw.client.ui.field.IFieldWidget;
 import com.tabulaw.client.ui.msg.GlobalMsgPanel;
-import com.tabulaw.client.validate.ErrorDisplay;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
 import com.tabulaw.client.validate.ErrorHandlerDelegate;
-import com.tabulaw.client.validate.ValidationException;
+import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.data.Status;
+import com.tabulaw.common.data.rpc.UserRegistrationRequest;
 import com.tabulaw.common.msg.Msg;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 
@@ -64,7 +71,7 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 	/**
 	 * The current mode.
 	 */
-	Mode mode;
+	Mode mode = Mode.LOGIN;
 
 	final FlowPanel topPanel, opRowPanel;
 
@@ -112,33 +119,67 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 
 		btnSubmit = new Button("Login", new ClickHandler() {
 
-			@SuppressWarnings("synthetic-access")
+			@SuppressWarnings({
+				"synthetic-access", "unchecked"
+			})
 			@Override
 			public void onClick(ClickEvent event) {
-				if(mode == Mode.LOGIN) {
-
-					try {
-						loginFieldPanel.getFieldGroup().validate();
-						setVisible(false);
-						form.submit();
+				switch(mode) {
+					case FORGOT_PASSWORD: {
+						IFieldWidget<String> femail = (IFieldWidget<String>) loginFieldPanel.getFieldGroup().getFieldWidget("userEmail");
+						if(!femail.isValid()) {
+							msgPanel.add(new Msg("Your email address must be specified for password retrieval.", MsgLevel.ERROR), null);
+							return;
+						}
+						String emailAddress = femail.getValue();
+						Poc.getUserRegisterService().requestPassword(emailAddress, new AsyncCallback<Payload>() {
+							
+							@Override
+							public void onSuccess(Payload result) {
+								msgPanel.add(result.getStatus().getMsgs(), null);
+							}
+							
+							@Override
+							public void onFailure(Throwable caught) {
+								msgPanel.add(new Msg("An error occurred while sending the email.", MsgLevel.ERROR), null);
+							}
+						});
+						break;
 					}
-					catch(ValidationException e) {
-						loginFieldPanel.getFieldGroup().getErrorHandler().handleErrors(e.getErrors(), ErrorDisplay.LOCAL.flag());
+					case LOGIN:
+						if(loginFieldPanel.getFieldGroup().isValid()) {
+							//setVisible(false);
+							form.submit();
+						}
+						break;
+					case REGISTER: {
+						FieldGroup fg = registerFieldPanel.getFieldGroup();
+						if(fg.isValid()) {
+							String emailAddress = (String) fg.getFieldWidget("userEmail").getValue();
+							String password = (String) fg.getFieldWidget("userPswd").getValue();
+							UserRegistrationRequest request = new UserRegistrationRequest(emailAddress, password);
+							Poc.getUserRegisterService().registerUser(request, new AsyncCallback<Payload>() {
+								
+								@Override
+								public void onSuccess(Payload result) {
+									Status status = result.getStatus();
+									List<Msg> msgs = status.getMsgs();
+									if(!status.hasErrors()) {
+										if(msgs == null) msgs = new ArrayList<Msg>(1);
+										msgs.add(new Msg("Now login!", MsgLevel.INFO));
+									}
+									switchMode(Mode.LOGIN);
+									if(msgs != null) msgPanel.add(msgs, null);
+								}
+								
+								@Override
+								public void onFailure(Throwable caught) {
+									msgPanel.add(new Msg("An error occurred while registering.", MsgLevel.ERROR), null);
+								}
+							});
+						}
+						break;
 					}
-				}
-				else {
-					final String emailAddress = loginFieldPanel.getFieldGroup().getFieldWidget("userEmail").getFieldValue();
-					if(emailAddress.length() == 0) {
-						msgPanel.add(new Msg("Your email address must be specified for password retrieval.", MsgLevel.ERROR), null);
-						return;
-					}
-
-					// TODO implement forgot password service
-					// final ForgotPasswordCommand fpc = new
-					// ForgotPasswordCommand(emailAddress);
-					// fpc.setSource(LoginTopPanel.this);
-					// fpc.execute();
-					Window.alert("Forgot password service not yet implemented.");
 				}
 			}
 		});
@@ -159,13 +200,14 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 			@Override
 			public void onClick(ClickEvent event) {
 				loginFieldPanel.getFieldGroup().getErrorHandler().clear();
-				if(mode != Mode.LOGIN) {
-					// to login mode
-					switchMode(Mode.LOGIN);
-				}
-				else {
-					// to forgot password mode
-					switchMode(Mode.FORGOT_PASSWORD);
+				switch(mode) {
+					case LOGIN:
+						switchMode(Mode.FORGOT_PASSWORD);
+						break;
+					case FORGOT_PASSWORD:
+					case REGISTER:
+						switchMode(Mode.LOGIN);
+						break;
 				}
 			}
 		});
@@ -263,12 +305,15 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 					// insert it just above the op row
 					topPanel.insert(registerFieldPanel, topPanel.getWidgetCount() - 2);
 				}
+				btnSubmit.setText("Register");
+				lnkTgl.setText("Cancel");
 				break;
 			}
 		}
 
-		boolean isRegister = (mode == Mode.REGISTER);
+		boolean isRegister = (newMode == Mode.REGISTER);
 		form.setVisible(!isRegister);
+		lnkRegister.setVisible(newMode == Mode.LOGIN);
 		if(registerFieldPanel != null) registerFieldPanel.setVisible(isRegister);
 
 		mode = newMode;

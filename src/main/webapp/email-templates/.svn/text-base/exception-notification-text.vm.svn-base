@@ -1,0 +1,12 @@
+#set ( $subject = $header )
+
+The following exception occurred on $datetime:
+
+Please check the error message below.
+
+Regards,
+
+smbiz Admin application
+
+Error: $error
+$trace

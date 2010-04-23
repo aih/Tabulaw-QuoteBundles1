@@ -68,7 +68,7 @@ public class TemplateComposer extends AbstractComposer<TemplatedMailContext> {
 
 			final VelocityContext velocityContext = new VelocityContext(mergeObjects);
 			try {
-				velocityEngine.mergeTemplate(templatePath, "ISO-8859-1", velocityContext, text);
+				velocityEngine.mergeTemplate(templatePath, "UTF-8", velocityContext, text);
 			}
 			catch(final Exception e) {
 				throw new VelocityException(e);

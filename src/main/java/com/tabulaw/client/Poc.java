@@ -47,11 +47,11 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 	private static final IUserContextServiceAsync userContextService;
 	
+	private static IUserCredentialsServiceAsync userCredentialsService;
+	
 	private static final IUserDataServiceAsync userDataService;
 
 	private static final IDocServiceAsync docService;
-	
-	private static IUserCredentialsServiceAsync userRegisterService;
 	
 	/**
 	 * Use this token to initialize GWT history tracking.
@@ -64,9 +64,9 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	private static QuoteBundle currentQuoteBundle;
 	
 	static {
-		docService = (IDocServiceAsync) GWT.create(IDocService.class);
 		userContextService = (IUserContextServiceAsync) GWT.create(IUserContextService.class);
 		userDataService = (IUserDataServiceAsync) GWT.create(IUserDataService.class);
+		docService = (IDocServiceAsync) GWT.create(IDocService.class);
 	}
 
 	/**
@@ -74,6 +74,16 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	 */
 	public static IUserContextServiceAsync getUserContextService() {
 		return userContextService;
+	}
+	
+	/**
+	 * @return The user register service.
+	 */
+	public static IUserCredentialsServiceAsync getUserRegisterService() {
+		if(userCredentialsService == null) {
+			userCredentialsService = (IUserCredentialsServiceAsync) GWT.create(IUserCredentialsService.class);
+		}
+		return userCredentialsService;
 	}
 	
 	/**
@@ -88,16 +98,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	 */
 	public static IDocServiceAsync getDocService() {
 		return docService;
-	}
-	
-	/**
-	 * @return The user register service.
-	 */
-	public static IUserCredentialsServiceAsync getUserRegisterService() {
-		if(userRegisterService == null) {
-			userRegisterService = (IUserCredentialsServiceAsync) GWT.create(IUserCredentialsService.class);
-		}
-		return userRegisterService;
 	}
 	
 	/**

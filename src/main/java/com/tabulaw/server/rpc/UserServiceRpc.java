@@ -73,6 +73,9 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	@Override
 	public Payload registerUser(UserRegistrationRequest request) {
 		Status status = new Status();
+		
+		// we are forced to create an http session here in order to access the servlet context
+		getRequestContext().getRequest().getSession(true);
 
 		PersistContext persistContext =
 				(PersistContext) super.getRequestContext().getServletContext().getAttribute(PersistContext.KEY);

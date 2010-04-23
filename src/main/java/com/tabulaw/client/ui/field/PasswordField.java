@@ -26,9 +26,11 @@ public final class PasswordField extends AbstractField<String> implements IHasMa
 
 		/**
 		 * Constructor
+		 * @param name
 		 */
-		public Impl() {
+		public Impl(String name) {
 			super();
+			setName(name);
 			addStyleName(Styles.TBOX);
 		}
 
@@ -46,7 +48,7 @@ public final class PasswordField extends AbstractField<String> implements IHasMa
 	 */
 	PasswordField(String name, String propName, String lblText, String helpText, int visibleLength) {
 		super(name, propName, lblText, helpText);
-		tb = new Impl();
+		tb = new Impl(name);
 		setVisibleLen(visibleLength);
 		tb.addValueChangeHandler(this);
 		tb.addFocusHandler(this);

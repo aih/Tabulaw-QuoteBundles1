@@ -13,6 +13,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.tabulaw.config.Config;
+import com.tabulaw.config.ConfigRef;
 import com.tabulaw.di.MailModule;
 
 /**
@@ -20,8 +21,8 @@ import com.tabulaw.di.MailModule;
  * @author jpk
  */
 @Test(groups = {
-	"mail",
-	"send" })
+	"mail", "send"
+})
 public class MailSenderTest {
 
 	/**
@@ -58,7 +59,7 @@ public class MailSenderTest {
 
 	@BeforeClass(groups = "mail")
 	protected void onSetUp() throws Exception {
-		config = Config.load();
+		config = Config.load(new ConfigRef("com/tabulaw/mail/config.properties"));
 		Injector injector = Guice.createInjector(new MailModule(config), new VelocityModule());
 		mailManager = injector.getInstance(MailManager.class);
 		Assert.assertNotNull(mailManager, "Unable to obtain the MailManager bean from the application context.");
@@ -69,7 +70,7 @@ public class MailSenderTest {
 		Assert.assertNotNull(mailRouting, "Unable to obtain the test.MailRouting from the application context.");
 	}
 
-	@Test(groups = "mail")
+	@Test(groups = "mail", enabled = false)
 	public void testSendSimpleText() {
 		IMailContext mc =
 				mailManager

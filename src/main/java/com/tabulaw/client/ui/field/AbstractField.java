@@ -455,6 +455,19 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 		}
 	}
 
+	@Override
+	public boolean isValid() {
+		if(errorHandler != null) errorHandler.resolveError(this, null, ErrorDisplay.ALL_FLAGS);
+		try {
+			validate();
+			return true;
+		}
+		catch(ValidationException e) {
+			if(errorHandler != null) errorHandler.handleErrors(e.getErrors(), ErrorDisplay.ALL_FLAGS);
+		}
+		return false;
+	}
+
 	public final void validate() throws ValidationException {
 		validate(getValue());
 	}
