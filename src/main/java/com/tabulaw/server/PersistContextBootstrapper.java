@@ -26,6 +26,9 @@ public class PersistContextBootstrapper implements IBootstrapHandler {
 		// store the sole persist context
 		final PersistContext context = injector.getInstance(PersistContext.class);
 		servletContext.setAttribute(PersistContext.KEY, context);
+		
+		// initialize the user service
+		context.getUserService().init();
 	}
 
 	@Override

@@ -125,11 +125,11 @@ public final class AuthenticationProcessingFilter implements Filter {
 			}
 
 			// http 302 client re-direct
-			//httpResponse.sendRedirect(httpResponse.encodeRedirectURL(finalUrl));
-			
+			// httpResponse.sendRedirect(httpResponse.encodeRedirectURL(finalUrl));
+
 			// server side re-direct
-			request.getRequestDispatcher(finalUrl).forward(request, response);			
-			
+			request.getRequestDispatcher(finalUrl).forward(request, response);
+
 			return;
 		}
 
@@ -197,20 +197,22 @@ public final class AuthenticationProcessingFilter implements Filter {
 			// now check user flags and expiry
 			if(!user.isEnabled()) {
 				// disabled user
-				throw new Exception("You account is locked.");
+				throw new Exception("Your account is disabled.");
 			}
-			
+
 			if(user.isExpired()) {
+				// expired user
 				throw new Exception("Your account has expired.");
 			}
-			
-			if(!user.isLocked()) {
+
+			if(user.isLocked()) {
+				// locked user
 				throw new Exception("Your account is locked.");
 			}
-			
+
 			// compare passwords
 			if(UserService.isPasswordValid(password, user.getPassword(), user.getEmailAddress())) {
-				
+
 				authRequest.principal = user;
 				return authRequest;
 			}

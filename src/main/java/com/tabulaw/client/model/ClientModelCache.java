@@ -75,7 +75,7 @@ public class ClientModelCache {
 	 *         {@link UserState}.
 	 */
 	public QuoteBundle getCurrentQuoteBundle() {
-		List<?> list = cache.get(EntityType.USER.name());
+		List<?> list = cache.get(EntityType.USER_STATE.name());
 		UserState userState = list.size() < 1 ? null : (UserState) list.get(0);
 		if(userState == null) throw new IllegalStateException();
 		String bundleId = userState.getCurrentQuoteBundleId();

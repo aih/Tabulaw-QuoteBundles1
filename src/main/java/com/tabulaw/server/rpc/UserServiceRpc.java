@@ -62,8 +62,13 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		final PersistContext pc = (PersistContext) rc.getServletContext().getAttribute(PersistContext.KEY);
 		
 		// get the retained user state if there is one
-		UserState userState = pc.getUserDataService().getUserState(user.getId());
-		payload.setUserState(userState);
+		try {
+			UserState userState = pc.getUserDataService().getUserState(user.getId());
+			payload.setUserState(userState);
+		}
+		catch(EntityNotFoundException e) {
+			// ok
+		}
 		
 		// get the user's quote bundles
 		List<QuoteBundle> bundles = pc.getUserDataService().getBundlesForUser(user.getId());
