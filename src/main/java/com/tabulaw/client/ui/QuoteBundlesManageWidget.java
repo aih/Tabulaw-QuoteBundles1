@@ -18,23 +18,18 @@ import com.allen_sauer.gwt.dnd.client.drop.VerticalPanelDropController;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.QuoteBundleListingWidget.BOption;
-import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.msg.Msg;
 
 /**
  * Manages the editing of quote bundles via drag and drop.
@@ -147,33 +142,13 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			// clone the dragged quote widget
 			Quote mQuoteClone = draggedQuoteModel.clone();
 			
-			//mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE));
-			// server-side persist
-			String bundleId = targetQuoteBundleWidget.getModel().getId();
-			Poc.getUserDataService().addQuoteToBundle(bundleId, mQuoteClone, new AsyncCallback<ModelPayload>() {
-				
-				@Override
-				public void onSuccess(ModelPayload result) {
-					if(result.hasErrors()) {
-						List<Msg> msgs = result.getStatus().getMsgs();
-						Notifier.get().post(msgs);
-					}
-					else {
-						Quote persistedQuote = (Quote) result.getModel();
-						targetQuoteBundleWidget.addQuote(persistedQuote, true);
-	
-						//String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
-						//Notifier.get().info(msg);
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					String emsg = "Failed to persist cloned Quote.";
-					Log.error(emsg, caught);
-					Notifier.get().error(emsg);
-				}
-			});
+			// TODO handle this
+			mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE));
+			
+			targetQuoteBundleWidget.addQuote(mQuoteClone, true);
+
+			//String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
+			//Notifier.get().info(msg);
 			
 			// deny since we are copying
 			throw new VetoDragException();
@@ -275,11 +250,11 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	void pinQuoteBundle(BOption option) {
 		option.removeFromParent();
 		String qbId = option.getBundleId();
-		String qbName = option.getBundleName();
+		//String qbName = option.getBundleName();
 
 		// replace just dropped option with quote bundle widget
 		QuoteBundle mQuoteBundle =
-				(QuoteBundle) ClientModelCache.get().get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), qbId, qbName));
+				(QuoteBundle) ClientModelCache.get().get(EntityType.QUOTE_BUNDLE, qbId);
 
 		insertQuoteBundleColumn(mQuoteBundle, 0);
 	}

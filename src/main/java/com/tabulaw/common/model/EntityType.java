@@ -5,13 +5,14 @@
  */
 package com.tabulaw.common.model;
 
+import com.tabulaw.IMarshalable;
 import com.tabulaw.INameValueProvider;
 
 /**
  * EntityType
  * @author jpk
  */
-public enum EntityType implements INameValueProvider<String> {
+public enum EntityType implements INameValueProvider<String>, IMarshalable {
 
 	AUTHORITY("Authority"),
 	USER("User"),

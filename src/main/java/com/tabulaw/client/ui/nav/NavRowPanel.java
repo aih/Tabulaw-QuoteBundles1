@@ -13,9 +13,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabBar;
@@ -124,6 +126,7 @@ public class NavRowPanel extends AbstractNavPanel {
 		final Label welcomeText;
 		final SimpleHyperLink lnkLogOut;
 		final FlowPanel pnl;
+		final Hidden hiddenCurrentBundleId;
 		final FormPanel frmLogout;
 
 		public LoggedInUserWidget() {
@@ -138,15 +141,26 @@ public class NavRowPanel extends AbstractNavPanel {
 
 				@Override
 				public void onClick(ClickEvent event) {
-					frmLogout.submit();
+					
+					// save the user state to the server
+					ClientModelCache.get().saveUserState(new Command() {
+						
+						@Override
+						public void execute() {
+							frmLogout.submit();
+						}
+					});
 				}
 			});
 			lnkLogOut.setStyleName(Styles.LOGOUT);
+			
+			hiddenCurrentBundleId = new Hidden("currentBundleId");
 
 			frmLogout = new FormPanel();
 			frmLogout.setMethod(FormPanel.METHOD_POST);
 			frmLogout.setAction("/logout");
 
+			pnl.add(hiddenCurrentBundleId);
 			pnl.add(welcomeText);
 			pnl.add(lnkLogOut);
 			frmLogout.add(pnl);

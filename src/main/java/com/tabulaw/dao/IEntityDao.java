@@ -22,6 +22,15 @@ import com.tabulaw.model.bk.IBusinessKey;
 public interface IEntityDao {
 
 	/**
+	 * Provides a batch of ids to use in new entities before persisting them.
+	 * @param entityClz entity type for which to get a batch of ids
+	 * @param numIds
+	 * @return 2 element array where the first element is the first available
+	 *         numeric id and the the second is the last available numeric id
+	 */
+	long[] generatePrimaryKeyBatch(Class<?> entityClz, int numIds);
+
+	/**
 	 * Loads a single entity specified by a primary key.
 	 * @param <E> entity type
 	 * @param entityType the entity type class
@@ -52,8 +61,7 @@ public interface IEntityDao {
 	 *         given name key.
 	 * @throws DataAccessException
 	 */
-	INamedEntity load(NameKey nameKey) throws EntityNotFoundException, NonUniqueResultException,
-	DataAccessException;
+	INamedEntity load(NameKey nameKey) throws EntityNotFoundException, NonUniqueResultException, DataAccessException;
 
 	/**
 	 * Returns all the entities managed by this DAO. This method will only include
@@ -103,7 +111,7 @@ public interface IEntityDao {
 
 	/**
 	 * Physical deletion of an entity identified by the given primary key.
-	 * @param <E> entity type 
+	 * @param <E> entity type
 	 * @param entityType entity class
 	 * @param id
 	 * @throws EntityNotFoundException
@@ -133,7 +141,7 @@ public interface IEntityDao {
 	 * @throws DataAccessException
 	 */
 	<E extends IEntity> E findEntity(Criteria<E> criteria) throws InvalidCriteriaException, EntityNotFoundException,
-	NonUniqueResultException, DataAccessException;
+			NonUniqueResultException, DataAccessException;
 
 	/**
 	 * Finds matching entities given criteria.
@@ -146,7 +154,7 @@ public interface IEntityDao {
 	 * @throws DataAccessException
 	 */
 	<E extends IEntity> List<E> findEntities(Criteria<E> criteria, Sorting sorting) throws InvalidCriteriaException,
-	DataAccessException;
+			DataAccessException;
 
 	/**
 	 * Returns a list of entities that satisfy the given id list. This method will
@@ -159,7 +167,7 @@ public interface IEntityDao {
 	 * @throws DataAccessException
 	 */
 	<E extends IEntity> List<E> findByIds(Class<E> entityType, Collection<String> ids, Sorting sorting)
-	throws DataAccessException;
+			throws DataAccessException;
 
 	/**
 	 * Retrieves the ids of the entities that match the given criteria. Used for
@@ -167,16 +175,15 @@ public interface IEntityDao {
 	 * @param <E> The entity type
 	 * @param criteria The criteria. May NOT be <code>null</code>.
 	 * @param sorting The sorting directive. May be <code>null</code>.
-	 * @return List of primary keys of matching entities, empty list if no matching
-	 *         entities are found.
+	 * @return List of primary keys of matching entities, empty list if no
+	 *         matching entities are found.
 	 * @throws InvalidCriteriaException When the criteria is <code>null</code> or
 	 *         found to be invalid.
 	 * @throws DataAccessException
 	 */
-	<E extends IEntity> List<String> getIds(Criteria<E> criteria, Sorting sorting)
-	throws InvalidCriteriaException,
-	DataAccessException;
-	
+	<E extends IEntity> List<String> getIds(Criteria<E> criteria, Sorting sorting) throws InvalidCriteriaException,
+			DataAccessException;
+
 	/**
 	 * Returns a sub-set of results using record set paging.
 	 * @param <E> The entity type
@@ -192,7 +199,6 @@ public interface IEntityDao {
 	 *         <code>null</code>.
 	 * @throws DataAccessException
 	 */
-	<E extends IEntity> IPageResult<E> getPage(Criteria<E> criteria, Sorting sorting,
-			int offset, int pageSize)
+	<E extends IEntity> IPageResult<E> getPage(Criteria<E> criteria, Sorting sorting, int offset, int pageSize)
 			throws InvalidCriteriaException, DataAccessException;
 }

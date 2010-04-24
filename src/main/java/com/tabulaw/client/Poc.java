@@ -34,8 +34,6 @@ import com.tabulaw.common.data.rpc.IUserContextService;
 import com.tabulaw.common.data.rpc.IUserContextServiceAsync;
 import com.tabulaw.common.data.rpc.IUserCredentialsService;
 import com.tabulaw.common.data.rpc.IUserCredentialsServiceAsync;
-import com.tabulaw.common.data.rpc.IUserDataService;
-import com.tabulaw.common.data.rpc.IUserDataServiceAsync;
 import com.tabulaw.common.data.rpc.UserContextPayload;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
@@ -51,8 +49,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 	private static IUserCredentialsServiceAsync userCredentialsService;
 
-	private static final IUserDataServiceAsync userDataService;
-
 	private static final IDocServiceAsync docService;
 
 	/**
@@ -64,7 +60,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 	static {
 		userContextService = (IUserContextServiceAsync) GWT.create(IUserContextService.class);
-		userDataService = (IUserDataServiceAsync) GWT.create(IUserDataService.class);
 		docService = (IDocServiceAsync) GWT.create(IDocService.class);
 
 		msgPanel = new GlobalMsgPanel();
@@ -85,13 +80,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 			userCredentialsService = (IUserCredentialsServiceAsync) GWT.create(IUserCredentialsService.class);
 		}
 		return userCredentialsService;
-	}
-
-	/**
-	 * @return The user data service.
-	 */
-	public static IUserDataServiceAsync getUserDataService() {
-		return userDataService;
 	}
 
 	/**
@@ -151,18 +139,25 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// ensure quote bundles view so it recieves model change events
 					// staying in sync!
 					ViewManager.get().loadView(new StaticViewInitializer(QuoteBundlesView.klas));
+					
+					// cache initial batch of next ids
+					ClientModelCache.get().setNextIdBatch(result.getNextIds());
 
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
 					getPortal().fireEvent(new ModelChangeEvent(ModelChangeOp.LOADED, liu, null));
 
+					// cache user state
+					UserState userState = result.getUserState();
+					if(userState == null) {
+						Log.debug("Creating new UserState instance");
+						userState = new UserState(liu.getId());
+					}
+					ClientModelCache.get().persist(userState, getPortal());
+
 					// load up user bundles
 					List<QuoteBundle> userBundles = result.getBundles();
 					ClientModelCache.get().persistAll(userBundles, getPortal());
-
-					// set user state
-					UserState userState = result.getUserState();
-					ClientModelCache.get().persist(userState, getPortal());
 
 					// show doc listing view by default
 					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));

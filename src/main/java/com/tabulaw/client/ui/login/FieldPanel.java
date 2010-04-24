@@ -28,7 +28,8 @@ import com.tabulaw.schema.PropertyType;
  */
 class FieldPanel extends AbstractFieldPanel<FlowPanel> {
 
-	static final PropertyMetadata userEmailMetadata = new PropertyMetadata(PropertyType.STRING, false, true, 50);
+	static final PropertyMetadata userNameMetadata = new PropertyMetadata(PropertyType.STRING, false, true, 50);
+	static final PropertyMetadata userEmailMetadata = new PropertyMetadata(PropertyType.STRING, false, true, 128);
 	static final PropertyMetadata userPasswordMetadata = new PropertyMetadata(PropertyType.STRING, false, true, 30);
 
 	/**
@@ -55,6 +56,10 @@ class FieldPanel extends AbstractFieldPanel<FlowPanel> {
 			fg.addField(password);
 
 			if(mode == Mode.REGISTER) {
+				TextField fname = FieldFactory.femail("userName", "name", "Name", "Your name", 25);
+				fname.setPropertyMetadata(userNameMetadata);
+				fg.addField(fname);
+				
 				PasswordField passwordConfirm =
 						FieldFactory.fpassword("userPswdConfirm", "passwordConfirm", "Confirm Password", "Confirm your password",
 								12);
@@ -116,6 +121,7 @@ class FieldPanel extends AbstractFieldPanel<FlowPanel> {
 				}
 				else {
 					// register mode
+					cmpsr.addField(fg.getFieldWidget("userName"));
 					cmpsr.addField(fg.getFieldWidget("userEmail"));
 					cmpsr.addField(fg.getFieldWidget("userPswd"));
 					cmpsr.addField(fg.getFieldWidget("userPswdConfirm"));

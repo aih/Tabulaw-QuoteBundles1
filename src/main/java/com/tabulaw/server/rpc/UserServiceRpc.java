@@ -8,15 +8,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.mail.MailSendException;
 
+import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.rpc.IUserContextService;
 import com.tabulaw.common.data.rpc.IUserCredentialsService;
+import com.tabulaw.common.data.rpc.IUserDataService;
+import com.tabulaw.common.data.rpc.IdsPayload;
 import com.tabulaw.common.data.rpc.UserContextPayload;
 import com.tabulaw.common.data.rpc.UserRegistrationRequest;
+import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IUserRef;
+import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
@@ -31,25 +38,35 @@ import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.RequestContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
+import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 import com.tabulaw.util.StringUtil;
 
 /**
  * @author jpk
  */
-public class UserServiceRpc extends RpcServlet implements IUserContextService, IUserCredentialsService {
+public class UserServiceRpc extends RpcServlet 
+implements IUserContextService, IUserCredentialsService, IUserDataService {
 
 	private static final long serialVersionUID = 7908647379731614097L;
 
 	private static final String EMAIL_TEMPLATE_NAME = "forgot-password";
-	
+
+	@Override
+	public void saveUserState(UserState userState) {
+		final PersistContext pc = getPersistContext();
+		UserDataService svc = pc.getUserDataService();
+		svc.saveUserState(userState);
+	}
+
 	@Override
 	public UserContextPayload getUserContext() {
 		final Status status = new Status();
 		UserContextPayload payload = new UserContextPayload(status);
 
 		final RequestContext rc = getRequestContext();
-		final UserContext userContext = rc.getSession() == null ? null : (UserContext) rc.getSession().getAttribute(UserContext.KEY);
+		final UserContext userContext =
+				rc.getSession() == null ? null : (UserContext) rc.getSession().getAttribute(UserContext.KEY);
 		if(userContext == null || userContext.getUser() == null) {
 			// presume not logged in yet
 			status.addMsg("User Context not found.", MsgLevel.INFO, MsgAttr.STATUS.flag);
@@ -59,8 +76,8 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		User user = userContext.getUser();
 		payload.setUser(user);
 
-		final PersistContext pc = (PersistContext) rc.getServletContext().getAttribute(PersistContext.KEY);
-		
+		final PersistContext pc = getPersistContext();
+
 		// get the retained user state if there is one
 		try {
 			UserState userState = pc.getUserDataService().getUserState(user.getId());
@@ -69,12 +86,16 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		catch(EntityNotFoundException e) {
 			// ok
 		}
-		
+
 		// get the user's quote bundles
 		List<QuoteBundle> bundles = pc.getUserDataService().getBundlesForUser(user.getId());
 		if(bundles != null) {
 			payload.setBundles(bundles);
 		}
+		
+		// get the next ids for client-side use
+		Map<EntityType, Integer[]> nextIds = getNextIdMap();
+		payload.setNextIds(nextIds);
 
 		status.addMsg("User Context retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		return payload;
@@ -83,12 +104,12 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	@Override
 	public Payload registerUser(UserRegistrationRequest request) {
 		Status status = new Status();
-		
-		// we are forced to create an http session here in order to access the servlet context
+
+		// we are forced to create an http session here in order to access the
+		// servlet context
 		getRequestContext().getRequest().getSession(true);
 
-		PersistContext persistContext =
-				(PersistContext) super.getRequestContext().getServletContext().getAttribute(PersistContext.KEY);
+		PersistContext persistContext = getPersistContext();
 		UserService userService = persistContext.getUserService();
 
 		String emailAddress = request.getEmailAddress();
@@ -113,8 +134,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			status.addMsg("An email address must be specified.", MsgLevel.ERROR, MsgAttr.STATUS.flag);
 		}
 		else {
-			PersistContext context =
-					(PersistContext) getRequestContext().getServletContext().getAttribute(PersistContext.KEY);
+			PersistContext context = getPersistContext();
 			UserService userService = context.getUserService();
 			try {
 				final IUserRef user = userService.getUserRef(emailAddress);
@@ -143,5 +163,187 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 
 		return p;
+	}
+	
+	private Map<EntityType, Integer[]> getNextIdMap() {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		long[] bundleIdRange = userDataService.generateQuoteBundleIds(100);
+		long[] quoteIdRange = userDataService.generateQuoteIds(100);
+
+		Integer[] iBundleIdRange = new Integer[] {
+			Integer.valueOf((int) bundleIdRange[0]), Integer.valueOf((int) bundleIdRange[1]),
+		};
+
+		Integer[] iQuoteIdRange = new Integer[] {
+			Integer.valueOf((int) quoteIdRange[0]), Integer.valueOf((int) quoteIdRange[1]),
+		};
+
+		HashMap<EntityType, Integer[]> idMap = new HashMap<EntityType, Integer[]>(2);
+		idMap.put(EntityType.QUOTE_BUNDLE, iBundleIdRange);
+		idMap.put(EntityType.QUOTE, iQuoteIdRange);
+		
+		return idMap;
+	}
+
+	@Override
+	public IdsPayload fetchIdBatch() {
+		Status status = new Status();
+		IdsPayload payload = new IdsPayload(status);
+		payload.setIds(getNextIdMap());
+		return payload;
+	}
+
+	@Override
+	public ModelPayload addBundleForUser(String userId, QuoteBundle bundle) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		ModelPayload payload = new ModelPayload(status);
+
+		try {
+			bundle = userDataService.addBundleForUser(userId, bundle);
+
+			payload.setModel(bundle);
+			status.addMsg("Bundle created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityExistsException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final ConstraintViolationException cve) {
+			PersistHelper.handleValidationException(context, cve, payload);
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public ModelPayload addQuoteToBundle(String bundleId, Quote quote) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		ModelPayload payload = new ModelPayload(status);
+
+		try {
+			quote = userDataService.addQuoteToBundle(bundleId, quote);
+			payload.setModel(quote);
+			status.addMsg("Quote added.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityExistsException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final ConstraintViolationException ise) {
+			PersistHelper.handleValidationException(context, ise, payload);
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload deleteBundleForUser(String userId, String bundleId) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		try {
+			userDataService.deleteBundleForUser(userId, bundleId);
+			status.addMsg("Bundle deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityNotFoundException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		try {
+			userDataService.removeQuoteFromBundle(bundleId, quoteId, deleteQuote);
+			status.addMsg("Quote removed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityNotFoundException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public ModelPayload saveBundleForUser(String userId, QuoteBundle qb) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		ModelPayload payload = new ModelPayload(status);
+
+		try {
+			qb = userDataService.saveBundleForUser(userId, qb);
+			payload.setModel(qb);
+			status.addMsg("Bundle saved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityExistsException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final ConstraintViolationException ise) {
+			PersistHelper.handleValidationException(context, ise, payload);
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	private PersistContext getPersistContext() {
+		return (PersistContext) getRequestContext().getServletContext().getAttribute(PersistContext.KEY);
 	}
 }

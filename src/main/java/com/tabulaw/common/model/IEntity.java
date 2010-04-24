@@ -18,6 +18,7 @@ public interface IEntity extends Serializable, Cloneable, IMarshalable, IModelKe
 	/**
 	 * @return The entity type.
 	 */
+	// TODO change return type to String@!!!!
 	EntityType getEntityType();
 
 	/**

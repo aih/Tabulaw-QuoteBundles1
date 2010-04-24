@@ -83,13 +83,13 @@ public class TextSelectApi implements IFiresTextSelectEvents {
 				var mark;
 				try {
 					if(iframedoc !== rng.getDocument()) alert('range.document != iframedoc!');
-					alert('iframedoc: ' + iframedoc + ', rng.getDocument(): ' + rng.getDocument());
+					//alert('iframedoc: ' + iframedoc + ', rng.getDocument(): ' + rng.getDocument());
 					mark  = new $wnd.Mark(rng);
 					@com.tabulaw.client.ui.TextSelectApi::fireTextSelectEvent(Lcom/tabulaw/client/model/MarkOverlay;)(mark);
 				}
 				catch(e) {
-					//alert('Unable to select this portion of text\n(' + e + ')');
-					alert('Unable to select this portion of text');
+					alert('Unable to select this portion of text\n(' + e + ')');
+					//alert('Unable to select this portion of text');
 				}
 			};
 			//////

@@ -82,11 +82,16 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 
 	private static void registerCallbacks(ObjectContainer oc) {
 		final EventRegistry registry = EventRegistryFactory.forObjectContainer(oc);
+
+		// NOTE: there is no mechanism for rolling back on the edits these listeners
+		// perform on the entities passed in in the case of a db4o save error!
+
 		registry.creating().addListener(new Timestamper(true));
 		registry.updating().addListener(new Timestamper(false));
+
 		final Versioner vsnr = new Versioner();
-		registry.created().addListener(vsnr);
-		registry.updated().addListener(vsnr);
+		registry.creating().addListener(vsnr);
+		registry.updating().addListener(vsnr);
 	}
 
 	/**
@@ -521,8 +526,9 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		// entities!
 		if(entity.isNew() && entity.getId() == null) {
 			Class<?> entityClass = entityTypeResolver.resolveEntityClass(entity.getEntityType().name());
-			String surrogatePk = this.generatePrimaryKey(entityClass);
+			String surrogatePk = generatePrimaryKey(entityClass);
 			entity.setId(surrogatePk);
+			logger.info("Generated id for entity: " + entity + " just before persisting it.");
 		}
 
 		getDb4oTemplate().store(entity);
@@ -593,7 +599,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		return idlist;
 	}
 
-	private String generatePrimaryKey(Class<?> clz) {
+	private IdState ensureIdState() {
 		if(state == null) {
 			try {
 				state = getObjectContainer().query(IdState.class).get(0);
@@ -605,8 +611,12 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 				getObjectContainer().store(state);
 			}
 		}
+		return state;
+	}
 
-		assert state != null;
+	private String generatePrimaryKey(Class<?> clz) {
+		ensureIdState();
+
 		Long current = state.getCurrentId(clz);
 
 		final long next = current == null ? 1L : current + 1;
@@ -615,5 +625,18 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		String surrogatePk = Long.toString(next);
 		logger.info("Generated new surrogate primary key: " + surrogatePk);
 		return surrogatePk;
+	}
+
+	public long[] generatePrimaryKeyBatch(Class<?> entityClz, int numIds) {
+		ensureIdState();
+		Long current = state.getCurrentId(entityClz);
+
+		long start = current == null ? 1L : current.longValue();
+		long end = start + numIds;
+
+		state.setCurrentId(entityClz, end);
+		getObjectContainer().store(state);
+
+		return new long[] {start, end};
 	}
 }

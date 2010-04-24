@@ -6,7 +6,6 @@
 package com.tabulaw.common.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
@@ -98,8 +97,7 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 	 *         bundle.
 	 */
 	public List<Quote> getQuotes() {
-		if(quotes == null) return Collections.emptyList();
-		return new ArrayList<Quote>(quotes);
+		return quotes;
 	}
 
 	public void setQuotes(List<Quote> quotes) {

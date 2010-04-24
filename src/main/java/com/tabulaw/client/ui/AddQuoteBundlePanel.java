@@ -13,6 +13,9 @@ import com.tabulaw.client.ui.field.FieldFactory;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.ui.field.FlowPanelFieldComposer;
 import com.tabulaw.client.ui.field.IFieldRenderer;
+import com.tabulaw.client.ui.field.IFieldWidget;
+import com.tabulaw.schema.PropertyMetadata;
+import com.tabulaw.schema.PropertyType;
 
 
 /**
@@ -23,6 +26,9 @@ public class AddQuoteBundlePanel extends AbstractFieldPanel<FlowPanel> {
 	
 	static class FieldProvider extends AbstractFieldGroupProvider {
 
+		static final PropertyMetadata qbNameMetadata = new PropertyMetadata(PropertyType.STRING, false, true, 50);
+		static final PropertyMetadata qbDescMetadata = new PropertyMetadata(PropertyType.STRING, false, false, 255);
+		
 		@Override
 		protected String getFieldGroupName() {
 			return "Quote Bundle";
@@ -30,8 +36,17 @@ public class AddQuoteBundlePanel extends AbstractFieldPanel<FlowPanel> {
 
 		@Override
 		protected void populateFieldGroup(FieldGroup fg) {
-			fg.addField(FieldFactory.ftext("qbName", "name", "Name", "The name to assign to the Quote Bundle", 25));
-			fg.addField(FieldFactory.ftextarea("qbDesc", "description", "Description", "Optional description for the Quote Bundle", 7, 15));
+			IFieldWidget<?> fw;
+			
+			fw = FieldFactory.ftext("qbName", "name", "Name", "The name to assign to the Quote Bundle", 25);
+			fw.setPropertyMetadata(qbNameMetadata);
+			fg.addField(fw);
+			
+			fw = FieldFactory.ftextarea("qbDesc", "description", "Description", "Optional description for the Quote Bundle", 7, 15);
+			fw.setPropertyMetadata(qbDescMetadata);
+			fg.addField(fw);
+			
+			fg.validateIncrementally(false);
 		}
 
 	}

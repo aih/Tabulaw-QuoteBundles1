@@ -105,7 +105,7 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 				public void onSuccess(DocSearchPayload result) {
 					if(result.hasErrors()) {
 						List<Msg> msgs = result.getStatus().getMsgs();
-						Notifier.get().post(msgs);
+						Notifier.get().post(msgs, -1);
 					}
 					else {
 						query = aquery;

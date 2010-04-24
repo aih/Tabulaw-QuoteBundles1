@@ -18,6 +18,22 @@ public class UserState extends EntityBase {
 
 	private String currentQuoteBundleId;
 
+	/**
+	 * Constructor
+	 */
+	public UserState() {
+		super();
+	}
+
+	/**
+	 * Constructor
+	 * @param userId
+	 */
+	public UserState(String userId) {
+		super();
+		setUserId(userId);
+	}
+
 	@Override
 	public IEntity clone() {
 		UserState cln = new UserState();
@@ -46,6 +62,7 @@ public class UserState extends EntityBase {
 	}
 
 	public void setUserId(String userId) {
+		if(userId == null) throw new NullPointerException();
 		this.userId = userId;
 	}
 
@@ -53,7 +70,16 @@ public class UserState extends EntityBase {
 		return currentQuoteBundleId;
 	}
 
-	public void setCurrentQuoteBundleId(String bundleId) {
+	/**
+	 * Sets the current quote bundle id.
+	 * @param bundleId
+	 * @return <code>true</code> if the current quote bundle id value actually
+	 *         changed
+	 */
+	public boolean setCurrentQuoteBundleId(String bundleId) {
+		if(bundleId == null) throw new NullPointerException();
+		if(bundleId.equals(currentQuoteBundleId)) return false;
 		this.currentQuoteBundleId = bundleId;
+		return true;
 	}
 }

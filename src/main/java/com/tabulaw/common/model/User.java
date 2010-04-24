@@ -51,12 +51,6 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity {
 	private ArrayList<Authority> authorities;
 	
 	/**
-	 * The id of the bundle the user set as current client-side.
-	 * This 
-	 */
-	private long currentQuoteBundleId;
-
-	/**
 	 * Constructor
 	 */
 	public User() {

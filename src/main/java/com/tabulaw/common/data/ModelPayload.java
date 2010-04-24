@@ -19,8 +19,6 @@ public final class ModelPayload extends ModelDataPayload {
 	 */
 	private IEntity model;
 
-	//private Model changedModel;
-
 	private ModelKey ref;
 
 	/**

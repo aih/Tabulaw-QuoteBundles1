@@ -305,7 +305,10 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 		boolean isRegister = (newMode == Mode.REGISTER);
 		form.setVisible(!isRegister);
 		lnkRegister.setVisible(newMode == Mode.LOGIN);
-		if(registerFieldPanel != null) registerFieldPanel.setVisible(isRegister);
+		if(registerFieldPanel != null) {
+			registerFieldPanel.setVisible(isRegister);
+			if(!isRegister) registerFieldPanel.getFieldGroup().clearValue();
+		}
 
 		mode = newMode;
 		ValueChangeEvent.fire(LoginTopPanel.this, mode);

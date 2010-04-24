@@ -7,11 +7,6 @@ package com.tabulaw.common.model;
 
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.tabulaw.schema.PropertyMetadata;
-import com.tabulaw.schema.PropertyType;
 
 /**
  * Provides the mocked data backing the application.
@@ -86,14 +81,18 @@ public class EntityFactory {
 		return instance;
 	}
 
+	/*
 	private final HashMap<EntityType, Map<String, PropertyMetadata>> metadata =
 			new HashMap<EntityType, Map<String, PropertyMetadata>>();
-
+	*/
+	
+	
 	/**
 	 * Constructor
 	 */
 	private EntityFactory() {
 
+		/*
 		// case metadata
 		HashMap<String, PropertyMetadata> metaCase = new HashMap<String, PropertyMetadata>();
 		metadata.put(EntityType.CASE, metaCase);
@@ -123,6 +122,8 @@ public class EntityFactory {
 		metadata.put(EntityType.QUOTE_BUNDLE, metaQuoteBundle);
 		metaQuoteBundle.put("name", new PropertyMetadata(PropertyType.STRING, false, true, 50));
 		metaQuoteBundle.put("description", new PropertyMetadata(PropertyType.STRING, false, false, 255));
+		*/
+		
 	} // constructor
 	
 	/**
@@ -130,9 +131,11 @@ public class EntityFactory {
 	 * @param entityType
 	 * @return map of property metadata keyed by property name
 	 */
+	/*
 	public Map<String, PropertyMetadata> getEntityMetadata(EntityType entityType) {
 		return metadata.get(entityType);
 	}
+	*/
 
 	/**
 	 * Creates a new entity instance of the given an entity type. <br>

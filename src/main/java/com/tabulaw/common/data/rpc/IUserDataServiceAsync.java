@@ -10,12 +10,17 @@ import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.common.model.UserState;
 
 /**
  * @author jpk
  */
 public interface IUserDataServiceAsync {
+	
+	void saveUserState(UserState userState, AsyncCallback<Void> callback);
 
+	void fetchIdBatch(AsyncCallback<IdsPayload> callback);
+	
 	void saveBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload> callback);
 
 	void addBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload> callback);

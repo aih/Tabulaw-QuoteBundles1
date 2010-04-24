@@ -24,7 +24,6 @@ public final class ModelChangeEvent extends GwtEvent<IModelChangeHandler> {
 	 * @author jpk
 	 */
 	public static enum ModelChangeOp {
-		AUXDATA_READY,
 		LOADED,
 		ADDED,
 		UPDATED,

@@ -3,21 +3,15 @@ package com.tabulaw.client.ui;
 import java.util.List;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
-import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
-import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.msg.Msg;
 
 /**
  * Widget that displays a quote bundle.
@@ -136,10 +130,10 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 */
 	protected final void setDragController(PickupDragController dragController) {
 		if(this.dragController == dragController) return;
-		
+
 		// already set
 		if(this.dragController != null) throw new IllegalStateException();
-		
+
 		this.dragController = dragController;
 	}
 
@@ -209,12 +203,13 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 */
 	protected Q addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
 		// add the quote ref to the quote bundle
-		if(addToThisBundleModel && mQuoteBundle != null) 
-			mQuoteBundle.insertQuote(mQuote, 0);
+		if(addToThisBundleModel && mQuoteBundle != null) mQuoteBundle.insertQuote(mQuote, 0);
 		if(persist) {
 			// add the quote updating the bundle quote refs too
 			ClientModelCache.get().persist(mQuote, this);
 			ClientModelCache.get().persist(mQuoteBundle, this);
+			// server side persist
+			ClientModelCache.get().addQuoteToBundle(mQuoteBundle.getId(), mQuote);
 		}
 		// add to the ui
 		Q qw = getNewQuoteWidget(mQuote);
@@ -236,37 +231,16 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	public Q removeQuote(final Quote mQuote, boolean persist, final boolean deleteQuote) {
 		int index = getQuoteWidgetIndex(mQuote.getId());
 		if(index != -1) {
-			if(mQuoteBundle.getQuotes().remove(mQuote)) {
+			if(mQuoteBundle.removeQuote(mQuote)) {
 				if(persist) {
-					// server-side persist
-					String bundleId = mQuoteBundle.getId();
-					String quoteId = mQuote.getId();
-					Poc.getUserDataService().removeQuoteFromBundle(bundleId, 	quoteId, deleteQuote, new AsyncCallback<Payload>() {
-						
-						@Override
-						public void onSuccess(Payload result) {
-							if(result.hasErrors()) {
-								List<Msg> msgs = result.getStatus().getMsgs();
-								Notifier.get().post(msgs);
-							}
-							else {
-								// delete the quote updating the bundle quote refs too
-								ModelKey mk = new ModelKey(EntityType.QUOTE.name(), mQuote.getId());
-								if(deleteQuote) ClientModelCache.get().remove(mk, AbstractQuoteBundleWidget.this);
-								ClientModelCache.get().persist(mQuoteBundle, AbstractQuoteBundleWidget.this);
-							}
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							String emsg = "Failed to persist Quote removal.";
-							Log.error(emsg, caught);
-							Notifier.get().error(emsg);
-						}
-					});
+					// delete the quote updating the bundle quote refs too
+					if(deleteQuote) {
+						ClientModelCache.get().remove(EntityType.QUOTE, mQuote.getId(), AbstractQuoteBundleWidget.this);
+					}
+					ClientModelCache.get().persist(mQuoteBundle, AbstractQuoteBundleWidget.this);
+					// server side persist
+					ClientModelCache.get().removeQuoteFromBundle(mQuoteBundle.getId(), mQuote.getId(), deleteQuote);
 				}
-				// NOTE: we could get out of sync with the server if the xhr call above fails!!
-				// TODO handle the case when xhr call fails!!!
 				Q qw = (Q) quotePanel.getWidget(index);
 				quotePanel.remove(index);
 				makeQuoteDraggable(qw, false);
@@ -275,7 +249,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		}
 		throw new IllegalStateException();
 	}
-	
+
 	private void makeQuoteDraggable(AbstractQuoteWidget qw, boolean draggable) {
 		if(dragController == null) return;
 		if(draggable) {

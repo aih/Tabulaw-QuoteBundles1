@@ -41,12 +41,36 @@ public class UserDataService extends AbstractEntityService {
 	public UserDataService(IEntityDao dao, ValidatorFactory validationFactory) {
 		super(dao, validationFactory);
 	}
-	
+
+	/**
+	 * Generates assignable surrogate primary keys for quote bundles guaranteed to
+	 * be unique throughout the life of the datastore.
+	 * @param numIds the number of ids to generate
+	 * @return list of generated ids
+	 */
+	@Transactional
+	public long[] generateQuoteBundleIds(int numIds) {
+		long[] idRange = dao.generatePrimaryKeyBatch(QuoteBundle.class, numIds);
+		return idRange;
+	}
+
+	/**
+	 * Generates assignable surrogate primary keys for quotes guaranteed to
+	 * be unique throughout the life of the datastore.
+	 * @param numIds the number of ids to generate
+	 * @return list of generated ids
+	 */
+	@Transactional
+	public long[] generateQuoteIds(int numIds) {
+		long[] idRange = dao.generatePrimaryKeyBatch(Quote.class, numIds);
+		return idRange;
+	}
+
 	@Transactional(readOnly = true)
 	public UserState getUserState(String userId) throws EntityNotFoundException {
 		return dao.load(UserState.class, userId);
 	}
-	
+
 	@Transactional
 	public void saveUserState(UserState userState) throws EntityExistsException {
 		dao.persist(userState);
@@ -168,8 +192,8 @@ public class UserDataService extends AbstractEntityService {
 	/**
 	 * Deletes a quote bundle and its association to the given user.
 	 * <p>
-	 * <b>WARNING:</b> any referenced quotes under the bundle will be orphaned if they do
-	 * not belong to any other bundles!
+	 * <b>WARNING:</b> any referenced quotes under the bundle will be orphaned if
+	 * they do not belong to any other bundles!
 	 * @param userId
 	 * @param bundleId
 	 * @throws EntityNotFoundException When either the user or bundle can't be

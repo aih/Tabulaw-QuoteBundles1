@@ -113,14 +113,6 @@
 		<servlet-name>UserServiceRpc</servlet-name>
 		<url-pattern>/poc/userContext</url-pattern>
 		<url-pattern>/poc/usercred</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>UserDataServiceRpc</servlet-name>
-		<servlet-class>com.tabulaw.server.rpc.UserDataServiceRpc</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>UserDataServiceRpc</servlet-name>
 		<url-pattern>/poc/userData</url-pattern>
 	</servlet-mapping>
 

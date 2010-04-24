@@ -186,7 +186,7 @@ public class DocUploadWidget extends AbstractModelChangeAwareWidget implements H
 						
 						@Override
 						public void execute() {
-							Notifier.get().post(msgs);
+							Notifier.get().post(msgs, -1);
 						}
 					});
 				}

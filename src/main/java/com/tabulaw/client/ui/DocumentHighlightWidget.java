@@ -5,8 +5,6 @@
  */
 package com.tabulaw.client.ui;
 
-import java.util.List;
-
 import com.allen_sauer.gwt.dnd.client.DragEndEvent;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
@@ -15,12 +13,10 @@ import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.DOMExt;
-import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.MarkOverlay;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -29,14 +25,12 @@ import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.IViewChangeHandler;
 import com.tabulaw.client.mvc.view.ViewChangeEvent;
 import com.tabulaw.client.ui.DocumentViewer.ViewMode;
-import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.msg.Msg;
 
 /**
  * Displays a document on the left and quote bundle on the right separated by a
@@ -122,40 +116,11 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 	public void onTextSelect(TextSelectEvent event) {
 		final MarkOverlay mark = event.getMark();
 		String serializedMark = mark.serialize();
-
 		// create the quote
 		Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
-		// server-side persist
-		Poc.getUserDataService().addQuoteToBundle(wDocQuoteBundle.getModel().getId(), quote,
-				new AsyncCallback<ModelPayload>() {
-
-					@Override
-					public void onSuccess(ModelPayload result) {
-						if(result.hasErrors()) {
-							List<Msg> msgs = result.getStatus().getMsgs();
-							Notifier.get().post(msgs);
-						}
-						else {
-							Quote persistedQuote = (Quote) result.getModel();
-
-							// debug
-							String serializedMark2 = persistedQuote.getSerializedMark();
-							MarkOverlay mark3 = MarkOverlay.deserialize(wDocViewer.getDocBody(), serializedMark2);
-							mark3.highlight();
-
-							// cache, show and highlight
-							persistedQuote.setMark(mark);
-							wDocQuoteBundle.addQuote(persistedQuote, true);
-						}
-					}
-
-					@Override
-					public void onFailure(Throwable caught) {
-						String emsg = "Failed to persist Quote Bundle.";
-						Log.error(emsg, caught);
-						Notifier.get().error(emsg);
-					}
-				});
+		// cache, show and highlight
+		quote.setMark(mark);
+		wDocQuoteBundle.addQuote(quote, true);
 	}
 
 	/**
@@ -165,41 +130,42 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 	 * @return <code>true</code> if the current quote bundle was changed
 	 */
 	private boolean maybeSetCurrentQuoteBundle() {
-		QuoteBundle mQb = ClientModelCache.get().getCurrentQuoteBundle();
-		if(mQb == null) {
-			return false;
-			//throw new IllegalStateException("No current qb set");
-			/*
-			assert crntQbKey == null;
+		QuoteBundle crntQb = ClientModelCache.get().getCurrentQuoteBundle();
+		if(crntQb == null) {
 			// auto-create a new quote bundle
-			Model mDoc = wDocViewer.getModel();
+			DocRef mDoc = wDocViewer.getModel();
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
-			String qbName = mDoc.asString("title");
+			String qbName = mDoc.getTitle();
 			String qbDesc = "Quote Bundle for " + qbName;
-			mQb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
-			mQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
+			crntQb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
 
-			Poc.setCurrentQuoteBundle(mQb);
+			crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
+
+			ClientModelCache.get().getUserState().setCurrentQuoteBundleId(crntQb.getId());
 			// fire model change event
-			ClientModelCache.get().persist(mQb, this);
-			*/
+			ClientModelCache.get().persist(crntQb, this);
+			
+			// server side persist
+			ClientModelCache.get().addBundle(crntQb);
 		}
-		if(crntQbId == null || !crntQbId.equals(mQb.getId())) {
+
+		if(crntQbId == null || !crntQbId.equals(crntQb.getId())) {
 			if(crntQbId != null) {
 				wDocQuoteBundle.clearQuotesFromUi();
 			}
 			if(Log.isDebugEnabled()) {
 				String from = wDocQuoteBundle.getModel() == null ? "-empty-" : wDocQuoteBundle.getModel().descriptor();
-				String to = mQb.descriptor();
+				String to = crntQb.descriptor();
 				Log.debug("maybeSetCurrentQuoteBundle() - Re-setting model from: " + from + " to " + to);
 			}
 			String docId = wDocViewer.getModel().getId();
 			assert docId != null;
 			wDocQuoteBundle.init(docId, wDocViewer.getDocBody());
-			wDocQuoteBundle.setModel(mQb);
-			crntQbId = mQb.getId();
+			wDocQuoteBundle.setModel(crntQb);
+			crntQbId = crntQb.getId();
 			return true;
 		}
+
 		return false;
 	}
 
@@ -226,42 +192,8 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 
 		TextSelectApi.init(wDocViewer.getFrameId());
 
-		if(ClientModelCache.get().getCurrentQuoteBundle() == null) {
-			String userId = ClientModelCache.get().getUser().getId();
-			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
-			String qbName = mDoc.getTitle();
-			String qbDesc = "Quote Bundle for " + qbName;
-			final QuoteBundle mQb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
-			Poc.getUserDataService().addBundleForUser(userId, mQb, new AsyncCallback<ModelPayload>() {
-
-				@Override
-				public void onSuccess(ModelPayload result) {
-					if(result.hasErrors()) {
-						List<Msg> msgs = result.getStatus().getMsgs();
-						Notifier.get().post(msgs);
-					}
-					else {
-						QuoteBundle persistedQb = (QuoteBundle) result.getModel();
-						ClientModelCache.get().setCurrentQuoteBundle(persistedQb.getId());
-						// fire model change event from the portal to ensure this view sees
-						// the ensuing model change event
-						// which will then trigger maybeSetCurrentQuoteBundle()..
-						ClientModelCache.get().persist(persistedQb, Poc.getPortal());
-					}
-				}
-
-				@Override
-				public void onFailure(Throwable caught) {
-					String emsg = "Unable to persist auto-created Quote Bundle";
-					Log.error(emsg, caught);
-					Notifier.get().error(emsg);
-				}
-			});
-		}
-		else {
-			// grab the current quote bundle
-			maybeSetCurrentQuoteBundle();
-		}
+		// grab the current quote bundle
+		maybeSetCurrentQuoteBundle();
 	}
 
 	@Override

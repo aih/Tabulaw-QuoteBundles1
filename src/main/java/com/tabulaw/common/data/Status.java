@@ -75,17 +75,19 @@ public final class Status implements IMarshalable {
 	}
 
 	/**
-	 * @return A {@link List} of messages having attributes matching those given.
+	 * @return A non-<code>null</code> {@link List} of messages having attributes
+	 *         matching those given.
 	 * @param attribs The desired attributes to filter against
 	 */
 	public List<Msg> getMsgs(int attribs) {
-		if(msgs == null) return null;
 		final List<Msg> list = new ArrayList<Msg>();
-		for(final Msg msg : msgs) {
-			final int mas = msg.getAttributes();
-			for(final MsgAttr a : MsgAttr.values()) {
-				if(((mas & a.flag) == a.flag) && ((attribs & a.flag) == a.flag)) {
-					list.add(msg);
+		if(msgs != null) {
+			for(final Msg msg : msgs) {
+				final int mas = msg.getAttributes();
+				for(final MsgAttr a : MsgAttr.values()) {
+					if(((mas & a.flag) == a.flag) && ((attribs & a.flag) == a.flag)) {
+						list.add(msg);
+					}
 				}
 			}
 		}
