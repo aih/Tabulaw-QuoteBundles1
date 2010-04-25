@@ -15,7 +15,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * NOTE: there are no natural business keys defined for quote bundles.
  * @author jpk
  */
-public class QuoteBundle extends TimeStampEntity implements INamedEntity {
+public class QuoteBundle extends TimeStampEntity implements INamedEntity, Comparable<QuoteBundle> {
 
 	private static final long serialVersionUID = -6606826756860275551L;
 
@@ -30,19 +30,6 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 	 */
 	public QuoteBundle() {
 		super();
-	}
-
-	/**
-	 * Constructor
-	 * @param name
-	 * @param description
-	 * @param quotes
-	 */
-	public QuoteBundle(String name, String description, List<Quote> quotes) {
-		super();
-		this.name = name;
-		this.description = description;
-		this.quotes = quotes;
 	}
 
 	@Override
@@ -63,18 +50,27 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 	}
 
 	@Override
-	public QuoteBundle clone() {
+	protected IEntity newInstance() {
+		return new QuoteBundle();
+	}
+
+	@Override
+	public void doClone(IEntity cln) {
+		super.doClone(cln);
+		QuoteBundle qb = (QuoteBundle) cln;
+		
 		ArrayList<Quote> cquotes = null;
 		if(quotes != null) {
 			cquotes = new ArrayList<Quote>(quotes.size());
 			for(Quote q : quotes) {
-				cquotes.add(q.clone());
+				cquotes.add((Quote)q.clone());
 			}
 		}
-		QuoteBundle cln = new QuoteBundle(name, description, cquotes);
-		cln.id = id;
-		cloneTimestamping(cln);
-		return cln;
+		
+		qb.id = id;
+		qb.name = name;
+		qb.description = description;
+		qb.quotes = cquotes;
 	}
 
 	@Override
@@ -97,6 +93,7 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 	 *         bundle.
 	 */
 	public List<Quote> getQuotes() {
+		if(quotes == null) quotes = new ArrayList<Quote>();
 		return quotes;
 	}
 
@@ -109,8 +106,8 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 	 * @param quote
 	 */
 	public void addQuote(Quote quote) {
-		if(quotes == null) quotes = new ArrayList<Quote>();
-		quotes.add(quote);
+		if(quote == null) throw new NullPointerException();
+		getQuotes().add(quote);
 	}
 
 	/**
@@ -119,8 +116,8 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 	 * @param index
 	 */
 	public void insertQuote(Quote quote, int index) {
-		if(quotes == null) quotes = new ArrayList<Quote>();
-		quotes.add(index, quote);
+		if(quote == null) throw new NullPointerException();
+		getQuotes().add(index, quote);
 	}
 
 	/**
@@ -150,6 +147,11 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Override
+	public int compareTo(QuoteBundle o) {
+		return name != null && o.name != null ? name.compareTo(o.name) : 0;
 	}
 
 	@Override

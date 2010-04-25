@@ -1,5 +1,6 @@
 package com.tabulaw.client.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
@@ -238,6 +239,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 						ClientModelCache.get().remove(EntityType.QUOTE, mQuote.getId(), AbstractQuoteBundleWidget.this);
 					}
 					ClientModelCache.get().persist(mQuoteBundle, AbstractQuoteBundleWidget.this);
+					
 					// server side persist
 					ClientModelCache.get().removeQuoteFromBundle(mQuoteBundle.getId(), mQuote.getId(), deleteQuote);
 				}
@@ -326,8 +328,10 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 * @param mQuoteBundleToSyncTo
 	 */
 	protected final void sync(QuoteBundle mQuoteBundleToSyncTo) {
-		List<Quote> existingQuotes = mQuoteBundle.getQuotes();
-		List<Quote> changedQuotes = mQuoteBundleToSyncTo.getQuotes();
+		// wrap in new lists to avoid concurrent mod exception!
+		List<Quote> existingQuotes = new ArrayList<Quote>(mQuoteBundle.getQuotes());
+		List<Quote> changedQuotes = new ArrayList<Quote>(mQuoteBundleToSyncTo.getQuotes());
+		
 		// IMPT: remove quotes first so highlighting works against a *clean* dom!
 		for(Quote mexisting : existingQuotes) {
 			if(!changedQuotes.contains(mexisting)) {
@@ -335,6 +339,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 				removeQuote(mexisting, false, false);
 			}
 		}
+		
 		for(Quote mchanged : changedQuotes) {
 			if(!existingQuotes.contains(mchanged)) {
 				// quote to add

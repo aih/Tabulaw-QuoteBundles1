@@ -8,7 +8,6 @@ package com.tabulaw.client.ui;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.edit.EditEvent;
@@ -18,6 +17,7 @@ import com.tabulaw.client.ui.edit.EditEvent.EditOp;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
 import com.tabulaw.client.validate.ErrorHandlerDelegate;
+import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.QuoteBundle;
 
@@ -53,10 +53,13 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 		if(event.getOp() == EditOp.SAVE) {
 			FieldGroup fieldGroup = event.getContent();
 			
+			// validate
+			if(!fieldGroup.isValid()) return;
+			
 			String qbName = (String) fieldGroup.getFieldWidget("qbName").getValue();
 			String qbDesc = (String) fieldGroup.getFieldWidget("qbDesc").getValue();
 			
-			QuoteBundle qb = new QuoteBundle(qbName, qbDesc, null);
+			QuoteBundle qb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
 			
 			// persist
 			
@@ -90,9 +93,6 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 	public void hide() {
 		if(mcr != null) mcr.removeHandler();
 		super.hide();
-		
-		// set error hander for edit panel
-		Poc.parkGlobalMsgPanel();
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 		super.show();
 		
 		// set error hander for edit panel
-		ErrorHandlerDelegate ehd = ErrorHandlerBuilder.build(true, true, Poc.unparkGlobalMsgPanel());
+		ErrorHandlerDelegate ehd = ErrorHandlerBuilder.build(false, true, null);
 		editPanel.setErrorHandler(ehd, true);
 
 		mcr = addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);

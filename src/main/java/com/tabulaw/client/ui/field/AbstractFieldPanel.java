@@ -68,6 +68,7 @@ public abstract class AbstractFieldPanel<W extends Widget> extends Composite imp
 	@Override
 	public final void setErrorHandler(IErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
+		if(group != null) group.setErrorHandler(errorHandler);
 	}
 
 	/**

@@ -53,11 +53,9 @@ public abstract class TimeStampEntity extends EntityBase implements ITimeStampEn
 	}
 
 	@Override
-	public IEntity clone() {
-		throw new UnsupportedOperationException();
-	}
-	
-	protected void cloneTimestamping(TimeStampEntity tse) {
+	protected void doClone(IEntity cln) {
+		super.doClone(cln);
+		TimeStampEntity tse = (TimeStampEntity) cln;
 		tse.setDateCreated(dateCreated == null ? null : new Date(dateCreated.getTime()));
 		tse.setDateModified(dateModified == null ? null : new Date(dateModified.getTime()));
 	}

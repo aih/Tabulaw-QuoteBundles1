@@ -42,19 +42,6 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 		super();
 	}
 
-	/**
-	 * Constructor
-	 * @param quote
-	 * @param serializedMark
-	 * @param document
-	 */
-	public Quote(String quote, String serializedMark, DocRef document) {
-		super();
-		this.quote = quote;
-		this.serializedMark = serializedMark;
-		this.document = document;
-	}
-
 	@Override
 	public String getId() {
 		return id;
@@ -66,12 +53,19 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	}
 
 	@Override
-	public Quote clone() {
+	protected IEntity newInstance() {
+		return new Quote();
+	}
+
+	@Override
+	public void doClone(IEntity cln) {
+		super.doClone(cln);
+		Quote q = (Quote) cln;
+		q.id = id;
+		q.quote = quote;
+		q.serializedMark = serializedMark;
 		// NOTE: keep the doc ref
-		Quote cln = new Quote(quote, serializedMark, document);
-		cln.id = id;
-		cloneTimestamping(cln);
-		return cln;
+		q.document = document;
 	}
 
 	@Override

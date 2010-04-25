@@ -35,10 +35,17 @@ public class UserState extends EntityBase {
 	}
 
 	@Override
-	public IEntity clone() {
-		UserState cln = new UserState();
-		cln.userId = userId;
-		return cln;
+	protected IEntity newInstance() {
+		return new UserState();
+	}
+
+	@Override
+	public void doClone(IEntity cln) {
+		super.doClone(cln);
+
+		UserState us = (UserState) cln;
+		us.userId = userId;
+		us.currentQuoteBundleId = currentQuoteBundleId;
 	}
 
 	@Override

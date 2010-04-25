@@ -55,8 +55,14 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 	}
 
 	@Override
-	public Authority clone() {
-		return new Authority(authority);
+	protected void doClone(IEntity cln) {
+		super.doClone(cln);
+		((Authority)cln).authority = authority;
+	}
+
+	@Override
+	protected IEntity newInstance() {
+		return new Authority();
 	}
 
 	@Override

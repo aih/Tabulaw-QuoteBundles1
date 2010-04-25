@@ -35,6 +35,7 @@ import com.tabulaw.common.data.rpc.IUserContextServiceAsync;
 import com.tabulaw.common.data.rpc.IUserCredentialsService;
 import com.tabulaw.common.data.rpc.IUserCredentialsServiceAsync;
 import com.tabulaw.common.data.rpc.UserContextPayload;
+import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
@@ -132,20 +133,34 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 				}
 				else {
 					hideLoginPanel();
-					
+
 					// attach the global msg panel in its native place
 					parkGlobalMsgPanel();
-					
+
 					// ensure quote bundles view so it recieves model change events
 					// staying in sync!
 					ViewManager.get().loadView(new StaticViewInitializer(QuoteBundlesView.klas));
-					
+
 					// cache initial batch of next ids
 					ClientModelCache.get().setNextIdBatch(result.getNextIds());
 
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
 					getPortal().fireEvent(new ModelChangeEvent(ModelChangeOp.LOADED, liu, null));
+
+					// load up user bundles
+					List<QuoteBundle> userBundles = result.getBundles();
+					
+					// we need to individually add the contained qoutes as well but don't
+					// throw model changes events for quotes
+					for(QuoteBundle qb : userBundles) {
+						List<Quote> quotes = qb.getQuotes();
+						for(Quote q : quotes) {
+							ClientModelCache.get().persist(q, null);
+						}
+					}
+					
+					ClientModelCache.get().persistAll(userBundles, getPortal());
 
 					// cache user state
 					UserState userState = result.getUserState();
@@ -154,10 +169,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 						userState = new UserState(liu.getId());
 					}
 					ClientModelCache.get().persist(userState, getPortal());
-
-					// load up user bundles
-					List<QuoteBundle> userBundles = result.getBundles();
-					ClientModelCache.get().persistAll(userBundles, getPortal());
 
 					// show doc listing view by default
 					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));

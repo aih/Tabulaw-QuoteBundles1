@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.math.NumberRange;
 import org.apache.commons.logging.Log;
@@ -62,22 +61,14 @@ import com.tabulaw.util.PropertyPath;
  */
 public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 
-	static class IdState {
+	public static class IdState extends HashMap<String, Long> {
 
 		private static final long serialVersionUID = 5319169153141045247L;
 
-		/**
-		 * Holds the next primary key for root entity types.
-		 */
-		private final Map<Class<?>, Long> idMap = new HashMap<Class<?>, Long>();
-
-		public Long getCurrentId(Class<?> entityType) {
-			return idMap.get(entityType);
+		public IdState() {
+			super();
 		}
 
-		public void setCurrentId(Class<?> entityType, Long currentId) {
-			idMap.put(entityType, currentId);
-		}
 	}
 
 	private static void registerCallbacks(ObjectContainer oc) {
@@ -167,8 +158,6 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	private final IEntityTypeResolver entityTypeResolver;
 
 	private final BusinessKeyFactory businessKeyFactory;
-
-	private IdState state = null;
 
 	/**
 	 * Constructor
@@ -492,32 +481,47 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	@Override
 	public <E extends IEntity> E persist(E entity) throws EntityExistsException, DataAccessException {
 		logger.debug("Persisting entity: " + entity);
-
+		Class<E> entityClass = (Class<E>) entityTypeResolver.resolveEntityClass(entity.getEntityType().name());
+		
 		// must check for business key uniqueness first!
-		try {
-			final List<E> list = (List<E>) loadAll(entity.getClass());
-			final ArrayList<E> mlist = new ArrayList<E>((list == null ? 0 : list.size()) + 1);
-			mlist.addAll(list);
-			if(entity.isNew()) {
-				mlist.add(entity);
-			}
-			else {
-				// find it in mlist and replace
-				for(int i = 0; i < mlist.size(); i++) {
-					final E e = mlist.get(i);
-					if(e.equals(entity)) {
-						mlist.set(i, entity);
-						break;
+		if(businessKeyFactory.hasBusinessKeys(entityClass)) {
+			try {
+				final List<E> list = loadAll(entityClass);
+				final ArrayList<E> mlist = new ArrayList<E>((list == null ? 0 : list.size()) + 1);
+				mlist.addAll(list);
+				if(entity.isNew()) {
+					mlist.add(entity);
+				}
+				else {
+					// find it in mlist and replace
+					for(int i = 0; i < mlist.size(); i++) {
+						final E e = mlist.get(i);
+						if(e.equals(entity)) {
+							mlist.set(i, entity);
+							break;
+						}
 					}
 				}
+				businessKeyFactory.isBusinessKeyUnique(mlist);
 			}
-			businessKeyFactory.isBusinessKeyUnique(mlist);
+			catch(final NonUniqueBusinessKeyException e) {
+				throw new EntityExistsException(e.getMessage());
+			}
+			catch(final BusinessKeyPropertyException e) {
+				throw new IllegalStateException(e);
+			}
 		}
-		catch(final NonUniqueBusinessKeyException e) {
-			throw new EntityExistsException(e.getMessage());
-		}
-		catch(final BusinessKeyPropertyException e) {
-			throw new IllegalStateException(e);
+		
+		// we must purge the existing entity first!
+		if(!entity.isNew() && entity.getId() != null) {
+			try {
+				purge(entity);
+				if(logger.isDebugEnabled()) 
+					logger.debug("Purged existing entity by id before updating: " + entity);
+			}
+			catch(EntityNotFoundException e) {
+				// ok
+			}
 		}
 
 		// NOTE: this doesn't handle any ancestor entities that my exist under this
@@ -525,7 +529,6 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		// the calling service is responsible for individually persisting child
 		// entities!
 		if(entity.isNew() && entity.getId() == null) {
-			Class<?> entityClass = entityTypeResolver.resolveEntityClass(entity.getEntityType().name());
 			String surrogatePk = generatePrimaryKey(entityClass);
 			entity.setId(surrogatePk);
 			logger.info("Generated id for entity: " + entity + " just before persisting it.");
@@ -549,7 +552,8 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	@Override
 	public <E extends IEntity> void purge(E entity) throws EntityNotFoundException, DataAccessException {
 		logger.debug("Purging entity: " + entity);
-		purge(entity.getClass(), entity.getId());
+		Class<? extends IEntity> entityClass = entityTypeResolver.resolveEntityClass(entity.getEntityType().name());
+		purge(entityClass, entity.getId());
 	}
 
 	@Override
@@ -599,44 +603,45 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 		return idlist;
 	}
 
-	private IdState ensureIdState() {
-		if(state == null) {
-			try {
-				state = getObjectContainer().query(IdState.class).get(0);
-				logger.info(state == null ? "Db4o primary key state NOT acquired." : "Db4o primary key state acquired.");
-			}
-			catch(Exception e) {
-				logger.info("Creating Db4o primary key state entity.");
-				state = new IdState();
-				getObjectContainer().store(state);
-			}
+	private IdState getIdState() {
+		IdState idState;
+		List<IdState> list = getObjectContainer().query(IdState.class);
+		if(list == null || list.size() == 0) {
+			idState = new IdState();
+			getObjectContainer().store(idState);
+			logger.info("Created and stored IdState instance");
 		}
-		return state;
+		else {
+			idState = list.get(0);
+		}
+		if(idState == null) throw new IllegalStateException();
+		return idState;
 	}
 
 	private String generatePrimaryKey(Class<?> clz) {
-		ensureIdState();
-
-		Long current = state.getCurrentId(clz);
-
+		IdState idState = getIdState();
+		Long current = idState.get(clz.getName());
 		final long next = current == null ? 1L : current + 1;
-		state.setCurrentId(clz, next);
-		getObjectContainer().store(state);
+		idState.put(clz.getName(), Long.valueOf(next));
+		getObjectContainer().store(idState);
+
 		String surrogatePk = Long.toString(next);
 		logger.info("Generated new surrogate primary key: " + surrogatePk);
 		return surrogatePk;
 	}
 
 	public long[] generatePrimaryKeyBatch(Class<?> entityClz, int numIds) {
-		ensureIdState();
-		Long current = state.getCurrentId(entityClz);
+		IdState idState = getIdState();
+		Long current = idState.get(entityClz.getName());
 
-		long start = current == null ? 1L : current.longValue();
+		long start = (current == null ? 0L : current.longValue()) + 1;
 		long end = start + numIds;
 
-		state.setCurrentId(entityClz, end);
-		getObjectContainer().store(state);
+		idState.put(entityClz.getName(), Long.valueOf(end));
+		getObjectContainer().store(idState);
 
-		return new long[] {start, end};
+		return new long[] {
+			start, end
+		};
 	}
 }

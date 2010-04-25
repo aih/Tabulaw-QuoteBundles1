@@ -36,6 +36,7 @@ import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
+import com.tabulaw.common.model.UserState;
 import com.tabulaw.config.Config;
 import com.tabulaw.config.IConfigAware;
 import com.tabulaw.config.IConfigKey;
@@ -121,6 +122,7 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 		CommonConfiguration cc = c.common();
 		cc.objectClass(Authority.class).updateDepth(1);
 		cc.objectClass(User.class).updateDepth(2);
+		cc.objectClass(UserState.class).updateDepth(1);
 		cc.objectClass(CaseRef.class).updateDepth(1);
 		cc.objectClass(DocRef.class).updateDepth(2);
 		cc.objectClass(Quote.class).updateDepth(1);

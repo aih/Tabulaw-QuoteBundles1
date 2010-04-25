@@ -29,7 +29,7 @@ import com.tabulaw.config.IConfigAware;
 public class Bootstrapper implements ServletContextListener {
 
 	private static final Log log = LogFactory.getLog(Bootstrapper.class);
-
+	
 	/**
 	 * The servlet context param name identifying the dependency injection modules
 	 * to load.
@@ -133,6 +133,9 @@ public class Bootstrapper implements ServletContextListener {
 		catch(final IllegalArgumentException e) {
 			throw new Error("Unable to load config: " + e.getMessage(), e);
 		}
+		
+		// put the config in the servlet context
+		servletContext.setAttribute(Config.KEY, config);
 
 		// pre dependency injection initializing
 		log.debug("Performing pre-injection initialization..");

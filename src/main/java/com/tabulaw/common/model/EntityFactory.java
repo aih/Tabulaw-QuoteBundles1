@@ -171,6 +171,23 @@ public class EntityFactory {
 		}
 		return e;
 	}
+	
+	/**
+	 * Builds a Case ref entity.
+	 * @param parties
+	 * @param citation
+	 * @param url
+	 * @param year
+	 * @return
+	 */
+	public CaseRef buildCase(String parties, String citation, String url, String year) {
+		CaseRef e = (CaseRef) create(EntityType.CASE);
+		e.setCitation(citation);
+		e.setParties(parties);
+		e.setUrl(url);
+		if(year != null) e.setYear(Integer.parseInt(year));
+		return e;
+	}
 
 	/**
 	 * Create a new contract type doc.
@@ -202,7 +219,7 @@ public class EntityFactory {
 			String year) {
 		DocRef doc = buildDoc(docTitle, docHash, docDate);
 		
-		CaseRef caseRef = (CaseRef) create(EntityType.CASE);
+		CaseRef caseRef = buildCase(parties, citation, url, year);
 		caseRef.setParties(parties);
 		caseRef.setCitation(citation);
 		caseRef.setUrl(url);

@@ -15,7 +15,7 @@ public abstract class EntityBase implements IEntity {
 	 * <em>transient</em> (not persisted yet) entity.
 	 */
 	private int version = -1;
-	
+
 	/**
 	 * Constructor
 	 */
@@ -28,8 +28,25 @@ public abstract class EntityBase implements IEntity {
 		return getEntityType().descriptor();
 	}
 
+	/**
+	 * @return A new empty instance via the default constructor.
+	 */
+	protected abstract IEntity newInstance();
+	
+	/**
+	 * Sets the properties on the given clone instance
+	 * @param cln the clone instance
+	 */
+	protected void doClone(IEntity cln) {
+		((EntityBase)cln).version = version;
+	}
+
 	@Override
-	public abstract IEntity clone();
+	public final IEntity clone() {
+		IEntity cln = newInstance();
+		doClone(cln);
+		return cln;
+	}
 
 	@Override
 	public ModelKey getModelKey() {

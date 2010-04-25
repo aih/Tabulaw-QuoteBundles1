@@ -40,21 +40,6 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 		super();
 	}
 
-	/**
-	 * Constructor
-	 * @param title
-	 * @param hash
-	 * @param date
-	 * @param caseRef
-	 */
-	public DocRef(String title, String hash, Date date, CaseRef caseRef) {
-		super();
-		this.title = title;
-		this.hash = hash;
-		this.date = date;
-		this.caseRef = caseRef;
-	}
-
 	@Override
 	public String getId() {
 		return hash;
@@ -73,9 +58,18 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	}
 
 	@Override
-	public DocRef clone() {
-		Date cdate = date == null ? null : new Date(date.getTime());
-		return new DocRef(title, hash, cdate, caseRef == null ? null : caseRef.clone());
+	protected IEntity newInstance() {
+		return new DocRef();
+	}
+
+	@Override
+	public void doClone(IEntity cln) {
+		super.doClone(cln);
+		DocRef dr = (DocRef) cln;
+		dr.title = title;
+		dr.hash = hash;
+		dr.date = date == null ? null : new Date(date.getTime());
+		dr.caseRef = (CaseRef) (caseRef == null ? null : caseRef.clone());
 	}
 
 	@Override

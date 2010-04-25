@@ -63,22 +63,6 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		public void onDragEnd(DragEndEvent event) {
 			super.onDragEnd(event);
 
-			// "demote" the last quote bundle in the main viewing area to the bundle
-			// listing
-			int numBundles = columns.getWidgetCount();
-			if(numBundles >= NUM_COLUMNS) {
-				// need to iterate since drag and drop adds place holder widgets
-				int ilast = -1;
-				for(int i = 0; i < columns.getWidgetCount(); i++) {
-					Widget w = columns.getWidget(i);
-					if(w instanceof QuoteBundleEditWidget) {
-						ilast = i;
-					}
-				}
-				QuoteBundleEditWidget last = (QuoteBundleEditWidget) columns.getWidget(ilast);
-				unpinQuoteBundle(last);
-			}
-
 			// convert the draggable to a QuoteBundleWidget
 			DragContext context = event.getContext();
 			pinQuoteBundle((BOption) context.draggable);
@@ -140,16 +124,15 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			}
 
 			// clone the dragged quote widget
-			Quote mQuoteClone = draggedQuoteModel.clone();
-			
-			// TODO handle this
+			Quote mQuoteClone = (Quote) draggedQuoteModel.clone();
+
 			mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE));
-			
+
 			targetQuoteBundleWidget.addQuote(mQuoteClone, true);
 
-			//String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
-			//Notifier.get().info(msg);
-			
+			// String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
+			// Notifier.get().info(msg);
+
 			// deny since we are copying
 			throw new VetoDragException();
 		}
@@ -250,11 +233,10 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	void pinQuoteBundle(BOption option) {
 		option.removeFromParent();
 		String qbId = option.getBundleId();
-		//String qbName = option.getBundleName();
+		// String qbName = option.getBundleName();
 
 		// replace just dropped option with quote bundle widget
-		QuoteBundle mQuoteBundle =
-				(QuoteBundle) ClientModelCache.get().get(EntityType.QUOTE_BUNDLE, qbId);
+		QuoteBundle mQuoteBundle = (QuoteBundle) ClientModelCache.get().get(EntityType.QUOTE_BUNDLE, qbId);
 
 		insertQuoteBundleColumn(mQuoteBundle, 0);
 	}
@@ -275,8 +257,8 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		QuoteBundle mQuoteBundle = quoteBundleWidget.getModel();
 		addQuoteBundleOption(mQuoteBundle);
 
-		//String msg = quoteBundleWidget.getModel().descriptor() + " closed.";
-		//Notifier.get().info(msg);
+		// String msg = quoteBundleWidget.getModel().descriptor() + " closed.";
+		// Notifier.get().info(msg);
 	}
 
 	/**
@@ -338,11 +320,28 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	}
 
 	/**
-	 * Inserts a quote bundle to the main viewing area only at the given column index. The bundle option
-	 * listing is un-affected.
+	 * Inserts a quote bundle to the main viewing area only at the given column
+	 * index. The bundle option listing is un-affected.
 	 * @param mQuoteBundle
 	 */
 	private void insertQuoteBundleColumn(final QuoteBundle mQuoteBundle, int index) {
+		
+		// "demote" the last quote bundle in the main viewing area to the bundle
+		// listing
+		int numBundles = columns.getWidgetCount();
+		if(numBundles >= NUM_COLUMNS) {
+			// need to iterate since drag and drop adds place holder widgets
+			int ilast = -1;
+			for(int i = 0; i < columns.getWidgetCount(); i++) {
+				Widget w = columns.getWidget(i);
+				if(w instanceof QuoteBundleEditWidget) {
+					ilast = i;
+				}
+			}
+			QuoteBundleEditWidget last = (QuoteBundleEditWidget) columns.getWidget(ilast);
+			unpinQuoteBundle(last);
+		}
+		
 		Log.debug("Inserting quote bundle col widget for: " + mQuoteBundle);
 		final QuoteBundleEditWidget qbw = new QuoteBundleEditWidget(quoteController);
 		qbw.setModel(mQuoteBundle);
@@ -405,9 +404,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 				}
 			}
 			if(event.getChangeOp() == ModelChangeOp.ADDED) {
-				// add and pin directly
-				pinQuoteBundle(addQuoteBundleOption(qb));
-				//Notifier.get().info("'" + mQuoteBundle.descriptor() + "' added.");
+				insertQuoteBundleColumn(qb, 0);
 			}
 		}
 	}

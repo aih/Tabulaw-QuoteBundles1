@@ -27,6 +27,8 @@ import org.apache.commons.logging.LogFactory;
  * @author jpk
  */
 public final class Config implements Configuration {
+	
+	public static final String KEY = Config.class.getName();
 
 	private static final Log log = LogFactory.getLog(Config.class);
 

@@ -80,22 +80,6 @@ public class ClientModelCache implements IModelSyncer {
 		}
 	}
 
-	private final HashMap<EntityType, IdCache> nextIdCache = new HashMap<EntityType, IdCache>();
-
-	private final HashMap<EntityType, List<IEntity>> entities = new HashMap<EntityType, List<IEntity>>();
-
-	/**
-	 * Constructor
-	 */
-	private ClientModelCache() {
-
-		// init entities map
-		for(EntityType et : EntityType.values()) {
-			entities.put(et, new ArrayList<IEntity>());
-		}
-
-	} // constructor
-	
 	private static void handleXhrPersistError(Throwable caught) {
 		String emsg = caught.getMessage();
 		Notifier.get().error(emsg);
@@ -124,8 +108,29 @@ public class ClientModelCache implements IModelSyncer {
 		}
 	}
 
+	private final HashMap<EntityType, IdCache> nextIdCache = new HashMap<EntityType, IdCache>();
+
+	private final HashMap<EntityType, List<IEntity>> entities = new HashMap<EntityType, List<IEntity>>();
+	
+	private final boolean doServerPersist;
+
+	/**
+	 * Constructor
+	 */
+	private ClientModelCache() {
+
+		// init entities map
+		for(EntityType et : EntityType.values()) {
+			entities.put(et, new ArrayList<IEntity>());
+		}
+		
+		doServerPersist = true;
+
+	} // constructor
+	
 	@Override
 	public void saveBundle(QuoteBundle bundle) {
+		if(!doServerPersist) return;
 		String userId = getUser().getId();
 		userDataService.saveBundleForUser(userId, bundle, new AsyncCallback<ModelPayload>() {
 
@@ -143,6 +148,7 @@ public class ClientModelCache implements IModelSyncer {
 
 	@Override
 	public void addBundle(QuoteBundle bundle) {
+		if(!doServerPersist) return;
 		String userId = getUser().getId();
 		userDataService.addBundleForUser(userId, bundle, new AsyncCallback<ModelPayload>() {
 
@@ -160,6 +166,7 @@ public class ClientModelCache implements IModelSyncer {
 
 	@Override
 	public void deleteBundle(String bundleId) {
+		if(!doServerPersist) return;
 		String userId = getUser().getId();
 		userDataService.deleteBundleForUser(userId, bundleId, new AsyncCallback<Payload>() {
 
@@ -177,6 +184,7 @@ public class ClientModelCache implements IModelSyncer {
 
 	@Override
 	public void addQuoteToBundle(String bundleId, Quote quote) {
+		if(!doServerPersist) return;
 		userDataService.addQuoteToBundle(bundleId, quote, new AsyncCallback<ModelPayload>() {
 
 			@Override
@@ -193,6 +201,7 @@ public class ClientModelCache implements IModelSyncer {
 
 	@Override
 	public void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote) {
+		if(!doServerPersist) return;
 		userDataService.removeQuoteFromBundle(bundleId, quoteId, deleteQuote, new AsyncCallback<Payload>() {
 
 			@Override

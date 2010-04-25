@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.common.model.User;
+import com.tabulaw.config.Config;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
@@ -78,6 +79,8 @@ public final class AuthenticationProcessingFilter implements Filter {
 	}
 	*/
 
+	private boolean loginBypass = false;
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
 			ServletException {
@@ -86,7 +89,24 @@ public final class AuthenticationProcessingFilter implements Filter {
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		HttpSession session = httpRequest.getSession(false);
 
-		// boolean showLoginPage = false;
+		if(loginBypass) {
+			UserContext userContext = session == null ? null : (UserContext) session.getAttribute(UserContext.KEY);
+			if(userContext == null) {
+				// auto-create session if necessary
+				if(session == null) {
+					log.info("Creating http session");
+					session = httpRequest.getSession(true);
+				}
+				// create an user context for this user session
+				log.debug("Creating user context with admin user bypassing login");
+				PersistContext persistContext = (PersistContext) session.getServletContext().getAttribute(PersistContext.KEY);
+				UserService userService = persistContext.getUserService();
+				User adminUser = userService.findByEmail("admin@tabulaw.com");
+				final UserContext context = new UserContext();
+				context.setUser(adminUser);
+				session.setAttribute(UserContext.KEY, context);
+			}
+		}
 
 		if(requiresAuthentication(httpRequest, httpResponse)) {
 			if(log.isDebugEnabled()) {
@@ -132,11 +152,11 @@ public final class AuthenticationProcessingFilter implements Filter {
 
 			return;
 		}
-
+		
 		chain.doFilter(request, response);
 	}
 
-	protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
+	private boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
 		String uri = request.getRequestURI();
 
 		// strip everything after the first semi-colon if present
@@ -152,40 +172,37 @@ public final class AuthenticationProcessingFilter implements Filter {
 		else {
 			urlMatch = uri.endsWith(request.getContextPath() + filterProcessesUrl);
 		}
-
 		if(!urlMatch) return false;
 
 		String qs = request.getQueryString();
 		return qs == null || qs.indexOf("login_error") == -1;
 	}
-
+	
 	@Override
 	public void init(FilterConfig config) throws ServletException {
+		Config cfg = (Config) config.getServletContext().getAttribute(Config.KEY);
+		if(cfg != null) {
+			loginBypass = cfg.getBoolean("login.bypass", false);
+		}
 	}
 
 	@Override
 	public void destroy() {
 	}
 
-	public Authentication attemptAuthentication(HttpServletRequest request) throws Exception {
-		String username = request.getParameter("userEmail");
-		String password = request.getParameter("userPswd");
-
-		if(username == null) {
-			username = "";
-		}
-
-		if(password == null) {
-			password = "";
-		}
-
-		username = username.trim();
-
-		Authentication authRequest = new Authentication(username, password);
-
-		// Place the last username attempted into HttpSession for views
+	private Authentication attemptAuthentication(HttpServletRequest request) throws Exception {
 		HttpSession session = request.getSession(false);
 		if(session == null) throw new IllegalStateException("No http session exists.");
+		
+		String username = null, password = null;
+		
+		username = request.getParameter("userEmail");
+		password = request.getParameter("userPswd");
+		if(username == null) username = "";
+		if(password == null) password = "";
+		username = username.trim();
+		
+		Authentication authRequest = new Authentication(username, password);
 
 		try {
 			// return this.getAuthenticationManager().authenticate(authRequest);

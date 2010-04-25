@@ -55,7 +55,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 				@Override
 				public void onClick(ClickEvent event) {
 					if(ClientModelCache.get().getUserState().setCurrentQuoteBundleId(mQuoteBundle.getId())) {
-						Notifier.get().info("Current Quote Bundle set.");
+						Notifier.get().info("Current Quote Bundle set.", 1000);
 						// we need to notify other views of the current quote bundle change
 						// and we do it by firing a model change event
 						fireEvent(new ModelChangeEvent(ModelChangeOp.UPDATED, mQuoteBundle, null));

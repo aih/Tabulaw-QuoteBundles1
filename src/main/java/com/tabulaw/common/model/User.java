@@ -25,7 +25,7 @@ import com.tabulaw.schema.BusinessObject;
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress"
 }))
-public class User extends TimeStampEntity implements IUserRef, INamedEntity {
+public class User extends TimeStampEntity implements IUserRef, INamedEntity, Comparable<User> {
 
 	private static final long serialVersionUID = -6126885590318834318L;
 
@@ -58,28 +58,6 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity {
 		authorities = new ArrayList<Authority>(3);
 	}
 
-	/**
-	 * Constructor
-	 * @param name
-	 * @param emailAddress
-	 * @param password
-	 * @param locked
-	 * @param enabled
-	 * @param expires
-	 * @param authorities
-	 */
-	public User(String name, String emailAddress, String password, boolean locked,
-			boolean enabled, Date expires, ArrayList<Authority> authorities) {
-		super();
-		this.name = name;
-		this.emailAddress = emailAddress;
-		this.password = password;
-		this.locked = locked;
-		this.enabled = enabled;
-		this.expires = expires;
-		this.authorities = authorities;
-	}
-
 	@Override
 	public final ModelKey getModelKey() {
 		ModelKey mk = super.getModelKey();
@@ -103,15 +81,27 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity {
 	}
 
 	@Override
-	public User clone() {
+	protected IEntity newInstance() {
+		return new User();
+	}
+
+	@Override
+	public void doClone(IEntity cln) {
+		super.doClone(cln);
+		User u = (User) cln;
+		
 		ArrayList<Authority> cauth = authorities == null ? null : new ArrayList<Authority>(authorities.size());
 		for(Authority a : authorities) {
-			cauth.add(a.clone());
+			cauth.add((Authority)a.clone());
 		}
 
-		User cln = new User(name, emailAddress, password, locked, enabled, expires, cauth);
-		cloneTimestamping(cln);
-		return cln;
+		u.name = name;
+		u.emailAddress = emailAddress;
+		u.password = password;
+		u.locked = locked;
+		u.enabled = enabled;
+		u.expires = expires;
+		u.authorities = cauth;
 	}
 
 	@Override
@@ -269,4 +259,8 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity {
 		return true;
 	}
 
+	@Override
+	public int compareTo(User o) {
+		return name != null && o.name != null ? name.compareTo(o.name) : 0;
+	}
 }

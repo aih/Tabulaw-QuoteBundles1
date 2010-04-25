@@ -5,6 +5,11 @@
  */
 package com.tabulaw.di;
 
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.tabulaw.model.EntityMetadata;
 import com.tabulaw.model.EntityTypeResolver;
@@ -16,23 +21,25 @@ import com.tabulaw.schema.SchemaInfo;
 /**
  * @author jpk
  */
-public class ModelModule extends ValidationModule {
+public class ModelModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		super.configure();
+		
+		// ValidationFactory
+		bind(ValidatorFactory.class).toProvider(new Provider<ValidatorFactory>() {
+
+			@Override
+			public ValidatorFactory get() {
+				return Validation.buildDefaultValidatorFactory();
+			}
+		}).in(Scopes.SINGLETON);
+		
 		bind(IEntityMetadata.class).to(EntityMetadata.class).in(Scopes.SINGLETON);
 
 		bind(ISchemaInfo.class).to(SchemaInfo.class).in(Scopes.SINGLETON);
 		
 		bind(IEntityTypeResolver.class).to(EntityTypeResolver.class).in(Scopes.SINGLETON);
-
-		// IEntityFactory
-		// bind(new
-		// TypeLiteral<IEntityFactory<?>>(){}).to(Db4oEntityFactory.class).in(Scopes.SINGLETON);
-
-		// IEntityAssembler
-		// bind(IEntityAssembler.class).to(EntityAssembler.class).in(Scopes.SINGLETON);
 	}
 
 }

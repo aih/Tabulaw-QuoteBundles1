@@ -32,21 +32,6 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		super();
 	}
 
-	/**
-	 * Constructor
-	 * @param parties
-	 * @param citation
-	 * @param url
-	 * @param year
-	 */
-	public CaseRef(String parties, String citation, String url, int year) {
-		super();
-		this.parties = parties;
-		this.citation = citation;
-		this.url = url;
-		this.year = year;
-	}
-
 	@Override
 	public String getId() {
 		return id;
@@ -58,10 +43,19 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 	}
 
 	@Override
-	public CaseRef clone() {
-		CaseRef cln = new CaseRef(parties, citation, url, year);
-		cln.id = id;
-		return cln;
+	protected void doClone(IEntity cln) {
+		super.doClone(cln);
+		CaseRef cr = (CaseRef) cln;
+		cr.id = id;
+		cr.parties = parties;
+		cr.citation = citation;
+		cr.url = url;
+		cr.year = year;
+	}
+
+	@Override
+	protected IEntity newInstance() {
+		return new CaseRef();
 	}
 
 	@Override

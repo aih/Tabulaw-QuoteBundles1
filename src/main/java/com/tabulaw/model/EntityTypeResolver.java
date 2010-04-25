@@ -10,9 +10,11 @@ import com.tabulaw.common.model.BundleUserBinding;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityType;
+import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
+import com.tabulaw.common.model.UserState;
 
 /**
  * @author jpk
@@ -20,7 +22,7 @@ import com.tabulaw.common.model.User;
 public class EntityTypeResolver implements IEntityTypeResolver {
 
 	@Override
-	public Class<?> resolveEntityClass(String entityType) throws IllegalArgumentException {
+	public Class<? extends IEntity> resolveEntityClass(String entityType) throws IllegalArgumentException {
 		EntityType et = Enum.valueOf(EntityType.class, entityType);
 		switch(et) {
 			case AUTHORITY:
@@ -37,22 +39,25 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 				return QuoteBundle.class;
 			case USER:
 				return User.class;
-			default:
-			case NOTE:
-				throw new IllegalArgumentException();
+			case USER_STATE:
+				return UserState.class;
 		}
+		throw new IllegalArgumentException("Un-handled entity type: " + et);
 	}
 
 	@Override
-	public String resolveEntityType(Class<?> clz) throws IllegalArgumentException {
+	public String resolveEntityType(Class<? extends IEntity> clz) throws IllegalArgumentException {
 		if(clz == Authority.class) {
 			return EntityType.AUTHORITY.name();
 		}
 		else if(clz == BundleUserBinding.class) {
 			return EntityType.BUNDLE_USER_BINDING.name();
 		}
-		else if(clz == BundleUserBinding.class) {
-			return EntityType.BUNDLE_USER_BINDING.name();
+		else if(clz == User.class) {
+			return EntityType.USER.name();
+		}
+		else if(clz == UserState.class) {
+			return EntityType.USER_STATE.name();
 		}
 		else if(clz == CaseRef.class) {
 			return EntityType.CASE.name();
@@ -71,7 +76,8 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 		else if(clz == QuoteBundle.class) {
 			return EntityType.QUOTE_BUNDLE.name();
 		}
-		throw new IllegalArgumentException();
+		
+		throw new IllegalArgumentException("Un-handled entity class: " + clz);
 	}
 
 }

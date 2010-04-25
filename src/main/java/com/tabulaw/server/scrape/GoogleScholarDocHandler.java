@@ -18,8 +18,8 @@ import org.htmlcleaner.TagNode;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
-import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.server.DocUtils;
 import com.tabulaw.util.StringUtil;
 
@@ -291,12 +291,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 			throw new IllegalArgumentException(e);
 		}
 		
-		//Model doc = EntityFactory.get().buildCaseDoc(docTitle, null, date, parties, citation, null, year);
-		//doc.setString("htmlContent", htmlContent);
-		
-		int year = Integer.parseInt(syear);
-		CaseRef caseRef = new CaseRef(parties, citation, null, year);
-		DocRef doc = new DocRef(docTitle, null, date, caseRef);
+		DocRef doc = EntityFactory.get().buildCaseDoc(docTitle, null, date, parties, citation, null, syear);
 		doc.setHtmlContent(htmlContent);
 		
 		return doc;

@@ -44,7 +44,12 @@ public class BundleUserBinding extends EntityBase {
 	}
 
 	@Override
-	public IEntity clone() {
+	protected void doClone(IEntity cln) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	protected IEntity newInstance() {
 		throw new UnsupportedOperationException();
 	}
 

@@ -5,6 +5,8 @@
  */
 package com.tabulaw.model;
 
+import com.tabulaw.common.model.IEntity;
+
 /**
  * IEntityTypeResolver
  * @author jpk
@@ -18,7 +20,7 @@ public interface IEntityTypeResolver {
 	 * @throws IllegalArgumentException when the entity class type can't be
 	 *         resolved.
 	 */
-	String resolveEntityType(Class<?> clz) throws IllegalArgumentException;
+	String resolveEntityType(Class<? extends IEntity> clz) throws IllegalArgumentException;
 
 	/**
 	 * Resolves the given token to a corres. entity class.
@@ -26,5 +28,5 @@ public interface IEntityTypeResolver {
 	 * @return the resolved entity class type
 	 * @throws IllegalArgumentException when the entity type can't be resolved.
 	 */
-	Class<?> resolveEntityClass(String entityType) throws IllegalArgumentException;
+	Class<? extends IEntity> resolveEntityClass(String entityType) throws IllegalArgumentException;
 }
