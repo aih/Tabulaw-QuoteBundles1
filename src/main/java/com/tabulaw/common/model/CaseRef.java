@@ -59,8 +59,8 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return EntityType.CASE;
+	public String getEntityType() {
+		return EntityType.CASE.name();
 	}
 
 	public String getParties() {

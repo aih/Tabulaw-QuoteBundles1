@@ -23,7 +23,7 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 
 	@Override
 	public Class<? extends IEntity> resolveEntityClass(String entityType) throws IllegalArgumentException {
-		EntityType et = Enum.valueOf(EntityType.class, entityType);
+		EntityType et = EntityType.fromString(entityType);
 		switch(et) {
 			case AUTHORITY:
 				return Authority.class;

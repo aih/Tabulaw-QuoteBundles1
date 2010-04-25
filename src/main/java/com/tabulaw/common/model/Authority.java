@@ -73,8 +73,8 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return EntityType.AUTHORITY;
+	public String getEntityType() {
+		return EntityType.AUTHORITY.name();
 	}
 
 	@Override

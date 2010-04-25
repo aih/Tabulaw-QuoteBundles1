@@ -73,8 +73,8 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return EntityType.DOCUMENT;
+	public String getEntityType() {
+		return EntityType.DOCUMENT.name();
 	}
 
 	@NotEmpty

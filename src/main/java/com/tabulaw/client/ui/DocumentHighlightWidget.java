@@ -175,7 +175,8 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 		if(!maybeSetCurrentQuoteBundle()) {
 			ModelChangeOp op = event.getChangeOp();
 			IEntity m = event.getModel();
-			if(op == ModelChangeOp.UPDATED && m.getEntityType() == EntityType.QUOTE_BUNDLE && m.getId().equals(crntQbId)) {
+			EntityType et = EntityType.fromString(m.getEntityType());
+			if(op == ModelChangeOp.UPDATED && et == EntityType.QUOTE_BUNDLE && m.getId().equals(crntQbId)) {
 				wDocQuoteBundle.sync((QuoteBundle) m);
 			}
 		}

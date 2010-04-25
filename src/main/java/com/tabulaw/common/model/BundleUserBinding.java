@@ -54,8 +54,8 @@ public class BundleUserBinding extends EntityBase {
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return EntityType.BUNDLE_USER_BINDING;
+	public String getEntityType() {
+		return EntityType.BUNDLE_USER_BINDING.name();
 	}
 
 	@Override

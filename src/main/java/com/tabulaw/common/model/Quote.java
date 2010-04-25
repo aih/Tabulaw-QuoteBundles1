@@ -69,8 +69,8 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return EntityType.QUOTE;
+	public String getEntityType() {
+		return EntityType.QUOTE.name();
 	}
 
 	@NotEmpty

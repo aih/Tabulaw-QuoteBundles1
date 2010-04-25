@@ -11,15 +11,15 @@ import com.tabulaw.ITypeDescriptorProvider;
  * Contract for a particular model type usable for server and client side.
  * @author jpk
  */
-public interface IEntity extends Serializable, Cloneable, IMarshalable, IModelKeyProvider, IDescriptorProvider, ITypeDescriptorProvider, IPropertyValueProvider {
+public interface IEntity 
+extends Serializable, Cloneable, IMarshalable, IModelKeyProvider, IDescriptorProvider, ITypeDescriptorProvider, IPropertyValueProvider {
 
 	static final String ID_FIELDNAME = "id";
 
 	/**
 	 * @return The entity type.
 	 */
-	// TODO change return type to String@!!!!
-	EntityType getEntityType();
+	String getEntityType();
 
 	/**
 	 * @return the id.

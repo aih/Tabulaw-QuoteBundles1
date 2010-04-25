@@ -11,6 +11,17 @@ import java.io.File;
  * @author jpk
  */
 abstract class AbstractFileConverter implements IFileConverter {
+	
+	/**
+	 * Is the file named such that is implies it has html content?
+	 * @param f
+	 * @return true/false
+	 */
+	static boolean isHtmlFileBasedOnFileExtension(File f) {
+		String fname = f.getName();
+		if(fname.endsWith(".htm") || fname.endsWith(".html")) return true;
+		return false;
+	}
 
 	/**
 	 * Creates a file ref with the local name having the given suffix that is

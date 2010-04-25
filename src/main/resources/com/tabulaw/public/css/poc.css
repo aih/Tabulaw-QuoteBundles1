@@ -176,19 +176,34 @@ body {
 
 /* the parent element of the nav row widget */
 #navRow {
-	border-bottom: 3px solid #BFBFBF;
+	/*border-bottom: 3px solid #BFBFBF;*/
 
 	/*debug*/
 	/*border: 1px solid gray*/
 }
 * html #navRow {
-	padding-top: 20px;
+	/*padding-top: 20px;
 	margin-right: 20px;
-	height: 25px;
+	height: 25px;*/
 }
-	/*unfortunately, this doesn't work in IE*/
-	html>/**/body .navRowTbl {
-		width: 100%;
+	
+/* login panel */
+.login {
+}
+	.loginForm {
+	}
+	.login .userReg {
+	}
+	.login .opPanel {
+	}
+	
+/* navRow widget */
+.navRow {
+	/*width: 100%;*/
+	/*overflow: hidden;*/
+}
+	.navRow .navRowTabs {
+		border-bottom: 3px solid #BFBFBF;
 	}
 	
 	/* nav row tab bar */
@@ -204,61 +219,64 @@ body {
 	.gwt-TabBar .gwt-TabBarItem-wrapper { table cell around tab }</li>
 	.gwt-TabBar .gwt-TabBarItem-selected { additional style for selected
 	*/
-	#navRow .gwt-TabBarItem {
+	.navRow .gwt-TabBarItem {
 		background-color: #DFDFDF;
 		-moz-border-radius-topright: 2px;
 		-moz-border-radius-topleft: 2px;
 		-webkit-border-top-right-radius: 2px;
 		-webkit-border-top-left-radius: 2px;
 	}
-	#navRow .gwt-TabBarItem span {
+	.navRow .gwt-TabBarItem span {
 		color: #7F7F7F;
 	}
-	#navRow .gwt-TabBarItem-selected {
+	.navRow .gwt-TabBarItem-selected {
 		background-color: #BFBFBF;
 	}
-	#navRow .gwt-TabBarItem-selected span {
+	.navRow .gwt-TabBarItem-selected span {
 		color: #2F2F2F;
 	}
-	#navRow .openDocs .gwt-TabBarItem-selected {
+	.navRow .openDocs .gwt-TabBarItem-selected {
 		/*display:none;*/
 	}
 	
-/* navRow widget */
-.navRow {
-	/*width: 100%;*/
-	/*overflow: hidden;*/
-}
-.navRow .mainViews {
-	float: left;
-	margin-right: 30px;
-}
-.navRow .openDocs {
-	float: left;
-}
-.navRow .crntqb {
-	float: right;
-	text-align: right;
-	margin-top: 24px;
-}
-.navRow .crntqb p {
-	font-weight: bold;
-	font-size: 11px;
-}
-.navRow .crntqb .echo {
-	font-style: italic;
-	font-weight: normal;
-	margin-right: 5px;
-}
+	.navRow .mainViews {
+		float: left;
+		margin-right: 30px;
+	}
+	.navRow .openDocs {
+		float: left;
+	}
+	.navRow .crntqb {
+		text-align: right;
+	}
+		.navRow .crntqb p {
+			font-weight: bold;
+			font-size: 11px;
+		}
+		.navRow .crntqb .echo {
+			font-style: italic;
+			font-weight: normal;
+			margin-right: 5px;
+		}
 
-/* login panel */
-.login {
+/* lgdInUsr widget */
+.lgdInUsr {
+	overflow: hidden;
+	white-space: nowrap;
 }
-	.loginForm {
+	.lgdInUsr .frmContents {
+		float: right;
+		overflow: hidden;
 	}
-	.login .userReg {
+	.lgdInUsr .welcomeText {
+		float: left;
+		margin-right: 10px;
+		font-size: 11px;
 	}
-	.login .opPanel {
+	.lgdInUsr  a.logout {
+		float: left;
+		font-size: 11px;
+		font-weight: bold;
 	}
 
 #portal {
@@ -544,6 +562,8 @@ body {
 	}
 	.quoteBundle .columns .wqbundle {
 		width: 200px;
+		margin-left: 3px;
+		margin-right: 3px;
 	}
 	/* drag and drop specific allowing drops to empty qb columns!! */
 	.quoteBundle .columns .spacer {

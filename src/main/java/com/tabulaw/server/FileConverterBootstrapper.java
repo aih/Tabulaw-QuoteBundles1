@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
 import com.google.inject.Injector;
 import com.tabulaw.server.convert.FileConverterDelegate;
+import com.tabulaw.server.convert.HtmlPassThroughFileConverter;
 import com.tabulaw.server.convert.IFileConverter;
 import com.tabulaw.server.convert.OpenOfficeFileConverter;
 
@@ -35,6 +36,10 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 	public void startup(Injector injector, ServletContext servletContext) {
 		ArrayList<IFileConverter> converters = new ArrayList<IFileConverter>();
 
+		// html pass through converter
+		converters.add(new HtmlPassThroughFileConverter());
+
+		// open office converter
 		try {
 			OpenOfficeFileConverter oofc = OpenOfficeFileConverter.create();
 			servletContext.setAttribute(OPEN_OFFICE_CONNECTION_KEY, oofc.getOpenOfficeConnection());
@@ -44,7 +49,8 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 			log.error("Unable to create open office file converter: " + e.getMessage(), e);
 		}
 
-		IFileConverter converterDelegate = converters.size() == 0 ? null : new FileConverterDelegate(converters);
+		IFileConverter converterDelegate =
+				converters.size() == 0 ? null : new FileConverterDelegate(converters.toArray(new IFileConverter[0]));
 		servletContext.setAttribute(FILE_CONVERTER_KEY, converterDelegate);
 	}
 

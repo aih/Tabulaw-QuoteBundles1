@@ -382,11 +382,13 @@ public class ClientModelCache implements IModelSyncer {
 	public void persist(IEntity m, Widget source) throws IllegalArgumentException {
 		if(m == null) throw new NullPointerException();
 		if(m.getId() == null) {
-			String nextId = getNextId(m.getEntityType());
+			EntityType et = EntityType.fromString(m.getEntityType());
+			String nextId = getNextId(et);
 			m.setId(nextId);
 			if(Log.isDebugEnabled()) Log.debug("Set entity id on: " + m);
 		}
-		List<IEntity> list = entities.get(m.getEntityType());
+		EntityType et = EntityType.fromString(m.getEntityType());
+		List<IEntity> list = entities.get(et);
 
 		IEntity existing = null;
 

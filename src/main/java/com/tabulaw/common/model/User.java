@@ -105,8 +105,8 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return EntityType.USER;
+	public String getEntityType() {
+		return EntityType.USER.name();
 	}
 
 	@Override

@@ -33,11 +33,13 @@ public interface IFileConverter {
 	}
 
 	/**
-	 * Converts the given file to a new file of a prescribed type.
+	 * Attempts to convert the given file to a new file of a given type.
 	 * @param input input file
-	 * @param outputFileType the desired converted file type
-	 * @return ref to the converted file
-	 * @throws Exception When the conversion is unsuccessful for any reason
+	 * @param outputFileType the desired file type to which to convert
+	 * @return ref to the converted file or <code>null</code> if no conversion
+	 *         took place
+	 * @throws Exception When the conversion is attempted but is unsuccessful for
+	 *         any reason
 	 */
 	File convert(File input, FileType outputFileType) throws Exception;
 }

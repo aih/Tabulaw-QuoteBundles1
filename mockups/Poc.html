@@ -55,205 +55,109 @@ HTML {
 <meta content="text/html; charset=UTF-8" http-equiv="content-type">
 <title>Tabulaw</title>
 
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/status.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/reset.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/base.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/widget-gwt.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/widget-tll.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/hnav.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/msg.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/options.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/toolbar.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/view.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/viewpath.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/tableview.css">
-<link rel="stylesheet" href="http://127.0.0.1:8888/poc/css/field.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/reset.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/base.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/widget-gwt.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/widget-tll.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/hnav.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/msg.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/options.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/toolbar.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/tableview.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/field.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/status.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/view.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/viewpath.css">
 
-<link rel="stylesheet" href="pocmock.css">
+<link rel="stylesheet" href="../src/main/resources/com/tabulaw/public/css/poc.css">
+
 </head>
 <body id="host-body" class="dragdrop-dropTarget dragdrop-boundary Documents">
 
-<iframe style="position: absolute; width: 0pt; height: 0pt; border: 0pt none;" tabindex="-1" id="__gwt_historyFrame"
-		src="javascript:''"></iframe>
-<noscript>&lt;div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red;
-background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif"&gt;Your web browser must have
-JavaScript enabled in order for this application to display correctly.&lt;/div&gt;</noscript>
-
 <div class="container">
-<div id="navRow">
-<div class="navRow">
-<div class="crntqb"></div>
+  <div id="contentwrapper">
+    <div id="mainCol">
+      <div id="navRow">
+        
+        <div class="navRow" style="">
+          <div class="crntqb"><p><span class="echo">Current Quote Bundle:</span>test2</p></div>
+
 <table cellspacing="0" cellpadding="0" class="navRowTbl">
-		<tbody>
-				<tr>
-						<td align="left" style="vertical-align: top;">
-						<table cellspacing="0" cellpadding="0" class="gwt-TabBar mainViews" role="tablist">
-								<tbody>
-										<tr>
-												<td height="100%" align="left" style="vertical-align: bottom;" class="gwt-TabBarFirst-wrapper">
-												<div class="gwt-TabBarFirst" style="white-space: normal; height: 100%;">&nbsp;</div>
-												</td>
-												<td align="left" style="vertical-align: bottom;"
-														class="gwt-TabBarItem-wrapper gwt-TabBarItem-wrapper-selected">
-												<div tabindex="0" class="gwt-TabBarItem gwt-TabBarItem-selected" role="tab"><input type="text"
-														tabindex="-1"
-														style="opacity: 0; height: 1px; width: 1px; z-index: -1; overflow: hidden; position: absolute;">
-												<div class="navButton navButton-docs" title="View Documents..."><span class="text">Documents</span></div>
-												</div>
-												</td>
-												<td align="left" style="vertical-align: bottom;" class="gwt-TabBarItem-wrapper">
-												<div tabindex="0" class="gwt-TabBarItem" role="tab"><input type="text" tabindex="-1"
-														style="opacity: 0; height: 1px; width: 1px; z-index: -1; overflow: hidden; position: absolute;">
-												<div class="navButton navButton-bundles" title="View Quote Bundles..."><span class="text">Quote
-												Bundles</span></div>
-												</div>
-												</td>
-												<td align="left" width="100%" style="vertical-align: bottom;" class="gwt-TabBarRest-wrapper">
-												<div class="gwt-TabBarRest" style="white-space: normal; height: 100%;">&nbsp;</div>
-												</td>
-										</tr>
-								</tbody>
-						</table>
-						</td>
-						<td align="left" style="vertical-align: top;">
-						<table cellspacing="0" cellpadding="0" class="gwt-TabBar openDocs" role="tablist">
-								<tbody>
-										<tr>
-												<td height="100%" align="left" style="vertical-align: bottom;" class="gwt-TabBarFirst-wrapper">
-												<div class="gwt-TabBarFirst" style="white-space: normal; height: 100%;">&nbsp;</div>
-												</td>
-												<td align="left" width="100%" style="vertical-align: bottom;" class="gwt-TabBarRest-wrapper">
-												<div class="gwt-TabBarRest" style="white-space: normal; height: 100%;">&nbsp;</div>
-												</td>
-										</tr>
-								</tbody>
-						</table>
-						</td>
-				</tr>
-		</tbody>
+  <tbody>
+    <tr>
+      <td align="left" style="vertical-align: top;">
+      <table cellspacing="0" cellpadding="0" class="gwt-TabBar mainViews" role="tablist">
+        <tbody>
+          <tr>
+            <td height="100%" align="left" style="vertical-align: bottom;" class="gwt-TabBarFirst-wrapper">
+            <div class="gwt-TabBarFirst" style="white-space: normal; height: 100%;">&nbsp;</div>
+            </td>
+            <td align="left" style="vertical-align: bottom;" class="gwt-TabBarItem-wrapper">
+            <div tabindex="0" class="gwt-TabBarItem" role="tab"><input type="text" tabindex="-1"
+              style="opacity: 0; height: 1px; width: 1px; z-index: -1; overflow: hidden; position: absolute;">
+            <div class="navButton navButton-docs" title="View Documents..."><span class="text">Documents</span></div>
+            </div>
+            </td>
+            <td align="left" style="vertical-align: bottom;"
+              class="gwt-TabBarItem-wrapper gwt-TabBarItem-wrapper-selected">
+            <div tabindex="0" class="gwt-TabBarItem gwt-TabBarItem-selected" role="tab"><input type="text"
+              tabindex="-1"
+              style="opacity: 0; height: 1px; width: 1px; z-index: -1; overflow: hidden; position: absolute;">
+            <div class="navButton navButton-bundles" title="View Quote Bundles..."><span class="text">Quote
+            Bundles</span></div>
+            </div>
+            </td>
+            <td align="left" width="100%" style="vertical-align: bottom;" class="gwt-TabBarRest-wrapper">
+            <div class="gwt-TabBarRest" style="white-space: normal; height: 100%;">&nbsp;</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+      <td align="left" style="vertical-align: top;">
+      <table cellspacing="0" cellpadding="0" class="gwt-TabBar openDocs" role="tablist">
+        <tbody>
+          <tr>
+            <td height="100%" align="left" style="vertical-align: bottom;" class="gwt-TabBarFirst-wrapper">
+            <div class="gwt-TabBarFirst" style="white-space: normal; height: 100%;">&nbsp;</div>
+            </td>
+            <td align="left" width="100%" style="vertical-align: bottom;" class="gwt-TabBarRest-wrapper">
+            <div class="gwt-TabBarRest" style="white-space: normal; height: 100%;">&nbsp;</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+      <td align="left" style="vertical-align: top;">
+      
+      <form target="FormPanel_1" method="post" action="/logout">
+        <div class="lgdInUsr">
+          <input type="hidden" name="currentBundleId">
+          <div class="welcomeText">Welcome Tabulaw Administrator!</div>
+          <a href="#" class="logout">Log Out</a>
+        </div>
+      </form>
+
+      </td>
+    </tr>
+  </tbody>
 </table>
+
 </div>
-</div>
-<div id="contentwrapper">
-<div id="mainCol">
-<div id="portal">
-<div>
-<div>
-<table cellspacing="0" cellpadding="0" class="viewContainer viewContainer-pinned">
-		<tbody>
-				<tr>
-						<td align="left" style="vertical-align: top;">
-						<table cellspacing="0" cellpadding="0" class="toolbar viewToolbar">
-								<tbody>
-										<tr>
-												<td align="left" width="100%" style="vertical-align: top;">
-												<div class="viewTitle">Documents</div>
-												</td>
-										</tr>
-								</tbody>
-						</table>
-						</td>
-				</tr>
-				<tr>
-						<td align="left" style="vertical-align: top;">
-						<div class="view" id="view_-1347456360">
-						<div class="docSuggest"><img border="0"
-								style="width: 15px; height: 15px; background: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAAgElEQVR42mNgwAP6968XmLJj+/zJO7f/h+Nd2/dP3bXVgIGQxsk7d5xH0QjHO97jNQCoqAG7RoQLcGsGSuLVDMQ00rxzx3qyNU/atT0Bn0ZQLJAR0uDQPg9SQ0DjjvMQFwC9AAoDSDg0EKURqyLCTh3UGqHxSZ5GEIDkGjI0AgEAHyMriY72ySYAAAAASUVORK5CYII=&quot;) no-repeat scroll 0px 0px transparent;"
-								src="http://127.0.0.1:8888/poc/clear.cache.gif" class="image"><input type="text" tabindex="0"
-								class="gwt-SuggestBox"></div>
-						<div>
-						<div tabindex="0"><input type="text" tabindex="-1"
-								style="opacity: 0; height: 1px; width: 1px; z-index: -1; overflow: hidden; position: absolute;">
-						<div class="tableView">
-						<div style="overflow: auto; position: relative;" class="portal">
-						<div style="position: relative;">
-						<table class="table">
-								<colgroup>
-										<col class="title">
-										<col class="date">
-										<col class="delete">
-								</colgroup>
-								<tbody>
-										<tr class="head">
-												<td class="title">
-												<div><img border="0"
-														style="width: 13px; height: 4px; background: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAECAYAAABV5LW0AAAAH0lEQVR42mNgQANrVsz8z0AKAGmAYZI1EKURmwZ8GgG/Pi7BuxCEQgAAAABJRU5ErkJggg==&quot;) no-repeat scroll 0px 0px transparent;"
-														src="http://127.0.0.1:8888/poc/clear.cache.gif" class="sort" title="Sort Descending"><a href="#"
-														class="tll-shl" title="Sort Descending">Title</a></div>
-												</td>
-												<td class="date">
-												<div><a href="#" class="tll-shl">Date</a></div>
-												</td>
-												<td class="delete">&nbsp;</td>
-										</tr>
-										<tr class="even">
-												<td class="title">Consultant Agreement with PIIA</td>
-												<td class="date">3/28/10</td>
-												<td class="delete"><img border="0"
-														style="width: 10px; height: 11px; background: url(&quot;images/trash.gif&quot;) no-repeat scroll 0px 0px transparent;"
-														src="http://127.0.0.1:8888/poc/clear.cache.gif" class="gwt-Image" title="Delete document.."></td>
-										</tr>
-										<tr class="odd">
-												<td class="title">Form of Mutual NDA</td>
-												<td class="date">3/28/10</td>
-												<td class="delete"><img border="0"
-														style="width: 10px; height: 11px; background: url(&quot;images/trash.gif&quot;) no-repeat scroll 0px 0px transparent;"
-														src="http://127.0.0.1:8888/poc/clear.cache.gif" class="gwt-Image" title="Delete document.."></td>
-										</tr>
-										<tr class="even">
-												<td class="title">Form of Unilateral NDA</td>
-												<td class="date">3/28/10</td>
-												<td class="delete"><img border="0"
-														style="width: 10px; height: 11px; background: url(&quot;images/trash.gif&quot;) no-repeat scroll 0px 0px transparent;"
-														src="http://127.0.0.1:8888/poc/clear.cache.gif" class="gwt-Image" title="Delete document.."></td>
-										</tr>
-										<tr class="odd">
-												<td class="title">Roe v. Wade</td>
-												<td class="date">4/9/10</td>
-												<td class="delete"><img border="0"
-														style="width: 10px; height: 11px; background: url(&quot;images/trash.gif&quot;) no-repeat scroll 0px 0px transparent;"
-														src="http://127.0.0.1:8888/poc/clear.cache.gif" class="gwt-Image" title="Delete document.."></td>
-										</tr>
-								</tbody>
-						</table>
-						</div>
-						</div>
-						<div class="nodata" style="display: none;">Currently, no Documents cached.</div>
-						</div>
-						</div>
-						</div>
-						</div>
-						</td>
-				</tr>
-		</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="navCol"><img title="brought to you by The Logic Lab" class="logo" src="../src/main/webapp/images/tabulaw_logo.png"
-		alt="Tabulaw">
-<table cellspacing="0" cellpadding="0">
-		<tbody>
-				<tr>
-						<td align="left" style="vertical-align: top;">
-						<div tabindex="0" class="gwt-PushButton widget gwt-PushButton-up" role="button" aria-pressed="false"><input
-								type="text" tabindex="-1"
-								style="opacity: 0; height: 1px; width: 1px; z-index: -1; overflow: hidden; position: absolute;">
-						<div class="html-face">Upload</div>
-						</div>
-						</td>
-				</tr>
-		</tbody>
-</table>
-</div>
-<div id="footer">
-<p class="footer">&copy; 2010 Tabulaw, Inc.</p>
-</div>
+      
+      </div>
+      <div id="portal">
+      
+<div style=""><div style="display: none;"><table cellspacing="0" cellpadding="0" class="viewContainer viewContainer-pinned"><tbody><tr><td align="left" style="vertical-align: top;"><table cellspacing="0" cellpadding="0" class="toolbar viewToolbar"><tbody><tr><td align="left" width="100%" style="vertical-align: top;"><div class="viewTitle">Documents</div></td></tr></tbody></table></td></tr><tr><td align="left" style="vertical-align: top;"><div class="view" id="view_-1347456360"><div class="docSuggest"><img border="0" style="width: 15px; height: 15px; background: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAAgElEQVR42mNgwAP6968XmLJj+/zJO7f/h+Nd2/dP3bXVgIGQxsk7d5xH0QjHO97jNQCoqAG7RoQLcGsGSuLVDMQ00rxzx3qyNU/atT0Bn0ZQLJAR0uDQPg9SQ0DjjvMQFwC9AAoDSDg0EKURqyLCTh3UGqHxSZ5GEIDkGjI0AgEAHyMriY72ySYAAAAASUVORK5CYII=&quot;) no-repeat scroll 0px 0px transparent;" src="http://127.0.0.1:8888/poc/clear.cache.gif" class="image"><input type="text" tabindex="0" class="gwt-SuggestBox"></div><div><div tabindex="0"><input type="text" tabindex="-1" style="opacity: 0; height: 1px; width: 1px; z-index: -1; overflow: hidden; position: absolute;"><div class="tableView"><div style="overflow: auto; position: relative;" class="portal"><div style="position: relative;"><table class="table"><colgroup><col class="title"><col class="date"><col class="delete"></colgroup><tbody><tr class="head"><td class="title"><div><img border="0" style="width: 13px; height: 4px; background: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAECAYAAABV5LW0AAAAH0lEQVR42mNgQANrVsz8z0AKAGmAYZI1EKURmwZ8GgG/Pi7BuxCEQgAAAABJRU5ErkJggg==&quot;) no-repeat scroll 0px 0px transparent;" src="http://127.0.0.1:8888/poc/clear.cache.gif" class="sort" title="Sort Descending"><a href="#" class="tll-shl" title="Sort Descending">Title</a></div></td><td class="date"><div><a href="#" class="tll-shl">Date</a></div></td><td class="delete">&nbsp;</td></tr><tr class="even"><td class="title">c.html</td><td class="date">4/24/10</td><td class="delete"><img border="0" style="width: 10px; height: 11px; background: url(&quot;images/trash.gif&quot;) no-repeat scroll 0px 0px transparent;" src="http://127.0.0.1:8888/poc/clear.cache.gif" class="gwt-Image" title="Delete document.."></td></tr><tr class="odd"><td class="title">Consultant Agreement with PIIA</td><td class="date">3/28/10</td><td class="delete"><img border="0" style="width: 10px; height: 11px; background: url(&quot;images/trash.gif&quot;) no-repeat scroll 0px 0px transparent;" src="http://127.0.0.1:8888/poc/clear.cache.gif" class="gwt-Image" title="Delete document.."></td></tr><tr class="even"><td class="title">Form of Mutual NDA</td><td class="date">3/28/10</td><td class="delete"><img border="0" style="width: 10px; height: 11px; background: url(&quot;images/trash.gif&quot;) no-repeat scroll 0px 0px transparent;" src="http://127.0.0.1:8888/poc/clear.cache.gif" class="gwt-Image" title="Delete document.."></td></tr><tr class="odd"><td class="title">Form of Unilateral NDA</td><td class="date">3/28/10</td><td class="delete"><img border="0" style="width: 10px; height: 11px; background: url(&quot;images/trash.gif&quot;) no-repeat scroll 0px 0px transparent;" src="http://127.0.0.1:8888/poc/clear.cache.gif" class="gwt-Image" title="Delete document.."></td></tr><tr class="even"><td class="title">People v. Black</td><td class="date">4/24/10</td><td class="delete"><img border="0" style="width: 10px; height: 11px; background: url(&quot;images/trash.gif&quot;) no-repeat scroll 0px 0px transparent;" src="http://127.0.0.1:8888/poc/clear.cache.gif" class="gwt-Image" title="Delete document.."></td></tr><tr class="odd"><td class="title">TES FRANCHISING</td><td class="date">4/24/10</td><td class="delete"><img border="0" style="width: 10px; height: 11px; background: url(&quot;images/trash.gif&quot;) no-repeat scroll 0px 0px transparent;" src="http://127.0.0.1:8888/poc/clear.cache.gif" class="gwt-Image" title="Delete document.."></td></tr></tbody></table></div></div><div class="nodata" style="display: none;">Currently, no Documents cached.</div></div></div></div></div></td></tr></tbody></table></div><div><table cellspacing="0" cellpadding="0" class="viewContainer viewContainer-pinned"><tbody><tr><td align="left" style="vertical-align: top;"><table cellspacing="0" cellpadding="0" class="toolbar viewToolbar"><tbody><tr><td align="left" width="100%" style="vertical-align: top;"><div class="viewTitle">Quote Bundles</div></td></tr></tbody></table></td></tr><tr><td align="left" style="vertical-align: top;"><div class="view" id="view_273780254"><div style="position: relative; overflow: hidden;" class="boundaryArea dragdrop-dropTarget dragdrop-boundary"><table cellspacing="4" cellpadding="0" class="dragdrop-dropTarget columns"><tbody><tr><td align="left" style="vertical-align: top;"><table cellspacing="0" cellpadding="0" class="wqbundle dragdrop-draggable"><tbody><tr><td align="left" style="vertical-align: top;"><div class="qbheader"><div class="buttons"><img src="images/document-icon.png" class="current" title="Set as current"><img src="images/x-button.png" class="x" title="Close"></div><div class="headertext dragdrop-handle"><p class="echo">Quote Bundle</p><p class="name">test2</p><p class="desc"><span class="echo">DESCRIPTION: </span>test desc2</p></div></div></td></tr><tr><td align="left" style="vertical-align: top;"><table cellspacing="4" cellpadding="0" class="quotes dragdrop-dropTarget"><tbody><tr><td align="left" style="vertical-align: top;"><div class="spacer"></div></td></tr></tbody></table></td></tr></tbody></table></td><td align="left" style="vertical-align: top;"><table cellspacing="0" cellpadding="0" class="wqbundle dragdrop-draggable"><tbody><tr><td align="left" style="vertical-align: top;"><div class="qbheader"><div class="buttons"><img src="images/document-icon.png" class="current" title="Set as current"><img src="images/x-button.png" class="x" title="Close"></div><div class="headertext dragdrop-handle"><p class="echo">Quote Bundle</p><p class="name">test</p><p class="desc"><span class="echo">DESCRIPTION: </span>test desc</p></div></div></td></tr><tr><td align="left" style="vertical-align: top;"><table cellspacing="4" cellpadding="0" class="quotes dragdrop-dropTarget"><tbody><tr><td align="left" style="vertical-align: top;"><div class="spacer"></div></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></div></div></td></tr></tbody></table></div></div>
+      
+      </div>
+    </div>
+  </div>
+  <div id="navCol">
+    <img title="brought to you by The Logic Lab" class="logo" src="../src/main/webapp/images/tabulaw_logo.png" alt="Tabulaw">
+  <table cellspacing="0" cellpadding="0" style=""><tbody><tr><td align="left" style="vertical-align: top;"><div class="viewTitle widget">Quote Bundles</div></td></tr><tr><td align="left" style="vertical-align: top;"><table cellspacing="0" cellpadding="0" id="qbListing" class="widget"><tbody><tr><td align="left" style="vertical-align: top;"><div class="spacer"></div></td></tr></tbody></table></td></tr><tr><td align="left" style="vertical-align: top;"><div class="navButton navButton-plus widget" title="Create a Quote Bundle..."><span class="text">New Quote Bundle</span></div></td></tr></tbody></table></div>
+  <div id="footer"><p class="footer">&copy; 2010 Tabulaw, Inc.</p></div>
 </div>
 
-<iframe src="javascript:''" id="poc" style="position: absolute; width: 0pt; height: 0pt; border: medium none;"
-		tabindex="-1"></iframe>
 </body>
 </html>

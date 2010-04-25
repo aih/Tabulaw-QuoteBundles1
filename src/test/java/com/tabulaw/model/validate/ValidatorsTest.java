@@ -18,7 +18,6 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.testng.annotations.Test;
 
-import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.INamedEntity;
 import com.tabulaw.common.model.TimeStampEntity;
@@ -64,8 +63,8 @@ public class ValidatorsTest {
 		}
 
 		@Override
-		public EntityType getEntityType() {
-			return EntityType.AUTHORITY;
+		public String getEntityType() {
+			return "TEST_ENTITY";
 		}
 
 		@Override

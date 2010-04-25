@@ -49,8 +49,8 @@ public class UserState extends EntityBase {
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return EntityType.USER_STATE;
+	public String getEntityType() {
+		return EntityType.USER_STATE.name();
 	}
 
 	@Override

@@ -6,24 +6,22 @@
 package com.tabulaw.server.convert;
 
 import java.io.File;
-import java.util.Collection;
 
 /**
  * Sole {@link IFileConverter} for use by clients.
  * @author jpk
  */
 public class FileConverterDelegate implements IFileConverter {
-	
-	private final Collection<IFileConverter> converters;
+
+	private final IFileConverter[] converters;
 
 	/**
 	 * Constructor
 	 * @param converters the required list of converters to employ
 	 */
-	public FileConverterDelegate(Collection<IFileConverter> converters) {
+	public FileConverterDelegate(IFileConverter... converters) {
 		super();
-		if(converters == null) throw new NullPointerException();
-		if(converters.size() < 1) throw new IllegalArgumentException("No converters given");
+		if(converters == null || converters.length < 1) throw new IllegalArgumentException("No converters given");
 		this.converters = converters;
 	}
 
@@ -40,12 +38,12 @@ public class FileConverterDelegate implements IFileConverter {
 				ex = e;
 			}
 		}
-		
-		if(ex != null) 
+
+		if(ex != null)
 			throw new Exception("Can' convert input file: '" + input + "'.  Error: " + ex.getMessage(), ex);
-		else if(fout == null)
+		else if(fout == null) 
 			throw new Exception("Can't convert input file: " + input);
-		
+
 		return fout;
 	}
 

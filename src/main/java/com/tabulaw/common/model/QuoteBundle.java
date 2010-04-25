@@ -74,8 +74,8 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return EntityType.QUOTE_BUNDLE;
+	public String getEntityType() {
+		return EntityType.QUOTE_BUNDLE.name();
 	}
 
 	@NotEmpty

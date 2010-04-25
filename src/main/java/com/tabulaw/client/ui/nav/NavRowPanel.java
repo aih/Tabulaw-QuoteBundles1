@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabBar;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
@@ -53,6 +54,12 @@ public class NavRowPanel extends AbstractNavPanel {
 		 * Style applied to the top most panel.
 		 */
 		public static final String NAV_ROW = "navRow";
+
+		/**
+		 * Style applied to the div containing the horizontal panel containing the
+		 * tabs.
+		 */
+		public static final String NAV_ROW_TABS = "navRowTabs";
 
 		/**
 		 * Style applied to the contained table element.
@@ -119,6 +126,7 @@ public class NavRowPanel extends AbstractNavPanel {
 		static class Styles {
 
 			public static final String LGD_IN_USR = "lgdInUsr";
+			public static final String FORM_CONTENTS = "frmContents";
 			public static final String WELCOME_TEXT = "welcomeText";
 			public static final String LOGOUT = "logout";
 		}
@@ -129,11 +137,14 @@ public class NavRowPanel extends AbstractNavPanel {
 		final Hidden hiddenCurrentBundleId;
 		final FormPanel frmLogout;
 
+		// wraps the form and is the top-most widget
+		final SimplePanel wrapper;
+
 		public LoggedInUserWidget() {
 			super();
 
 			pnl = new FlowPanel();
-			pnl.setStyleName(Styles.LGD_IN_USR);
+			pnl.setStyleName(Styles.FORM_CONTENTS);
 
 			welcomeText = new Label();
 			welcomeText.setStyleName(Styles.WELCOME_TEXT);
@@ -141,10 +152,10 @@ public class NavRowPanel extends AbstractNavPanel {
 
 				@Override
 				public void onClick(ClickEvent event) {
-					
+
 					// save the user state to the server
 					ClientModelCache.get().saveUserState(new Command() {
-						
+
 						@Override
 						public void execute() {
 							frmLogout.submit();
@@ -153,7 +164,7 @@ public class NavRowPanel extends AbstractNavPanel {
 				}
 			});
 			lnkLogOut.setStyleName(Styles.LOGOUT);
-			
+
 			hiddenCurrentBundleId = new Hidden("currentBundleId");
 
 			frmLogout = new FormPanel();
@@ -165,7 +176,11 @@ public class NavRowPanel extends AbstractNavPanel {
 			pnl.add(lnkLogOut);
 			frmLogout.add(pnl);
 
-			initWidget(frmLogout);
+			wrapper = new SimplePanel();
+			wrapper.setStyleName(Styles.LGD_IN_USR);
+			wrapper.setWidget(frmLogout);
+
+			initWidget(wrapper);
 		}
 
 		public void populate(User mUser) {
@@ -181,7 +196,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			super.onModelChangeEvent(event);
 			if(event.getChangeOp() == ModelChangeOp.LOADED) {
 				IEntity m = event.getModel();
-				if(m.getEntityType() == EntityType.USER) {
+				if(EntityType.fromString(m.getEntityType()) == EntityType.USER) {
 					populate((User) m);
 				}
 			}
@@ -207,22 +222,11 @@ public class NavRowPanel extends AbstractNavPanel {
 	private final LoggedInUserWidget liuWidget = new LoggedInUserWidget();
 
 	private final HorizontalPanel hp = new HorizontalPanel();
+	private final SimplePanel hpWrapper = new SimplePanel();
 
 	private final FlowPanel panel = new FlowPanel();
 
 	private boolean handlingViewChange;
-
-	/**
-	 * Clears out the nav row resetting its state to that of page refresh state.
-	 */
-	public void clear() {
-		while(openDocTabs.getTabCount() > 0)
-			openDocTabs.removeTab(0);
-		openDocNavButtons.clear();
-
-		crntQuoteBudleWidget.clear();
-		liuWidget.clear();
-	}
 
 	/**
 	 * Constructor
@@ -259,11 +263,15 @@ public class NavRowPanel extends AbstractNavPanel {
 		hp.setStyleName(Styles.NAV_ROW_TBL);
 		hp.add(mainViewTabs);
 		hp.add(openDocTabs);
-		hp.add(liuWidget);
+
+		hpWrapper.setStyleName(Styles.NAV_ROW_TABS);
+		hpWrapper.setWidget(hp);
 
 		panel.setStyleName(Styles.NAV_ROW);
+
+		panel.add(liuWidget);
+		panel.add(hpWrapper);
 		panel.add(crntQuoteBudleWidget);
-		panel.add(hp);
 
 		mainViewTabs.addSelectionHandler(new SelectionHandler<Integer>() {
 
@@ -286,6 +294,18 @@ public class NavRowPanel extends AbstractNavPanel {
 		});
 
 		initWidget(panel);
+	}
+
+	/**
+	 * Clears out the nav row resetting its state to that of page refresh state.
+	 */
+	public void clear() {
+		while(openDocTabs.getTabCount() > 0)
+			openDocTabs.removeTab(0);
+		openDocNavButtons.clear();
+
+		crntQuoteBudleWidget.clear();
+		liuWidget.clear();
 	}
 
 	@Override
@@ -362,7 +382,8 @@ public class NavRowPanel extends AbstractNavPanel {
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
-		if(event.getChangeOp() == ModelChangeOp.DELETED && EntityType.DOCUMENT.name().equals(event.getModelKey().getEntityType())) {
+		if(event.getChangeOp() == ModelChangeOp.DELETED
+				&& EntityType.DOCUMENT.name().equals(event.getModelKey().getEntityType())) {
 			// remove open doc tab
 			boolean found = false;
 			int i = 0;

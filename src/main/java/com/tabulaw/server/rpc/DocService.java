@@ -123,13 +123,6 @@ public class DocService extends RpcServlet implements IDocService {
 		return payload;
 	}
 
-	private File createLocalDocFile(String filename) {
-		URL url = getClass().getClassLoader().getResource("");
-		String canonicalname = url.getPath() + filename;
-		File f = new File(canonicalname);
-		return f;
-	}
-
 	@Override
 	public DocFetchPayload fetch(String remoteDocUrl) {
 		Status status = new Status();
@@ -151,7 +144,7 @@ public class DocService extends RpcServlet implements IDocService {
 		final int hash = DocUtils.docHash(remoteDocUrl);
 		final String filename = DocUtils.localDocFilename(hash);
 		try {
-			File f = createLocalDocFile(filename);
+			File f = DocUtils.getDocRef(filename);
 			if(!f.exists()) {
 				// fetch
 				String fcontents = DocUtils.fetch(new URL(remoteDocUrl));

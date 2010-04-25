@@ -6,43 +6,47 @@
 package com.tabulaw.common.model;
 
 import com.tabulaw.IMarshalable;
-import com.tabulaw.INameValueProvider;
+import com.tabulaw.ITypeDescriptorProvider;
 
 /**
- * EntityType
+ * The defined entity types in the app expressed as an enum.
+ * <p>
+ * <b>IMPT: </b>The corres. cannonical (stirng-wise) entity type is the enum's
+ * desc() value.
  * @author jpk
  */
-public enum EntityType implements INameValueProvider<String>, IMarshalable {
+public enum EntityType implements IMarshalable, ITypeDescriptorProvider {
 
 	AUTHORITY("Authority"),
 	USER("User"),
 	USER_STATE("User State"),
-	
+
 	BUNDLE_USER_BINDING("Bundle User Binding"),
-	
+
 	CASE("Case"),
 	DOCUMENT("Document"),
-	
+
 	QUOTE("Quote"),
 	QUOTE_BUNDLE("Quote Bundle"),
-	
+
 	NOTE("Note");
 
-	private final String name;
+	private final String desc;
 
-	private EntityType(String name) {
-		this.name = name;
+	private EntityType(String desc) {
+		this.desc = desc;
 	}
 
 	public String getName() {
-		return name;
-	}
-
-	public String getValue() {
 		return name();
 	}
 
-	public String descriptor() {
-		return getName();
+	@Override
+	public String typeDesc() {
+		return desc;
+	}
+
+	public static EntityType fromString(String set) {
+		return Enum.valueOf(EntityType.class, set);
 	}
 }

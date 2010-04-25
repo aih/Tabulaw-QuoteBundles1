@@ -1,6 +1,7 @@
 package com.tabulaw.common.model;
 
 import com.tabulaw.schema.Managed;
+import com.tabulaw.util.StringUtil;
 
 /**
  * EntityBase - Base class for all entities.
@@ -25,7 +26,7 @@ public abstract class EntityBase implements IEntity {
 
 	@Override
 	public String typeDesc() {
-		return getEntityType().descriptor();
+		return StringUtil.enumStyleToPresentation(getEntityType());
 	}
 
 	/**
@@ -50,7 +51,7 @@ public abstract class EntityBase implements IEntity {
 
 	@Override
 	public ModelKey getModelKey() {
-		return new ModelKey(getEntityType().name(), getId());
+		return new ModelKey(getEntityType(), getId());
 	}
 
 	@Managed

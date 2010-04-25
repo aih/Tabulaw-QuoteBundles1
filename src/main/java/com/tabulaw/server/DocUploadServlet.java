@@ -65,7 +65,6 @@ public class DocUploadServlet extends HttpServlet {
 
 				List<FileItem> items = upload.parseRequest(req);
 
-				String uploadPath = new File(getClass().getClassLoader().getResource("").toURI()).getPath() + File.separator;
 				File f = null;
 				int numSuccessful = 0;
 				for(FileItem item : items) {
@@ -73,7 +72,7 @@ public class DocUploadServlet extends HttpServlet {
 						String filename = item.getName();
 						if(StringUtil.isEmpty(filename)) continue;
 						filename = FilenameUtils.getName(filename);
-						f = new File(uploadPath + filename);
+						f = DocUtils.getDocRef(filename);
 						try {
 							item.write(f);
 						}
