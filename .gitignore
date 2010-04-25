@@ -2,3 +2,4 @@
 *.war
 /test-output
 /target
+/userDataServiceTestDb
