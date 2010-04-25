@@ -123,12 +123,12 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 				throw new VetoDragException();
 			}
 
-			// clone the dragged quote widget
+			// clone the dragged quote widget setting its id to a new one
 			Quote mQuoteClone = (Quote) draggedQuoteModel.clone();
-
 			mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE));
 
-			targetQuoteBundleWidget.addQuote(mQuoteClone, true);
+			// add and persist
+			targetQuoteBundleWidget.addQuote(mQuoteClone, true, true);
 
 			// String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
 			// Notifier.get().info(msg);
@@ -325,7 +325,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 * @param mQuoteBundle
 	 */
 	private void insertQuoteBundleColumn(final QuoteBundle mQuoteBundle, int index) {
-		
+
 		// "demote" the last quote bundle in the main viewing area to the bundle
 		// listing
 		int numBundles = columns.getWidgetCount();
@@ -341,7 +341,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			QuoteBundleEditWidget last = (QuoteBundleEditWidget) columns.getWidget(ilast);
 			unpinQuoteBundle(last);
 		}
-		
+
 		Log.debug("Inserting quote bundle col widget for: " + mQuoteBundle);
 		final QuoteBundleEditWidget qbw = new QuoteBundleEditWidget(quoteController);
 		qbw.setModel(mQuoteBundle);

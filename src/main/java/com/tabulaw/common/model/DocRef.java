@@ -94,6 +94,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	}
 
 	public void setHash(String hash) {
+		if(hash == null) throw new NullPointerException();
 		this.hash = hash;
 	}
 
@@ -143,6 +144,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 		return title != null && o.title != null ? title.compareTo(o.title) : 0;
 	}
 
+	/*
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -163,7 +165,8 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 		else if(!hash.equals(other.hash)) return false;
 		return true;
 	}
-
+	*/
+	
 	@Override
 	public Object getPropertyValue(String propertyPath) {
 		
@@ -180,5 +183,10 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 		}
 		
 		return null;
+	}
+
+	@Override
+	public String descriptor() {
+		return typeDesc() + " (" + getTitle() + ")";
 	}
 }

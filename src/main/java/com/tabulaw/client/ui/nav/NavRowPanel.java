@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -25,13 +26,13 @@ import com.google.gwt.user.client.ui.TabBar;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.model.ClientModelCache;
+import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.mvc.view.UnloadViewRequest;
 import com.tabulaw.client.mvc.view.ViewKey;
-import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.SimpleHyperLink;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
 import com.tabulaw.client.ui.login.UserSessionEvent;
@@ -87,7 +88,7 @@ public class NavRowPanel extends AbstractNavPanel {
 	 * events.
 	 * @author jpk
 	 */
-	public static class CurrentQuoteBundleDisplayWidget extends AbstractModelChangeAwareWidget {
+	public static class CurrentQuoteBundleDisplayWidget extends Composite implements IModelChangeHandler {
 
 		private final HTML html = new HTML();
 		private String crntQbId;
@@ -110,7 +111,6 @@ public class NavRowPanel extends AbstractNavPanel {
 
 		@Override
 		public void onModelChangeEvent(ModelChangeEvent event) {
-			super.onModelChangeEvent(event);
 			update();
 		}
 
@@ -121,7 +121,7 @@ public class NavRowPanel extends AbstractNavPanel {
 
 	} // CurrentQuoteBundleDisplayWidget
 
-	static class LoggedInUserWidget extends AbstractModelChangeAwareWidget {
+	static class LoggedInUserWidget extends Composite implements IModelChangeHandler {
 
 		static class Styles {
 
@@ -193,7 +193,6 @@ public class NavRowPanel extends AbstractNavPanel {
 
 		@Override
 		public void onModelChangeEvent(ModelChangeEvent event) {
-			super.onModelChangeEvent(event);
 			if(event.getChangeOp() == ModelChangeOp.LOADED) {
 				IEntity m = event.getModel();
 				if(EntityType.fromString(m.getEntityType()) == EntityType.USER) {

@@ -120,7 +120,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 		Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
 		// cache, show and highlight
 		quote.setMark(mark);
-		wDocQuoteBundle.addQuote(quote, true);
+		wDocQuoteBundle.addQuote(quote, true, true);
 	}
 
 	/**
@@ -132,20 +132,21 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 	private boolean maybeSetCurrentQuoteBundle() {
 		QuoteBundle crntQb = ClientModelCache.get().getCurrentQuoteBundle();
 		if(crntQb == null) {
+			
 			// auto-create a new quote bundle
 			DocRef mDoc = wDocViewer.getModel();
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
 			String qbName = mDoc.getTitle();
 			String qbDesc = "Quote Bundle for " + qbName;
 			crntQb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
-
 			crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
 
 			ClientModelCache.get().getUserState().setCurrentQuoteBundleId(crntQb.getId());
-			// fire model change event
+			
+			// client-side persist
 			ClientModelCache.get().persist(crntQb, this);
 			
-			// server side persist
+			// server-side persist
 			ClientModelCache.get().addBundle(crntQb);
 		}
 

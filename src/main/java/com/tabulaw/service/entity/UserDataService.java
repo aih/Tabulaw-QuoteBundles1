@@ -8,6 +8,7 @@ package com.tabulaw.service.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.ValidatorFactory;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -102,9 +103,11 @@ public class UserDataService extends AbstractEntityService {
 	 * @param userId
 	 * @param bundle
 	 * @return the saved bundle
+	 * @throws ConstraintViolationException When the given bundle isn't valid
 	 */
 	@Transactional
-	public QuoteBundle saveBundleForUser(String userId, QuoteBundle bundle) {
+	public QuoteBundle saveBundleForUser(String userId, QuoteBundle bundle) 
+	throws ConstraintViolationException {
 		if(userId == null) throw new NullPointerException();
 
 		validate(bundle);
@@ -179,9 +182,11 @@ public class UserDataService extends AbstractEntityService {
 	 * @param userId
 	 * @param bundle
 	 * @return the persisted bundle
+	 * @throws ConstraintViolationException When the givne bundle isn't valid
 	 */
 	@Transactional
-	public QuoteBundle addBundleForUser(String userId, QuoteBundle bundle) {
+	public QuoteBundle addBundleForUser(String userId, QuoteBundle bundle) 
+	throws ConstraintViolationException {
 		if(!bundle.isNew()) throw new IllegalArgumentException("Bundle already added.");
 		validate(bundle);
 		QuoteBundle persistedBundle = dao.persist(bundle);
@@ -210,9 +215,12 @@ public class UserDataService extends AbstractEntityService {
 	 * @param bundleId
 	 * @param quote
 	 * @return the persisted quote
+	 * @throws ConstraintViolationException When the quote doesn't validate
+	 * @throws EntityNotFoundException When the bundle can't be found from the given id
 	 */
 	@Transactional
-	public Quote addQuoteToBundle(String bundleId, Quote quote) {
+	public Quote addQuoteToBundle(String bundleId, Quote quote) 
+	throws ConstraintViolationException, EntityNotFoundException {
 		if(!quote.isNew()) throw new IllegalArgumentException("Quote isn't new");
 		validate(quote);
 		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);

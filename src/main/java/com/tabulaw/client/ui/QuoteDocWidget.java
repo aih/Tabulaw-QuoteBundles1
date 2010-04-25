@@ -39,6 +39,5 @@ public class QuoteDocWidget extends AbstractQuoteWidget {
 	protected void handleXClick() {
 		// remove from bundle and permanantly delete the quote
 		parentQuoteBundleWidget.removeQuote(quote, true, true);
-		
 	}
 }

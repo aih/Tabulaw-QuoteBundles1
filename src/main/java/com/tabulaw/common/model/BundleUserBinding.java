@@ -74,6 +74,7 @@ public class BundleUserBinding extends EntityBase {
 	}
 
 	public void setBundleId(String bundleId) {
+		if(bundleId == null) throw new NullPointerException();
 		this.bundleId = bundleId;
 	}
 
@@ -83,9 +84,11 @@ public class BundleUserBinding extends EntityBase {
 	}
 
 	public void setUserId(String userId) {
+		if(userId == null) throw new NullPointerException();
 		this.userId = userId;
 	}
 
+	/*
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -111,4 +114,5 @@ public class BundleUserBinding extends EntityBase {
 		else if(!userId.equals(other.userId)) return false;
 		return true;
 	}
+	*/
 }

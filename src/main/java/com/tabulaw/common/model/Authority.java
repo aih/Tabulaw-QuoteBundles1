@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import com.tabulaw.IMarshalable;
 import com.tabulaw.schema.BusinessKeyDef;
 import com.tabulaw.schema.BusinessObject;
+import com.tabulaw.util.StringUtil;
 
 /**
  * A defined user role called authority.
@@ -95,6 +96,7 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 	}
 
 	public void setAuthority(String authority) {
+		if(authority == null) throw new NullPointerException();
 		this.authority = authority;
 	}
 
@@ -113,9 +115,10 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 
 	@Override
 	public String descriptor() {
-		return getAuthority();
+		return StringUtil.enumStyleToPresentation(getAuthority());
 	}
 
+	/*
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -136,6 +139,7 @@ public class Authority extends EntityBase implements INamedEntity, Comparable<Au
 		else if(!authority.equals(other.authority)) return false;
 		return true;
 	}
+	*/
 
 	@Override
 	public Object getPropertyValue(String propertyPath) {

@@ -320,7 +320,8 @@ public class ClientModelCache implements IModelSyncer {
 	public IEntity get(ModelKey key) throws IllegalArgumentException, EntityNotFoundException {
 		if(key == null) throw new NullPointerException();
 		if(!key.isSet()) throw new IllegalArgumentException("Key not set");
-		return get(entityTypeFromString(key.getEntityType()), key.getId());
+		EntityType et = EntityType.fromString(key.getEntityType());
+		return get(et, key.getId());
 	}
 
 	/**
@@ -392,14 +393,16 @@ public class ClientModelCache implements IModelSyncer {
 
 		IEntity existing = null;
 
-		if(!m.isNew()) {
+		// NO this logic if now bad since we are persisting server-side in parallel
+		// w/o any callback based updating to the entities held in this cache!
+		//if(!m.isNew()) {
 			for(IEntity em : list) {
 				if(em.getId().equals(m.getId())) {
 					existing = em;
 					break;
 				}
 			}
-		}
+		//}
 
 		ModelChangeOp op = existing == null ? ModelChangeOp.ADDED : ModelChangeOp.UPDATED;
 
@@ -454,7 +457,8 @@ public class ClientModelCache implements IModelSyncer {
 	public IEntity remove(ModelKey key, Widget source) throws IllegalArgumentException, EntityNotFoundException {
 		if(key == null) throw new NullPointerException();
 		if(!key.isSet()) throw new IllegalArgumentException("Key not set");
-		return remove(entityTypeFromString(key.getEntityType()), key.getId(), source);
+		EntityType et = EntityType.fromString(key.getEntityType());
+		return remove(et, key.getId(), source);
 	}
 	
 	/**
@@ -539,12 +543,5 @@ public class ClientModelCache implements IModelSyncer {
 			if(surl != null && surl.equals(remoteCaseUrl)) return (DocRef) m;
 		}
 		return null;
-	}
-
-	private EntityType entityTypeFromString(String s) {
-		for(EntityType et : EntityType.values()) {
-			if(et.name().equals(s)) return et;
-		}
-		throw new IllegalArgumentException("Un-recognized entity type: " + s);
 	}
 }

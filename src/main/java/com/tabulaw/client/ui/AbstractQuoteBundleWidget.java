@@ -182,18 +182,6 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	}
 
 	/**
-	 * Adds a quote the underlying model as well as adding a new quote widget to
-	 * this widget.
-	 * @param mQuote
-	 * @param persist update the datastore (which will trigger a model change
-	 *        event)?
-	 * @return The added quote widget
-	 */
-	public Q addQuote(Quote mQuote, boolean persist) {
-		return addQuote(mQuote, persist, true);
-	}
-
-	/**
 	 * Adds a quote.
 	 * @param mQuote quote model to add
 	 * @param persist save both the bundle and quote model data (firing model
@@ -343,7 +331,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		for(Quote mchanged : changedQuotes) {
 			if(!existingQuotes.contains(mchanged)) {
 				// quote to add
-				addQuote(mchanged, false);
+				addQuote(mchanged, false, true);
 			}
 		}
 	}

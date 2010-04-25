@@ -59,14 +59,4 @@ public abstract class TimeStampEntity extends EntityBase implements ITimeStampEn
 		tse.setDateCreated(dateCreated == null ? null : new Date(dateCreated.getTime()));
 		tse.setDateModified(dateModified == null ? null : new Date(dateModified.getTime()));
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return super.equals(obj);
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
 }

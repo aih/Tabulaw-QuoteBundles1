@@ -10,16 +10,19 @@ import javax.validation.Valid;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.tabulaw.schema.BusinessKeyDef;
-import com.tabulaw.schema.BusinessObject;
 import com.tabulaw.schema.Reference;
+import com.tabulaw.util.StringUtil;
 
 /**
  * @author jpk
  */
+// NO - we don't enforce this as we want to supported "cloned" quotes that
+// reference the same quote for a given doc but are distinct existing in different bundles.
+/*
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Doc Hash and Mark", properties = {
 	"document.hash", "serializedMark"
 }))
+*/
 public class Quote extends TimeStampEntity implements Comparable<Quote> {
 
 	private static final long serialVersionUID = -2887172300623884436L;
@@ -43,12 +46,18 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	}
 
 	@Override
+	public String descriptor() {
+		return typeDesc() + " (" + StringUtil.abbr(getQuote(), 50) + ")";
+	}
+	
+	@Override
 	public String getId() {
 		return id;
 	}
 
 	@Override
 	public void setId(String id) {
+		if(id == null) throw new NullPointerException();
 		this.id = id;
 	}
 
@@ -122,6 +131,7 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 		return 0;
 	}
 
+	/*
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -147,4 +157,5 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 		else if(!serializedMark.equals(other.serializedMark)) return false;
 		return true;
 	}
+	*/
 }

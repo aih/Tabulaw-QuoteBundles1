@@ -109,6 +109,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		return EntityType.USER.name();
 	}
 
+	@NotEmpty
 	@Override
 	@Length(max = MAXLEN_NAME)
 	public String getName() {
@@ -128,6 +129,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	}
 
 	public void setEmailAddress(String emailAddress) {
+		if(emailAddress == null) throw new NullPointerException();
 		this.emailAddress = emailAddress;
 	}
 
@@ -238,6 +240,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		this.enabled = enabled;
 	}
 
+	/*
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -258,7 +261,8 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		else if(!emailAddress.equals(other.emailAddress)) return false;
 		return true;
 	}
-
+	*/
+	
 	@Override
 	public int compareTo(User o) {
 		return name != null && o.name != null ? name.compareTo(o.name) : 0;

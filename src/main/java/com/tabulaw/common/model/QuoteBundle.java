@@ -39,6 +39,7 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 
 	@Override
 	public void setId(String id) {
+		if(id == null) throw new NullPointerException();
 		this.id = id;
 	}
 
@@ -73,6 +74,11 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 		qb.quotes = cquotes;
 	}
 
+	@Override
+	public String descriptor() {
+		return typeDesc() + " (" + getName() + ")";
+	}
+	
 	@Override
 	public String getEntityType() {
 		return EntityType.QUOTE_BUNDLE.name();
@@ -154,6 +160,7 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 		return name != null && o.name != null ? name.compareTo(o.name) : 0;
 	}
 
+	/*
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -174,4 +181,5 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 		else if(!id.equals(other.id)) return false;
 		return true;
 	}
+	*/
 }

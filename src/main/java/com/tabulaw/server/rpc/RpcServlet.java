@@ -21,6 +21,24 @@ public abstract class RpcServlet extends RemoteServiceServlet {
 	private static final long serialVersionUID = 5032508084607776181L;
 
 	protected final Log log = LogFactory.getLog(this.getClass());
+	
+	/**
+	 * Adds an error message to the given status.
+	 * @param emsg the error message to add
+	 * @param status 
+	 */
+	public static final void addError(String emsg, Status status) {
+		status.addMsg(emsg, MsgLevel.ERROR, MsgAttr.EXCEPTION.flag);
+	}
+
+	/**
+	 * Adds a fatal error message to the given status.
+	 * @param emsg the error message to add
+	 * @param status 
+	 */
+	public static final void addFatalError(String emsg, Status status) {
+		status.addMsg(emsg, MsgLevel.FATAL, MsgAttr.EXCEPTION.flag);
+	}
 
 	/**
 	 * Appends ui-friendly message(s) to the given {@link Status} instance from
@@ -34,10 +52,10 @@ public abstract class RpcServlet extends RemoteServiceServlet {
 			emsg = t.getClass().getSimpleName();
 		}
 		if(t instanceof RuntimeException) {
-			status.addMsg(emsg, MsgLevel.FATAL, MsgAttr.EXCEPTION.flag);
+			addFatalError(emsg, status);
 		}
 		else {
-			status.addMsg(emsg, MsgLevel.ERROR, MsgAttr.EXCEPTION.flag);
+			addError(emsg, status);
 		}
 	}
 

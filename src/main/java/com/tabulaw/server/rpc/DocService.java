@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -117,7 +118,13 @@ public class DocService extends RpcServlet implements IDocService {
 			RpcServlet.exceptionToStatus(e, status);
 		}
 		catch(IOException e) {
-			RpcServlet.exceptionToStatus(e, status);
+			if(e instanceof UnknownHostException) {
+				String emsg = "Can't connect to document provider: " + StringUtil.enumStyleToPresentation(handler.getDocDataType().name());
+				RpcServlet.addError(emsg, status);
+			}
+			else {
+				RpcServlet.exceptionToStatus(e, status);
+			}
 		}
 
 		return payload;

@@ -33,12 +33,18 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 	}
 
 	@Override
+	public String descriptor() {
+		return typeDesc() + " (" + getCitation() + ")";
+	}
+	
+	@Override
 	public String getId() {
 		return id;
 	}
 
 	@Override
 	public void setId(String id) {
+		if(id == null) throw new NullPointerException();
 		this.id = id;
 	}
 
@@ -95,6 +101,7 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		this.year = year;
 	}
 
+	/*
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -115,6 +122,7 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		else if(!url.equals(other.url)) return false;
 		return true;
 	}
+	*/
 
 	@Override
 	public int compareTo(CaseRef o) {
@@ -125,5 +133,4 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		}
 		return 0;
 	}
-
 }
