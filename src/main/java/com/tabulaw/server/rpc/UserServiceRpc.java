@@ -112,11 +112,12 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 		PersistContext persistContext = getPersistContext();
 		UserService userService = persistContext.getUserService();
 
+		String name = request.getName();
 		String emailAddress = request.getEmailAddress();
 		String password = request.getPassword();
 
 		try {
-			userService.create(emailAddress, password);
+			userService.create(name, emailAddress, password);
 		}
 		catch(EntityExistsException e) {
 			status.addMsg("Email already exists", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag | MsgAttr.FIELD.flag, "userEmail");
@@ -134,6 +135,10 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 			status.addMsg("An email address must be specified.", MsgLevel.ERROR, MsgAttr.STATUS.flag);
 		}
 		else {
+			// we are forced to create an http session here in order to access the
+			// servlet context
+			getRequestContext().getRequest().getSession(true);
+			
 			PersistContext context = getPersistContext();
 			UserService userService = context.getUserService();
 			try {

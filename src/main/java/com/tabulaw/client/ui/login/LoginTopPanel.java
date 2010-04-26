@@ -170,9 +170,10 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 					case REGISTER: {
 						FieldGroup fg = registerFieldPanel.getFieldGroup();
 						if(fg.isValid()) {
+							String name = (String) fg.getFieldWidget("userName").getValue();
 							String emailAddress = (String) fg.getFieldWidget("userEmail").getValue();
 							String password = (String) fg.getFieldWidget("userPswd").getValue();
-							UserRegistrationRequest request = new UserRegistrationRequest(emailAddress, password);
+							UserRegistrationRequest request = new UserRegistrationRequest(name, emailAddress, password);
 							Poc.getUserRegisterService().registerUser(request, new AsyncCallback<Payload>() {
 
 								@Override

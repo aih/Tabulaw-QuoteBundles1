@@ -12,16 +12,34 @@ import com.tabulaw.IMarshalable;
  */
 public class UserRegistrationRequest implements IMarshalable {
 
-	private String emailAddress, password;
+	private String name, emailAddress, password;
 
+	/**
+	 * Constructor
+	 */
 	public UserRegistrationRequest() {
 		super();
 	}
 
-	public UserRegistrationRequest(String emailAddress, String password) {
+	/**
+	 * Constructor
+	 * @param name
+	 * @param emailAddress
+	 * @param password
+	 */
+	public UserRegistrationRequest(String name, String emailAddress, String password) {
 		super();
+		this.name = name;
 		this.emailAddress = emailAddress;
 		this.password = password;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getEmailAddress() {

@@ -122,6 +122,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 
 	/**
 	 * Create a user.
+	 * @param name
 	 * @param emailAddress
 	 * @param password
 	 * @return
@@ -129,7 +130,9 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 * @throws EntityExistsException
 	 */
 	@Transactional
-	public User create(String emailAddress, String password) throws ValidationException, EntityExistsException {
+	public User create(String name, String emailAddress, String password) throws ValidationException, EntityExistsException {
+		if(name == null || emailAddress == null || password == null) throw new NullPointerException();
+		
 		final User user = new User();
 
 		String encPassword = null;
@@ -142,6 +145,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 
 		user.setEmailAddress(emailAddress);
 		user.setPassword(encPassword);
+		user.setName(name);
 
 		// set default expiry date to 1 day from now
 		final Calendar clndr = Calendar.getInstance();
@@ -154,6 +158,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 
 		// set the role as user by default
 		user.addAuthority(dao.load(Authority.class, AuthorityRoles.ROLE_ADMINISTRATOR.name()));
+		
+		validate(user);
 
 		dao.persist(user);
 

@@ -58,7 +58,7 @@ class FieldPanel extends AbstractFieldPanel<FlowPanel> {
 			fg.addField(password);
 
 			if(mode == Mode.REGISTER) {
-				TextField fname = FieldFactory.femail("userName", "name", "Name", "Your name", visibleFieldLen);
+				TextField fname = FieldFactory.ftext("userName", "name", "Name", "Your name", visibleFieldLen);
 				fname.setPropertyMetadata(userNameMetadata);
 				fg.addField(fname);
 				
