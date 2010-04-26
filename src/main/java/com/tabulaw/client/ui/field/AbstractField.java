@@ -8,7 +8,11 @@ import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -159,6 +163,21 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 		pnl.setStyleName(Styles.FIELD);
 
 		initWidget(pnl);
+	}
+
+	@Override
+	public final HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
+		return addDomHandler(handler, KeyDownEvent.getType());
+	}
+
+	@Override
+	public final HandlerRegistration addBlurHandler(BlurHandler handler) {
+		return addDomHandler(handler, BlurEvent.getType());
+	}
+
+	@Override
+	public final HandlerRegistration addFocusHandler(FocusHandler handler) {
+		return addDomHandler(handler, FocusEvent.getType());
 	}
 
 	@Override

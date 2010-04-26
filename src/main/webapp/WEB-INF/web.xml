@@ -93,7 +93,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>LoginServlet</servlet-name>
-		<url-pattern>/login</url-pattern>
+		<url-pattern>/poc/login</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -102,7 +102,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>LogoutServlet</servlet-name>
-		<url-pattern>/logout</url-pattern>
+		<url-pattern>/poc/logout</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

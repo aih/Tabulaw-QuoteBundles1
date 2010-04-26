@@ -18,7 +18,7 @@ public interface ListingNavBarImageBundle extends ClientBundle {
 	 * split
 	 * @return the image prototype
 	 */
-	@Source(value = "../../../public/images/../public/images/split.gif")
+	@Source(value = "../../../public/images/split.gif")
 	ImageResource split();
 
 	/**

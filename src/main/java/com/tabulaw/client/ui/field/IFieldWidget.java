@@ -6,6 +6,9 @@ package com.tabulaw.client.ui.field;
 
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.dom.client.HasBlurHandlers;
+import com.google.gwt.event.dom.client.HasFocusHandlers;
+import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.HasText;
@@ -22,7 +25,10 @@ import com.tabulaw.schema.PropertyMetadata;
  * @param <V> value type
  * @author jpk
  */
-public interface IFieldWidget<V> extends IField, IPropertyNameProvider, HasValue<V>, HasText, IHasHelpText, IValidator, ValueChangeHandler<V>, Focusable, BlurHandler, FocusHandler, IHasConverter<Object, V> {
+public interface IFieldWidget<V> extends IField, IPropertyNameProvider, HasValue<V>, 
+HasText, IHasHelpText, IValidator, ValueChangeHandler<V>, 
+Focusable, BlurHandler, FocusHandler, HasKeyDownHandlers,
+IHasConverter<Object, V>, HasFocusHandlers, HasBlurHandlers {
 
 	/**
 	 * Styles - (field.css)

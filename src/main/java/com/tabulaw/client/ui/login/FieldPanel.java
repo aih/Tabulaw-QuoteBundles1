@@ -47,22 +47,24 @@ class FieldPanel extends AbstractFieldPanel<FlowPanel> {
 		@Override
 		protected void populateFieldGroup(final FieldGroup fg) {
 
-			TextField email = FieldFactory.femail("userEmail", "emailAddress", "Email Address", "Your email address", 25);
+			int visibleFieldLen = 30;
+			
+			TextField email = FieldFactory.femail("userEmail", "emailAddress", "Email Address", "Your email address", visibleFieldLen);
 			email.setPropertyMetadata(userEmailMetadata);
 			fg.addField(email);
 
-			PasswordField password = FieldFactory.fpassword("userPswd", "password", "Password", "Specify a password", 12);
+			PasswordField password = FieldFactory.fpassword("userPswd", "password", "Password", "Specify a password", visibleFieldLen);
 			password.setPropertyMetadata(userPasswordMetadata);
 			fg.addField(password);
 
 			if(mode == Mode.REGISTER) {
-				TextField fname = FieldFactory.femail("userName", "name", "Name", "Your name", 25);
+				TextField fname = FieldFactory.femail("userName", "name", "Name", "Your name", visibleFieldLen);
 				fname.setPropertyMetadata(userNameMetadata);
 				fg.addField(fname);
 				
 				PasswordField passwordConfirm =
 						FieldFactory.fpassword("userPswdConfirm", "passwordConfirm", "Confirm Password", "Confirm your password",
-								12);
+								visibleFieldLen);
 				passwordConfirm.setPropertyMetadata(userPasswordMetadata);
 				fg.addField(passwordConfirm);
 

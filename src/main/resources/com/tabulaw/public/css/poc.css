@@ -5,6 +5,19 @@ body {
 	/*text-align: center;*/
 }
 
+body * {
+	color: #2F2F2F;
+}
+
+a, a:visited {
+	color: navy;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+}
+
 /* drag and drop overrides */
 .Gx8miifI {
 	border: 1px dashed #BFBFBF;
@@ -15,6 +28,23 @@ body {
 
 .msg {
 	font-family: Arial, Helvetica, sans-serif;
+}
+
+/* global message panel */
+.gmsg {
+	margin-bottom: 15px;
+}
+	.gmsg .heading {
+		display: none;
+	}
+	.gmsg li {
+		list-style-type: none;
+		margin-left: 10px;
+	}
+
+/* field label required indicator (asterisk) */
+.rqd {
+	color: red !important;
 }
 
 .gwt-PopupPanelGlass {
@@ -50,18 +80,15 @@ body {
 		float: right;
 	}
 
-.container {
+#container {
 	margin: 20px;
 	overflow: hidden;
 	
 	/*debug*/
 	/*border: 1px solid skyblue;*/
 }
-* html .container {
+* html #container {
 	margin: 0;
-}
-.container * {
-	color: #2F2F2F;
 }
 
 #contentwrapper {
@@ -190,13 +217,29 @@ body {
 /* login panel */
 .login {
 }
+	.login .heading {
+		font-size: 18px;
+		font-weight: bold;
+		margin-bottom: 20px;
+	}
+	.login .gmsg {
+		width: 500px;
+	}
 	.loginForm {
 	}
 	.login .userReg {
 	}
 	.login .opPanel {
+		margin-top: 10px;
+		margin-bottom: 20px;
 	}
-	
+		.login .opPanel a, .login .opPanel button {
+			margin-right: 10px;
+		}
+		.login .opPanel button {
+			font-weight: bold;
+		}
+
 /* navRow widget */
 .navRow {
 	/*width: 100%;*/
@@ -302,7 +345,6 @@ body {
 
 #footer {
 	clear: left;
-	text-align: center;
 	width: 100%;
 	margin-top: 10px;
 	

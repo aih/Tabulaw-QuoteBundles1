@@ -200,7 +200,7 @@ public class EntityFactory {
 		DocRef doc = (DocRef) create(EntityType.DOCUMENT);
 		doc.setTitle(docTitle);
 		doc.setDate(docDate);
-		doc.setHash(docHash);
+		if(docHash != null) doc.setHash(docHash);
 		return doc;
 	}
 

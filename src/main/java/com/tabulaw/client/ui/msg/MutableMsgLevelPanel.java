@@ -95,9 +95,14 @@ public class MutableMsgLevelPanel extends Composite {
 		public static final String CONTAINER = "container";
 
 		/**
-		 * Style applied to to widgets containing messages.
+		 * Style applied to to the heading div
 		 */
-		public static final String MSG = "msg";
+		public static final String HEADING = "heading";
+
+		/**
+		 * Style applied to to message list
+		 */
+		public static final String MLIST = "mlist";
 
 		/**
 		 * Style applied to the title of this panel.
@@ -141,10 +146,12 @@ public class MutableMsgLevelPanel extends Composite {
 		container.addStyleName(mlevel.getName().toLowerCase());
 		initWidget(container);
 
+		// heading
 		final Image img = Util.getMsgLevelImage(mlevel);
 		// NOTE: since this is a clipped image, the width/height should be known
-		final FlowPanel fp = new FlowPanel();
-		fp.add(new ImageContainer(img));
+		final FlowPanel heading = new FlowPanel();
+		heading.setStyleName(Styles.HEADING);
+		heading.add(new ImageContainer(img));
 		String title;
 		switch(mlevel) {
 			case ERROR:
@@ -162,10 +169,11 @@ public class MutableMsgLevelPanel extends Composite {
 				break;
 		}
 		final Label l = new Label(title);
-		l.setStyleName("bold");
 		l.addStyleName(Styles.TITLE);
-		fp.add(l);
-		container.add(fp);
+		heading.add(l);
+		container.add(heading);
+		
+		list.addStyleName(Styles.MLIST);
 		container.add(list);
 	}
 

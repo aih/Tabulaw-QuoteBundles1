@@ -35,7 +35,7 @@ public final class AuthenticationProcessingFilter implements Filter {
 
 	public static final String AUTH_EXCEPTION_KEY = AuthenticationProcessingFilter.class.getName();
 
-	private static final String filterProcessesUrl = "/login";
+	private static final String filterProcessesUrl = "/poc/login";
 
 	static class SecurityContext {
 
@@ -132,7 +132,7 @@ public final class AuthenticationProcessingFilter implements Filter {
 				context.setUser(authResult.principal);
 				session.setAttribute(UserContext.KEY, context);
 
-				finalUrl = httpRequest.getContextPath() + "/login";
+				finalUrl = /*httpRequest.getContextPath() +*/ filterProcessesUrl;
 			}
 			catch(Exception failed) {
 				// Authentication failed
@@ -141,7 +141,7 @@ public final class AuthenticationProcessingFilter implements Filter {
 				// put it in the session to get grabbed down the line
 				session.setAttribute(AUTH_EXCEPTION_KEY, failed);
 
-				finalUrl = httpRequest.getContextPath() + "/login?login_error=1";
+				finalUrl = /*httpRequest.getContextPath() +*/ filterProcessesUrl + "?login_error=1";
 			}
 
 			// http 302 client re-direct

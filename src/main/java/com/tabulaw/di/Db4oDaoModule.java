@@ -11,8 +11,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -142,21 +140,11 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 
 		// db40 db file URI
 		final String path = config == null ? DEFAULT_DB4O_FILENAME : config.getString(ConfigKeys.DB4O_FILENAME.getKey());
-		// if(path.indexOf('/') >= 0) thr
-		try {
-			// first attempt to load existing file
-			final URL url = Db4oDaoModule.class.getClassLoader().getResource(path);
-			URI uri = url == null ? null : url.toURI();
-			if(uri == null) {
-				// create in working dir
-				final File f = new File(path);
-				uri = f.toURI();
-			}
-			bind(URI.class).annotatedWith(Db4oFile.class).toInstance(uri);
-		}
-		catch(final URISyntaxException e) {
-			throw new IllegalStateException(e);
-		}
+		String cpRootPath = Db4oDaoModule.class.getClassLoader().getResource("").getPath();
+		String dbPath = cpRootPath + path;
+		final File f = new File(dbPath);
+		URI uri = f.toURI();
+		bind(URI.class).annotatedWith(Db4oFile.class).toInstance(uri);
 
 		// Configuration (db4o)
 		// NOTE: we need to always generate a fresh instance to avoid db4o exception

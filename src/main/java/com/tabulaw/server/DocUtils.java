@@ -32,6 +32,8 @@ public class DocUtils {
 
 	static final String jsScriptCallbackBlock, cssHighightStylesBlock;
 
+	static final String docDirPath;
+
 	static {
 		htmlPrefixBlock =
 				"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">"
@@ -45,13 +47,15 @@ public class DocUtils {
 						+ "</script>";
 
 		cssHighightStylesBlock = "<style type=\"text/css\">.highlight{background-color:yellow;}</style>";
+
+		docDirPath = DocUtils.class.getClassLoader().getResource("").getPath() + "docs" + File.separator;
 	}
 
 	/**
 	 * @return ref to the directory containing all cached docs on disk.
 	 */
 	public static File getDocDirRef() {
-		File f = new File("docs");
+		File f = new File(docDirPath);
 		return f;
 	}
 
@@ -62,15 +66,8 @@ public class DocUtils {
 	 * @throws IllegalArgumentException when the op fails
 	 */
 	public static File getDocRef(String docId) throws IllegalArgumentException {
-		File f = new File("docs/" + docId);
+		File f = new File(docDirPath + docId);
 		return f;
-		/*
-		try {
-		}
-		catch(URISyntaxException e) {
-			throw new IllegalStateException("Unable to get doc ref: " + e.getMessage(), e);
-		}
-		*/
 	}
 
 	public static String dateAsString(Date date) {

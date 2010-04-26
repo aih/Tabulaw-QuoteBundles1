@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -169,7 +170,7 @@ public class NavRowPanel extends AbstractNavPanel {
 
 			frmLogout = new FormPanel();
 			frmLogout.setMethod(FormPanel.METHOD_POST);
-			frmLogout.setAction("/logout");
+			frmLogout.setAction(GWT.getModuleBaseURL() + "logout");
 
 			pnl.add(hiddenCurrentBundleId);
 			pnl.add(welcomeText);

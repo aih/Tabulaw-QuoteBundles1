@@ -6,23 +6,31 @@ package com.tabulaw.client.ui.login;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
+import com.tabulaw.IDescriptorProvider;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.data.rpc.IHasRpcHandlers;
 import com.tabulaw.client.data.rpc.IRpcHandler;
 import com.tabulaw.client.data.rpc.RpcEvent;
+import com.tabulaw.client.ui.FocusCommand;
 import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.ui.SimpleHyperLink;
 import com.tabulaw.client.ui.field.FieldGroup;
@@ -35,12 +43,14 @@ import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.rpc.UserRegistrationRequest;
 import com.tabulaw.common.msg.Msg;
 import com.tabulaw.common.msg.Msg.MsgLevel;
+import com.tabulaw.util.StringUtil;
 
 /**
  * Houses user login panel and registration panels.
  * @author jpk
  */
-public class LoginTopPanel extends Composite implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<LoginTopPanel.Mode> {
+public class LoginTopPanel extends Composite 
+implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<LoginTopPanel.Mode> {
 
 	static class Styles {
 
@@ -48,6 +58,10 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 		 * The top-most panel.
 		 */
 		public static final String LOGIN = "login";
+		/**
+		 * The heading label for each mode.
+		 */
+		public static final String HEADING = "heading";
 		/**
 		 * Table containing username/password fields.
 		 */
@@ -62,19 +76,25 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 		public static final String OP_PANEL = "opPanel";
 	}
 
-	static enum Mode {
+	static enum Mode implements IDescriptorProvider {
 		LOGIN,
 		FORGOT_PASSWORD,
 		REGISTER;
+
+		@Override
+		public String descriptor() {
+			return StringUtil.enumStyleToPresentation(name());
+		}
 	}
 
 	/**
 	 * The current mode.
 	 */
-	Mode mode = Mode.LOGIN;
+	Mode mode;
 
 	final FlowPanel topPanel, opRowPanel;
 
+	final Label heading;
 	final GlobalMsgPanel msgPanel;
 	final FormPanel form;
 
@@ -91,19 +111,22 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 	 */
 	public LoginTopPanel() {
 		super();
-
+		
+		heading = new Label(Mode.LOGIN.descriptor());
+		heading.setStyleName(Styles.HEADING);
+		
 		// grab the sole global msg panel for use by this panal for the duration of
 		// user login
 		msgPanel = Poc.unparkGlobalMsgPanel();
 
-		errorHandler = ErrorHandlerBuilder.build(true, true, msgPanel);
+		errorHandler = ErrorHandlerBuilder.build(true, false, msgPanel);
 
 		loginFieldPanel = new FieldPanel(Mode.LOGIN);
 		loginFieldPanel.setErrorHandler(errorHandler);
-
+		
 		form = new FormPanel();
 		form.setStyleName(Styles.LOGIN_FORM);
-		form.setAction("/login");
+		form.setAction(GWT.getModuleBaseURL() + "login");
 		form.setMethod(FormPanel.METHOD_POST);
 
 		btnSubmit = new Button("Login", new ClickHandler() {
@@ -242,11 +265,15 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 
 		topPanel = new FlowPanel();
 		topPanel.addStyleName(Styles.LOGIN);
+		topPanel.add(heading);
 		topPanel.add(msgPanel);
 		topPanel.add(form);
 		topPanel.add(opRowPanel);
 
 		initWidget(topPanel);
+		
+		// initial mode
+		switchMode(Mode.LOGIN);
 
 		addRpcHandler(new RpcUiHandler(this));
 	}
@@ -265,26 +292,44 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 	public HandlerRegistration addRpcHandler(IRpcHandler handler) {
 		return addHandler(handler, RpcEvent.TYPE);
 	}
+	
+	private HandlerRegistration hrLoginPswdFieldKeyDown;
 
 	private void switchMode(Mode newMode) {
 		if(mode == newMode) return;
 		switch(newMode) {
+			case LOGIN: {
+				msgPanel.clear();
+				IFieldWidget<?> fpswd = loginFieldPanel.getFieldGroup().getFieldWidget("userPswd");
+				fpswd.setVisible(true);
+				lnkTgl.setTitle("Forgot Password");
+				lnkTgl.setText("Forgot Password");
+				btnSubmit.setText("Login");
+				
+				// trap keydown event when in password field to auto-submit login form
+				assert hrLoginPswdFieldKeyDown == null;
+				hrLoginPswdFieldKeyDown = fpswd.addKeyDownHandler(new KeyDownHandler() {
+					
+					@Override
+					public void onKeyDown(KeyDownEvent event) {
+						if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+							btnSubmit.click();
+						}
+					}
+				});
+				
+				DeferredCommand.addCommand(new FocusCommand(loginFieldPanel.getFieldGroup().getFieldWidget("userEmail"), true));
+				break;
+			}
 			case FORGOT_PASSWORD: {
 				Msg imsg =
-						new Msg("Please specify your email address and your password will be emailed to you.", MsgLevel.INFO);
+						new Msg("Specify your email address and your password will be emailed to you.", MsgLevel.INFO);
 				msgPanel.add(imsg, null);
 				loginFieldPanel.getFieldGroup().getFieldWidget("userPswd").setVisible(false);
 				lnkTgl.setTitle("Back to Login");
 				lnkTgl.setText("Back to Login");
 				btnSubmit.setText("Email Password");
-				break;
-			}
-			case LOGIN: {
-				msgPanel.clear();
-				loginFieldPanel.getFieldGroup().getFieldWidget("userPswd").setVisible(true);
-				lnkTgl.setTitle("Forgot Password");
-				lnkTgl.setText("Forgot Password");
-				btnSubmit.setText("Login");
+				DeferredCommand.addCommand(new FocusCommand(loginFieldPanel.getFieldGroup().getFieldWidget("userEmail"), true));
 				break;
 			}
 			case REGISTER: {
@@ -298,9 +343,12 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 				btnSubmit.setText("Register");
 				lnkTgl.setText("Cancel");
 				loginFieldPanel.getFieldGroup().clearValue();
+				DeferredCommand.addCommand(new FocusCommand(registerFieldPanel.getFieldGroup().getFieldWidget("userName"), true));
 				break;
 			}
 		}
+		
+		heading.setText(newMode.descriptor());
 
 		boolean isRegister = (newMode == Mode.REGISTER);
 		form.setVisible(!isRegister);
@@ -308,6 +356,11 @@ public class LoginTopPanel extends Composite implements IHasUserSessionHandlers,
 		if(registerFieldPanel != null) {
 			registerFieldPanel.setVisible(isRegister);
 			if(!isRegister) registerFieldPanel.getFieldGroup().clearValue();
+		}
+		
+		if(newMode != Mode.LOGIN && hrLoginPswdFieldKeyDown != null) {
+			hrLoginPswdFieldKeyDown.removeHandler();
+			hrLoginPswdFieldKeyDown = null;
 		}
 
 		mode = newMode;
