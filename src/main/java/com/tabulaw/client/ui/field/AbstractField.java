@@ -512,13 +512,22 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 	protected abstract String doGetText();
 
 	@Override
-	public final String getText() {
+	public String getText() {
 		String sval = doGetText();
 		sval = StringUtil.isEmpty(sval) ? dfltReadOnlyEmptyValue : sval;
 		return sval;
 	}
+	
+	public final HTML getReadOnlyWidget() {
+		if(rof == null) rof = new HTML();
+		return rof;
+	}
+	
+	protected void setReadOnlyContent() {
+		rof.setText(getText());
+	}
 
-	private void draw() {
+	protected void draw() {
 
 		Widget formWidget;
 
@@ -540,15 +549,14 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 
 		if(readOnly) {
 			if(pnl.getWidgetCount() != 2) {
-				assert rof == null;
-				rof = new HTML();
-				pnl.add(rof);
+				//assert rof == null;
+				pnl.add(getReadOnlyWidget());
 			}
 			assert rof != null;
 			// set help text
 			rof.setTitle(helpText);
 
-			rof.setText(getText());
+			setReadOnlyContent();
 		}
 		if(fldLbl != null) fldLbl.setFor(readOnly ? "" : domId);
 

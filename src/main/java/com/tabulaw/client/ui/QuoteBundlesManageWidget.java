@@ -20,11 +20,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
-import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.QuoteBundleListingWidget.BOption;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
@@ -52,22 +50,6 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	} // Styles
 
 	static final int NUM_COLUMNS = 3;
-
-	class BundleOptionDragHandler extends LoggingDragHandler {
-
-		public BundleOptionDragHandler() {
-			super("Quote Bundle Option");
-		}
-
-		@Override
-		public void onDragEnd(DragEndEvent event) {
-			super.onDragEnd(event);
-
-			// convert the draggable to a QuoteBundleWidget
-			DragContext context = event.getContext();
-			pinQuoteBundle((BOption) context.draggable);
-		}
-	} // BundleOptionDragHandler
 
 	class QuoteBundleDragHandler extends LoggingDragHandler {
 
@@ -153,11 +135,6 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 */
 	private final HorizontalPanel columns = new HorizontalPanel();
 
-	// bundle option (nav col) dragging (nav col to main view area)
-	private final PickupDragController bundleOptionController;
-	private final BundleOptionDragHandler bundleOptionHandler;
-	private final HorizontalPanelDropController bundleOptionDropController;
-
 	// quote bundle widget dragging (main viewing area to nav col)
 	private final PickupDragController quoteBundleController;
 	private final QuoteBundleDragHandler quoteBundleHandler;
@@ -181,14 +158,6 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		initWidget(boundaryPanel);
 
 		qbListingWidget = new QuoteBundleListingWidget();
-
-		// init bundle option dragging
-		bundleOptionController = new PickupDragController(RootPanel.get(), false);
-		bundleOptionController.setBehaviorMultipleSelection(false);
-		bundleOptionHandler = new BundleOptionDragHandler();
-		bundleOptionController.addDragHandler(bundleOptionHandler);
-		bundleOptionDropController = new HorizontalPanelDropController(columns);
-		bundleOptionController.registerDropController(bundleOptionDropController);
 
 		// initialize quote bundle dragging
 		quoteBundleController = new PickupDragController(boundaryPanel, false);
@@ -288,10 +257,12 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	}
 
 	private void clearBundleOptions() {
+		/*
 		BOption[] currentOptions = qbListingWidget.getOptionsPanel().getOptions();
 		for(BOption option : currentOptions) {
 			bundleOptionController.makeNotDraggable(option);
 		}
+		*/
 		qbListingWidget.getOptionsPanel().clearOptions();
 	}
 
@@ -314,9 +285,26 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 */
 	private BOption addQuoteBundleOption(QuoteBundle mQuoteBundle) {
 		BOption option = new BOption(mQuoteBundle.getId(), mQuoteBundle.getName());
+		option.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				pinQuoteBundle((BOption) event.getSource());
+			}
+		});
 		qbListingWidget.getOptionsPanel().addOption(option);
-		bundleOptionController.makeDraggable(option);
+		//bundleOptionController.makeDraggable(option);
 		return option;
+	}
+	
+	private BOption removeQuoteBundleOption(QuoteBundle qb) {
+		for(BOption option : qbListingWidget.getOptionsPanel().getOptions()) {
+			if(option.bundleId.equals(qb.getId())) {
+				qbListingWidget.getOptionsPanel().removeOption(option);
+				return option;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -355,7 +343,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		columns.insert(qbw, index);
 
 		// make quote bundle widget draggable to bundle options
-		quoteBundleController.makeDraggable(qbw, qbw.header.getHtmlHeader());
+		quoteBundleController.makeDraggable(qbw, qbw.header.getDraggable());
 
 		// initialize a quote drop controller for this quote bundle widget
 		VerticalPanelDropController quoteDropController = new VerticalPanelDropController(qbw.quotePanel);
@@ -371,7 +359,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		}
 	}
 
-	private void removeQuoteBundleColumn(QuoteBundle mQuoteBundle) {
+	private boolean removeQuoteBundleColumn(QuoteBundle mQuoteBundle) {
 		// identify the quote bundle widget
 		String rmId = mQuoteBundle.getId();
 		for(int i = 0; i < columns.getWidgetCount(); i++) {
@@ -381,9 +369,10 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 				quoteController.unregisterDropController(quoteDropController);
 				// TODO makeNotDraggable the child quotes too ???
 				columns.remove(qbw);
-				return;
+				return true;
 			}
 		}
+		return false;
 	}
 
 	@Override
@@ -393,19 +382,25 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		EntityType et = EntityType.fromString(m.getEntityType());
 		if(et == EntityType.QUOTE_BUNDLE) {
 			QuoteBundle qb = (QuoteBundle) m;
-			if(event.getChangeOp() == ModelChangeOp.UPDATED) {
-				String id = m.getId();
-				// look for the quote bundle in the pinned quote bundle widgets
-				for(int i = 0; i < columns.getWidgetCount(); i++) {
-					QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) columns.getWidget(i);
-					QuoteBundle qbm = qbw.getModel();
-					if(qbm.getId().equals(id)) {
-						qbw.sync(qb);
+			switch(event.getChangeOp()) {
+				case UPDATED: {
+					String id = m.getId();
+					// look for the quote bundle in the pinned quote bundle widgets
+					for(int i = 0; i < columns.getWidgetCount(); i++) {
+						QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) columns.getWidget(i);
+						QuoteBundle qbm = qbw.getModel();
+						if(qbm.getId().equals(id)) {
+							qbw.sync(qb);
+						}
 					}
+					break;
 				}
-			}
-			if(event.getChangeOp() == ModelChangeOp.ADDED) {
-				insertQuoteBundleColumn(qb, 0);
+				case ADDED:
+					insertQuoteBundleColumn(qb, 0);
+					break;
+				case DELETED:
+					if(removeQuoteBundleOption(qb) == null) removeQuoteBundleColumn(qb);
+					break;
 			}
 		}
 	}

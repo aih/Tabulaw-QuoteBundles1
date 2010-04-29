@@ -6,7 +6,7 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * Br - HTML p tag in widget form.
+ * HTML p tag in widget form.
  * @author jpk
  */
 public class P extends Widget implements HasHTML, HasText {

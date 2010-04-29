@@ -56,8 +56,8 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
-	 * Generates assignable surrogate primary keys for quotes guaranteed to
-	 * be unique throughout the life of the datastore.
+	 * Generates assignable surrogate primary keys for quotes guaranteed to be
+	 * unique throughout the life of the datastore.
 	 * @param numIds the number of ids to generate
 	 * @return list of generated ids
 	 */
@@ -97,6 +97,34 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
+	 * Updates the non-relational bundle properties in the given bundle. The
+	 * bundle must already exist.
+	 * @param userId
+	 * @param bundle ref to an existing bundle whose properties are persisted to
+	 *        that held in the datastore.
+	 * @throws IllegalArgumentException When the given bundle is not new
+	 * @throws ConstraintViolationException When the bundle's properties don't
+	 *         validate
+	 * @throws EntityNotFoundException When the quote bundle isn't found in the
+	 *         datastore
+	 */
+	@Transactional
+	public void updateBundlePropsForUser(String userId, QuoteBundle bundle) throws IllegalArgumentException,
+			ConstraintViolationException, EntityNotFoundException {
+
+		if(userId == null || bundle == null) throw new NullPointerException();
+
+		validate(bundle);
+
+		if(bundle.isNew()) throw new IllegalArgumentException();
+		
+		QuoteBundle existingQb = dao.load(QuoteBundle.class, bundle.getId());
+		existingQb.setName(bundle.getName());
+		existingQb.setDescription(bundle.getDescription());
+		dao.persist(existingQb);
+	}
+
+	/**
 	 * Saves the quote bundle for the given user as well as any referenced quotes
 	 * doing a full replacement of the bundle with that given as well as the child
 	 * quotes.
@@ -106,8 +134,7 @@ public class UserDataService extends AbstractEntityService {
 	 * @throws ConstraintViolationException When the given bundle isn't valid
 	 */
 	@Transactional
-	public QuoteBundle saveBundleForUser(String userId, QuoteBundle bundle) 
-	throws ConstraintViolationException {
+	public QuoteBundle saveBundleForUser(String userId, QuoteBundle bundle) throws ConstraintViolationException {
 		if(userId == null) throw new NullPointerException();
 
 		validate(bundle);
@@ -185,8 +212,7 @@ public class UserDataService extends AbstractEntityService {
 	 * @throws ConstraintViolationException When the givne bundle isn't valid
 	 */
 	@Transactional
-	public QuoteBundle addBundleForUser(String userId, QuoteBundle bundle) 
-	throws ConstraintViolationException {
+	public QuoteBundle addBundleForUser(String userId, QuoteBundle bundle) throws ConstraintViolationException {
 		if(!bundle.isNew()) throw new IllegalArgumentException("Bundle already added.");
 		validate(bundle);
 		QuoteBundle persistedBundle = dao.persist(bundle);
@@ -196,17 +222,29 @@ public class UserDataService extends AbstractEntityService {
 
 	/**
 	 * Deletes a quote bundle and its association to the given user.
-	 * <p>
-	 * <b>WARNING:</b> any referenced quotes under the bundle will be orphaned if
-	 * they do not belong to any other bundles!
 	 * @param userId
 	 * @param bundleId
+	 * @param deleteQuotes delete contained quotes as well? if <code>false</code>,
+	 *        any contained quotes may end up in an orphaned state meaning they
+	 *        will not be referenced by any existing bundle
 	 * @throws EntityNotFoundException When either the user or bundle can't be
 	 *         resolved
 	 */
 	@Transactional
-	public void deleteBundleForUser(String userId, String bundleId) throws EntityNotFoundException {
-		dao.purge(QuoteBundle.class, bundleId);
+	public void deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes) throws EntityNotFoundException {
+		if(deleteQuotes) {
+			QuoteBundle bundle = dao.load(QuoteBundle.class, bundleId);
+			List<Quote> quotes = bundle.getQuotes();
+			if(quotes != null) {
+				for(Quote q : quotes) {
+					dao.purge(q);
+				}
+			}
+			dao.purge(bundle);
+		}
+		else {
+			dao.purge(QuoteBundle.class, bundleId);
+		}
 		removeBundleUserBinding(bundleId, userId);
 	}
 
@@ -216,11 +254,12 @@ public class UserDataService extends AbstractEntityService {
 	 * @param quote
 	 * @return the persisted quote
 	 * @throws ConstraintViolationException When the quote doesn't validate
-	 * @throws EntityNotFoundException When the bundle can't be found from the given id
+	 * @throws EntityNotFoundException When the bundle can't be found from the
+	 *         given id
 	 */
 	@Transactional
-	public Quote addQuoteToBundle(String bundleId, Quote quote) 
-	throws ConstraintViolationException, EntityNotFoundException {
+	public Quote addQuoteToBundle(String bundleId, Quote quote) throws ConstraintViolationException,
+			EntityNotFoundException {
 		if(!quote.isNew()) throw new IllegalArgumentException("Quote isn't new");
 		validate(quote);
 		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);

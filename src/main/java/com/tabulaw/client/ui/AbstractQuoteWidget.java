@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.Resources;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
@@ -22,7 +23,7 @@ import com.tabulaw.common.model.Quote;
  * Base class for widgets displaying quotes.
  * @author jpk
  */
-public abstract class AbstractQuoteWidget extends Composite implements ClickHandler {
+public abstract class AbstractQuoteWidget extends Composite {
 
 	static class Styles {
 
@@ -137,13 +138,39 @@ public abstract class AbstractQuoteWidget extends Composite implements ClickHand
 		panel.add(header);
 		panel.add(quoteBlock);
 
+		ImageContainer ic;
+
+		/*
+		// add delete icon
+		ic = new ImageContainer(new Image(Resources.INSTANCE.delete()));
+		ic.setTitle("Permanantly delete quote");
+		//ic.addStyleName(Styles.X);
+		ic.getImage().addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(Window.confirm("Remove " + getModel().descriptor() + " from this Quote Bundle?")) {
+					AbstractQuoteWidget.this.parentQuoteBundleWidget.removeQuote(quote, true, true);
+				}
+			}
+		});
+		header.add(ic);
+		*/
+
 		// add X icon
-		Image img = new Image("images/x-button.png", 0, 0, 15, 15);
-		ImageContainer x = new ImageContainer(img);
-		x.setTitle(getXTitle());
-		x.addStyleName(Styles.X);
-		x.getImage().addClickHandler(this);
-		header.add(x);
+		ic = new ImageContainer(new Image(Resources.INSTANCE.XButton()));
+		ic.setTitle(getXTitle());
+		ic.addStyleName(Styles.X);
+		ic.getImage().addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(allowXClick()) {
+					handleXClick();
+				}
+			}
+		});
+		header.add(ic);
 		
 		initWidget(panel);
 	}
@@ -205,11 +232,4 @@ public abstract class AbstractQuoteWidget extends Composite implements ClickHand
 	 * Handles the X click action.
 	 */
 	protected abstract void handleXClick();
-
-	@Override
-	public final void onClick(ClickEvent event) {
-		if(allowXClick()) {
-			handleXClick();
-		}
-	}
 }

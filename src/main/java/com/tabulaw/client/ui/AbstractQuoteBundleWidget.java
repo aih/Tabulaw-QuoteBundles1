@@ -4,12 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.convert.IConverter;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.ui.edit.EditableTextWidget;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
@@ -31,8 +36,6 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 
 		public static final String HEADER = "qbheader";
 
-		public static final String HEADER_TEXT = "headertext";
-
 		public static final String ECHO = "echo";
 
 		public static final String NAME = "name";
@@ -41,6 +44,24 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 
 		public static final String QUOTES = "quotes";
 	} // Styles
+	
+	static final IConverter<String, String> headerDescTextExtractor = new IConverter<String, String>() {
+		
+		@Override
+		public String convert(String in) throws IllegalArgumentException {
+			int index = in.indexOf("</span>");
+			if(index == -1) index = in.indexOf("</SPAN>");
+			return in.substring(index + 7);
+		}
+	};
+
+	static final IConverter<String, String> headerDescInnerHtmlSetter = new IConverter<String, String>() {
+		
+		@Override
+		public String convert(String in) throws IllegalArgumentException {
+			return "<span class=\"" + Styles.ECHO + "\">DESCRIPTION: </span>" + (in == null ? "" : in);
+		}
+	};
 
 	/**
 	 * Extensible quote bundle header widget.
@@ -50,7 +71,8 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 
 		protected final FlowPanel header = new FlowPanel();
 
-		protected final HTML htmlHeader;
+		protected final Label lblQb;
+		protected final EditableTextWidget pName, pDesc;
 
 		protected QuoteBundle mQuoteBundle;
 
@@ -60,11 +82,33 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		public Header() {
 			initWidget(header);
 
-			htmlHeader = new HTML();
-			htmlHeader.setStyleName(Styles.HEADER_TEXT);
+			lblQb = new Label("Quote Bundle");
+			lblQb.setStyleName(Styles.ECHO);
+
+			pName = new EditableTextWidget();
+			pName.addStyleName(Styles.NAME);
+			pName.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<String> event) {
+					mQuoteBundle.setName(event.getValue());
+				}
+			});
+
+			pDesc = new EditableTextWidget(headerDescTextExtractor, headerDescInnerHtmlSetter);
+			pDesc.addStyleName(Styles.DESC);
+			pDesc.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<String> event) {
+					mQuoteBundle.setDescription(event.getValue());
+				}
+			});
 
 			header.setStyleName(Styles.HEADER);
-			header.add(htmlHeader);
+			header.add(lblQb);
+			header.add(pName);
+			header.add(pDesc);
 		}
 
 		/**
@@ -74,20 +118,13 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		public void setModel(QuoteBundle mQuoteBundle) {
 			String name = mQuoteBundle.getName();
 			String desc = mQuoteBundle.getDescription();
-			String h1 = "<p class=\"" + Styles.ECHO + "\">Quote Bundle</p>";
-			String h2 = "<p class=\"" + Styles.NAME + "\">" + (name == null ? "" : name) + "</p>";
-			String h3 =
-					"<p class=\"" + Styles.DESC + "\"><span class=\"" + Styles.ECHO + "\">DESCRIPTION: </span>"
-							+ (desc == null ? "" : desc) + "</p>";
-			htmlHeader.setHTML(h1 + h2 + h3);
+			pName.setText(name == null ? "" : name);
+			pDesc.setHTML(headerDescInnerHtmlSetter.convert(desc));
 			this.mQuoteBundle = mQuoteBundle;
 		}
 
-		/**
-		 * @return The draggable {@link HTML} widget.
-		 */
-		public final HTML getHtmlHeader() {
-			return htmlHeader;
+		public final Widget getDraggable() {
+			return lblQb;
 		}
 
 	} // Header
@@ -227,7 +264,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 						ClientModelCache.get().remove(EntityType.QUOTE, mQuote.getId(), AbstractQuoteBundleWidget.this);
 					}
 					ClientModelCache.get().persist(mQuoteBundle, AbstractQuoteBundleWidget.this);
-					
+
 					// server side persist
 					ClientModelCache.get().removeQuoteFromBundle(mQuoteBundle.getId(), mQuote.getId(), deleteQuote);
 				}
@@ -319,7 +356,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		// wrap in new lists to avoid concurrent mod exception!
 		List<Quote> existingQuotes = new ArrayList<Quote>(mQuoteBundle.getQuotes());
 		List<Quote> changedQuotes = new ArrayList<Quote>(mQuoteBundleToSyncTo.getQuotes());
-		
+
 		// IMPT: remove quotes first so highlighting works against a *clean* dom!
 		for(Quote mexisting : existingQuotes) {
 			if(!changedQuotes.contains(mexisting)) {
@@ -327,7 +364,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 				removeQuote(mexisting, false, false);
 			}
 		}
-		
+
 		for(Quote mchanged : changedQuotes) {
 			if(!existingQuotes.contains(mchanged)) {
 				// quote to add

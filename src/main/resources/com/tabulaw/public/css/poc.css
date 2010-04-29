@@ -107,13 +107,11 @@ a:active {
 	.navButton .text {
 	}
 	.navButton-bundles {
-		/*background: url(/images/quote-bundle-icon.png) left no-repeat transparent;*/
 	}
 	.navButton-docs {
-		/*background: url(/images/document-icon.png) left  no-repeat transparent;*/
 	}
 	.navButton-doc {
-		background: url(/images/document-icon.png) left no-repeat transparent;
+		background: url(../images/document-icon.png) left no-repeat transparent;
 		width: 60px;
 		font-size: 11px;
 		font-weight: normal;
@@ -127,7 +125,6 @@ a:active {
 		float: right;
 	}
 	.navButton-plus {
-		/*background: url(/images/plus-button.png) right no-repeat transparent;*/
 		text-align: center;
 	}
 
@@ -185,7 +182,7 @@ a:active {
 	#navCol #qbListing .option {
 		border-bottom: 1px solid #BFBFBF;
 		padding-left: 10px;
-		background: url(/images/quote-bundle-icon.png) no-repeat left;
+		background: url(../images/quote-bundle-icon.png) no-repeat left;
 		overflow: hidden;
 	}
 	#navCol #qbListing .option span {
@@ -385,7 +382,10 @@ a:active {
 			margin-left: 15px;
 			cursor: pointer;
 		} 
-	.wqbundle .quotes {
+		.wqbundle .buttons .save {
+			display:none;
+		} 
+.wqbundle .quotes {
 		/*height: 100%;*/
 		width: 100%;
 	}

@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Poc;
+import com.tabulaw.client.Resources;
 import com.tabulaw.client.data.rpc.RpcCommand;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -119,7 +120,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 					table.setText(rowIndex, cellIndex, sdate);
 					break;
 				case 2: {
-					Image img = new Image("images/trash.gif", 0, 0, 10, 11);
+					Image img = new Image(Resources.INSTANCE.delete());
 					img.setTitle("Delete document..");
 					img.addClickHandler(new ClickHandler() {
 

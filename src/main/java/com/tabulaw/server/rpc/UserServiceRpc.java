@@ -264,7 +264,7 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 	}
 
 	@Override
-	public Payload deleteBundleForUser(String userId, String bundleId) {
+	public Payload deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
@@ -272,7 +272,7 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 		Payload payload = new Payload(status);
 
 		try {
-			userDataService.deleteBundleForUser(userId, bundleId);
+			userDataService.deleteBundleForUser(userId, bundleId, deleteQuotes);
 			status.addMsg("Bundle deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
@@ -329,6 +329,36 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 			qb = userDataService.saveBundleForUser(userId, qb);
 			payload.setModel(qb);
 			status.addMsg("Bundle saved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityExistsException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final ConstraintViolationException ise) {
+			PersistHelper.handleValidationException(context, ise, payload);
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload updateBundlePropsForUser(String userId, QuoteBundle bundle) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		try {
+			userDataService.updateBundlePropsForUser(userId, bundle);
+			status.addMsg("Quote Bundle properties saved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityExistsException e) {
 			RpcServlet.exceptionToStatus(e, payload.getStatus());

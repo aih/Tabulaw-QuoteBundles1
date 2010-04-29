@@ -17,7 +17,7 @@ import com.tabulaw.client.validate.StringLengthValidator;
  * TextField
  * @author jpk
  */
-public final class TextField extends AbstractField<String> implements IHasMaxLength, IHasFormat {
+public class TextField extends AbstractField<String> implements IHasMaxLength, IHasFormat {
 
 	/**
 	 * Impl
@@ -52,7 +52,7 @@ public final class TextField extends AbstractField<String> implements IHasMaxLen
 	 * @param helpText
 	 * @param visibleLength
 	 */
-	TextField(String name, String propName, String labelText, String helpText, int visibleLength) {
+	public TextField(String name, String propName, String labelText, String helpText, int visibleLength) {
 		super(name, propName, labelText, helpText);
 		tb = new Impl(name);
 		setVisibleLen(visibleLength);

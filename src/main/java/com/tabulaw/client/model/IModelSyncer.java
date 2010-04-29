@@ -20,10 +20,12 @@ import com.tabulaw.common.model.QuoteBundle;
 public interface IModelSyncer {
 
 	void saveBundle(QuoteBundle bundle);
+	
+	void updateBundleProps(QuoteBundle bundle);
 
 	void addBundle(QuoteBundle bundle);
 
-	void deleteBundle(String bundleId);
+	void deleteBundle(String bundleId, boolean deleteQuotes);
 
 	void addQuoteToBundle(String bundleId, Quote quote);
 

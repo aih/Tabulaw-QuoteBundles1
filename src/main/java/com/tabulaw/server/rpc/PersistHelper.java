@@ -8,7 +8,7 @@ package com.tabulaw.server.rpc;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import com.tabulaw.common.data.ModelPayload;
+import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
@@ -46,7 +46,7 @@ public class PersistHelper {
 
 	@SuppressWarnings("unchecked")
 	public static void handleValidationException(PersistContext context, ConstraintViolationException cve,
-			ModelPayload payload) {
+			Payload payload) {
 		// final Class<? extends IEntity> entityClass =
 		// (Class<? extends IEntity>)
 		// context.getEntityTypeResolver().resolveEntityClass(model.getEntityType());

@@ -20,6 +20,22 @@ public interface Resources extends ClientBundle {
 	@Source("../public/images/note-icon.png")
 	ImageResource searchImage();
 
+	// TODO point to a real save icon
+	@Source("../public/images/pencil.gif")
+	ImageResource save();
+	
 	@Source("../public/images/pencil.gif")
 	ImageResource pencil();
+	
+	@Source("../public/images/delete.gif")
+	ImageResource delete();
+
+	@Source("../public/images/x-button.png")
+	ImageResource XButton();
+
+	@Source("../public/images/document-icon.png")
+	ImageResource documentIcon();
+
+	@Source("../public/images/quote-bundle-icon.png")
+	ImageResource quoteBundleIcon();
 }

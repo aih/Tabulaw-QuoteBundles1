@@ -6,13 +6,10 @@ package com.tabulaw.client.ui.field;
 
 import java.util.Date;
 
-import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.MouseOutHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.datepicker.client.DateBox;
@@ -48,23 +45,28 @@ public class DateField extends AbstractField<Date> implements IHasFormat {
 		}
 
 		@Override
+		public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
+			return getTextBox().addKeyDownHandler(handler);
+		}
+
+		@Override
 		public HandlerRegistration addBlurHandler(BlurHandler handler) {
-			return addDomHandler(handler, BlurEvent.getType());
+			return getTextBox().addBlurHandler(handler);
 		}
 
 		@Override
 		public HandlerRegistration addMouseOverHandler(MouseOverHandler handler) {
-			return addDomHandler(handler, MouseOverEvent.getType());
+			return getTextBox().addMouseOverHandler(handler);
 		}
 
 		@Override
 		public HandlerRegistration addMouseOutHandler(MouseOutHandler handler) {
-			return addDomHandler(handler, MouseOutEvent.getType());
+			return getTextBox().addMouseOutHandler(handler);
 		}
 
 		@Override
 		public HandlerRegistration addFocusHandler(FocusHandler handler) {
-			return addDomHandler(handler, FocusEvent.getType());
+			return getTextBox().addFocusHandler(handler);
 		}
 	}
 

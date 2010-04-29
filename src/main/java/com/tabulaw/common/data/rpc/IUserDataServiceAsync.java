@@ -22,10 +22,12 @@ public interface IUserDataServiceAsync {
 	void fetchIdBatch(AsyncCallback<IdsPayload> callback);
 	
 	void saveBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload> callback);
+	
+	void updateBundlePropsForUser(String userId, QuoteBundle bundle, AsyncCallback<Payload> callback);
 
 	void addBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload> callback);
 
-	void deleteBundleForUser(String userId, String bundleId, AsyncCallback<Payload> callback);
+	void deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes, AsyncCallback<Payload> callback);
 
 	void addQuoteToBundle(String bundleId, Quote quote, AsyncCallback<ModelPayload> callback);
 

@@ -147,6 +147,24 @@ public class ClientModelCache implements IModelSyncer {
 	}
 
 	@Override
+	public void updateBundleProps(QuoteBundle bundle) {
+		if(!doServerPersist) return;
+		String userId = getUser().getId();
+		userDataService.updateBundlePropsForUser(userId, bundle, new AsyncCallback<Payload>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				handleXhrPersistError(caught);
+			}
+
+			@Override
+			public void onSuccess(Payload result) {
+				handlePersistResponse(result);
+			}
+		});
+	}
+
+	@Override
 	public void addBundle(QuoteBundle bundle) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
@@ -165,10 +183,10 @@ public class ClientModelCache implements IModelSyncer {
 	}
 
 	@Override
-	public void deleteBundle(String bundleId) {
+	public void deleteBundle(String bundleId, boolean deleteQuotes) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
-		userDataService.deleteBundleForUser(userId, bundleId, new AsyncCallback<Payload>() {
+		userDataService.deleteBundleForUser(userId, bundleId, deleteQuotes, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

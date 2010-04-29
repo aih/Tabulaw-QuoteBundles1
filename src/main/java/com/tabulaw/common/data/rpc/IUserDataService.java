@@ -19,7 +19,7 @@ import com.tabulaw.common.model.UserState;
  */
 @RemoteServiceRelativePath(value = "userData")
 public interface IUserDataService extends RemoteService {
-	
+
 	/**
 	 * Persists the given user state.
 	 * @param userState
@@ -42,6 +42,14 @@ public interface IUserDataService extends RemoteService {
 	ModelPayload saveBundleForUser(String userId, QuoteBundle bundle);
 
 	/**
+	 * Updates the non-relational bundle properties.
+	 * @param userId
+	 * @param bundle
+	 * @return payload containing the resultant status of the update op
+	 */
+	Payload updateBundlePropsForUser(String userId, QuoteBundle bundle);
+
+	/**
 	 * Adds a bundle for the given user.
 	 * @param userId
 	 * @param bundle
@@ -53,9 +61,10 @@ public interface IUserDataService extends RemoteService {
 	 * Deletes a bundle for the given user.
 	 * @param userId
 	 * @param bundleId
+	 * @param deleteQuotes delete contained qoutes as well?
 	 * @return payload containing the status of the operation
 	 */
-	Payload deleteBundleForUser(String userId, String bundleId);
+	Payload deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes);
 
 	/**
 	 * Adds a quote to the bundle
