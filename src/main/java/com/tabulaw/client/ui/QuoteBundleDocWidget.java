@@ -7,8 +7,10 @@ package com.tabulaw.client.ui;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.user.client.ui.HTML;
 import com.tabulaw.client.model.MarkOverlay;
 import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.QuoteBundle;
 
 /**
  * Quote bundle widget intended for use side by side with a document in view.
@@ -17,6 +19,28 @@ import com.tabulaw.common.model.Quote;
 public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteDocWidget, AbstractQuoteBundleWidget.Header> {
 
 	static class DocHeader extends AbstractQuoteBundleWidget.Header {
+		
+		private final HTML htmlName, htmlDesc;
+
+		public DocHeader() {
+			super();
+			htmlName = new HTML();
+			htmlName.addStyleName(AbstractQuoteBundleWidget.Styles.NAME);
+			htmlDesc = new HTML();
+			htmlDesc.addStyleName(AbstractQuoteBundleWidget.Styles.DESC);
+			header.add(htmlName);
+			header.add(htmlDesc);
+		}
+
+		@Override
+		public void setModel(QuoteBundle mQuoteBundle) {
+			super.setModel(mQuoteBundle);
+			String name = bundle.getName();
+			String desc = bundle.getDescription();
+			htmlName.setText(name == null ? "" : name);
+			htmlDesc.setHTML(headerDescInnerHtmlSetter.convert(desc));
+		}
+
 
 	}
 

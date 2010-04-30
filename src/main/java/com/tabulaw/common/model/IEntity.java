@@ -11,8 +11,7 @@ import com.tabulaw.ITypeDescriptorProvider;
  * Contract for a particular model type usable for server and client side.
  * @author jpk
  */
-public interface IEntity 
-extends Serializable, Cloneable, IMarshalable, IModelKeyProvider, IDescriptorProvider, ITypeDescriptorProvider, IPropertyValueProvider {
+public interface IEntity extends Serializable, Cloneable, IMarshalable, IModelKeyProvider, IDescriptorProvider, ITypeDescriptorProvider, IPropertyValueProvider {
 
 	static final String ID_FIELDNAME = "id";
 
@@ -48,6 +47,8 @@ extends Serializable, Cloneable, IMarshalable, IModelKeyProvider, IDescriptorPro
 	void setVersion(int version);
 
 	/**
+	 * Clones this entity
+	 * <em>excluding the <code>version</code> and <code>id</code> properties</em>.
 	 * @return A distinct deep copy of all properties that are managed by this
 	 *         entity (those that are not referenced).
 	 */

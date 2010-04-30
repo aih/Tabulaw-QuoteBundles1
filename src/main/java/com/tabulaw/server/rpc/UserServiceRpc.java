@@ -94,7 +94,7 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 		}
 		
 		// get the next ids for client-side use
-		Map<EntityType, Integer[]> nextIds = getNextIdMap();
+		Map<String, Integer[]> nextIds = getNextIdMap();
 		payload.setNextIds(nextIds);
 
 		status.addMsg("User Context retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
@@ -104,10 +104,6 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 	@Override
 	public Payload registerUser(UserRegistrationRequest request) {
 		Status status = new Status();
-
-		// we are forced to create an http session here in order to access the
-		// servlet context
-		getRequestContext().getRequest().getSession(true);
 
 		PersistContext persistContext = getPersistContext();
 		UserService userService = persistContext.getUserService();
@@ -135,10 +131,6 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 			status.addMsg("An email address must be specified.", MsgLevel.ERROR, MsgAttr.STATUS.flag);
 		}
 		else {
-			// we are forced to create an http session here in order to access the
-			// servlet context
-			getRequestContext().getRequest().getSession(true);
-			
 			PersistContext context = getPersistContext();
 			UserService userService = context.getUserService();
 			try {
@@ -170,7 +162,7 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 		return p;
 	}
 	
-	private Map<EntityType, Integer[]> getNextIdMap() {
+	private Map<String, Integer[]> getNextIdMap() {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
@@ -185,9 +177,9 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 			Integer.valueOf((int) quoteIdRange[0]), Integer.valueOf((int) quoteIdRange[1]),
 		};
 
-		HashMap<EntityType, Integer[]> idMap = new HashMap<EntityType, Integer[]>(2);
-		idMap.put(EntityType.QUOTE_BUNDLE, iBundleIdRange);
-		idMap.put(EntityType.QUOTE, iQuoteIdRange);
+		HashMap<String, Integer[]> idMap = new HashMap<String, Integer[]>(2);
+		idMap.put(EntityType.QUOTE_BUNDLE.name(), iBundleIdRange);
+		idMap.put(EntityType.QUOTE.name(), iQuoteIdRange);
 		
 		return idMap;
 	}

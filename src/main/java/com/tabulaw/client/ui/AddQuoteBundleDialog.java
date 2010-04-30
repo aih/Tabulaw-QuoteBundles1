@@ -18,6 +18,7 @@ import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
 import com.tabulaw.client.validate.ErrorHandlerDelegate;
 import com.tabulaw.common.model.EntityFactory;
+import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.QuoteBundle;
 
 /**
@@ -59,6 +60,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 			String qbDesc = (String) fieldGroup.getFieldWidget("qbDesc").getValue();
 
 			QuoteBundle qb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
+			qb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
 
 			// default set the current quote bundle if not set yet
 			if(ClientModelCache.get().getUserState().getCurrentQuoteBundleId() == null) {

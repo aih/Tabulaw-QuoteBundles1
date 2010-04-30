@@ -13,8 +13,8 @@ import com.allen_sauer.gwt.dnd.client.DragContext;
 import com.allen_sauer.gwt.dnd.client.DragEndEvent;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
+import com.allen_sauer.gwt.dnd.client.drop.FlowPanelDropController;
 import com.allen_sauer.gwt.dnd.client.drop.HorizontalPanelDropController;
-import com.allen_sauer.gwt.dnd.client.drop.VerticalPanelDropController;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -26,6 +26,7 @@ import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.QuoteBundleListingWidget.BOption;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
+import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 
@@ -107,7 +108,8 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 
 			// clone the dragged quote widget setting its id to a new one
 			Quote mQuoteClone = (Quote) draggedQuoteModel.clone();
-			mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE));
+			mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
+			mQuoteClone.setVersion(-1);	// CRITICAL
 
 			// add and persist
 			targetQuoteBundleWidget.addQuote(mQuoteClone, true, true);
@@ -145,8 +147,8 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	private final PickupDragController quoteController;
 	private final QuoteDragHandler quoteHandler;
 
-	private final HashMap<QuoteBundleEditWidget, VerticalPanelDropController> qbDropBindings =
-			new HashMap<QuoteBundleEditWidget, VerticalPanelDropController>();
+	private final HashMap<QuoteBundleEditWidget, FlowPanelDropController> qbDropBindings =
+			new HashMap<QuoteBundleEditWidget, FlowPanelDropController>();
 
 	/**
 	 * Constructor
@@ -205,9 +207,10 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		// String qbName = option.getBundleName();
 
 		// replace just dropped option with quote bundle widget
-		QuoteBundle mQuoteBundle = (QuoteBundle) ClientModelCache.get().get(EntityType.QUOTE_BUNDLE, qbId);
+		ModelKey key = new ModelKey(EntityType.QUOTE_BUNDLE.name(), qbId);
+		QuoteBundle bundle = (QuoteBundle) ClientModelCache.get().get(key);
 
-		insertQuoteBundleColumn(mQuoteBundle, 0);
+		insertQuoteBundleColumn(bundle, 0);
 	}
 
 	/**
@@ -217,14 +220,14 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 */
 	void unpinQuoteBundle(QuoteBundleEditWidget quoteBundleWidget) {
 		// unregister quote drop controller for this quote bundle widget
-		VerticalPanelDropController quoteDropController = qbDropBindings.remove(quoteBundleWidget);
+		FlowPanelDropController quoteDropController = qbDropBindings.remove(quoteBundleWidget);
 		quoteController.unregisterDropController(quoteDropController);
 
 		// remove just added quote bundle widget and replace with bundle option to
 		// options panel
 		quoteBundleWidget.removeFromParent();
-		QuoteBundle mQuoteBundle = quoteBundleWidget.getModel();
-		addQuoteBundleOption(mQuoteBundle);
+		QuoteBundle bundle = quoteBundleWidget.getModel();
+		addQuoteBundleOption(bundle);
 
 		// String msg = quoteBundleWidget.getModel().descriptor() + " closed.";
 		// Notifier.get().info(msg);
@@ -280,11 +283,11 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	/**
 	 * Adds a bundle option to the bundle listing only not affecting the quote
 	 * bundle columns in the main viewing area.
-	 * @param mQuoteBundle
+	 * @param bundle
 	 * @return new added option
 	 */
-	private BOption addQuoteBundleOption(QuoteBundle mQuoteBundle) {
-		BOption option = new BOption(mQuoteBundle.getId(), mQuoteBundle.getName());
+	private BOption addQuoteBundleOption(QuoteBundle bundle) {
+		BOption option = new BOption(bundle.getId(), bundle.getName());
 		option.addClickHandler(new ClickHandler() {
 			
 			@Override
@@ -310,9 +313,9 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	/**
 	 * Inserts a quote bundle to the main viewing area only at the given column
 	 * index. The bundle option listing is un-affected.
-	 * @param mQuoteBundle
+	 * @param bundle
 	 */
-	private void insertQuoteBundleColumn(final QuoteBundle mQuoteBundle, int index) {
+	private void insertQuoteBundleColumn(final QuoteBundle bundle, int index) {
 
 		// "demote" the last quote bundle in the main viewing area to the bundle
 		// listing
@@ -330,9 +333,9 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			unpinQuoteBundle(last);
 		}
 
-		Log.debug("Inserting quote bundle col widget for: " + mQuoteBundle);
+		Log.debug("Inserting quote bundle col widget for: " + bundle);
 		final QuoteBundleEditWidget qbw = new QuoteBundleEditWidget(quoteController);
-		qbw.setModel(mQuoteBundle);
+		qbw.setModel(bundle);
 		qbw.setCloseHandler(new ClickHandler() {
 
 			@Override
@@ -346,7 +349,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		quoteBundleController.makeDraggable(qbw, qbw.header.getDraggable());
 
 		// initialize a quote drop controller for this quote bundle widget
-		VerticalPanelDropController quoteDropController = new VerticalPanelDropController(qbw.quotePanel);
+		FlowPanelDropController quoteDropController = new FlowPanelDropController(qbw.quotePanel);
 		quoteController.registerDropController(quoteDropController);
 		qbDropBindings.put(qbw, quoteDropController);
 
@@ -359,13 +362,13 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		}
 	}
 
-	private boolean removeQuoteBundleColumn(QuoteBundle mQuoteBundle) {
+	private boolean removeQuoteBundleColumn(QuoteBundle bundle) {
 		// identify the quote bundle widget
-		String rmId = mQuoteBundle.getId();
+		String rmId = bundle.getId();
 		for(int i = 0; i < columns.getWidgetCount(); i++) {
 			QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) columns.getWidget(i);
 			if(qbw.getModel().getId().equals(rmId)) {
-				VerticalPanelDropController quoteDropController = qbDropBindings.remove(qbw);
+				FlowPanelDropController quoteDropController = qbDropBindings.remove(qbw);
 				quoteController.unregisterDropController(quoteDropController);
 				// TODO makeNotDraggable the child quotes too ???
 				columns.remove(qbw);

@@ -10,7 +10,6 @@ import java.util.Map;
 
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
-import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
@@ -33,7 +32,7 @@ public class UserContextPayload extends Payload {
 	/**
 	 * Map of id ranges keyed by entity type.
 	 */
-	private Map<EntityType, Integer[]> nextIds;
+	private Map<String, Integer[]> nextIds;
 
 	/**
 	 * Constructor
@@ -87,11 +86,11 @@ public class UserContextPayload extends Payload {
 	/**
 	 * @return Map of assignable ranges keyed by entity type.
 	 */
-	public Map<EntityType, Integer[]> getNextIds() {
+	public Map<String, Integer[]> getNextIds() {
 		return nextIds;
 	}
 
-	public void setNextIds(Map<EntityType, Integer[]> nextIds) {
+	public void setNextIds(Map<String, Integer[]> nextIds) {
 		this.nextIds = nextIds;
 	}
 }

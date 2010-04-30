@@ -139,7 +139,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 			String qbName = mDoc.getTitle();
 			String qbDesc = "Quote Bundle for " + qbName;
 			crntQb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
-			crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE));
+			crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
 
 			ClientModelCache.get().getUserState().setCurrentQuoteBundleId(crntQb.getId());
 			

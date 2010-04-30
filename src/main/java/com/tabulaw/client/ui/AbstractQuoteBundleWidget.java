@@ -4,18 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.convert.IConverter;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
-import com.tabulaw.client.ui.edit.EditableTextWidget;
-import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 
@@ -25,7 +20,7 @@ import com.tabulaw.common.model.QuoteBundle;
  * @param <H> the quote bundle {@link Header} widget type.
  * @author jpk
  */
-public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H extends AbstractQuoteBundleWidget.Header> extends VerticalPanel {
+public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H extends AbstractQuoteBundleWidget.Header> extends FlowPanel {
 
 	static class Styles {
 
@@ -36,11 +31,11 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 
 		public static final String HEADER = "qbheader";
 
-		public static final String ECHO = "echo";
-
 		public static final String NAME = "name";
 
 		public static final String DESC = "desc";
+
+		public static final String ECHO = "echo";
 
 		public static final String QUOTES = "quotes";
 	} // Styles
@@ -72,9 +67,8 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		protected final FlowPanel header = new FlowPanel();
 
 		protected final Label lblQb;
-		protected final EditableTextWidget pName, pDesc;
 
-		protected QuoteBundle mQuoteBundle;
+		protected QuoteBundle bundle;
 
 		/**
 		 * Constructor
@@ -85,42 +79,16 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 			lblQb = new Label("Quote Bundle");
 			lblQb.setStyleName(Styles.ECHO);
 
-			pName = new EditableTextWidget();
-			pName.addStyleName(Styles.NAME);
-			pName.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-				@Override
-				public void onValueChange(ValueChangeEvent<String> event) {
-					mQuoteBundle.setName(event.getValue());
-				}
-			});
-
-			pDesc = new EditableTextWidget(headerDescTextExtractor, headerDescInnerHtmlSetter);
-			pDesc.addStyleName(Styles.DESC);
-			pDesc.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-				@Override
-				public void onValueChange(ValueChangeEvent<String> event) {
-					mQuoteBundle.setDescription(event.getValue());
-				}
-			});
-
 			header.setStyleName(Styles.HEADER);
 			header.add(lblQb);
-			header.add(pName);
-			header.add(pDesc);
 		}
 
 		/**
 		 * Sets the quote bundle model updating the UI.
-		 * @param mQuoteBundle the quote bundle model data
+		 * @param bundle the quote bundle model data
 		 */
-		public void setModel(QuoteBundle mQuoteBundle) {
-			String name = mQuoteBundle.getName();
-			String desc = mQuoteBundle.getDescription();
-			pName.setText(name == null ? "" : name);
-			pDesc.setHTML(headerDescInnerHtmlSetter.convert(desc));
-			this.mQuoteBundle = mQuoteBundle;
+		public void setModel(QuoteBundle bundle) {
+			this.bundle = bundle;
 		}
 
 		public final Widget getDraggable() {
@@ -133,12 +101,12 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 * Supports drag drop targeting.
 	 * @author jpk
 	 */
-	protected static class QuotesPanel extends VerticalPanelWithSpacer {
+	protected static class QuotesPanel extends FlowPanel {
 
 		public QuotesPanel() {
 			super();
 			setStyleName(AbstractQuoteBundleWidget.Styles.QUOTES);
-			setSpacing(4);
+			//setSpacing(4);
 		}
 	} // QuotesPanel
 
@@ -146,7 +114,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 
 	protected QuotesPanel quotePanel = new QuotesPanel();
 
-	protected QuoteBundle mQuoteBundle;
+	protected QuoteBundle bundle;
 
 	private PickupDragController dragController;
 
@@ -183,26 +151,26 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	protected abstract Q getNewQuoteWidget(Quote mQuote);
 
 	public final QuoteBundle getModel() {
-		return mQuoteBundle;
+		return bundle;
 	}
 
 	/**
 	 * Sets the quote bundle model clearing the ui then adding based on the
 	 * provided model data.
-	 * @param mQuoteBundle
+	 * @param bundle
 	 */
-	public final void setModel(QuoteBundle mQuoteBundle) {
-		header.setModel(mQuoteBundle);
+	public final void setModel(QuoteBundle bundle) {
+		header.setModel(bundle);
 		clearQuotesFromUi();
-		if(mQuoteBundle != null) {
-			List<Quote> mQuotes = mQuoteBundle.getQuotes();
+		if(bundle != null) {
+			List<Quote> mQuotes = bundle.getQuotes();
 			if(mQuotes != null) {
 				for(Quote mQuote : mQuotes) {
 					addQuote(mQuote, false, false);
 				}
 			}
 		}
-		this.mQuoteBundle = mQuoteBundle;
+		this.bundle = bundle;
 	}
 
 	/**
@@ -229,13 +197,13 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 */
 	protected Q addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
 		// add the quote ref to the quote bundle
-		if(addToThisBundleModel && mQuoteBundle != null) mQuoteBundle.insertQuote(mQuote, 0);
+		if(addToThisBundleModel && bundle != null) bundle.insertQuote(mQuote, 0);
 		if(persist) {
 			// add the quote updating the bundle quote refs too
 			ClientModelCache.get().persist(mQuote, this);
-			ClientModelCache.get().persist(mQuoteBundle, this);
+			ClientModelCache.get().persist(bundle, this);
 			// server side persist
-			ClientModelCache.get().addQuoteToBundle(mQuoteBundle.getId(), mQuote);
+			ClientModelCache.get().addQuoteToBundle(bundle.getId(), mQuote);
 		}
 		// add to the ui
 		Q qw = getNewQuoteWidget(mQuote);
@@ -257,16 +225,16 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	public Q removeQuote(final Quote mQuote, boolean persist, final boolean deleteQuote) {
 		int index = getQuoteWidgetIndex(mQuote.getId());
 		if(index != -1) {
-			if(mQuoteBundle.removeQuote(mQuote)) {
+			if(bundle.removeQuote(mQuote)) {
 				if(persist) {
 					// delete the quote updating the bundle quote refs too
 					if(deleteQuote) {
-						ClientModelCache.get().remove(EntityType.QUOTE, mQuote.getId(), AbstractQuoteBundleWidget.this);
+						ClientModelCache.get().remove(mQuote.getModelKey(), AbstractQuoteBundleWidget.this);
 					}
-					ClientModelCache.get().persist(mQuoteBundle, AbstractQuoteBundleWidget.this);
+					ClientModelCache.get().persist(bundle, AbstractQuoteBundleWidget.this);
 
 					// server side persist
-					ClientModelCache.get().removeQuoteFromBundle(mQuoteBundle.getId(), mQuote.getId(), deleteQuote);
+					ClientModelCache.get().removeQuoteFromBundle(bundle.getId(), mQuote.getId(), deleteQuote);
 				}
 				Q qw = (Q) quotePanel.getWidget(index);
 				quotePanel.remove(index);
@@ -350,12 +318,12 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 * Compares the given quote bundle model against the one held currently adding
 	 * quotes that don't exist and removing those that do but not in the one
 	 * given. No model change event is fired.
-	 * @param mQuoteBundleToSyncTo
+	 * @param bundleToSyncTo
 	 */
-	protected final void sync(QuoteBundle mQuoteBundleToSyncTo) {
+	protected final void sync(QuoteBundle bundleToSyncTo) {
 		// wrap in new lists to avoid concurrent mod exception!
-		List<Quote> existingQuotes = new ArrayList<Quote>(mQuoteBundle.getQuotes());
-		List<Quote> changedQuotes = new ArrayList<Quote>(mQuoteBundleToSyncTo.getQuotes());
+		List<Quote> existingQuotes = new ArrayList<Quote>(bundle.getQuotes());
+		List<Quote> changedQuotes = new ArrayList<Quote>(bundleToSyncTo.getQuotes());
 
 		// IMPT: remove quotes first so highlighting works against a *clean* dom!
 		for(Quote mexisting : existingQuotes) {

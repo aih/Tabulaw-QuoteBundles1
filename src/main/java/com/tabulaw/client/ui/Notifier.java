@@ -63,12 +63,16 @@ public class Notifier {
 	}
 	
 	public void post(Collection<Msg> msgs, int duration) {
+		post(msgs, duration, false);
+	}
+	
+	public void post(Collection<Msg> msgs, int duration, boolean showImage) {
 		final MsgPopup mp = new MsgPopup(refWidget);
 		for(Msg msg : msgs) {
 			mp.addMsg(msg, null);
 			//mp.setAnimationEnabled(true);
 		}
-		mp.showMsgs(Position.BOTTOM, duration, true);
+		mp.showMsgs(Position.BOTTOM, duration, showImage);
 	}
 	
 	private void show(String msg, MsgLevel level, int duration) {

@@ -19,11 +19,14 @@ a:active {
 }
 
 /* drag and drop overrides */
-.Gx8miifI {
+.dragdrop-positioner {
 	border: 1px dashed #BFBFBF;
-	margin: 0 !important;
-	zoom: 1;
-	z-index: 100;
+}
+.dragdrop-flow-panel-positioner {
+	color: #BFBFBF;
+}
+.dragdrop-proxy {
+	background-color: #BFBFBF; 
 }
 
 .msg {
@@ -371,6 +374,7 @@ a:active {
 		.wqbundle .qbheader .name {
 			font-size: 20px;
 			border-bottom: 4px solid #BFBFBF/*#D0E4F6*/;
+			margin-top: 2px; /* hack so qb name text doesn't wrap if it extends at or beyond buttons div just above */
 		}
 		.wqbundle .qbheader .desc {
 			font-size: 11px;
@@ -379,13 +383,13 @@ a:active {
 			float: right;
 		} 
 		.wqbundle .buttons img {
-			margin-left: 15px;
+			margin-left: 10px;
 			cursor: pointer;
 		} 
 		.wqbundle .buttons .save {
-			display:none;
+			padding-bottom: 4px;
 		} 
-.wqbundle .quotes {
+	.wqbundle .quotes {
 		/*height: 100%;*/
 		width: 100%;
 	}
@@ -614,7 +618,7 @@ a:active {
 	}
 	.quoteBundle .boundaryArea {
 		width: 100%;
-		/*height: 578px;*/
+		/*min-height: 578px;*/
 		height: 535px;
 		overflow-y: auto !important;
 	}

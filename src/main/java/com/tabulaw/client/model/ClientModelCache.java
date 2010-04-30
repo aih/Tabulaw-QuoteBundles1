@@ -84,7 +84,7 @@ public class ClientModelCache implements IModelSyncer {
 		String emsg = caught.getMessage();
 		Notifier.get().error(emsg);
 	}
-	
+
 	private static void handlePersistResponse(Payload payload) {
 		if(payload.hasErrors()) {
 			// error
@@ -103,15 +103,15 @@ public class ClientModelCache implements IModelSyncer {
 			Notifier.get().post(msgs, 1000);
 
 			// TODO what do we do with the persisted entity in the payload ???
-			// we don't want a collision in accessing the sole entity map which 
-			// as i see it is possible 
+			// we don't want a collision in accessing the sole entity map which
+			// as i see it is possible
 		}
 	}
 
-	private final HashMap<EntityType, IdCache> nextIdCache = new HashMap<EntityType, IdCache>();
+	private final HashMap<String, IdCache> nextIdCache = new HashMap<String, IdCache>();
 
-	private final HashMap<EntityType, List<IEntity>> entities = new HashMap<EntityType, List<IEntity>>();
-	
+	private final HashMap<String, List<IEntity>> entities = new HashMap<String, List<IEntity>>();
+
 	private final boolean doServerPersist;
 
 	/**
@@ -121,13 +121,13 @@ public class ClientModelCache implements IModelSyncer {
 
 		// init entities map
 		for(EntityType et : EntityType.values()) {
-			entities.put(et, new ArrayList<IEntity>());
+			entities.put(et.name(), new ArrayList<IEntity>());
 		}
-		
+
 		doServerPersist = true;
 
 	} // constructor
-	
+
 	@Override
 	public void saveBundle(QuoteBundle bundle) {
 		if(!doServerPersist) return;
@@ -238,8 +238,8 @@ public class ClientModelCache implements IModelSyncer {
 	 * Sets a batch of ids for use in entity creation.
 	 * @param nextIdBatch
 	 */
-	public void setNextIdBatch(Map<EntityType, Integer[]> nextIdBatch) {
-		for(EntityType et : nextIdBatch.keySet()) {
+	public void setNextIdBatch(Map<String, Integer[]> nextIdBatch) {
+		for(String et : nextIdBatch.keySet()) {
 			Integer[] rng = nextIdBatch.get(et);
 			IdCache idCache = new IdCache(rng);
 			nextIdCache.put(et, idCache);
@@ -253,7 +253,7 @@ public class ClientModelCache implements IModelSyncer {
 	 * @throws IllegalArgumentException When there are no cached ids for the given
 	 *         entity type
 	 */
-	public String getNextId(EntityType entityType) throws IllegalArgumentException {
+	public String getNextId(String entityType) throws IllegalArgumentException {
 		IdCache idCache = nextIdCache.get(entityType);
 		if(idCache == null) throw new IllegalArgumentException("No ids cached for entity type: " + entityType);
 		int nextId = idCache.getNextId();
@@ -275,7 +275,7 @@ public class ClientModelCache implements IModelSyncer {
 	 * @return The currently logged in user.
 	 */
 	public User getUser() {
-		List<? extends IEntity> list = entities.get(EntityType.USER);
+		List<? extends IEntity> list = entities.get(EntityType.USER.name());
 		return list.size() < 1 ? null : (User) list.get(0).clone();
 	}
 
@@ -283,7 +283,7 @@ public class ClientModelCache implements IModelSyncer {
 	 * @return The logged in user's sole {@link UserState} instance.
 	 */
 	public UserState getUserState() {
-		List<?> list = entities.get(EntityType.USER_STATE);
+		List<?> list = entities.get(EntityType.USER_STATE.name());
 		UserState userState = list.size() < 1 ? null : (UserState) list.get(0);
 		return userState;
 	}
@@ -318,7 +318,7 @@ public class ClientModelCache implements IModelSyncer {
 		if(userState != null) {
 			String qbid = userState.getCurrentQuoteBundleId();
 			if(qbid != null) {
-				QuoteBundle qb = (QuoteBundle) get(EntityType.QUOTE_BUNDLE, qbid);
+				QuoteBundle qb = (QuoteBundle) get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), qbid));
 				return qb;
 			}
 		}
@@ -338,31 +338,14 @@ public class ClientModelCache implements IModelSyncer {
 	public IEntity get(ModelKey key) throws IllegalArgumentException, EntityNotFoundException {
 		if(key == null) throw new NullPointerException();
 		if(!key.isSet()) throw new IllegalArgumentException("Key not set");
-		EntityType et = EntityType.fromString(key.getEntityType());
-		return get(et, key.getId());
-	}
-
-	/**
-	 * Gets the model identified by the given entity type and id.
-	 * <p>
-	 * A copy of the model is made retaining reference type relations to other
-	 * model instances.
-	 * @param entityType
-	 * @param id entity id
-	 * @return the found model.
-	 * @throws IllegalArgumentException When one or more of the args is
-	 *         un-recognized
-	 * @throws EntityNotFoundException When the model can't be found
-	 */
-	public IEntity get(EntityType entityType, String id) throws IllegalArgumentException, EntityNotFoundException {
-		if(entityType == null || id == null) throw new NullPointerException();
-		List<? extends IEntity> list = entities.get(entityType);
+		List<? extends IEntity> list = entities.get(key.getEntityType());
+		final String id = key.getId();
 		for(IEntity m : list) {
 			if(m.getId().equals(id)) {
 				return m.clone();
 			}
 		}
-		throw new EntityNotFoundException("Entity of type: " + entityType + " and id: " + id
+		throw new EntityNotFoundException("Entity of type: " + key.getEntityType() + " and id: " + id
 				+ " not found in client datastore.");
 	}
 
@@ -372,7 +355,7 @@ public class ClientModelCache implements IModelSyncer {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<?> getAll(EntityType etype) {
-		List<? extends IEntity> list = entities.get(etype);
+		List<? extends IEntity> list = entities.get(etype.name());
 		ArrayList<IEntity> rlist = new ArrayList<IEntity>(list.size());
 		for(IEntity m : list) {
 			rlist.add(m.clone());
@@ -401,26 +384,24 @@ public class ClientModelCache implements IModelSyncer {
 	public void persist(IEntity m, Widget source) throws IllegalArgumentException {
 		if(m == null) throw new NullPointerException();
 		if(m.getId() == null) {
-			EntityType et = EntityType.fromString(m.getEntityType());
-			String nextId = getNextId(et);
+			String nextId = getNextId(m.getEntityType());
 			m.setId(nextId);
 			if(Log.isDebugEnabled()) Log.debug("Set entity id on: " + m);
 		}
-		EntityType et = EntityType.fromString(m.getEntityType());
-		List<IEntity> list = entities.get(et);
+		List<IEntity> list = entities.get(m.getEntityType());
 
 		IEntity existing = null;
 
 		// NO this logic if now bad since we are persisting server-side in parallel
 		// w/o any callback based updating to the entities held in this cache!
-		//if(!m.isNew()) {
-			for(IEntity em : list) {
-				if(em.getId().equals(m.getId())) {
-					existing = em;
-					break;
-				}
+		// if(!m.isNew()) {
+		for(IEntity em : list) {
+			if(em.getId().equals(m.getId())) {
+				existing = em;
+				break;
 			}
-		//}
+		}
+		// }
 
 		ModelChangeOp op = existing == null ? ModelChangeOp.ADDED : ModelChangeOp.UPDATED;
 
@@ -432,7 +413,7 @@ public class ClientModelCache implements IModelSyncer {
 		list.add(copy);
 
 		// fire model change event
-		if(source != null) source.fireEvent(new ModelChangeEvent(op, copy, null));
+		if(source != null) source.fireEvent(new ModelChangeEvent(op, m, null));
 	}
 
 	/**
@@ -464,7 +445,7 @@ public class ClientModelCache implements IModelSyncer {
 	 * Removes the model identified by the given key from this datastore.
 	 * <p>
 	 * Fires a {@link ModelChangeEvent} if successful.
-	 * @param key 
+	 * @param key
 	 * @param source optional source widget when specified, a model change event
 	 *        is fired on it
 	 * @return The deleted model or <code>null</code> if the model was not
@@ -475,25 +456,8 @@ public class ClientModelCache implements IModelSyncer {
 	public IEntity remove(ModelKey key, Widget source) throws IllegalArgumentException, EntityNotFoundException {
 		if(key == null) throw new NullPointerException();
 		if(!key.isSet()) throw new IllegalArgumentException("Key not set");
-		EntityType et = EntityType.fromString(key.getEntityType());
-		return remove(et, key.getId(), source);
-	}
-	
-	/**
-	 * Removes the model identified by the given entity type and id from this datastore.
-	 * <p>
-	 * Fires a {@link ModelChangeEvent} if successful.
-	 * @param entityType
-	 * @param id
-	 * @param source optional source widget when specified, a model change event
-	 *        is fired on it
-	 * @return The deleted model or <code>null</code> if the model was not
-	 *         deleted.
-	 * @throws EntityNotFoundException When the entity to purge is not found
-	 */
-	public IEntity remove(EntityType entityType, String id, Widget source) throws EntityNotFoundException {
-		if(entityType == null || id == null) throw new NullPointerException();
-		List<IEntity> list = entities.get(entityType);
+		List<IEntity> list = entities.get(key.getEntityType());
+		final String id = key.getId();
 		IEntity t = null;
 		for(IEntity m : list) {
 			if(m.getId().equals(id)) {
@@ -501,9 +465,7 @@ public class ClientModelCache implements IModelSyncer {
 				break;
 			}
 		}
-		if(t == null)
-			throw new EntityNotFoundException("Entity of key: '" + new ModelKey(entityType.name(), id)
-					+ "' not found for remove.");
+		if(t == null) throw new EntityNotFoundException("Entity of key: '" + key + "' not found for remove.");
 		list.remove(t);
 		// fire model change event
 		if(source != null) source.fireEvent(new ModelChangeEvent(ModelChangeOp.DELETED, t, null));
@@ -518,7 +480,7 @@ public class ClientModelCache implements IModelSyncer {
 	 * @param source the sourcing widget that will source a model change event
 	 */
 	public void removeAll(EntityType etype, Widget source) {
-		List<IEntity> list = entities.get(etype);
+		List<IEntity> list = entities.get(etype.name());
 		if(list == null || list.size() < 1) return;
 		ArrayList<IEntity> rlist = new ArrayList<IEntity>(list);
 		for(IEntity m : rlist) {
@@ -553,7 +515,7 @@ public class ClientModelCache implements IModelSyncer {
 	}
 
 	public DocRef getCaseDocByRemoteUrl(String remoteCaseUrl) {
-		List<IEntity> list = entities.get(EntityType.DOCUMENT);
+		List<IEntity> list = entities.get(EntityType.DOCUMENT.name());
 		for(IEntity m : list) {
 			CaseRef caseRef = ((DocRef) m).getCaseRef();
 			if(caseRef == null) continue;

@@ -33,13 +33,13 @@ public abstract class EntityBase implements IEntity {
 	 * @return A new empty instance via the default constructor.
 	 */
 	protected abstract IEntity newInstance();
-	
+
 	/**
 	 * Sets the properties on the given clone instance
 	 * @param cln the clone instance
 	 */
 	protected void doClone(IEntity cln) {
-		((EntityBase)cln).version = version;
+		((EntityBase) cln).version = version;
 	}
 
 	@Override

@@ -89,14 +89,16 @@ public final class AuthenticationProcessingFilter implements Filter {
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		HttpSession session = httpRequest.getSession(false);
 
+		// auto-create session if necessary
+		if(session == null) {
+			log.info("Creating http session");
+			session = httpRequest.getSession(true);
+			if(session == null) throw new Error();
+		}
+		
 		if(loginBypass) {
-			UserContext userContext = session == null ? null : (UserContext) session.getAttribute(UserContext.KEY);
+			UserContext userContext = (UserContext) session.getAttribute(UserContext.KEY);
 			if(userContext == null) {
-				// auto-create session if necessary
-				if(session == null) {
-					log.info("Creating http session");
-					session = httpRequest.getSession(true);
-				}
 				// create an user context for this user session
 				log.debug("Creating user context with admin user bypassing login");
 				PersistContext persistContext = (PersistContext) session.getServletContext().getAttribute(PersistContext.KEY);
@@ -111,12 +113,6 @@ public final class AuthenticationProcessingFilter implements Filter {
 		if(requiresAuthentication(httpRequest, httpResponse)) {
 			if(log.isDebugEnabled()) {
 				log.debug("Request is to process authentication");
-			}
-
-			// auto-create session if necessary
-			if(session == null) {
-				log.info("Creating http session");
-				session = httpRequest.getSession(true);
 			}
 
 			Authentication authResult;

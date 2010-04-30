@@ -106,7 +106,7 @@ public class EditableTextWidget extends TextField implements HasHTML {
 				@Override
 				public void onKeyDown(KeyDownEvent event) {
 					if(event.getNativeKeyCode() == KeyCodes.KEY_ESCAPE) {
-						setHTML(origValue);
+						if(origValue != null) setHTML(origValue);
 						setReadOnly(true);
 					}
 					else if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -173,6 +173,13 @@ public class EditableTextWidget extends TextField implements HasHTML {
 	public void setHTML(String html) {
 		getReadOnlyWidget().setHTML(html);
 		//((TextBox) getEditable()).setText(extractText(html));
+	}
+	
+	public void revert() {
+		if(origValue != null) {
+			setHTML(origValue);
+			origValue = null;
+		}
 	}
 
 	protected String extractText(String html) {

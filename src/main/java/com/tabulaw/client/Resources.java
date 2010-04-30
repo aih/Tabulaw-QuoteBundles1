@@ -20,6 +20,9 @@ public interface Resources extends ClientBundle {
 	@Source("../public/images/note-icon.png")
 	ImageResource searchImage();
 
+	@Source("../public/images/undo.gif")
+	ImageResource undo();
+	
 	// TODO point to a real save icon
 	@Source("../public/images/pencil.gif")
 	ImageResource save();
