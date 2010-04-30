@@ -396,7 +396,7 @@ public class ClientModelCache implements IModelSyncer {
 		// w/o any callback based updating to the entities held in this cache!
 		// if(!m.isNew()) {
 		for(IEntity em : list) {
-			if(em.getId().equals(m.getId())) {
+			if(em.equals(m)) {
 				existing = em;
 				break;
 			}
@@ -409,11 +409,12 @@ public class ClientModelCache implements IModelSyncer {
 			list.remove(existing);
 		}
 
-		IEntity copy = m.clone();
+		// TODO figure out how to avoid multiple clone() calls!
+		IEntity copy = m.clone(), copy2 = m.clone();
 		list.add(copy);
 
 		// fire model change event
-		if(source != null) source.fireEvent(new ModelChangeEvent(op, m, null));
+		if(source != null) source.fireEvent(new ModelChangeEvent(op, copy2, null));
 	}
 
 	/**
@@ -508,7 +509,7 @@ public class ClientModelCache implements IModelSyncer {
 	public boolean compareQuotes(Quote q1, Quote q2) {
 		DocRef doc1 = q1.getDocument();
 		DocRef doc2 = q2.getDocument();
-		if(doc1.getId().equals(doc2.getId())) {
+		if(doc1.equals(doc2)) {
 			return ObjectUtil.equals(q1.getQuote(), q2.getQuote());
 		}
 		return false;

@@ -116,7 +116,7 @@ public class UserDataService extends AbstractEntityService {
 
 		validate(bundle);
 
-		if(bundle.isNew()) throw new IllegalArgumentException();
+		if(bundle.isNew()) throw new IllegalArgumentException("Bundle must already exist");
 		
 		QuoteBundle existingQb = dao.load(QuoteBundle.class, bundle.getId());
 		existingQb.setName(bundle.getName());

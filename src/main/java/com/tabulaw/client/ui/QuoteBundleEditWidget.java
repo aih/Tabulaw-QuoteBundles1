@@ -210,32 +210,11 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 	public QuoteBundleEditWidget(PickupDragController dragController) {
 		super(new EditHeader());
 		setDragController(dragController);
+		dropAreaCheck();
 	}
 
 	public void setCloseHandler(ClickHandler closeHandler) {
 		header.close.addClickHandler(closeHandler);
-	}
-
-	@Override
-	protected QuoteEditWidget getNewQuoteWidget(Quote mQuote) {
-		return new QuoteEditWidget(this, mQuote);
-	}
-
-	@Override
-	protected QuoteEditWidget addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
-		QuoteEditWidget w = super.addQuote(mQuote, persist, addToThisBundleModel);
-		dropAreaCheck();
-		return w;
-	}
-	
-	private void dropAreaCheck() {
-		// maintain a drop area
-		if(quotePanel.getWidgetCount() == 0) {
-			quotePanel.getElement().getStyle().setHeight(50, Unit.PX);
-		}
-		else {
-			quotePanel.getElement().getStyle().clearHeight();
-		}
 	}
 
 	@Override
@@ -263,5 +242,27 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	protected QuoteEditWidget getNewQuoteWidget(Quote mQuote) {
+		return new QuoteEditWidget(this, mQuote);
+	}
+
+	@Override
+	protected QuoteEditWidget addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
+		QuoteEditWidget w = super.addQuote(mQuote, persist, addToThisBundleModel);
+		dropAreaCheck();
+		return w;
+	}
+	
+	private void dropAreaCheck() {
+		// maintain a drop area
+		if(quotePanel.getWidgetCount() == 0) {
+			quotePanel.getElement().getStyle().setHeight(50, Unit.PX);
+		}
+		else {
+			quotePanel.getElement().getStyle().clearHeight();
+		}
 	}
 }
