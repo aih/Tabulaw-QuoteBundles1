@@ -6,7 +6,6 @@
 package com.tabulaw.client.view;
 
 import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -16,7 +15,6 @@ import com.tabulaw.client.mvc.view.UnloadViewRequest;
 import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.mvc.view.ViewOptions;
 import com.tabulaw.client.ui.DocumentHighlightWidget;
-import com.tabulaw.client.ui.ModelChangeDispatcher;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.ModelKey;
 
@@ -91,6 +89,13 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 	protected void doInitialization(DocumentViewInitializer initializer) {
 		docKey = initializer.getDocumentKey();
 		if(docKey == null) throw new IllegalArgumentException();
+		docWidget.makeModelChangeAware();
+	}
+
+	@Override
+	protected void doDestroy() {
+		super.doDestroy();
+		docWidget.unmakeModelChangeAware();
 	}
 
 	@Override
@@ -112,21 +117,5 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 			ViewManager.get().dispatch(new UnloadViewRequest(getViewKey(), true, true));
 			return;
 		}
-		docWidget.onModelChangeEvent(event);
 	}
-	
-	private HandlerRegistration hrModelChange;
-
-	@Override
-	protected void onLoad() {
-		super.onLoad();
-		hrModelChange = addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
-	}
-
-	@Override
-	protected void onUnload() {
-		hrModelChange.removeHandler();
-		super.onUnload();
-	}
-
 }

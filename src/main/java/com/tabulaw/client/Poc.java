@@ -146,7 +146,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
-					getPortal().fireEvent(new ModelChangeEvent(ModelChangeOp.LOADED, liu, null));
+					getPortal().fireEvent(new ModelChangeEvent(null, ModelChangeOp.LOADED, liu, null));
 
 					// load up user bundles
 					List<QuoteBundle> userBundles = result.getBundles();
@@ -251,6 +251,12 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	private void build() {
 		Log.debug("Building..");
 
+		// add the portal
+		Portal portal = new Portal();
+		RootPanel.get("portal").add(portal);
+		
+		ClientModelCache.init(portal);
+
 		// add the nav row panel
 		NavRowPanel navRowPanel = new NavRowPanel(this);
 		navRowPanel.setVisible(false);
@@ -260,10 +266,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		NavColPanel navColPanel = new NavColPanel();
 		navColPanel.setVisible(false);
 		RootPanel.get("navCol").add(navColPanel);
-
-		// add the portal
-		Portal portal = new Portal();
-		RootPanel.get("portal").add(portal);
 
 		ViewManager.initialize(portal.getPanel(), 10);
 

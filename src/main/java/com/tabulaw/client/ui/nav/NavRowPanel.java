@@ -106,7 +106,11 @@ public class NavRowPanel extends AbstractNavPanel {
 				if(!id.equals(crntQbId)) {
 					this.crntQbId = id;
 					html.setHTML("<p><span class=\"echo\">Current Quote Bundle:</span>" + cqb.getName() + "</p>");
+					html.setVisible(true);
 				}
+			}
+			else {
+				html.setVisible(false);
 			}
 		}
 

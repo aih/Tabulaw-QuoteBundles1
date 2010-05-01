@@ -14,7 +14,7 @@ public interface IViewState {
 	/**
 	 * @return <code>true</code> if minimized.
 	 */
-	boolean isMinimized();
+	//boolean isMinimized();
 
 	/**
 	 * @return <code>true</code> if popped.

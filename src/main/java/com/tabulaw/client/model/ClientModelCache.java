@@ -50,10 +50,15 @@ public class ClientModelCache implements IModelSyncer {
 		userDataService = (IUserDataServiceAsync) GWT.create(IUserDataService.class);
 	}
 
-	private static final ClientModelCache instance = new ClientModelCache();
+	private static ClientModelCache instance;
 
 	public static ClientModelCache get() {
+		if(instance == null) throw new IllegalStateException("Init must be called.");
 		return instance;
+	}
+	
+	public static void init(IHasModelChangeHandlers modelChangeDispatcher) {
+		instance = new ClientModelCache(modelChangeDispatcher);
 	}
 
 	static class IdCache {
@@ -107,6 +112,8 @@ public class ClientModelCache implements IModelSyncer {
 			// as i see it is possible
 		}
 	}
+	
+	private final IHasModelChangeHandlers modelChangeDispatcher;
 
 	private final HashMap<String, IdCache> nextIdCache = new HashMap<String, IdCache>();
 
@@ -117,7 +124,9 @@ public class ClientModelCache implements IModelSyncer {
 	/**
 	 * Constructor
 	 */
-	private ClientModelCache() {
+	private ClientModelCache(IHasModelChangeHandlers modelChangeDispatcher) {
+		if(modelChangeDispatcher == null) throw new NullPointerException();
+		this.modelChangeDispatcher = modelChangeDispatcher;
 
 		// init entities map
 		for(EntityType et : EntityType.values()) {
@@ -318,8 +327,12 @@ public class ClientModelCache implements IModelSyncer {
 		if(userState != null) {
 			String qbid = userState.getCurrentQuoteBundleId();
 			if(qbid != null) {
-				QuoteBundle qb = (QuoteBundle) get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), qbid));
-				return qb;
+				try {
+					return (QuoteBundle) get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), qbid));
+				}
+				catch(EntityNotFoundException e) {
+					// ok - fall through
+				}
 			}
 		}
 		return null;
@@ -414,7 +427,7 @@ public class ClientModelCache implements IModelSyncer {
 		list.add(copy);
 
 		// fire model change event
-		if(source != null) source.fireEvent(new ModelChangeEvent(op, copy2, null));
+		if(source != null) modelChangeDispatcher.fireEvent(new ModelChangeEvent(source, op, copy2, null));
 	}
 
 	/**
@@ -469,7 +482,7 @@ public class ClientModelCache implements IModelSyncer {
 		if(t == null) throw new EntityNotFoundException("Entity of key: '" + key + "' not found for remove.");
 		list.remove(t);
 		// fire model change event
-		if(source != null) source.fireEvent(new ModelChangeEvent(ModelChangeOp.DELETED, t, null));
+		if(source != null) modelChangeDispatcher.fireEvent(new ModelChangeEvent(source, ModelChangeOp.DELETED, t, null));
 		return t;
 	}
 
@@ -491,7 +504,7 @@ public class ClientModelCache implements IModelSyncer {
 		// fire model change event(s)
 		if(source != null) {
 			for(IEntity e : rlist) {
-				source.fireEvent(new ModelChangeEvent(ModelChangeOp.DELETED, e, null));
+				modelChangeDispatcher.fireEvent(new ModelChangeEvent(source, ModelChangeOp.DELETED, e, null));
 			}
 		}
 	}

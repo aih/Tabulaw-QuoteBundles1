@@ -106,7 +106,13 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 
 	@Override
 	protected void doInitialization(StaticViewInitializer initializer) {
-		// default add the first two quote bundles to the move panel
+		qbPanel.makeModelChangeAware();
+	}
+
+	@Override
+	protected void doDestroy() {
+		super.doDestroy();
+		qbPanel.unmakeModelChangeAware();
 	}
 
 	@Override

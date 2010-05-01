@@ -46,4 +46,17 @@ public abstract class AbstractNavPanel extends AbstractModelChangeAwareWidget im
 	 * @param key the view key of the unloaded view
 	 */
 	protected abstract void handleViewUnload(ViewKey key);
+
+	@Override
+	protected void onLoad() {
+		super.onLoad();
+		makeModelChangeAware();
+	}
+
+	@Override
+	protected void onUnload() {
+		unmakeModelChangeAware();
+		super.onUnload();
+	}
+	
 }

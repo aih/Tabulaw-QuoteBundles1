@@ -18,6 +18,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
@@ -41,7 +42,7 @@ import com.tabulaw.util.StringUtil;
  * <p>Fires a value change event signaling completion of upload.
  * @author jpk
  */
-public class DocUploadWidget extends AbstractModelChangeAwareWidget implements HasValueChangeHandlers<String> {
+public class DocUploadWidget extends Composite implements HasValueChangeHandlers<String> {
 
 	public static class Styles {
 

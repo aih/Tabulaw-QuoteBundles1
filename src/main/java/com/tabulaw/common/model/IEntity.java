@@ -32,6 +32,9 @@ public interface IEntity extends Serializable, Cloneable, IMarshalable, IModelKe
 	void setId(String id);
 
 	/**
+	 * Is the entity transient (non-persisted) state? <b>NOTE: </b>This should be
+	 * used with extreme caution since we don't wait and update entity state on
+	 * the client!!!
 	 * @return <code>true</code> if the entity has not yet been persisted.
 	 */
 	boolean isNew();

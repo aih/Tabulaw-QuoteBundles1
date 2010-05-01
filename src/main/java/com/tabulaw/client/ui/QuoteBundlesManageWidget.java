@@ -83,7 +83,8 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			// identify the target quote bundle widget (recipient of draggable)
 			final QuoteBundleEditWidget targetQuoteBundleWidget;
 			try {
-				targetQuoteBundleWidget = (QuoteBundleEditWidget) context.finalDropController.getDropTarget().getParent();
+				targetQuoteBundleWidget =
+						(QuoteBundleEditWidget) context.finalDropController.getDropTarget().getParent().getParent();
 			}
 			catch(NullPointerException e) {
 				// presume the drop target is the same as the source!
@@ -109,7 +110,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			// clone the dragged quote widget setting its id to a new one
 			Quote mQuoteClone = (Quote) draggedQuoteModel.clone();
 			mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
-			mQuoteClone.setVersion(-1);	// CRITICAL
+			mQuoteClone.setVersion(-1); // CRITICAL
 
 			// add and persist
 			targetQuoteBundleWidget.addQuote(mQuoteClone, true, true);
@@ -289,17 +290,17 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	private BOption addQuoteBundleOption(QuoteBundle bundle) {
 		BOption option = new BOption(bundle.getId(), bundle.getName());
 		option.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
 				pinQuoteBundle((BOption) event.getSource());
 			}
 		});
 		qbListingWidget.getOptionsPanel().addOption(option);
-		//bundleOptionController.makeDraggable(option);
+		// bundleOptionController.makeDraggable(option);
 		return option;
 	}
-	
+
 	private BOption removeQuoteBundleOption(QuoteBundle qb) {
 		for(BOption option : qbListingWidget.getOptionsPanel().getOptions()) {
 			if(option.bundleId.equals(qb.getId())) {

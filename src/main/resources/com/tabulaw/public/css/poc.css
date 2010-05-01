@@ -393,6 +393,12 @@ a:active {
 		/*height: 100%;*/
 		width: 100%;
 	}
+	.wqbundle .qbcurrent {
+		border: 3px solid #DFDFDF;
+		-moz-border-radius: 6px;
+		-webkit-border-radius: 6px;
+		padding: 4px;
+	}
 
 /* wquote */
 .wquote {
@@ -619,8 +625,9 @@ a:active {
 	.quoteBundle .boundaryArea {
 		width: 100%;
 		/*min-height: 578px;*/
-		height: 535px;
-		overflow-y: auto !important;
+		
+		/*height: 535px;
+		overflow-y: auto !important;*/
 	}
 
 /* document view styling */

@@ -69,16 +69,19 @@ public class UserDataService extends AbstractEntityService {
 
 	@Transactional(readOnly = true)
 	public UserState getUserState(String userId) throws EntityNotFoundException {
+		if(userId == null) throw new NullPointerException();
 		return dao.load(UserState.class, userId);
 	}
 
 	@Transactional
 	public void saveUserState(UserState userState) throws EntityExistsException {
+		if(userState == null) throw new NullPointerException();
 		dao.persist(userState);
 	}
 
 	@Transactional(readOnly = true)
 	public List<QuoteBundle> getBundlesForUser(String userId) {
+		if(userId == null) throw new NullPointerException();
 		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
 		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
 		try {
@@ -116,8 +119,6 @@ public class UserDataService extends AbstractEntityService {
 
 		validate(bundle);
 
-		if(bundle.isNew()) throw new IllegalArgumentException("Bundle must already exist");
-		
 		QuoteBundle existingQb = dao.load(QuoteBundle.class, bundle.getId());
 		existingQb.setName(bundle.getName());
 		existingQb.setDescription(bundle.getDescription());
@@ -139,18 +140,21 @@ public class UserDataService extends AbstractEntityService {
 
 		validate(bundle);
 
-		boolean isNew = bundle.isNew();
+		QuoteBundle existing;
+		try {
+			existing = dao.load(QuoteBundle.class, bundle.getId());
+		}
+		catch(EntityNotFoundException e) {
+			// new
+			existing = null;
+		}
 
 		// clear out existing
-		if(!isNew) {
-			if(bundle.getId() == null) throw new IllegalArgumentException();
-			dao.purge(QuoteBundle.class, bundle.getId());
-		}
-		List<Quote> existingQuotes = bundle.getQuotes();
-		if(existingQuotes != null) {
-			for(Quote eq : existingQuotes) {
-				if(!eq.isNew()) {
-					if(eq.getId() == null) throw new IllegalArgumentException();
+		if(existing != null) {
+			dao.purge(QuoteBundle.class, existing.getId());
+			List<Quote> existingQuotes = existing.getQuotes();
+			if(existingQuotes != null) {
+				for(Quote eq : existingQuotes) {
 					dao.purge(eq);
 				}
 			}
@@ -170,7 +174,7 @@ public class UserDataService extends AbstractEntityService {
 		}
 
 		// create binding if this is a new bundle
-		if(isNew) addBundleUserBinding(bundle.getId(), userId);
+		if(existing == null) addBundleUserBinding(bundle.getId(), userId);
 
 		return persistedBundle;
 	}
@@ -213,11 +217,19 @@ public class UserDataService extends AbstractEntityService {
 	 */
 	@Transactional
 	public QuoteBundle addBundleForUser(String userId, QuoteBundle bundle) throws ConstraintViolationException {
-		if(!bundle.isNew()) throw new IllegalArgumentException("Bundle already added.");
-		validate(bundle);
-		QuoteBundle persistedBundle = dao.persist(bundle);
-		addBundleUserBinding(persistedBundle.getId(), userId);
-		return persistedBundle;
+		if(userId == null || bundle == null) throw new NullPointerException();
+		
+		try {
+			dao.load(QuoteBundle.class, bundle.getId());
+			throw new IllegalArgumentException("Bundle already exists.");
+		}
+		catch(EntityNotFoundException e) {
+			// desired
+			validate(bundle);
+			QuoteBundle persistedBundle = dao.persist(bundle);
+			addBundleUserBinding(persistedBundle.getId(), userId);
+			return persistedBundle;
+		}
 	}
 
 	/**
@@ -260,10 +272,21 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional
 	public Quote addQuoteToBundle(String bundleId, Quote quote) throws ConstraintViolationException,
 			EntityNotFoundException {
-		if(!quote.isNew()) throw new IllegalArgumentException("Quote isn't new");
-		validate(quote);
+		if(bundleId == null || quote == null) throw new NullPointerException();
+		
 		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);
 		assert qb != null;
+		
+		// ensure quote is new
+		try {
+			dao.load(Quote.class, quote.getId());
+			throw new IllegalArgumentException("Quote already exists");
+		}
+		catch(EntityNotFoundException e) {
+			// expected
+		}
+		
+		validate(quote);
 		Quote persistedQuote = dao.persist(quote);
 		qb.addQuote(persistedQuote);
 		dao.persist(qb);
@@ -286,6 +309,7 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional
 	public void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote)
 			throws EntityNotFoundException {
+		if(bundleId == null || quoteId == null) throw new NullPointerException();
 		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);
 		Quote tormv = null;
 		if(qb.getQuotes() != null) {
@@ -325,6 +349,7 @@ public class UserDataService extends AbstractEntityService {
 	 */
 	@Transactional
 	public void removeBundleUserBinding(String bundleId, String userId) throws EntityNotFoundException {
+		if(bundleId == null || userId == null) throw new NullPointerException();
 		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
 		c.getPrimaryGroup().addCriterion("bundleId", bundleId, Comparator.EQUALS, true);
 		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);

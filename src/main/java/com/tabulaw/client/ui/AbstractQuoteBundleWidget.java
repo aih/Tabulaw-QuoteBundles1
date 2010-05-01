@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -20,7 +20,8 @@ import com.tabulaw.common.model.QuoteBundle;
  * @param <H> the quote bundle {@link Header} widget type.
  * @author jpk
  */
-public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H extends AbstractQuoteBundleWidget.Header> extends FlowPanel {
+public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H extends AbstractQuoteBundleWidget.Header> 
+extends AbstractModelChangeAwareWidget {
 
 	static class Styles {
 
@@ -62,7 +63,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	 * Extensible quote bundle header widget.
 	 * @author jpk
 	 */
-	protected static class Header extends AbstractModelChangeAwareWidget {
+	protected static class Header extends Composite {
 
 		protected final FlowPanel header = new FlowPanel();
 
@@ -74,13 +75,13 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		 * Constructor
 		 */
 		public Header() {
-			initWidget(header);
-
 			lblQb = new Label("Quote Bundle");
 			lblQb.setStyleName(Styles.ECHO);
 
 			header.setStyleName(Styles.HEADER);
 			header.add(lblQb);
+			
+			initWidget(header);
 		}
 
 		/**
@@ -115,6 +116,8 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	protected QuotesPanel quotePanel = new QuotesPanel();
 
 	protected QuoteBundle bundle;
+	
+	private final FlowPanel panel = new FlowPanel();
 
 	private PickupDragController dragController;
 
@@ -125,9 +128,10 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 	protected AbstractQuoteBundleWidget(H headerWidget) {
 		super();
 		this.header = headerWidget;
-		setStyleName(Styles.WQBUNDLE);
-		add(header);
-		add(quotePanel);
+		panel.setStyleName(Styles.WQBUNDLE);
+		panel.add(header);
+		panel.add(quotePanel);
+		initWidget(panel);
 	}
 
 	/**
@@ -299,21 +303,7 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 		}
 		return -1;
 	}
-
-	private HandlerRegistration mcr;
-
-	@Override
-	protected void onLoad() {
-		super.onLoad();
-		mcr = addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
-	}
-
-	@Override
-	protected void onUnload() {
-		mcr.removeHandler();
-		super.onUnload();
-	}
-
+	
 	/**
 	 * Compares the given quote bundle model against the one held currently adding
 	 * quotes that don't exist and removing those that do but not in the one
@@ -339,5 +329,10 @@ public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H
 				addQuote(mchanged, false, true);
 			}
 		}
+	}
+
+	@Override
+	public void onModelChangeEvent(ModelChangeEvent event) {
+		// no-op
 	}
 }

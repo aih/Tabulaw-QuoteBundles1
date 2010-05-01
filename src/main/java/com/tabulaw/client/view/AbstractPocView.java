@@ -41,11 +41,9 @@ public abstract class AbstractPocView<I extends IViewInitializer> extends Abstra
 		return null;
 	}
 
-	/**
-	 * Handles model changes.
-	 * @param event The {@link ModelChangeEvent}
-	 */
-	protected abstract void handleModelChange(ModelChangeEvent event);
+	protected void handleModelChange(ModelChangeEvent event) {
+		// base impl no-op
+	}
 	
 	@Override
 	public final void onModelChangeEvent(ModelChangeEvent event) {

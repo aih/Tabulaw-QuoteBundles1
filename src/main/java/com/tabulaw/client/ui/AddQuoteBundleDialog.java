@@ -5,11 +5,9 @@
  */
 package com.tabulaw.client.ui;
 
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DeferredCommand;
 import com.tabulaw.client.Poc;
 import com.tabulaw.client.model.ClientModelCache;
-import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.edit.EditEvent;
 import com.tabulaw.client.ui.edit.FieldGroupEditPanel;
 import com.tabulaw.client.ui.edit.IEditHandler;
@@ -30,8 +28,6 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 	private final AddQuoteBundlePanel fieldPanel = new AddQuoteBundlePanel();
 
 	private final FieldGroupEditPanel editPanel = new FieldGroupEditPanel("Add", null, "Cancel", null, fieldPanel);
-
-	private HandlerRegistration mcr;
 
 	/**
 	 * Constructor
@@ -81,21 +77,13 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 	}
 
 	@Override
-	public void hide() {
-		if(mcr != null) mcr.removeHandler();
-		super.hide();
-	}
-
-	@Override
 	public void show() {
 		super.show();
 
 		// set error hander for edit panel
 		ErrorHandlerDelegate ehd = ErrorHandlerBuilder.build(false, true, null);
 		editPanel.setErrorHandler(ehd, true);
-
-		mcr = addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
-		// editPanel.setModel(EntityFactory.get().buildQuoteBundle(null, null));
+		
 		DeferredCommand.addCommand(new FocusCommand(fieldPanel.getFocusable(), true));
 	}
 }

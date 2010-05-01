@@ -7,10 +7,8 @@ package com.tabulaw.client.view;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.mvc.view.ViewOptions;
@@ -68,7 +66,7 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 	
 	private final DocumentsListingWidget docListing = new DocumentsListingWidget();
 	
-	private HandlerRegistration hrModelChangeSuggest;
+	// private HandlerRegistration hrModelChangeSuggest;
 	
 	private DocUploadDialog docUploadDialog;
 	
@@ -100,29 +98,17 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 	protected void doInitialization(StaticViewInitializer initializer) {
 		addWidget(docSuggest);
 		addWidget(docListing);
-		
-		// this is necessary since the docListing widget won't see the model change
-		// event fired
-		// from doc suggest widget since it exists under the *same* view which model
-		// change dispatcher doesn't support
-		hrModelChangeSuggest = docSuggest.addModelChangeHandler(docListing);
+		docListing.makeModelChangeAware();
 	}
 
 	@Override
 	protected final void doRefresh() {
-		//docListing.getOperator().refresh();
 		docListing.loadData();
 	}
 
 	@Override
 	protected final void doDestroy() {
 		if(docListing.getOperator() != null) docListing.getOperator().clear();
-		hrModelChangeSuggest.removeHandler();
-		hrModelChangeSuggest = null;
-	}
-
-	@Override
-	protected void handleModelChange(ModelChangeEvent event) {
-		docListing.onModelChangeEvent(event);
+		docListing.unmakeModelChangeAware();
 	}
 }

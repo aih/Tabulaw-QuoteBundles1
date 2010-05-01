@@ -45,6 +45,8 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 		public static final String CURRENT = "current";
 
 		public static final String X = "x";
+		
+		public static final String QB_CURRENT = "qbcurrent";
 	} // Styles
 
 	/**
@@ -84,7 +86,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 			
 			save = new Image(Resources.INSTANCE.save());
 			save.setStyleName(Styles.SAVE);
-			save.setTitle("Click to save Name and Description");
+			save.setTitle("Save Name and Description");
 			save.setVisible(false);
 			save.addClickHandler(new ClickHandler() {
 
@@ -102,7 +104,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 
 			undo = new Image(Resources.INSTANCE.undo());
 			undo.setStyleName(Styles.UNDO);
-			undo.setTitle("Click to revert Name and Description");
+			undo.setTitle("Revert Name and Description");
 			undo.setVisible(false);
 			undo.addClickHandler(new ClickHandler() {
 
@@ -154,9 +156,9 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 				public void onClick(ClickEvent event) {
 					if(ClientModelCache.get().getUserState().setCurrentQuoteBundleId(bundle.getId())) {
 						Notifier.get().info("Current Quote Bundle set.", 1000);
-						// we need to notify other views of the current quote bundle change
+						// we need to globally notify all views of the current quote bundle change
 						// and we do it by firing a model change event
-						fireEvent(new ModelChangeEvent(ModelChangeOp.UPDATED, bundle, null));
+						Poc.getPortal().fireEvent(new ModelChangeEvent(current, ModelChangeOp.UPDATED, bundle, null));
 					}
 				}
 			});
@@ -191,7 +193,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 				}
 			});
 		}
-
+		
 		@Override
 		public void setModel(QuoteBundle mQuoteBundle) {
 			super.setModel(mQuoteBundle);
@@ -199,6 +201,25 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 			String desc = bundle.getDescription();
 			pName.setText(name == null ? "" : name);
 			pDesc.setHTML(headerDescInnerHtmlSetter.convert(desc));
+			currentQuoteBundleCheck();
+		}
+
+		/**
+		 * Sets relevant state based on the current quote bundle.
+		 */
+		void currentQuoteBundleCheck() {
+			QuoteBundle cqb = ClientModelCache.get().getCurrentQuoteBundle();
+			boolean isCurrent = cqb != null && cqb.equals(bundle);
+			current.setVisible(!isCurrent);
+			delete.setVisible(!isCurrent);
+			if(isCurrent) {
+				lblQb.setText("Current Quote Bundle");
+				addStyleName(Styles.QB_CURRENT);
+			}
+			else {
+				lblQb.setText("Quote Bundle");
+				removeStyleName(Styles.QB_CURRENT);
+			}
 		}
 
 	} // EditHeader
@@ -209,6 +230,10 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 	 */
 	public QuoteBundleEditWidget(PickupDragController dragController) {
 		super(new EditHeader());
+		
+		// TODO do we need to handle clean up?
+		makeModelChangeAware();
+		
 		setDragController(dragController);
 		dropAreaCheck();
 	}
@@ -264,5 +289,11 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 		else {
 			quotePanel.getElement().getStyle().clearHeight();
 		}
+	}
+
+	@Override
+	public void onModelChangeEvent(ModelChangeEvent event) {
+		super.onModelChangeEvent(event);
+		header.currentQuoteBundleCheck();
 	}
 }

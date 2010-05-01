@@ -132,7 +132,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 
 	/**
 	 * The parent view panel. This property must be set so that views can attach
-	 * to the DOM.  The panel must support multiple children.
+	 * to the DOM. The panel must support multiple children.
 	 */
 	private final ComplexPanel parentViewPanel;
 
@@ -188,7 +188,6 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		// add supported controllers
 		controllers.add(new ShowViewController());
 		controllers.add(new UnloadViewController());
-		controllers.add(new PinPopViewController());
 	}
 
 	@Override
@@ -214,7 +213,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	public ViewKey getCurrentViewKey() {
 		return current == null ? null : current.vc.getViewKey();
 	}
-	
+
 	/**
 	 * Loads the view into cache but does't add it to the dom.
 	 * @param init
@@ -224,9 +223,9 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		// first check if not already cached
 		CView e = cache.peekQueue(init.getViewKey());
 		if(e != null) return;
-		
+
 		Log.debug("Loading view: " + init + " ..");
-		
+
 		// non-cached view
 		final IView<IViewInitializer> view = (IView<IViewInitializer>) init.getViewKey().getViewClass().newView();
 
@@ -234,7 +233,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		view.initialize(init);
 
 		e = new CView(new ViewContainer(view, init.getViewKey().getViewClass().getViewOptions(), init.getViewKey()), init);
-		
+
 		cacheView(e);
 
 		view.apply(e.vc, e.vc.getToolbar());
@@ -253,7 +252,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		CView cv = cache.peekQueue(key);
 		return cv == null ? null : cv.vc.getView();
 	}
-	
+
 	/**
 	 * Sets the current view. The current view is defined as the visible pinned
 	 * view.
@@ -268,13 +267,12 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		CView e;
 		final ViewOptions options = init.getViewKey().getViewClass().getViewOptions();
 		final int cacheIndex = cache.searchQueue(key);
-		final boolean showPopped = ((cacheIndex == -1) && options.isInitiallyPopped());
 
 		if(cacheIndex != -1) {
 			// existing cached view
 			e = cache.removeAt(cacheIndex);
 			assert e != null;
-			setCurrentView(e, showPopped);
+			setCurrentView(e);
 		}
 		else {
 			Log.debug("Creating and initializing view: " + key + " ..");
@@ -285,7 +283,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 			view.initialize(init);
 
 			e = new CView(new ViewContainer(view, options, key), init);
-			setCurrentView(e, showPopped);
+			setCurrentView(e);
 
 			view.apply(e.vc, e.vc.getToolbar());
 
@@ -297,60 +295,50 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	/**
 	 * Sets the current view given a presently cached view container.
 	 * @param e primary cache element
-	 * @param showPopped show popped or pinned?
 	 */
-	private void setCurrentView(CView e, boolean showPopped) {
+	private void setCurrentView(CView e) {
 		final ViewContainer vc = e.vc;
 		final ViewOptions options = e.init.getViewKey().getViewClass().getViewOptions();
 
-		// set the view
-		if(showPopped) {
-			// NOTE: the view history is not affected!
-			vc.pop(parentViewPanel);
-		}
-		else {
-			final boolean sameView = (current != null && current.equals(e));
-			final boolean pndgIsPopped = e.vc.isPopped();
-			final boolean crntIsPopped = current != null && current.vc.isPopped();
+		final boolean rmvCrnt = current != null;
+		final boolean pinPndg = rmvCrnt || (!e.vc.isAttached() || !e.vc.isVisible());
 
-			final boolean rmvCrnt = current != null && ((!sameView && !crntIsPopped) || (sameView && pndgIsPopped));
-			final boolean pinPndg = (rmvCrnt || (sameView && crntIsPopped) || !sameView || (!e.vc.isAttached() || !e.vc.isVisible()));
-
-			if(rmvCrnt) {
-				// remove or hide the current pinned view
-				if(current.init.getViewKey().getViewClass().getViewOptions().isKeepInDom()) {
-					current.vc.setVisible(false);
-				}
-				else {
-					current.vc.removeFromParent();
-				}
-				RootPanel.get().removeStyleName(current.vc.getView().getViewClass().getName());
+		if(rmvCrnt) {
+			// remove or hide the current pinned view
+			if(current.init.getViewKey().getViewClass().getViewOptions().isKeepInDom()) {
+				current.vc.setVisible(false);
 			}
-			if(pinPndg) {
-				// add the current view's view class name to the root panel
-				RootPanel.get().addStyleName(e.vc.getView().getViewClass().getName());
-				// ** pin the view (the current view in the dom) **
-				vc.makePinReady();
-				if(options.isKeepInDom() && parentViewPanel.getWidgetIndex(vc) >= 0) {
-					vc.setVisible(true);
-				}
-				else {
-					parentViewPanel.add(vc);
-				}
+			else {
+				current.vc.removeFromParent();
 			}
-			// set as current
-			current = e;
-			
-			// fire view load event
-			DeferredCommand.addCommand(new Command() {
-
-				@SuppressWarnings("synthetic-access")
-				@Override
-				public void execute() {
-					viewChangeHandlers.fireEvent(ViewChangeEvent.viewLoadedEvent(current.getViewKey()));
-				}
-			});
+			RootPanel.get().removeStyleName(current.vc.getView().getViewClass().getName());
 		}
+		if(pinPndg) {
+			// add the current view's view class name to the root panel
+			RootPanel.get().addStyleName(e.vc.getView().getViewClass().getName());
+
+			// ** pin the view (the current view in the dom) **
+			// vc.makePinReady();
+
+			if(options.isKeepInDom() && parentViewPanel.getWidgetIndex(vc) >= 0) {
+				vc.setVisible(true);
+			}
+			else {
+				parentViewPanel.add(vc);
+			}
+		}
+		// set as current
+		current = e;
+
+		// fire view load event
+		DeferredCommand.addCommand(new Command() {
+
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void execute() {
+				viewChangeHandlers.fireEvent(ViewChangeEvent.viewLoadedEvent(current.getViewKey()));
+			}
+		});
 
 		// add the view to the cache
 		cacheView(e);
@@ -359,7 +347,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		if(pendingUnload != null) {
 			Log.debug("Destroying pending unload view- " + pendingUnload.vc.getView().toString() + "..");
 			pendingUnload.vc.getView().onDestroy();
-			
+
 			// fire view un-load event
 			DeferredCommand.addCommand(new Command() {
 
@@ -375,7 +363,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		// set the initial view if not set
 		if(initial == null) initial = e;
 	}
-	
+
 	private void cacheView(CView e) {
 		// add the view to the cache
 		final CView old = cache.cache(e);
@@ -384,7 +372,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 			Log.debug("Destroying view - " + old.vc.getView().toString() + "..");
 			// view life-cycle destroy
 			old.vc.getView().onDestroy();
-			
+
 			// fire view un-load event
 			DeferredCommand.addCommand(new Command() {
 
@@ -571,12 +559,11 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	 * @param capacity the maximum number of view refs to provide in the returned
 	 *        array. <code>-1</code> indicates un-bounded in which case the
 	 *        capacity is that of the number of distinct views visited.
-	 * @param includePopped Included views that are currently popped?
 	 * @param includeFirst Include the first cached view? <br>
 	 *        NOTE: This view is <em>always</em> retained.
 	 * @return A newly created never <code>null</code> array of view references.
 	 */
-	public ViewRef[] getViewRefs(int capacity, boolean includePopped, boolean includeFirst) {
+	public ViewRef[] getViewRefs(int capacity, boolean includeFirst) {
 		if(initial == null) return new ViewRef[0];
 		assert current != null;
 
@@ -593,12 +580,6 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 				if(current.compareTo(r) == 0) {
 					// don't include the current view
 					r = null;
-				}
-				else if(!includePopped) {
-					final CView e = cache.peekQueue(r.getViewKey());
-					if(e != null && e.vc.isPopped()) {
-						r = null;
-					}
 				}
 				if(r != null) {
 					plist.add(r);
@@ -628,38 +609,6 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		}
 
 		return plist.toArray(new ViewRef[plist.size()]);
-	}
-
-	/**
-	 * Pops the currently visible pinned view out of the natural flow of the DOM
-	 * document routing the {@link ViewKey} of the view that is to be the
-	 * subsequent pinned view through the browser history system.
-	 */
-	void popCurrentView() {
-		if(current != null) {
-			assert !current.vc.isPopped();
-
-			// pop the view
-			current.vc.pop(parentViewPanel);
-
-			final CView nextCurrent = findFirstView(current);
-			final ViewKey vk = nextCurrent == null ? null : nextCurrent.getViewKey();
-			if(vk != null) {
-				History.newItem(generateViewKeyHistoryToken(vk));
-			}
-		}
-	}
-
-	/**
-	 * Pins a popped view.
-	 * @param key the view key of the popped view to pin
-	 */
-	void pinPoppedView(ViewKey key) {
-		final CView e = findView(key);
-		if(e == null) throw new IllegalStateException();
-		if(e.vc.isPopped()) {
-			setCurrentView(e, false);
-		}
 	}
 
 	/**
@@ -740,7 +689,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 					e = initial;
 				}
 				if(e != null) {
-					setCurrentView(e, false);
+					setCurrentView(e);
 				}
 				else {
 					Log.debug("Un-resolvable view hash: " + viewKeyHash + ". No action performed.");

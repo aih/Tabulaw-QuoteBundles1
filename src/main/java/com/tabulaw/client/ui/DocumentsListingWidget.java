@@ -9,7 +9,6 @@ import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLTable;
@@ -89,20 +88,6 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		protected void onCellClick(int colIndex, int rowIndex) {
 			if(rowIndex > 0 && colIndex < 2)
 				ViewManager.get().dispatch(new ShowViewRequest(new DocumentViewInitializer(getRowKey(rowIndex))));
-		}
-
-		private HandlerRegistration hrModelChange;
-
-		@Override
-		protected void onLoad() {
-			super.onLoad();
-			hrModelChange = addHandler(ModelChangeDispatcher.get(), ModelChangeEvent.TYPE);
-		}
-
-		@Override
-		protected void onUnload() {
-			hrModelChange.removeHandler();
-			super.onUnload();
 		}
 	}
 

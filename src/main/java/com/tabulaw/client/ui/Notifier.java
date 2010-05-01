@@ -39,27 +39,27 @@ public class Notifier {
 	}
 	
 	public void info(String msg) {
-		show(msg, MsgLevel.INFO, -1);
+		show(msg, MsgLevel.INFO, -1, false);
 	}
 
 	public void warn(String msg) {
-		show(msg, MsgLevel.WARN, -1);
+		show(msg, MsgLevel.WARN, -1, false);
 	}
 	
 	public void error(String msg) {
-		show(msg, MsgLevel.ERROR, -1);
+		show(msg, MsgLevel.ERROR, -1, false);
 	}
 	
 	public void info(String msg, int duration) {
-		show(msg, MsgLevel.INFO, duration);
+		show(msg, MsgLevel.INFO, duration, false);
 	}
 
 	public void warn(String msg, int duration) {
-		show(msg, MsgLevel.WARN, duration);
+		show(msg, MsgLevel.WARN, duration, false);
 	}
 	
 	public void error(String msg, int duration) {
-		show(msg, MsgLevel.ERROR, duration);
+		show(msg, MsgLevel.ERROR, duration, false);
 	}
 	
 	public void post(Collection<Msg> msgs, int duration) {
@@ -72,13 +72,13 @@ public class Notifier {
 			mp.addMsg(msg, null);
 			//mp.setAnimationEnabled(true);
 		}
-		mp.showMsgs(Position.BOTTOM, duration, showImage);
+		mp.showMsgs(Position.TOP, duration, showImage);
 	}
 	
-	private void show(String msg, MsgLevel level, int duration) {
+	public void show(String msg, MsgLevel level, int duration, boolean showImage) {
 		final MsgPopup mp = new MsgPopup(refWidget);
 		mp.addMsg(new Msg(msg, level), null);
 		//mp.setAnimationEnabled(true);
-		mp.showMsgs(Position.BOTTOM, duration, true);
+		mp.showMsgs(Position.TOP, duration, showImage);
 	}
 }

@@ -16,6 +16,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SuggestBox;
@@ -38,15 +39,13 @@ import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.msg.Msg;
 
 /**
  * Search as you type doc search widget.
  * @author jpk
  */
-public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements IRpcHandler {
+public class DocSuggestWidget extends Composite implements IRpcHandler {
 
 	public static class Styles {
 
@@ -207,8 +206,7 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 								@Override
 								public void execute() {
 									// show the doc (letting the model change event finish first)
-									ModelKey mk = new ModelKey(EntityType.DOCUMENT.name(), mNewDoc.getId());
-									final DocumentViewInitializer dvi = new DocumentViewInitializer(mk);
+									final DocumentViewInitializer dvi = new DocumentViewInitializer(mNewDoc.getModelKey());
 									ViewManager.get().dispatch(new ShowViewRequest(dvi));
 								}
 							});
@@ -217,8 +215,7 @@ public class DocSuggestWidget extends AbstractModelChangeAwareWidget implements 
 					}.execute();
 				}
 				else {
-					ModelKey mk = new ModelKey(EntityType.DOCUMENT.name(), mDoc.getId());
-					final DocumentViewInitializer dvi = new DocumentViewInitializer(mk);
+					final DocumentViewInitializer dvi = new DocumentViewInitializer(mDoc.getModelKey());
 					DeferredCommand.addCommand(new Command() {
 
 						@Override

@@ -5,6 +5,7 @@
 package com.tabulaw.client.model;
 
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.ModelKey;
 
@@ -29,21 +30,28 @@ public final class ModelChangeEvent extends GwtEvent<IModelChangeHandler> {
 		UPDATED,
 		DELETED;
 	}
-
+	
 	private final ModelChangeOp change;
 	private final IEntity model;
 	private final ModelKey modelKey;
+	private final Widget wsource;
 
 	/**
 	 * Constructor
+	 * @param wsource the logical widget source of the event
 	 * @param change
 	 * @param model
 	 * @param modelKey
 	 */
-	public ModelChangeEvent(ModelChangeOp change, IEntity model, ModelKey modelKey) {
+	public ModelChangeEvent(Widget wsource, ModelChangeOp change, IEntity model, ModelKey modelKey) {
+		this.wsource = wsource;
 		this.change = change;
 		this.model = model;
 		this.modelKey = modelKey;
+	}
+	
+	public Widget getWSource() {
+		return wsource;
 	}
 
 	public ModelChangeOp getChangeOp() {
