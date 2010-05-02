@@ -16,6 +16,9 @@ public class ManageUsersWidget extends Composite {
 
 	private final UsersListingWidget listing;
 
+	/**
+	 * Constructor
+	 */
 	public ManageUsersWidget() {
 		super();
 
