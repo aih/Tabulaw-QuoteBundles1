@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 16, 2010
  */
-package com.tabulaw.client.app.ui.quote;
+package com.tabulaw.client.app.ui;
 
 import com.google.gwt.user.client.DeferredCommand;
 import com.tabulaw.client.app.Poc;

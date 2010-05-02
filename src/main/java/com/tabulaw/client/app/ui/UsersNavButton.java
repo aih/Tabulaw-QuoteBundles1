@@ -3,7 +3,7 @@
  * @author jpk
  * @since May 1, 2010
  */
-package com.tabulaw.client.app.ui.nav;
+package com.tabulaw.client.app.ui;
 
 import com.tabulaw.client.app.ui.view.ManageUsersView;
 import com.tabulaw.client.mvc.view.IViewInitializer;

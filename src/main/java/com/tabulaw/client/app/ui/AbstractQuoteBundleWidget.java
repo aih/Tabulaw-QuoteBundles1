@@ -1,4 +1,4 @@
-package com.tabulaw.client.app.ui.quote;
+package com.tabulaw.client.app.ui;
 
 import java.util.ArrayList;
 import java.util.List;

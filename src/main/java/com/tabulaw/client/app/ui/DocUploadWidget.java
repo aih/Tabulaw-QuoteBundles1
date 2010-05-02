@@ -3,7 +3,7 @@
  * @author jpk
  * @since Mar 30, 2010
  */
-package com.tabulaw.client.app.ui.doc;
+package com.tabulaw.client.app.ui;
 
 import java.util.ArrayList;
 import java.util.Date;

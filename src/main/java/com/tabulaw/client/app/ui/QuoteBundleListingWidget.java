@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 12, 2010
  */
-package com.tabulaw.client.app.ui.quote;
+package com.tabulaw.client.app.ui;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.tabulaw.client.ui.VerticalPanelWithSpacer;

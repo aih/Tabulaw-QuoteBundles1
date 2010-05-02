@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 20, 2010
  */
-package com.tabulaw.client.app.ui.doc;
+package com.tabulaw.client.app.ui;
 
 import com.allen_sauer.gwt.dnd.client.DragEndEvent;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
@@ -19,9 +19,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.DOMExt;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
-import com.tabulaw.client.app.ui.doc.DocumentViewer.ViewMode;
-import com.tabulaw.client.app.ui.quote.QuoteBundleDocWidget;
-import com.tabulaw.client.app.ui.quote.QuoteDocWidget;
+import com.tabulaw.client.app.ui.DocumentViewer.ViewMode;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;

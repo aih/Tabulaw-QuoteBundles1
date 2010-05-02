@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 28, 2010
  */
-package com.tabulaw.client.app.ui.quote;
+package com.tabulaw.client.app.ui;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.JavaScriptObject;

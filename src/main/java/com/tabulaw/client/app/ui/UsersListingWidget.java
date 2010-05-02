@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 14, 2010
  */
-package com.tabulaw.client.app.ui.user;
+package com.tabulaw.client.app.ui;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLTable;

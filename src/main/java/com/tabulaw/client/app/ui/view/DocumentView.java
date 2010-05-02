@@ -8,7 +8,7 @@ package com.tabulaw.client.app.ui.view;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.doc.DocumentHighlightWidget;
+import com.tabulaw.client.app.ui.DocumentHighlightWidget;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;

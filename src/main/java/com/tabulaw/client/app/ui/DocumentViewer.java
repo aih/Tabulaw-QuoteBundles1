@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 14, 2010
  */
-package com.tabulaw.client.app.ui.doc;
+package com.tabulaw.client.app.ui;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -158,7 +158,7 @@ public class DocumentViewer extends Composite implements DoubleClickHandler, Has
 	 * @return the DOM iframe body ref of the contained document.
 	 */
 	public native JavaScriptObject getDocBody() /*-{
-		var frameId = this.@com.tabulaw.client.app.ui.doc.DocumentViewer::getFrameId()();
+		var frameId = this.@com.tabulaw.client.app.ui.DocumentViewer::getFrameId()();
 		var frame = $wnd.goog.dom.$(frameId);
 		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 		return fbody;
@@ -185,14 +185,14 @@ public class DocumentViewer extends Composite implements DoubleClickHandler, Has
 	}
 
 	public native String getDocHtml() /*-{
-		var fid = this.@com.tabulaw.client.app.ui.doc.DocumentViewer::getFrameId()();
+		var fid = this.@com.tabulaw.client.app.ui.DocumentViewer::getFrameId()();
 		var frame = $wnd.goog.dom.$(fid);
 		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 		return fbody.innerHTML;
 	}-*/;
 
 	public native void setDocHtml(String html) /*-{
-		var fid = this.@com.tabulaw.client.app.ui.doc.DocumentViewer::getFrameId()();
+		var fid = this.@com.tabulaw.client.app.ui.DocumentViewer::getFrameId()();
 		var frame = $wnd.goog.dom.$(fid);
 		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 		//$wnd.alert('html: ' + html);

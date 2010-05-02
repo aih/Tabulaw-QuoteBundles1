@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.app.ui.view;
 
-import com.tabulaw.client.app.ui.user.ManageUsersWidget;
+import com.tabulaw.client.app.ui.ManageUsersWidget;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
 

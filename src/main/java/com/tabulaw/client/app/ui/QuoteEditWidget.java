@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 13, 2010
  */
-package com.tabulaw.client.app.ui.quote;
+package com.tabulaw.client.app.ui;
 
 import com.google.gwt.user.client.Window;
 import com.tabulaw.common.model.Quote;

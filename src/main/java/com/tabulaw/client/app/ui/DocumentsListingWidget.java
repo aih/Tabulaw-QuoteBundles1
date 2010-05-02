@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 14, 2010
  */
-package com.tabulaw.client.app.ui.doc;
+package com.tabulaw.client.app.ui;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 13, 2010
  */
-package com.tabulaw.client.app.ui.nav;
+package com.tabulaw.client.app.ui;
 
 import com.tabulaw.client.app.ui.view.QuoteBundlesView;
 import com.tabulaw.client.mvc.view.IViewInitializer;

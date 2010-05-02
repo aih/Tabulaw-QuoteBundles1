@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 14, 2010
  */
-package com.tabulaw.client.app.ui.quote;
+package com.tabulaw.client.app.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.quote.QuoteBundleListingWidget.BOption;
+import com.tabulaw.client.app.ui.QuoteBundleListingWidget.BOption;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.LoggingDragHandler;

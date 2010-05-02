@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 16, 2010
  */
-package com.tabulaw.client.app.ui.quote;
+package com.tabulaw.client.app.ui;
 
 import java.util.List;
 
