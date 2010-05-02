@@ -20,6 +20,7 @@ import com.tabulaw.common.data.rpc.IUserCredentialsService;
 import com.tabulaw.common.data.rpc.IUserDataService;
 import com.tabulaw.common.data.rpc.IdsPayload;
 import com.tabulaw.common.data.rpc.UserContextPayload;
+import com.tabulaw.common.data.rpc.UserListPayload;
 import com.tabulaw.common.data.rpc.UserRegistrationRequest;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IUserRef;
@@ -50,6 +51,21 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 	private static final long serialVersionUID = 7908647379731614097L;
 
 	private static final String EMAIL_TEMPLATE_NAME = "forgot-password";
+
+	@Override
+	public UserListPayload getAllUsers() {
+		final Status status = new Status();
+		UserListPayload payload = new UserListPayload(status);
+
+		final PersistContext pc = getPersistContext();
+		UserDataService uds = pc.getUserDataService();
+
+		List<User> list = uds.getAllUsers();
+		payload.setUsers(list);
+
+		status.addMsg("Users retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		return payload;
+	}
 
 	@Override
 	public void saveUserState(UserState userState) {

@@ -42,12 +42,16 @@ import com.tabulaw.util.ObjectUtil;
 /**
  * @author jpk
  */
-public class ClientModelCache implements IModelSyncer {
+public class ClientModelCache {
 
 	private static final IUserDataServiceAsync userDataService;
 
 	static {
 		userDataService = (IUserDataServiceAsync) GWT.create(IUserDataService.class);
+	}
+	
+	public static IUserDataServiceAsync getUserDataService() {
+		return userDataService;
 	}
 
 	private static ClientModelCache instance;
@@ -137,7 +141,6 @@ public class ClientModelCache implements IModelSyncer {
 
 	} // constructor
 
-	@Override
 	public void saveBundle(QuoteBundle bundle) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
@@ -155,7 +158,6 @@ public class ClientModelCache implements IModelSyncer {
 		});
 	}
 
-	@Override
 	public void updateBundleProps(QuoteBundle bundle) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
@@ -173,7 +175,6 @@ public class ClientModelCache implements IModelSyncer {
 		});
 	}
 
-	@Override
 	public void addBundle(QuoteBundle bundle) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
@@ -191,7 +192,6 @@ public class ClientModelCache implements IModelSyncer {
 		});
 	}
 
-	@Override
 	public void deleteBundle(String bundleId, boolean deleteQuotes) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
@@ -209,7 +209,6 @@ public class ClientModelCache implements IModelSyncer {
 		});
 	}
 
-	@Override
 	public void addQuoteToBundle(String bundleId, Quote quote) {
 		if(!doServerPersist) return;
 		userDataService.addQuoteToBundle(bundleId, quote, new AsyncCallback<ModelPayload>() {
@@ -226,7 +225,6 @@ public class ClientModelCache implements IModelSyncer {
 		});
 	}
 
-	@Override
 	public void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote) {
 		if(!doServerPersist) return;
 		userDataService.removeQuoteFromBundle(bundleId, quoteId, deleteQuote, new AsyncCallback<Payload>() {
@@ -243,7 +241,6 @@ public class ClientModelCache implements IModelSyncer {
 		});
 	}
 
-	@Override
 	public void addBundleUserBinding(String bundleId) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
@@ -261,7 +258,6 @@ public class ClientModelCache implements IModelSyncer {
 		});
 	}
 
-	@Override
 	public void addDocUserBinding(String docId) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
@@ -279,7 +275,6 @@ public class ClientModelCache implements IModelSyncer {
 		});
 	}
 
-	@Override
 	public void removeBundleUserBinding(String bundleId) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
@@ -297,7 +292,6 @@ public class ClientModelCache implements IModelSyncer {
 		});
 	}
 
-	@Override
 	public void removeDocUserBinding(String docId) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();

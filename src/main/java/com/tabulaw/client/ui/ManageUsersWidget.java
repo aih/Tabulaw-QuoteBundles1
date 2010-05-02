@@ -14,4 +14,17 @@ import com.google.gwt.user.client.ui.Composite;
  */
 public class ManageUsersWidget extends Composite {
 
+	private final UsersListingWidget listing;
+
+	public ManageUsersWidget() {
+		super();
+
+		listing = new UsersListingWidget();
+
+		initWidget(listing);
+	}
+
+	public void refresh() {
+		listing.getOperator().refresh();
+	}
 }

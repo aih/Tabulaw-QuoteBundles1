@@ -44,19 +44,48 @@ import com.tabulaw.listhandler.InMemoryListHandler;
  */
 public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
-	static class DocListing extends ModelListingWidget<DocRef, DocumentsListingWidget.Table> /*implements IRpcHandler*/ {
+	static class ListingConfig extends AbstractListingConfig {
 
-		//final RpcUiHandler rpcui;
-		
+		static final Sorting defaultSorting = new Sorting("title");
+
+		static final String[] modelProps = new String[] {
+			"title", "date"
+		};
+
+		static final Column[] cols =
+				new Column[] {
+					new Column("Title", null, "title", null, "title"),
+					new Column("Date", GlobalFormat.DATE, "date", null, "date"), new Column("", null, null, null, "delete"),
+				};
+
+		public ListingConfig() {
+			super("Document", modelProps, cols, defaultSorting, 1000);
+		}
+
+		@Override
+		public boolean isShowRefreshBtn() {
+			return false;
+		}
+
+		@Override
+		public boolean isShowNavBar() {
+			return false;
+		}
+	} // ListingConfig
+
+	static class DocListing extends ModelListingWidget<DocRef, DocumentsListingWidget.Table> /*implements IRpcHandler*/{
+
+		// final RpcUiHandler rpcui;
+
 		public DocListing() {
 			super(config.getListingId(), config.getListingElementName(), new Table(config), null);
-			//rpcui = new RpcUiHandler(this);
+			// rpcui = new RpcUiHandler(this);
 		}
-		
+
 		Table getTable() {
 			return table;
 		}
-		
+
 		@Override
 		protected Widget createNoDataRowsWidget() {
 			return new Label("Currently, no Documents cached.");
@@ -65,7 +94,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		@Override
 		public void onModelChangeEvent(ModelChangeEvent event) {
 			if(event.getModelKey() != null && event.getModelKey().getEntityType().equals(EntityType.DOCUMENT.name())) {
-				//super.onModelChangeEvent(event);
+				// super.onModelChangeEvent(event);
 				getOperator().refresh();
 			}
 		}
@@ -92,10 +121,9 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 	}
 
 	class CellRenderer implements ITableCellRenderer<DocRef> {
-		
+
 		@Override
-		public void renderCell(int rowIndex, final int cellIndex, final DocRef rowData, Column column,
-				final HTMLTable table) {
+		public void renderCell(int rowIndex, final int cellIndex, final DocRef rowData, Column column, final HTMLTable table) {
 			switch(cellIndex) {
 				case 0:
 					table.setText(rowIndex, cellIndex, rowData.getTitle());
@@ -114,10 +142,14 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 							event.stopPropagation();
 							String docref = rowData.getTitle();
 							if(Window.confirm("Delete document '" + docref + "'?")) {
-								DocRef deleted = (DocRef) ClientModelCache.get().remove(rowData.getModelKey(), table);
-								if(deleted != null) {
-									operator.refresh();
-								}
+
+								// client
+								ClientModelCache.get().remove(rowData.getModelKey(), table);
+
+								operator.refresh();
+
+								// server
+								ClientModelCache.get().removeDocUserBinding(rowData.getId());
 							}
 						}
 					});
@@ -127,33 +159,6 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 			}
 		}
 	} // CellRenderer
-	
-	static class ListingConfig extends AbstractListingConfig {
-
-		static final Sorting defaultSorting = new Sorting("title");
-
-		static final String[] modelProps = new String[] { "title", "date" };
-
-		static final Column[] cols = new Column[] {
-			new Column("Title", null, "title", null, "title"),
-			new Column("Date", GlobalFormat.DATE, "date", null, "date"), 
-			new Column("", null, null, null, "delete"), 
-		};
-
-		public ListingConfig() {
-			super("Document", modelProps, cols, defaultSorting, 1000);
-		}
-
-		@Override
-		public boolean isShowRefreshBtn() {
-			return false;
-		}
-
-		@Override
-		public boolean isShowNavBar() {
-			return false;
-		}
-	} // ListingConfig
 
 	static final IListingConfig config = new ListingConfig();
 
@@ -162,30 +167,30 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 	private final DocListing listingWidget;
 
 	private final FlowPanel pnl = new FlowPanel();
-	
+
 	/**
 	 * Constructor
 	 */
 	public DocumentsListingWidget() {
 		super();
-		
+
 		listingWidget = new DocListing();
-		
+
 		pnl.add(listingWidget);
-		
+
 		initWidget(pnl);
 	}
-	
+
 	public Operator getOperator() {
 		return operator;
 	}
-	
+
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
 		listingWidget.onModelChangeEvent(event);
 	}
-	
+
 	public static class Operator extends DataListingOperator<DocRef, InMemoryListHandler<DocRef>> {
 
 		public Operator() {
@@ -195,16 +200,16 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		@SuppressWarnings("unchecked")
 		@Override
 		public void refresh() {
-			getDataProvider().setList((List<DocRef>)ClientModelCache.get().getAll(EntityType.DOCUMENT));
+			getDataProvider().setList((List<DocRef>) ClientModelCache.get().getAll(EntityType.DOCUMENT));
 			super.refresh();
 		}
 	}
-	
+
 	public void loadData() {
 		// get docs from server
 		if(operator == null) {
 			new RpcCommand<DocListingPayload>() {
-				
+
 				@Override
 				protected void doExecute() {
 					setSource(listingWidget);

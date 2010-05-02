@@ -200,7 +200,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	public boolean inRole(String role) {
 		if(authorities == null) return false;
 		for(final Authority a : authorities) {
-			if(a.equals(role)) return true;
+			if(a.getAuthority().equals(role)) return true;
 		}
 		return false;
 	}
@@ -240,31 +240,43 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		this.enabled = enabled;
 	}
 
-	/*
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((emailAddress == null) ? 0 : emailAddress.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if(this == obj) return true;
-		if(!super.equals(obj)) return false;
-		if(getClass() != obj.getClass()) return false;
-		User other = (User) obj;
-		if(emailAddress == null) {
-			if(other.emailAddress != null) return false;
-		}
-		else if(!emailAddress.equals(other.emailAddress)) return false;
-		return true;
-	}
-	*/
-	
 	@Override
 	public int compareTo(User o) {
 		return name != null && o.name != null ? name.compareTo(o.name) : 0;
+	}
+
+	@Override
+	public Object getPropertyValue(String propertyPath) {
+		if("name".equals(propertyPath)) {
+			return getName();
+		}
+		if("dateCreated".equals(propertyPath)) {
+			return getDateCreated();
+		}
+		if("dateModified".equals(propertyPath)) {
+			return getDateModified();
+		}
+		else if("emailAddress".equals(propertyPath)) {
+			return getEmailAddress();
+		}
+		else if("locked".equals(propertyPath)) {
+			return isLocked();
+		}
+		else if("enabled".equals(propertyPath)) {
+			return isEnabled();
+		}
+		else if("expires".equals(propertyPath)) {
+			return getExpires();
+		}
+		else if("authorities".equals(propertyPath)) {
+			StringBuilder sb = new StringBuilder();
+			for(Authority a : getAuthorities()) {
+				sb.append(",");
+				sb.append(a.getAuthority());
+			}
+			return sb.length() > 0 ? sb.substring(1) : "";
+		}
+		
+		return null;
 	}
 }

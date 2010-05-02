@@ -17,7 +17,7 @@ public class UsersNavButton extends AbstractNavButton {
 	static final IViewInitializer vi = new StaticViewInitializer(ManageUsersView.klas);
 
 	public UsersNavButton() {
-		super("Usres", null);
+		super("Users", null);
 	}
 
 	@Override

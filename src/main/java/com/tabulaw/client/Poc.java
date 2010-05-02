@@ -138,12 +138,12 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// attach the global msg panel in its native place
 					parkGlobalMsgPanel();
 
+					// cache initial batch of next ids
+					ClientModelCache.get().setNextIdBatch(result.getNextIds());
+
 					// ensure quote bundles view so it recieves model change events
 					// staying in sync!
 					ViewManager.get().loadView(new StaticViewInitializer(QuoteBundlesView.klas));
-
-					// cache initial batch of next ids
-					ClientModelCache.get().setNextIdBatch(result.getNextIds());
 
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
@@ -161,6 +161,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 						}
 					}
 					
+					// cache bundles and notify
 					ClientModelCache.get().persistAll(userBundles, getPortal());
 
 					// cache user state
@@ -254,6 +255,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 		// add the portal
 		Portal portal = new Portal();
+		portal.setVisible(false);
 		RootPanel.get("portal").add(portal);
 		
 		ClientModelCache.init(portal);
@@ -274,18 +276,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		ViewManager.get().addViewChangeHandler(navColPanel);
 		ViewManager.get().addViewChangeHandler(navRowPanel);
 
-		// pre-load quote bundles view so it recieves model change events staying in
-		// sync!
-		// ViewManager.get().loadView(new
-		// StaticViewInitializer(QuoteBundlesView.klas));
-
 		// initialize the ui msg notifier
 		Notifier.init(navColPanel);
-
-		// hide until user context gotten
-		portal.setVisible(false);
-		getNavRow().setVisible(false);
-		getNavCol().setVisible(false);
 
 		Log.debug("Building complete.");
 	}

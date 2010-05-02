@@ -28,6 +28,13 @@ public interface IUserDataService extends RemoteService {
 	IdsPayload fetchIdBatch();
 
 	/**
+	 * Administration function for fetching the list of users by which to manage
+	 * them.
+	 * @return list of all registered users.
+	 */
+	UserListPayload getAllUsers();
+
+	/**
 	 * Persists the given user state.
 	 * @param userState
 	 */
@@ -48,7 +55,7 @@ public interface IUserDataService extends RemoteService {
 	 * @return payload containing the resultant status of the update op
 	 */
 	Payload updateBundlePropsForUser(String userId, QuoteBundle bundle);
-	
+
 	/**
 	 * Deletes the binding between a user and a bundle.
 	 * @param userId
@@ -56,7 +63,7 @@ public interface IUserDataService extends RemoteService {
 	 * @return payload containing the resultant status of the op
 	 */
 	Payload addBundleUserBinding(String userId, String bundleId);
-	
+
 	/**
 	 * Removes the binding between a user and a bundle.
 	 * @param userId
@@ -64,7 +71,7 @@ public interface IUserDataService extends RemoteService {
 	 * @return payload containing the resultant status of the op
 	 */
 	Payload removeBundleUserBinding(String userId, String bundleId);
-	
+
 	/**
 	 * Creates a binding between a user and a document.
 	 * @param userId
@@ -72,7 +79,7 @@ public interface IUserDataService extends RemoteService {
 	 * @return payload containing the resultant status of the op
 	 */
 	Payload addDocUserBinding(String userId, String docId);
-	
+
 	/**
 	 * Deletes the binding between a user and a document.
 	 * @param userId

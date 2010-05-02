@@ -37,7 +37,6 @@ public class ManageUsersView extends AbstractPocView<StaticViewInitializer> {
 	public ManageUsersView() {
 		super();
 		widget = new ManageUsersWidget();
-		addWidget(widget);
 	}
 
 	@Override
@@ -53,12 +52,18 @@ public class ManageUsersView extends AbstractPocView<StaticViewInitializer> {
 	@Override
 	protected void doInitialization(StaticViewInitializer initializer) {
 		super.doInitialization(initializer);
+		addWidget(widget);
 	}
 
 	@Override
+	protected final void doDestroy() {
+		// no-op
+	}
+	
+	@Override
 	protected void doRefresh() {
 		super.doRefresh();
-		// widget.refresh();
+		widget.refresh();
 	}
 
 }

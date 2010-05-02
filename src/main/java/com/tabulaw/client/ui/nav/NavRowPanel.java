@@ -43,6 +43,7 @@ import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
+import com.tabulaw.common.model.Authority.AuthorityRoles;
 
 /**
  * The top nav row.
@@ -211,7 +212,7 @@ public class NavRowPanel extends AbstractNavPanel {
 		ViewManager.get().dispatch(new ShowViewRequest(list.get(index).getViewInitializer()));
 	}
 
-	private static final int maxNumOpenViews = 6;
+	private static final int maxNumOpenDocs = 6;
 
 	private final ArrayList<AbstractNavButton> mainViewButtons = new ArrayList<AbstractNavButton>();
 
@@ -241,11 +242,9 @@ public class NavRowPanel extends AbstractNavPanel {
 
 		DocumentsNavButton nbDocListing = new DocumentsNavButton();
 		QuoteBundlesNavButton nbQuoteBundles = new QuoteBundlesNavButton();
-		UsersNavButton nbUsers = new UsersNavButton();
 
 		mainViewButtons.add(nbDocListing);
 		mainViewButtons.add(nbQuoteBundles);
-		mainViewButtons.add(nbUsers);
 
 		mainViewTabs.addStyleName(Styles.MAIN_VIEWS);
 		mainViewTabs.addTab(nbDocListing);
@@ -310,6 +309,12 @@ public class NavRowPanel extends AbstractNavPanel {
 			openDocTabs.removeTab(0);
 		openDocNavButtons.clear();
 
+		// remove tail admin users nav button if present
+		if(mainViewButtons.size() == 3) {
+			mainViewButtons.remove(2);
+			mainViewTabs.removeTab(2);
+		}
+
 		crntQuoteBudleWidget.clear();
 		liuWidget.clear();
 	}
@@ -336,7 +341,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			mainViewTabs.selectTab(-1);
 
 			// unload oldest view if at capacity
-			if(openDocNavButtons.size() > maxNumOpenViews) {
+			if(openDocNavButtons.size() > maxNumOpenDocs) {
 				openDocTabs.setVisible(false);
 				ViewKey tounload = openDocNavButtons.get(openDocNavButtons.size() - 1).getViewInitializer().getViewKey();
 				ViewManager.get().dispatch(new UnloadViewRequest(tounload, true, false));
@@ -388,7 +393,20 @@ public class NavRowPanel extends AbstractNavPanel {
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
-		if(event.getChangeOp() == ModelChangeOp.DELETED
+
+		// user loaded
+		if(event.getChangeOp() == ModelChangeOp.LOADED
+				&& EntityType.USER.name().equals(event.getModelKey().getEntityType())) {
+			User liu = (User) event.getModel();
+			if(liu.inRole(AuthorityRoles.ROLE_ADMINISTRATOR.name())) {
+				UsersNavButton nbUsers = new UsersNavButton();
+				mainViewButtons.add(nbUsers);
+				mainViewTabs.addTab(nbUsers);
+			}
+		}
+
+		// document deleted
+		else if(event.getChangeOp() == ModelChangeOp.DELETED
 				&& EntityType.DOCUMENT.name().equals(event.getModelKey().getEntityType())) {
 			// remove open doc tab
 			boolean found = false;

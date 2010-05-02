@@ -19,6 +19,8 @@ public interface IUserDataServiceAsync {
 	
 	void fetchIdBatch(AsyncCallback<IdsPayload> callback);
 	
+	void getAllUsers(AsyncCallback<UserListPayload> callback);
+	
 	void saveUserState(UserState userState, AsyncCallback<Void> callback);
 
 	void saveBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload> callback);
