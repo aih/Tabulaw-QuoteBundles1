@@ -8,7 +8,7 @@ package com.tabulaw.client.ui;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
-import com.tabulaw.client.Poc;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
 

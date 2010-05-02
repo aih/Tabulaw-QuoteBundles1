@@ -7,7 +7,7 @@ package com.tabulaw.client.ui;
 
 import java.util.ArrayList;
 
-import com.tabulaw.client.model.MarkOverlay;
+import com.tabulaw.client.app.model.MarkOverlay;
 
 /**
  * API for use in a native JavaScript context in order to realize document text
@@ -85,7 +85,7 @@ public class TextSelectApi implements IFiresTextSelectEvents {
 					if(iframedoc !== rng.getDocument()) alert('range.document != iframedoc!');
 					//alert('iframedoc: ' + iframedoc + ', rng.getDocument(): ' + rng.getDocument());
 					mark  = new $wnd.Mark(rng);
-					@com.tabulaw.client.ui.TextSelectApi::fireTextSelectEvent(Lcom/tabulaw/client/model/MarkOverlay;)(mark);
+					@com.tabulaw.client.ui.TextSelectApi::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
 				}
 				catch(e) {
 					alert('Unable to select this portion of text\n(' + e + ')');

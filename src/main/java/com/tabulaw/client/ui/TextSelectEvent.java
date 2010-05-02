@@ -6,7 +6,7 @@
 package com.tabulaw.client.ui;
 
 import com.google.gwt.event.shared.GwtEvent;
-import com.tabulaw.client.model.MarkOverlay;
+import com.tabulaw.client.app.model.MarkOverlay;
 
 /**
  * TextSelectEvent

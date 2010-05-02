@@ -5,6 +5,6 @@
 
 	<inherits name="com.tabulaw.Poc" />
 
-	<entry-point class="com.tabulaw.client.Poc" />
+	<entry-point class="com.tabulaw.client.app.Poc" />
 
 </module>
