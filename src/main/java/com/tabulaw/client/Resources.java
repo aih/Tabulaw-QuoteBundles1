@@ -17,6 +17,9 @@ public interface Resources extends ClientBundle {
 
 	Resources INSTANCE = GWT.create(Resources.class);
 
+	@Source("../public/images/permalink.gif")
+	ImageResource permalink();
+
 	@Source("../public/images/note-icon.png")
 	ImageResource searchImage();
 

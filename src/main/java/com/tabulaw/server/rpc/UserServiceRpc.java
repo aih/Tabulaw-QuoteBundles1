@@ -35,7 +35,6 @@ import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailManager;
 import com.tabulaw.mail.MailRouting;
 import com.tabulaw.server.PersistContext;
-import com.tabulaw.server.RequestContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
 import com.tabulaw.service.entity.UserDataService;
@@ -60,13 +59,11 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 	}
 
 	@Override
-	public UserContextPayload getUserContext() {
+	public UserContextPayload getClientUserContext() {
 		final Status status = new Status();
 		UserContextPayload payload = new UserContextPayload(status);
 
-		final RequestContext rc = getRequestContext();
-		final UserContext userContext =
-				rc.getSession() == null ? null : (UserContext) rc.getSession().getAttribute(UserContext.KEY);
+		final UserContext userContext = getUserContext();
 		if(userContext == null || userContext.getUser() == null) {
 			// presume not logged in yet
 			status.addMsg("User Context not found.", MsgLevel.INFO, MsgAttr.STATUS.flag);
@@ -120,6 +117,114 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 		}
 
 		return new Payload(status);
+	}
+
+	@Override
+	public Payload addBundleUserBinding(String userId, String bundleId) {
+		final Status status = new Status();
+		Payload payload = new Payload(status);
+		
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+		
+		try {
+			userDataService.addBundleUserBinding(userId, bundleId);
+			status.addMsg("User Bundle binding created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityExistsException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload addDocUserBinding(String userId, String docId) {
+		final Status status = new Status();
+		Payload payload = new Payload(status);
+		
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+		
+		try {
+			userDataService.addDocUserBinding(userId, docId);
+			status.addMsg("User Document binding created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityExistsException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload removeBundleUserBinding(String userId, String bundleId) {
+		final Status status = new Status();
+		Payload payload = new Payload(status);
+		
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+		
+		try {
+			userDataService.removeBundleUserBinding(userId, bundleId);
+			status.addMsg("User Bundle binding removed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityNotFoundException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload removeDocUserBinding(String userId, String docId) {
+		final Status status = new Status();
+		Payload payload = new Payload(status);
+		
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+		
+		try {
+			userDataService.removeDocUserBinding(userId, docId);
+			status.addMsg("User Document binding removed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityNotFoundException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
 	}
 
 	public Payload requestPassword(final String emailAddress) {
@@ -368,9 +473,5 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 		}
 
 		return payload;
-	}
-
-	private PersistContext getPersistContext() {
-		return (PersistContext) getRequestContext().getServletContext().getAttribute(PersistContext.KEY);
 	}
 }

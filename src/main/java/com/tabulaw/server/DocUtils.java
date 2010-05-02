@@ -17,6 +17,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.io.FileUtils;
+
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
@@ -61,7 +63,7 @@ public class DocUtils {
 
 	/**
 	 * Creates {@link File} instance given a doc id.
-	 * @param docId
+	 * @param docId the doc hash
 	 * @return new {@link File} instance pointing to the doc on disk
 	 * @throws IllegalArgumentException when the op fails
 	 */
@@ -70,10 +72,11 @@ public class DocUtils {
 		return f;
 	}
 
-	public static String dateAsString(Date date) {
-		return dateFormat.format(date);
-	}
-
+	/**
+	 * Serializes the state of the given doc ref into a single token.
+	 * @param doc doc to serialize
+	 * @return serialized doc token
+	 */
 	public static String serializeDocument(DocRef doc) {
 		StringBuilder sb = new StringBuilder(1024);
 
@@ -109,7 +112,38 @@ public class DocUtils {
 
 		return sb.toString();
 	}
+	
+	/**
+	 * Extracts the serialized doc ref token from a locally cached doc file.
+	 * @param fdoc ref to a locally cached doc file
+	 * @return the contained serialized doc ref token or <code>null</code> if not
+	 *         found in the doc file's contents
+	 * @throws IOException
+	 */
+	public static String getSerializedDocToken(File fdoc) throws IOException {
+		// for now just load the entire doc as a string for simplicity's sake
+		String s = FileUtils.readFileToString(fdoc, "UTF-8");
+		int index = s.indexOf(']');
+		if(index == -1) return null;
+		return s.substring(0, index);
+	}
 
+	/**
+	 * @param fdoc
+	 * @return
+	 * @throws IOException
+	 */
+	public static DocRef deserializeDocument(File fdoc) throws IOException {
+		String stoken = getSerializedDocToken(fdoc);
+		return stoken == null ? null : deserializeDocument(stoken);
+	}
+
+	/**
+	 * Creates a doc ref entity given the serialized doc token.
+	 * @param s serialized doc token
+	 * @return newly created {@link DocRef} entity or <code>null</code> if the
+	 *         format is un-recognized.
+	 */
 	public static DocRef deserializeDocument(String s) {
 		// check to see if we have a serializer first line
 		if(s.charAt(0) != '[') return null;
@@ -175,10 +209,26 @@ public class DocUtils {
 			throw new IllegalArgumentException("Unhandled doc type: " + type);
 	}
 
+	/**
+	 * Creates a int hashcode that is intended to be unique against all other
+	 * locally cached docs.
+	 * @param remoteUrl the remove doc url
+	 * @return hash code of the given remote url
+	 */
+	// TODO this routine may not return unique ids as is really intended because
+	// it relies on the java string hashCode function!
 	public static int docHash(String remoteUrl) {
 		return Math.abs(remoteUrl.hashCode());
 	}
 
+	/**
+	 * Creates the local doc filename given the raw hash code.
+	 * <p>
+	 * This return value is what is used as the actual doc hash in the context of
+	 * the doc ref entity.
+	 * @param docHash
+	 * @return
+	 */
 	public static String localDocFilename(int docHash) {
 		return "doc_" + docHash + ".htm";
 	}

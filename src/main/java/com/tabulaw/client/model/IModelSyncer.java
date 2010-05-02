@@ -31,4 +31,11 @@ public interface IModelSyncer {
 
 	void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote);
 
+	void addBundleUserBinding(String bundleId);
+
+	void removeBundleUserBinding(String bundleId);
+
+	void addDocUserBinding(String docId);
+
+	void removeDocUserBinding(String docId);
 }

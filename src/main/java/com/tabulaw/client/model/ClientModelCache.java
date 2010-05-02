@@ -243,6 +243,78 @@ public class ClientModelCache implements IModelSyncer {
 		});
 	}
 
+	@Override
+	public void addBundleUserBinding(String bundleId) {
+		if(!doServerPersist) return;
+		String userId = getUser().getId();
+		userDataService.addBundleUserBinding(userId, bundleId, new AsyncCallback<Payload>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				handleXhrPersistError(caught);
+			}
+
+			@Override
+			public void onSuccess(Payload result) {
+				handlePersistResponse(result);
+			}
+		});
+	}
+
+	@Override
+	public void addDocUserBinding(String docId) {
+		if(!doServerPersist) return;
+		String userId = getUser().getId();
+		userDataService.addDocUserBinding(userId, docId, new AsyncCallback<Payload>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				handleXhrPersistError(caught);
+			}
+
+			@Override
+			public void onSuccess(Payload result) {
+				handlePersistResponse(result);
+			}
+		});
+	}
+
+	@Override
+	public void removeBundleUserBinding(String bundleId) {
+		if(!doServerPersist) return;
+		String userId = getUser().getId();
+		userDataService.removeBundleUserBinding(userId, bundleId, new AsyncCallback<Payload>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				handleXhrPersistError(caught);
+			}
+
+			@Override
+			public void onSuccess(Payload result) {
+				handlePersistResponse(result);
+			}
+		});
+	}
+
+	@Override
+	public void removeDocUserBinding(String docId) {
+		if(!doServerPersist) return;
+		String userId = getUser().getId();
+		userDataService.removeBundleUserBinding(userId, docId, new AsyncCallback<Payload>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				handleXhrPersistError(caught);
+			}
+
+			@Override
+			public void onSuccess(Payload result) {
+				handlePersistResponse(result);
+			}
+		});
+	}
+
 	/**
 	 * Sets a batch of ids for use in entity creation.
 	 * @param nextIdBatch

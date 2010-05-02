@@ -147,9 +147,9 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		user.setPassword(encPassword);
 		user.setName(name);
 
-		// set default expiry date to 1 day from now
+		// set default expiry date to 6 months from now
 		final Calendar clndr = Calendar.getInstance();
-		clndr.add(Calendar.DAY_OF_MONTH, 1);
+		clndr.add(Calendar.MONTH, 6);
 		final Date expires = clndr.getTime();
 		user.setExpires(expires);
 

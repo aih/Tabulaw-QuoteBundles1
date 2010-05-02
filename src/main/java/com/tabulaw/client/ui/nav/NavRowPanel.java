@@ -241,9 +241,11 @@ public class NavRowPanel extends AbstractNavPanel {
 
 		DocumentsNavButton nbDocListing = new DocumentsNavButton();
 		QuoteBundlesNavButton nbQuoteBundles = new QuoteBundlesNavButton();
+		UsersNavButton nbUsers = new UsersNavButton();
 
 		mainViewButtons.add(nbDocListing);
 		mainViewButtons.add(nbQuoteBundles);
+		mainViewButtons.add(nbUsers);
 
 		mainViewTabs.addStyleName(Styles.MAIN_VIEWS);
 		mainViewTabs.addTab(nbDocListing);

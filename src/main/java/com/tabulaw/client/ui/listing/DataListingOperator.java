@@ -7,6 +7,8 @@ package com.tabulaw.client.ui.listing;
 
 import java.util.List;
 
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.tabulaw.common.data.ListingOp;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.listhandler.EmptyListException;
@@ -130,6 +132,14 @@ public class DataListingOperator<R, H extends IListHandler<R>> extends AbstractL
 		offset = 0;
 		sorting = null;
 		fireListingEvent(ListingOp.CLEAR);
-		current.clear();
+		if(current != null) {
+			DeferredCommand.addCommand(new Command() {
+				
+				@Override
+				public void execute() {
+					current.clear();
+				}
+			});
+		}
 	}
 }

@@ -367,6 +367,10 @@ function Mark() {
 	this.getText = function () {
 		return this.text;
 	}
+	
+	this.getStartNode = function() {
+		return this.startNodePath == null ? null : this.startNodePath.getNode();
+	}
 
 	/*
 	this.eq = function (other, noCheckBack) {

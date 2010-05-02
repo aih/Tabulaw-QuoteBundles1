@@ -9,6 +9,7 @@ import com.tabulaw.common.model.Authority;
 import com.tabulaw.common.model.BundleUserBinding;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.DocUserBinding;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.Quote;
@@ -29,6 +30,8 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 				return Authority.class;
 			case BUNDLE_USER_BINDING:
 				return BundleUserBinding.class;
+			case DOC_USER_BINDING:
+				return DocUserBinding.class;
 			case CASE:
 				return CaseRef.class;
 			case DOCUMENT:
@@ -52,6 +55,9 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 		}
 		else if(clz == BundleUserBinding.class) {
 			return EntityType.BUNDLE_USER_BINDING.name();
+		}
+		else if(clz == DocUserBinding.class) {
+			return EntityType.DOC_USER_BINDING.name();
 		}
 		else if(clz == User.class) {
 			return EntityType.USER.name();

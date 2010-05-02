@@ -7,6 +7,9 @@ package com.tabulaw.client.ui;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -15,6 +18,10 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.Resources;
+import com.tabulaw.client.model.MarkOverlay;
+import com.tabulaw.client.mvc.ViewManager;
+import com.tabulaw.client.mvc.view.ShowViewRequest;
+import com.tabulaw.client.view.DocumentViewInitializer;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
@@ -39,6 +46,10 @@ public abstract class AbstractQuoteWidget extends Composite {
 		 * X icon in cite header.
 		 */
 		public static final String X = "x";
+		/**
+		 * link to doc and highlight.
+		 */
+		public static final String HLINK = "hlink";
 		/**
 		 * Quote block below cite block.
 		 */
@@ -156,6 +167,35 @@ public abstract class AbstractQuoteWidget extends Composite {
 		});
 		header.add(ic);
 		*/
+		
+		// add link to highlight icon
+		ic = new ImageContainer(new Image(Resources.INSTANCE.permalink()));
+		ic.setTitle("Goto highlight");
+		ic.addStyleName(Styles.HLINK);
+		ic.getImage().addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				// goto hightlight switching current doc if necessary
+				DocRef docRef = quote.getDocument();
+				final DocumentViewInitializer dvi = new DocumentViewInitializer(docRef.getModelKey());
+				ViewManager.get().dispatch(new ShowViewRequest(dvi, new Command() {
+
+					@Override
+					public void execute() {
+						// TODO goto highlight
+						MarkOverlay mark = (MarkOverlay) quote.getMark();
+						if(mark != null) {
+							Element elm = mark.getStartNode();
+							if(elm != null) {
+								DOM.scrollIntoView(elm);
+							}
+						}
+					}
+				}));
+			}
+		});
+		header.add(ic);
 
 		// add X icon
 		ic = new ImageContainer(new Image(Resources.INSTANCE.XButton()));

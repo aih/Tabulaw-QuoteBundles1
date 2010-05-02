@@ -10,9 +10,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -30,9 +28,13 @@ import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
+import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.server.DocUtils;
+import com.tabulaw.server.PersistContext;
+import com.tabulaw.server.UserContext;
 import com.tabulaw.server.scrape.GoogleScholarDocHandler;
 import com.tabulaw.server.scrape.IDocHandler;
+import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -64,27 +66,33 @@ public class DocService extends RpcServlet implements IDocService {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public DocListingPayload getCachedDocs() {
 		Status status = new Status();
-		ArrayList<DocRef> docList = new ArrayList<DocRef>();
 
+		// get user doc bindings
+		PersistContext pc = getPersistContext();
+		UserDataService uds = pc.getUserDataService();
+		UserContext uc = getUserContext();
+		String userId = uc.getUser().getId();
+		List<DocRef> docList = uds.getDocsForUser(userId);
+
+		/*
 		try {
 			File docDir = DocUtils.getDocDirRef();
-			Iterator<File> itr = FileUtils.iterateFiles(docDir, new String[] { "htm", "html"
+			Iterator<File> itr = FileUtils.iterateFiles(docDir, new String[] {
+				"htm", "html"
 			}, false);
 			while(itr.hasNext()) {
 				File f = itr.next();
-				String s = FileUtils.readFileToString(f, "UTF-8");
-				s = s.trim();
-				DocRef mDoc = DocUtils.deserializeDocument(s);
+				DocRef mDoc = DocUtils.deserializeDocument(f);
 				if(mDoc != null) docList.add(mDoc);
 			}
 		}
 		catch(Exception e) {
 			RpcServlet.exceptionToStatus(e, status);
 		}
+		*/
 
 		DocListingPayload payload = new DocListingPayload(status, docList);
 
@@ -119,7 +127,9 @@ public class DocService extends RpcServlet implements IDocService {
 		}
 		catch(IOException e) {
 			if(e instanceof UnknownHostException) {
-				String emsg = "Can't connect to document provider: " + StringUtil.enumStyleToPresentation(handler.getDocDataType().name());
+				String emsg =
+						"Can't connect to document provider: "
+								+ StringUtil.enumStyleToPresentation(handler.getDocDataType().name());
 				RpcServlet.addError(emsg, status);
 			}
 			else {
@@ -148,19 +158,22 @@ public class DocService extends RpcServlet implements IDocService {
 			return payload;
 		}
 
-		final int hash = DocUtils.docHash(remoteDocUrl);
-		final String filename = DocUtils.localDocFilename(hash);
+		final int remoteDocHashcode = DocUtils.docHash(remoteDocUrl);
+
+		// NOTE: this is the doc hash from the perspective of the DocRef entity
+		final String docHash = DocUtils.localDocFilename(remoteDocHashcode);
+		DocRef mDoc = null;
 		try {
-			File f = DocUtils.getDocRef(filename);
+			File f = DocUtils.getDocRef(docHash);
 			if(!f.exists()) {
 				// fetch
 				String fcontents = DocUtils.fetch(new URL(remoteDocUrl));
 
 				// parse
-				DocRef mDoc = handler.parseSingleDocument(fcontents);
+				mDoc = handler.parseSingleDocument(fcontents);
 				CaseRef caseRef = mDoc.getCaseRef();
 				caseRef.setUrl(remoteDocUrl);
-				mDoc.setHash(filename);
+				mDoc.setHash(docHash);
 				String htmlContent = mDoc.getHtmlContent();
 				mDoc.setHtmlContent(null); // clear it out
 
@@ -168,7 +181,18 @@ public class DocService extends RpcServlet implements IDocService {
 				String sdoc = DocUtils.serializeDocument(mDoc);
 				FileUtils.writeStringToFile(f, sdoc + htmlContent);
 			}
-			payload.setLocalUrl(filename);
+			payload.setDocHash(docHash);
+
+			// persist the doc user binding
+			try {
+				PersistContext pc = getPersistContext();
+				UserContext uc = getUserContext();
+				UserDataService uds = pc.getUserDataService();
+				uds.saveDocForUser(uc.getUser().getId(), mDoc);
+			}
+			catch(EntityExistsException e) {
+				// ok - presume the doc file was deleted but was retained in the datastore
+			}
 		}
 		catch(MalformedURLException e) {
 			e.printStackTrace();

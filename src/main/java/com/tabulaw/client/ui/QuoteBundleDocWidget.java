@@ -64,10 +64,15 @@ public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteDocWidg
 	protected QuoteDocWidget getNewQuoteWidget(Quote mQuote) {
 		return new QuoteDocWidget(this, mQuote);
 	}
+	
+	public void highlightQuote() {
+		// TODO impl
+	}
 
 	@Override
 	protected QuoteDocWidget addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
 		QuoteDocWidget w = super.addQuote(mQuote, persist, addToThisBundleModel);
+		assert mQuote == w.getModel();
 		String wDocId = w.getModel().getDocument().getId();
 		if(docId != null && docId.equals(wDocId)) {
 			// highlight
@@ -75,6 +80,7 @@ public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteDocWidg
 			if(mark == null) {
 				String stoken = w.getModel().getSerializedMark();
 				mark = MarkOverlay.deserialize(domDocBodyRef, stoken);
+				w.getModel().setMark(mark); // cache
 			}
 
 			// TODO temp HACK wrap w/ try/catch

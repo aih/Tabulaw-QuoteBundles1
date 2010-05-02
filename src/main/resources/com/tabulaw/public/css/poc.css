@@ -418,6 +418,13 @@ a:active {
 .wquote .cite {
 	padding: 3px;
 }
+.wquote .hlink {
+	float: right;
+	width: 14px;
+	height: 14px;
+	margin: 4px;
+	cursor: pointer;
+}
 .wquote .x {
 	float: right;
 	width: 14px;

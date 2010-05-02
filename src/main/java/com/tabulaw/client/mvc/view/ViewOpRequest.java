@@ -5,6 +5,7 @@
  */
 package com.tabulaw.client.mvc.view;
 
+import com.google.gwt.user.client.Command;
 
 /**
  * ViewOpRequest
@@ -17,10 +18,20 @@ public abstract class ViewOpRequest extends AbstractViewRequest {
 	/**
 	 * Constructor
 	 * @param viewKey
+	 * @param onCompleteCommand optional command to execute upon completion of
+	 *        request
+	 */
+	public ViewOpRequest(ViewKey viewKey, Command onCompleteCommand) {
+		super(onCompleteCommand);
+		this.viewKey = viewKey;
+	}
+
+	/**
+	 * Constructor
+	 * @param viewKey
 	 */
 	public ViewOpRequest(ViewKey viewKey) {
-		super();
-		this.viewKey = viewKey;
+		this(viewKey, null);
 	}
 
 	@Override

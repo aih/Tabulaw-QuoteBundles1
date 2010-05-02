@@ -215,6 +215,14 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	}
 
 	/**
+	 * @return the current view or <code>null</code> if not set.
+	 */
+	public IView<?> getCurrentView() {
+		ViewKey cvk = getCurrentViewKey();
+		return cvk == null ? null : resolveView(cvk);
+	}
+
+	/**
 	 * Loads the view into cache but does't add it to the dom.
 	 * @param init
 	 */
@@ -653,6 +661,11 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		for(final IController c : controllers) {
 			if(c.canHandle(request)) {
 				c.handle(request);
+				
+				// execute on complete command if specified
+				Command cmd = request.onCompleteCommand();
+				if(cmd != null) cmd.execute();
+				
 				return;
 			}
 		}

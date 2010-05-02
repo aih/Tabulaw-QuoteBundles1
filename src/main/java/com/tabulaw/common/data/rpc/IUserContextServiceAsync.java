@@ -12,5 +12,5 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface IUserContextServiceAsync {
 
-	void getUserContext(AsyncCallback<UserContextPayload> callback);
+	void getClientUserContext(AsyncCallback<UserContextPayload> callback);
 }

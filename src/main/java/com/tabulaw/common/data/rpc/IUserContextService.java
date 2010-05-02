@@ -19,5 +19,5 @@ public interface IUserContextService extends RemoteService {
 	 * context.
 	 * @return the payload by which the client-side user context is populated.
 	 */
-	UserContextPayload getUserContext();
+	UserContextPayload getClientUserContext();
 }

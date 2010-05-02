@@ -10,7 +10,9 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
+import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.RequestContext;
+import com.tabulaw.server.UserContext;
 
 /**
  * RpcServlet
@@ -21,11 +23,11 @@ public abstract class RpcServlet extends RemoteServiceServlet {
 	private static final long serialVersionUID = 5032508084607776181L;
 
 	protected final Log log = LogFactory.getLog(this.getClass());
-	
+
 	/**
 	 * Adds an error message to the given status.
 	 * @param emsg the error message to add
-	 * @param status 
+	 * @param status
 	 */
 	public static final void addError(String emsg, Status status) {
 		status.addMsg(emsg, MsgLevel.ERROR, MsgAttr.EXCEPTION.flag);
@@ -34,7 +36,7 @@ public abstract class RpcServlet extends RemoteServiceServlet {
 	/**
 	 * Adds a fatal error message to the given status.
 	 * @param emsg the error message to add
-	 * @param status 
+	 * @param status
 	 */
 	public static final void addFatalError(String emsg, Status status) {
 		status.addMsg(emsg, MsgLevel.FATAL, MsgAttr.EXCEPTION.flag);
@@ -64,5 +66,19 @@ public abstract class RpcServlet extends RemoteServiceServlet {
 	 */
 	protected final RequestContext getRequestContext() {
 		return new RequestContext(getThreadLocalRequest(), getThreadLocalResponse());
+	}
+
+	/**
+	 * @return The sole persist context instance.
+	 */
+	protected final UserContext getUserContext() {
+		return (UserContext) getRequestContext().getSession().getAttribute(UserContext.KEY);
+	}
+	
+	/**
+	 * @return The sole persist context instance.
+	 */
+	protected final PersistContext getPersistContext() {
+		return (PersistContext) getRequestContext().getServletContext().getAttribute(PersistContext.KEY);
 	}
 }

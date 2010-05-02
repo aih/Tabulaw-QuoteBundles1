@@ -5,6 +5,8 @@
  */
 package com.tabulaw.client.mvc.view;
 
+import com.google.gwt.user.client.Command;
+
 /**
  * ShowViewRequest
  * @author jpk
@@ -19,9 +21,20 @@ public final class ShowViewRequest extends AbstractViewRequest {
 	/**
 	 * Constructor - Use for dynamic views that will have default view options.
 	 * @param init
+	 * @param onCompleteCommand optional command to get executed upon completion
+	 *        of showing the view
+	 */
+	public ShowViewRequest(IViewInitializer init, Command onCompleteCommand) {
+		super(onCompleteCommand);
+		this.init = init;
+	}
+
+	/**
+	 * Constructor - Use for dynamic views that will have default view options.
+	 * @param init
 	 */
 	public ShowViewRequest(IViewInitializer init) {
-		this.init = init;
+		this(init, null);
 	}
 
 	/**

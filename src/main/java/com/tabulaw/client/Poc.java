@@ -27,6 +27,7 @@ import com.tabulaw.client.ui.nav.NavColPanel;
 import com.tabulaw.client.ui.nav.NavRowPanel;
 import com.tabulaw.client.view.DocumentView;
 import com.tabulaw.client.view.DocumentsView;
+import com.tabulaw.client.view.ManageUsersView;
 import com.tabulaw.client.view.QuoteBundlesView;
 import com.tabulaw.common.data.rpc.IDocService;
 import com.tabulaw.common.data.rpc.IDocServiceAsync;
@@ -122,7 +123,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	private LoginTopPanel loginPanel;
 
 	private void getUserContext() {
-		userContextService.getUserContext(new AsyncCallback<UserContextPayload>() {
+		userContextService.getClientUserContext(new AsyncCallback<UserContextPayload>() {
 
 			@Override
 			public void onSuccess(UserContextPayload result) {
@@ -293,5 +294,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		ViewClass.addClass(DocumentsView.klas);
 		ViewClass.addClass(DocumentView.klas);
 		ViewClass.addClass(QuoteBundlesView.klas);
+		ViewClass.addClass(ManageUsersView.klas);
 	}
 }

@@ -19,7 +19,10 @@ public class DocFetchPayload extends Payload {
 	 */
 	private String remoteUrl;
 
-	private String localUrl;
+	/**
+	 * The unique doc id.
+	 */
+	private String docHash;
 
 	// private String docHtml;
 
@@ -39,19 +42,19 @@ public class DocFetchPayload extends Payload {
 	}
 
 	/**
-	 * @return The url of the localized (fetched) version of hte document.
+	 * @return The unique local doc id which is the non-path filename of the local
+	 *         doc on disk.
 	 */
-	public String getLocalUrl() {
-		return localUrl;
+	public String getDocHash() {
+		return docHash;
 	}
 
-	public void setLocalUrl(String localUrl) {
-		this.localUrl = localUrl;
+	public void setDocHash(String docHash) {
+		this.docHash = docHash;
 	}
 
 	/**
-	 * @return The http url that sourced this doc content. This can be used as a
-	 *         unique hash for the doc.
+	 * @return The http url that sourced this doc content.
 	 */
 	public String getRemoteUrl() {
 		return remoteUrl;

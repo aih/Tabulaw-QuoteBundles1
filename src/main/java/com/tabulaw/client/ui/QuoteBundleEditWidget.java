@@ -138,7 +138,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 						ClientModelCache.get().remove(bundle.getModelKey(), Poc.getPortal());
 
 						// server side
-						ClientModelCache.get().deleteBundle(bundle.getId(), true);
+						ClientModelCache.get().removeBundleUserBinding(bundle.getId());
 					}
 				}
 			});
@@ -212,6 +212,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 			boolean isCurrent = cqb != null && cqb.equals(bundle);
 			current.setVisible(!isCurrent);
 			delete.setVisible(!isCurrent);
+			close.setVisible(!isCurrent);
 			if(isCurrent) {
 				lblQb.setText("Current Quote Bundle");
 				addStyleName(Styles.QB_CURRENT);

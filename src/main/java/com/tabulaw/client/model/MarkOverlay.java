@@ -1,6 +1,7 @@
 package com.tabulaw.client.model;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.user.client.Element;
 
 /**
  * Overlay for Mark in mark.js
@@ -28,6 +29,13 @@ public class MarkOverlay extends JavaScriptObject {
 	 * @return The text of the user selection.
 	 */
 	public final native String getText() /*-{ return this.getText(); }-*/;
+	
+	/**
+	 * @return The start node.
+	 */
+	public final native Element getStartNode() /*-{
+		return this.getStartNode();
+	}-*/;
 
 	/**
 	 * Highlights the text selection.

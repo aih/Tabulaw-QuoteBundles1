@@ -17,14 +17,22 @@ import com.tabulaw.common.model.UserState;
  */
 public interface IUserDataServiceAsync {
 	
-	void saveUserState(UserState userState, AsyncCallback<Void> callback);
-
 	void fetchIdBatch(AsyncCallback<IdsPayload> callback);
 	
+	void saveUserState(UserState userState, AsyncCallback<Void> callback);
+
 	void saveBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload> callback);
 	
 	void updateBundlePropsForUser(String userId, QuoteBundle bundle, AsyncCallback<Payload> callback);
 
+	void addBundleUserBinding(String userId, String bundleId, AsyncCallback<Payload> callback);
+	
+	void removeBundleUserBinding(String userId, String bundleId, AsyncCallback<Payload> callback);
+	
+	void addDocUserBinding(String userId, String docId, AsyncCallback<Payload> callback);
+	
+	void removeDocUserBinding(String userId, String docId, AsyncCallback<Payload> callback);
+	
 	void addBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload> callback);
 
 	void deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes, AsyncCallback<Payload> callback);

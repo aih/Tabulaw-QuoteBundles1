@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
 import com.tabulaw.common.model.BundleUserBinding;
+import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.DocUserBinding;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.UserState;
@@ -41,6 +43,26 @@ public class UserDataService extends AbstractEntityService {
 	@Inject
 	public UserDataService(IEntityDao dao, ValidatorFactory validationFactory) {
 		super(dao, validationFactory);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<DocRef> getDocsForUser(String userId) {
+		if(userId == null) throw new NullPointerException();
+		Criteria<DocUserBinding> c = new Criteria<DocUserBinding>(DocUserBinding.class);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		try {
+			List<DocUserBinding> bindings = dao.findEntities(c, null);
+			if(bindings.size() < 1) return new ArrayList<DocRef>(0);
+			ArrayList<String> docIds = new ArrayList<String>(bindings.size());
+			for(DocUserBinding b : bindings) {
+				docIds.add(b.getDocId());
+			}
+			List<DocRef> list = dao.findByIds(DocRef.class, docIds, new Sorting("name"));
+			return list;
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	/**
@@ -124,6 +146,36 @@ public class UserDataService extends AbstractEntityService {
 		existingQb.setDescription(bundle.getDescription());
 		dao.persist(existingQb);
 	}
+	
+	/**
+	 * Saves the doc for the given user.
+	 * @param userId
+	 * @param doc
+	 * @return the saved doc
+	 * @throws ConstraintViolationException When the given doc isn't valid
+	 */
+	public DocRef saveDocForUser(String userId, DocRef doc) throws ConstraintViolationException {
+		if(userId == null || doc == null) throw new NullPointerException();
+		
+		validate(doc);
+
+		DocRef existing;
+		try {
+			existing = dao.load(DocRef.class, doc.getId());
+		}
+		catch(EntityNotFoundException e) {
+			// new
+			existing = null;
+		}
+
+		// save the doc
+		DocRef persisted = dao.persist(doc);
+		
+		// create binding if this is a new bundle
+		if(existing == null) addDocUserBinding(userId, doc.getId());
+
+		return persisted;
+	}
 
 	/**
 	 * Saves the quote bundle for the given user as well as any referenced quotes
@@ -136,7 +188,7 @@ public class UserDataService extends AbstractEntityService {
 	 */
 	@Transactional
 	public QuoteBundle saveBundleForUser(String userId, QuoteBundle bundle) throws ConstraintViolationException {
-		if(userId == null) throw new NullPointerException();
+		if(userId == null || bundle == null) throw new NullPointerException();
 
 		validate(bundle);
 
@@ -174,7 +226,7 @@ public class UserDataService extends AbstractEntityService {
 		}
 
 		// create binding if this is a new bundle
-		if(existing == null) addBundleUserBinding(bundle.getId(), userId);
+		if(existing == null) addBundleUserBinding(userId, bundle.getId());
 
 		return persistedBundle;
 	}
@@ -227,7 +279,7 @@ public class UserDataService extends AbstractEntityService {
 			// desired
 			validate(bundle);
 			QuoteBundle persistedBundle = dao.persist(bundle);
-			addBundleUserBinding(persistedBundle.getId(), userId);
+			addBundleUserBinding(userId, persistedBundle.getId());
 			return persistedBundle;
 		}
 	}
@@ -257,7 +309,7 @@ public class UserDataService extends AbstractEntityService {
 		else {
 			dao.purge(QuoteBundle.class, bundleId);
 		}
-		removeBundleUserBinding(bundleId, userId);
+		removeBundleUserBinding(userId, bundleId);
 	}
 
 	/**
@@ -330,12 +382,12 @@ public class UserDataService extends AbstractEntityService {
 
 	/**
 	 * Adds an association of an existing quote bundle to an existing user.
-	 * @param bundleId
 	 * @param userId
+	 * @param bundleId
 	 * @throws EntityExistsException if the association already exists
 	 */
 	@Transactional
-	public void addBundleUserBinding(String bundleId, String userId) throws EntityExistsException {
+	public void addBundleUserBinding(String userId, String bundleId) throws EntityExistsException {
 		if(bundleId == null || userId == null) throw new NullPointerException();
 		BundleUserBinding binding = new BundleUserBinding(bundleId, userId);
 		dao.persist(binding);
@@ -343,17 +395,52 @@ public class UserDataService extends AbstractEntityService {
 
 	/**
 	 * Removes a user bundle association.
-	 * @param bundleId
 	 * @param userId
+	 * @param bundleId
 	 * @throws EntityNotFoundException when the association doesn't exist
 	 */
 	@Transactional
-	public void removeBundleUserBinding(String bundleId, String userId) throws EntityNotFoundException {
+	public void removeBundleUserBinding(String userId, String bundleId) throws EntityNotFoundException {
 		if(bundleId == null || userId == null) throw new NullPointerException();
 		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
 		c.getPrimaryGroup().addCriterion("bundleId", bundleId, Comparator.EQUALS, true);
 		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
 		BundleUserBinding binding;
+		try {
+			binding = dao.findEntity(c);
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
+		dao.purge(binding);
+	}
+
+	/**
+	 * Adds an association of an existing doc to an existing user.
+	 * @param userId
+	 * @param docId
+	 * @throws EntityExistsException if the association already exists
+	 */
+	@Transactional
+	public void addDocUserBinding(String userId, String docId) throws EntityExistsException {
+		if(docId == null || userId == null) throw new NullPointerException();
+		DocUserBinding binding = new DocUserBinding(docId, userId);
+		dao.persist(binding);
+	}
+
+	/**
+	 * Removes a user doc association.
+	 * @param userId
+	 * @param docId
+	 * @throws EntityNotFoundException when the association doesn't exist
+	 */
+	@Transactional
+	public void removeDocUserBinding(String userId, String docId) throws EntityNotFoundException {
+		if(docId == null || userId == null) throw new NullPointerException();
+		Criteria<DocUserBinding> c = new Criteria<DocUserBinding>(DocUserBinding.class);
+		c.getPrimaryGroup().addCriterion("docId", docId, Comparator.EQUALS, true);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		DocUserBinding binding;
 		try {
 			binding = dao.findEntity(c);
 		}

@@ -192,12 +192,9 @@ public class DocSuggestWidget extends Composite implements IRpcHandler {
 								return;
 							}
 							final DocRef mNewDoc =
-									EntityFactory.get().buildCaseDoc(caseDoc.getTitle(), result.getLocalUrl(), new Date(), null,
+									EntityFactory.get().buildCaseDoc(caseDoc.getTitle(), result.getDocHash(), new Date(), null,
 											caseDoc.getCitation(), caseDoc.getUrl(), null);
 							
-							// TODO do we need to set a doc id here?
-							//mNewDoc.setId(ClientModelCache.get().getNextId(EntityType.DOCUMENT));
-
 							// persist the new doc and propagate through app
 							ClientModelCache.get().persist(mNewDoc, DocSuggestWidget.this);
 

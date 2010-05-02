@@ -21,17 +21,17 @@ import com.tabulaw.common.model.UserState;
 public interface IUserDataService extends RemoteService {
 
 	/**
-	 * Persists the given user state.
-	 * @param userState
-	 */
-	void saveUserState(UserState userState);
-
-	/**
 	 * Fetches a chunk of ids categorized by entity type for use in creating new
 	 * entitites client-side and subsequently persisting them.
 	 * @return a chunk of assignable categorized ids by entity type
 	 */
 	IdsPayload fetchIdBatch();
+
+	/**
+	 * Persists the given user state.
+	 * @param userState
+	 */
+	void saveUserState(UserState userState);
 
 	/**
 	 * Saves the quote bundle for the given user.
@@ -48,6 +48,38 @@ public interface IUserDataService extends RemoteService {
 	 * @return payload containing the resultant status of the update op
 	 */
 	Payload updateBundlePropsForUser(String userId, QuoteBundle bundle);
+	
+	/**
+	 * Deletes the binding between a user and a bundle.
+	 * @param userId
+	 * @param bundleId
+	 * @return payload containing the resultant status of the op
+	 */
+	Payload addBundleUserBinding(String userId, String bundleId);
+	
+	/**
+	 * Removes the binding between a user and a bundle.
+	 * @param userId
+	 * @param bundleId
+	 * @return payload containing the resultant status of the op
+	 */
+	Payload removeBundleUserBinding(String userId, String bundleId);
+	
+	/**
+	 * Creates a binding between a user and a document.
+	 * @param userId
+	 * @param docId
+	 * @return payload containing the resultant status of the op
+	 */
+	Payload addDocUserBinding(String userId, String docId);
+	
+	/**
+	 * Deletes the binding between a user and a document.
+	 * @param userId
+	 * @param docId
+	 * @return payload containing the resultant status of the op
+	 */
+	Payload removeDocUserBinding(String userId, String docId);
 
 	/**
 	 * Adds a bundle for the given user.
@@ -59,6 +91,8 @@ public interface IUserDataService extends RemoteService {
 
 	/**
 	 * Deletes a bundle for the given user.
+	 * <p>
+	 * This is an admin related operation.
 	 * @param userId
 	 * @param bundleId
 	 * @param deleteQuotes delete contained qoutes as well?

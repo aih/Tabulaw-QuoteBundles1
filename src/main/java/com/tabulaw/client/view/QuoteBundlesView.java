@@ -9,7 +9,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
@@ -118,10 +117,5 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 	@Override
 	protected void doRefresh() {
 		qbPanel.refresh();
-	}
-
-	@Override
-	protected void handleModelChange(ModelChangeEvent event) {
-		qbPanel.onModelChangeEvent(event);
 	}
 }
