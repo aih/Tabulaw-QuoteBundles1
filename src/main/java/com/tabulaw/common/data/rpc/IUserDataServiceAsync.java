@@ -19,11 +19,9 @@ public interface IUserDataServiceAsync {
 	
 	void fetchIdBatch(AsyncCallback<IdsPayload> callback);
 	
-	void getAllUsers(AsyncCallback<UserListPayload> callback);
-	
 	void saveUserState(UserState userState, AsyncCallback<Void> callback);
 
-	void saveBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload> callback);
+	void saveBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload<QuoteBundle>> callback);
 	
 	void updateBundlePropsForUser(String userId, QuoteBundle bundle, AsyncCallback<Payload> callback);
 
@@ -35,11 +33,11 @@ public interface IUserDataServiceAsync {
 	
 	void removeDocUserBinding(String userId, String docId, AsyncCallback<Payload> callback);
 	
-	void addBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload> callback);
+	void addBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload<QuoteBundle>> callback);
 
 	void deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes, AsyncCallback<Payload> callback);
 
-	void addQuoteToBundle(String bundleId, Quote quote, AsyncCallback<ModelPayload> callback);
+	void addQuoteToBundle(String bundleId, Quote quote, AsyncCallback<ModelPayload<Quote>> callback);
 
 	void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote, AsyncCallback<Payload> callback);
 }

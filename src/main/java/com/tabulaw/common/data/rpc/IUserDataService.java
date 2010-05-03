@@ -28,13 +28,6 @@ public interface IUserDataService extends RemoteService {
 	IdsPayload fetchIdBatch();
 
 	/**
-	 * Administration function for fetching the list of users by which to manage
-	 * them.
-	 * @return list of all registered users.
-	 */
-	UserListPayload getAllUsers();
-
-	/**
 	 * Persists the given user state.
 	 * @param userState
 	 */
@@ -46,7 +39,7 @@ public interface IUserDataService extends RemoteService {
 	 * @param bundle
 	 * @return payload containing the persisted bundle
 	 */
-	ModelPayload saveBundleForUser(String userId, QuoteBundle bundle);
+	ModelPayload<QuoteBundle> saveBundleForUser(String userId, QuoteBundle bundle);
 
 	/**
 	 * Updates the non-relational bundle properties.
@@ -94,7 +87,7 @@ public interface IUserDataService extends RemoteService {
 	 * @param bundle
 	 * @return payload containing the persisted bundle
 	 */
-	ModelPayload addBundleForUser(String userId, QuoteBundle bundle);
+	ModelPayload<QuoteBundle> addBundleForUser(String userId, QuoteBundle bundle);
 
 	/**
 	 * Deletes a bundle for the given user.
@@ -113,7 +106,7 @@ public interface IUserDataService extends RemoteService {
 	 * @param quote quote to add
 	 * @return the persisted quote
 	 */
-	ModelPayload addQuoteToBundle(String bundleId, Quote quote);
+	ModelPayload<Quote> addQuoteToBundle(String bundleId, Quote quote);
 
 	/**
 	 * @param bundleId id of the bundle containing the quote to remove.

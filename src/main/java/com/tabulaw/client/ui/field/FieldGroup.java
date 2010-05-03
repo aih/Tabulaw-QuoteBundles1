@@ -371,9 +371,10 @@ public final class FieldGroup implements IField, Iterable<IField> {
 	 * @return The found field widget or <code>null</code> if no field widget
 	 *         exists with the given name.
 	 */
-	public IFieldWidget<?> getFieldWidget(String nme) {
+	@SuppressWarnings("unchecked")
+	public IFieldWidget getFieldWidget(String nme) {
 		final IField f = findByName(nme, this);
-		return f instanceof IFieldWidget<?> ? (IFieldWidget<?>) f : null;
+		return f instanceof IFieldWidget ? (IFieldWidget) f : null;
 	}
 
 	/**

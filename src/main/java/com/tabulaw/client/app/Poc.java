@@ -31,6 +31,8 @@ import com.tabulaw.client.ui.login.UserSessionEvent;
 import com.tabulaw.client.ui.msg.GlobalMsgPanel;
 import com.tabulaw.common.data.rpc.IDocService;
 import com.tabulaw.common.data.rpc.IDocServiceAsync;
+import com.tabulaw.common.data.rpc.IUserAdminService;
+import com.tabulaw.common.data.rpc.IUserAdminServiceAsync;
 import com.tabulaw.common.data.rpc.IUserContextService;
 import com.tabulaw.common.data.rpc.IUserContextServiceAsync;
 import com.tabulaw.common.data.rpc.IUserCredentialsService;
@@ -47,6 +49,8 @@ import com.tabulaw.common.model.UserState;
  */
 public class Poc implements EntryPoint, IUserSessionHandler {
 
+	private static IUserAdminServiceAsync userAdminService;
+	
 	private static final IUserContextServiceAsync userContextService;
 
 	private static IUserCredentialsServiceAsync userCredentialsService;
@@ -65,6 +69,16 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		docService = (IDocServiceAsync) GWT.create(IDocService.class);
 
 		msgPanel = new GlobalMsgPanel();
+	}
+
+	/**
+	 * @return The user admin service.
+	 */
+	public static IUserAdminServiceAsync getUserAdminService() {
+		if(userAdminService == null) {
+			userAdminService = (IUserAdminServiceAsync) GWT.create(IUserAdminService.class);
+		}
+		return userAdminService;
 	}
 
 	/**

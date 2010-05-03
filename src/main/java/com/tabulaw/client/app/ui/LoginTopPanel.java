@@ -5,6 +5,7 @@ package com.tabulaw.client.app.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -27,6 +28,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.tabulaw.IDescriptorProvider;
 import com.tabulaw.client.app.Poc;
+import com.tabulaw.client.app.model.EntityMetadataProvider;
 import com.tabulaw.client.data.rpc.IHasRpcHandlers;
 import com.tabulaw.client.data.rpc.IRpcHandler;
 import com.tabulaw.client.data.rpc.RpcEvent;
@@ -53,10 +55,10 @@ import com.tabulaw.client.validate.ValidationException;
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.rpc.UserRegistrationRequest;
+import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.msg.Msg;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.schema.PropertyMetadata;
-import com.tabulaw.schema.PropertyType;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -73,10 +75,6 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 	 * @author jpk
 	 */
 	static class FieldPanel extends AbstractFieldPanel<FlowPanel> {
-
-		static final PropertyMetadata userNameMetadata = new PropertyMetadata(PropertyType.STRING, false, true, 50);
-		static final PropertyMetadata userEmailMetadata = new PropertyMetadata(PropertyType.STRING, false, true, 128);
-		static final PropertyMetadata userPasswordMetadata = new PropertyMetadata(PropertyType.STRING, false, true, 30);
 
 		/**
 		 * Provides login or user register fields depending on the flag provided upon
@@ -95,23 +93,25 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 
 				int visibleFieldLen = 30;
 				
+				Map<String, PropertyMetadata> metamap = EntityMetadataProvider.get().getEntityMetadata(EntityType.USER);
+				
 				TextField email = FieldFactory.femail("userEmail", "emailAddress", "Email Address", "Your email address", visibleFieldLen);
-				email.setPropertyMetadata(userEmailMetadata);
+				email.setPropertyMetadata(metamap.get("emailAddress"));
 				fg.addField(email);
 
 				PasswordField password = FieldFactory.fpassword("userPswd", "password", "Password", "Specify a password", visibleFieldLen);
-				password.setPropertyMetadata(userPasswordMetadata);
+				password.setPropertyMetadata(metamap.get("password"));
 				fg.addField(password);
 
 				if(mode == Mode.REGISTER) {
 					TextField fname = FieldFactory.ftext("userName", "name", "Name", "Your name", visibleFieldLen);
-					fname.setPropertyMetadata(userNameMetadata);
+					fname.setPropertyMetadata(metamap.get("name"));
 					fg.addField(fname);
 					
 					PasswordField passwordConfirm =
 							FieldFactory.fpassword("userPswdConfirm", "passwordConfirm", "Confirm Password", "Confirm your password",
 									visibleFieldLen);
-					passwordConfirm.setPropertyMetadata(userPasswordMetadata);
+					passwordConfirm.setPropertyMetadata(metamap.get("password"));
 					fg.addField(passwordConfirm);
 
 					fg.addValidator(new IValidator() {
@@ -265,8 +265,7 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 			public void onClick(ClickEvent event) {
 				switch(mode) {
 					case FORGOT_PASSWORD: {
-						IFieldWidget<String> femail =
-								(IFieldWidget<String>) loginFieldPanel.getFieldGroup().getFieldWidget("userEmail");
+						IFieldWidget<String> femail = loginFieldPanel.getFieldGroup().getFieldWidget("userEmail");
 						if(!femail.isValid()) {
 							msgPanel.add(new Msg("Your email address must be specified for password retrieval.", MsgLevel.ERROR),
 									null);

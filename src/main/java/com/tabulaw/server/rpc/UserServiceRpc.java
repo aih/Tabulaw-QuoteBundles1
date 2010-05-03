@@ -15,6 +15,7 @@ import org.springframework.mail.MailSendException;
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
+import com.tabulaw.common.data.rpc.IUserAdminService;
 import com.tabulaw.common.data.rpc.IUserContextService;
 import com.tabulaw.common.data.rpc.IUserCredentialsService;
 import com.tabulaw.common.data.rpc.IUserDataService;
@@ -46,7 +47,7 @@ import com.tabulaw.util.StringUtil;
  * @author jpk
  */
 public class UserServiceRpc extends RpcServlet 
-implements IUserContextService, IUserCredentialsService, IUserDataService {
+implements IUserContextService, IUserCredentialsService, IUserDataService, IUserAdminService {
 
 	private static final long serialVersionUID = 7908647379731614097L;
 
@@ -58,10 +59,25 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 		UserListPayload payload = new UserListPayload(status);
 
 		final PersistContext pc = getPersistContext();
-		UserDataService uds = pc.getUserDataService();
+		UserService svc = pc.getUserService();
 
-		List<User> list = uds.getAllUsers();
+		List<User> list = svc.getAllUsers();
 		payload.setUsers(list);
+
+		status.addMsg("Users retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		return payload;
+	}
+
+	@Override
+	public ModelPayload<User> updateUser(User user) {
+		final Status status = new Status();
+		ModelPayload<User> payload = new ModelPayload<User>(status);
+		
+		final PersistContext pc = getPersistContext();
+		UserService svc = pc.getUserService();
+
+		user = svc.updateUser(user);
+		payload.setModel(user);
 
 		status.addMsg("Users retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		return payload;
@@ -314,12 +330,12 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 	}
 
 	@Override
-	public ModelPayload addBundleForUser(String userId, QuoteBundle bundle) {
+	public ModelPayload<QuoteBundle> addBundleForUser(String userId, QuoteBundle bundle) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
 		Status status = new Status();
-		ModelPayload payload = new ModelPayload(status);
+		ModelPayload<QuoteBundle> payload = new ModelPayload<QuoteBundle>(status);
 
 		try {
 			bundle = userDataService.addBundleForUser(userId, bundle);
@@ -346,12 +362,12 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 	}
 
 	@Override
-	public ModelPayload addQuoteToBundle(String bundleId, Quote quote) {
+	public ModelPayload<Quote> addQuoteToBundle(String bundleId, Quote quote) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
 		Status status = new Status();
-		ModelPayload payload = new ModelPayload(status);
+		ModelPayload<Quote> payload = new ModelPayload<Quote>(status);
 
 		try {
 			quote = userDataService.addQuoteToBundle(bundleId, quote);
@@ -431,12 +447,12 @@ implements IUserContextService, IUserCredentialsService, IUserDataService {
 	}
 
 	@Override
-	public ModelPayload saveBundleForUser(String userId, QuoteBundle qb) {
+	public ModelPayload<QuoteBundle> saveBundleForUser(String userId, QuoteBundle qb) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
 		Status status = new Status();
-		ModelPayload payload = new ModelPayload(status);
+		ModelPayload<QuoteBundle> payload = new ModelPayload<QuoteBundle>(status);
 
 		try {
 			qb = userDataService.saveBundleForUser(userId, qb);

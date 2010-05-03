@@ -5,11 +5,15 @@
  */
 package com.tabulaw.client.ui;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.ui.msg.MsgPopup;
+import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.msg.Msg;
+import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 
 
@@ -80,5 +84,43 @@ public class Notifier {
 		mp.addMsg(new Msg(msg, level), null);
 		//mp.setAnimationEnabled(true);
 		mp.showMsgs(Position.TOP, duration, showImage);
+	}
+	
+	/**
+	 * @param caught
+	 */
+	public void showFor(Throwable caught) {
+		String emsg = caught.getMessage();
+		error(emsg);
+	}
+	
+	/**
+	 * @param payload
+	 */
+	public void showFor(Payload payload) {
+		showFor(payload, null);
+	}
+
+	/**
+	 * @param payload
+	 * @param defaultSuccessMsg
+	 */
+	public void showFor(Payload payload, String defaultSuccessMsg) {
+		if(payload.hasErrors()) {
+			// error
+			List<Msg> errorMsgs = payload.getStatus().getMsgs(MsgAttr.EXCEPTION.flag);
+			if(errorMsgs.size() > 0) {
+				Notifier.get().post(errorMsgs, -1);
+			}
+		}
+		else {
+			// success
+			List<Msg> msgs = payload.getStatus().getMsgs();
+			if(msgs == null) msgs = new ArrayList<Msg>();
+			if(msgs.size() < 1 && defaultSuccessMsg != null) {
+				msgs.add(new Msg(defaultSuccessMsg, MsgLevel.INFO));
+			}
+			Notifier.get().post(msgs, 1000);
+		}
 	}
 }

@@ -312,16 +312,15 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 				getColumnFormatter().addStyleName(c, col.getStyle());
 				getCellFormatter().addStyleName(0, c, col.getStyle());
 			}
-			if(config.isSortable()) {
-				if(isRowCntCol) {
-					setWidget(0, c, new Label("#"));
-				}
-				else if(col.getPropertyName() != null) {
-					assert sortlinks != null;
-					final SortLink sl = new SortLink(col, ignoreCaseWhenSorting);
-					sortlinks[c] = sl;
-					setWidget(0, c, sl);
-				}
+
+			if(isRowCntCol) {
+				setWidget(0, c, new Label("#"));
+			}
+			else if(config.isSortable() && col.getPropertyName() != null) {
+				assert sortlinks != null;
+				final SortLink sl = new SortLink(col, ignoreCaseWhenSorting);
+				sortlinks[c] = sl;
+				setWidget(0, c, sl);
 			}
 			else {
 				setWidget(0, c, new Label(col.getName()));

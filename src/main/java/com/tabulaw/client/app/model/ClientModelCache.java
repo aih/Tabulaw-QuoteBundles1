@@ -35,9 +35,6 @@ import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
-import com.tabulaw.common.msg.Msg;
-import com.tabulaw.common.msg.Msg.MsgAttr;
-import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.util.ObjectUtil;
 
@@ -91,32 +88,12 @@ public class ClientModelCache {
 		}
 	}
 
-	private static void handleXhrPersistError(Throwable caught) {
-		String emsg = caught.getMessage();
-		Notifier.get().error(emsg);
-	}
-
 	private static void handlePersistResponse(Payload payload) {
-		if(payload.hasErrors()) {
-			// error
-			List<Msg> errorMsgs = payload.getStatus().getMsgs(MsgAttr.EXCEPTION.flag);
-			if(errorMsgs.size() > 0) {
-				Notifier.get().post(errorMsgs, -1);
-			}
-		}
-		else {
-			// success
-			List<Msg> msgs = payload.getStatus().getMsgs();
-			if(msgs == null) msgs = new ArrayList<Msg>();
-			if(msgs.size() < 1) {
-				msgs.add(new Msg("Persist operation successful.", MsgLevel.INFO));
-			}
-			Notifier.get().post(msgs, 1000);
+		Notifier.get().showFor(payload, "Persist op successful.");
 
-			// TODO what do we do with the persisted entity in the payload ???
-			// we don't want a collision in accessing the sole entity map which
-			// as i see it is possible
-		}
+		// TODO what do we do with the persisted entity in the payload ???
+		// we don't want a collision in accessing the sole entity map which
+		// as i see it is possible
 	}
 	
 	private final IHasModelChangeHandlers modelChangeDispatcher;
@@ -146,15 +123,15 @@ public class ClientModelCache {
 	public void saveBundle(QuoteBundle bundle) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
-		userDataService.saveBundleForUser(userId, bundle, new AsyncCallback<ModelPayload>() {
+		userDataService.saveBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				handleXhrPersistError(caught);
+				Notifier.get().showFor(caught);
 			}
 
 			@Override
-			public void onSuccess(ModelPayload result) {
+			public void onSuccess(ModelPayload<QuoteBundle> result) {
 				handlePersistResponse(result);
 			}
 		});
@@ -167,7 +144,7 @@ public class ClientModelCache {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				handleXhrPersistError(caught);
+				Notifier.get().showFor(caught);
 			}
 
 			@Override
@@ -180,15 +157,15 @@ public class ClientModelCache {
 	public void addBundle(QuoteBundle bundle) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
-		userDataService.addBundleForUser(userId, bundle, new AsyncCallback<ModelPayload>() {
+		userDataService.addBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				handleXhrPersistError(caught);
+				Notifier.get().showFor(caught);
 			}
 
 			@Override
-			public void onSuccess(ModelPayload result) {
+			public void onSuccess(ModelPayload<QuoteBundle> result) {
 				handlePersistResponse(result);
 			}
 		});
@@ -201,7 +178,7 @@ public class ClientModelCache {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				handleXhrPersistError(caught);
+				Notifier.get().showFor(caught);
 			}
 
 			@Override
@@ -213,15 +190,15 @@ public class ClientModelCache {
 
 	public void addQuoteToBundle(String bundleId, Quote quote) {
 		if(!doServerPersist) return;
-		userDataService.addQuoteToBundle(bundleId, quote, new AsyncCallback<ModelPayload>() {
+		userDataService.addQuoteToBundle(bundleId, quote, new AsyncCallback<ModelPayload<Quote>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				handleXhrPersistError(caught);
+				Notifier.get().showFor(caught);
 			}
 
 			@Override
-			public void onSuccess(ModelPayload result) {
+			public void onSuccess(ModelPayload<Quote> result) {
 				handlePersistResponse(result);
 			}
 		});
@@ -233,7 +210,7 @@ public class ClientModelCache {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				handleXhrPersistError(caught);
+				Notifier.get().showFor(caught);
 			}
 
 			@Override
@@ -250,7 +227,7 @@ public class ClientModelCache {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				handleXhrPersistError(caught);
+				Notifier.get().showFor(caught);
 			}
 
 			@Override
@@ -267,7 +244,7 @@ public class ClientModelCache {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				handleXhrPersistError(caught);
+				Notifier.get().showFor(caught);
 			}
 
 			@Override
@@ -284,7 +261,7 @@ public class ClientModelCache {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				handleXhrPersistError(caught);
+				Notifier.get().showFor(caught);
 			}
 
 			@Override
@@ -301,7 +278,7 @@ public class ClientModelCache {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				handleXhrPersistError(caught);
+				Notifier.get().showFor(caught);
 			}
 
 			@Override

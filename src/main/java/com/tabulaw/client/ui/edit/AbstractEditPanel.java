@@ -34,7 +34,8 @@ import com.tabulaw.common.msg.Msg;
  * @param <P> field panel type
  * @author jpk
  */
-public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> extends Composite implements ClickHandler, IHasEditHandlers<T> {
+public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> extends Composite 
+implements ClickHandler, IHasEditHandlers<T> {
 
 	/**
 	 * Styles - (admin.css)
@@ -80,7 +81,7 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 	/**
 	 * The composite's target widget
 	 */
-	private final FlowPanel panel = new FlowPanel();
+	protected final FlowPanel panel = new FlowPanel();
 
 	private final SimplePanel portal = new SimplePanel();
 
@@ -104,7 +105,7 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 
 	private final Button btnSave;
 
-	private Button btnReset, btnDelete, btnCancel;
+	protected Button btnReset, btnDelete, btnCancel;
 
 	/**
 	 * Constructor
@@ -260,7 +261,7 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 			errorHandler.handleError(new Error(classifier, fw, emsg), ErrorDisplay.ALL_FLAGS);
 		}
 	}
-
+	
 	/**
 	 * @return The edit content.
 	 */
@@ -269,19 +270,21 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 	public final void onClick(ClickEvent event) {
 		final Object sender = event.getSource();
 		if(sender == btnSave) {
-			T editContent = getEditContent();
-			if(editContent != null) {
-				EditEvent.fireSave(this, editContent);
+			if(fieldPanel.getFieldGroup().isValid()) {
+				T editContent = getEditContent();
+				if(editContent != null) {
+					EditEvent.fireSave(this, editContent);
+				}
 			}
 		}
 		else if(sender == btnReset) {
 			fieldPanel.reset();
 		}
 		else if(sender == btnDelete) {
-			T editContent = getEditContent();
-			if(editContent != null) {
-				EditEvent.fireDelete(this, editContent);
-			}
+			//T editContent = getEditContent();
+			//if(editContent != null) {
+				EditEvent.fireDelete(this);
+			//}
 		}
 		else if(sender == btnCancel) {
 			EditEvent.fireCancel(this);

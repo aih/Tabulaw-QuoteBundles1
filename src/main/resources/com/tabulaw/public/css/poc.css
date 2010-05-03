@@ -347,6 +347,7 @@ a:active {
 	clear: left;
 	width: 100%;
 	margin-top: 10px;
+	display: block;
 	
 	/*debug*/
 	/*border: 1px solid gray;*/
@@ -671,3 +672,45 @@ a:active {
 		max-height: 50px;
 		overflow: hidden;
 	}
+
+/* Users view */
+.manageUsers {
+}
+	.manageUsers .tableView {
+		font-family: Arial, Helvetica, sans-serif !important;
+	}
+	.manageUsers .tableView .head {
+		color: #7F7F7F;
+		font-weight: bold !important;
+	}
+	.manageUsers .tableView tr.head td {
+		border-bottom: solid #BFBFBF 1px;
+	}
+	/*
+	.manageUsers .tableView .date {
+		font-family: Arial, Helvetica, sans-serif;
+		font-weight: bold;
+		font-size: 11px;
+	}
+	.manageUsers .tableView .delete {
+		text-align: center;
+	}
+	*/
+	.manageUsers .tableView .actv {
+		background-color: #BFBFBF;
+	}
+	
+	.manageUsers .entityEdit {
+		margin-left: 30px;
+		padding: 10px;
+		-moz-border-radius: 6px;
+		-webkit-border-radius: 6px;
+		border: 3px solid #DFDFDF;
+	}
+	.manageUsers .entityEdit .btnRow {
+		margin-top: 10px;
+	}
+	.manageUsers .entityEdit .btnRow button {
+		margin-right: 10px;
+	}
+	

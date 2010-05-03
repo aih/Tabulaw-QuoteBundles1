@@ -34,10 +34,9 @@ public final class EditEvent<T> extends GwtEvent<IEditHandler<T>> {
 	 * Fires a delete edit event.
 	 * @param <T> edit content type
 	 * @param source
-	 * @param deleted deleted content
 	 */
-	public static <T> void fireDelete(IHasEditHandlers<T> source, T deleted) {
-		source.fireEvent(new EditEvent<T>(EditOp.DELETE, deleted));
+	public static <T> void fireDelete(IHasEditHandlers<T> source) {
+		source.fireEvent(new EditEvent<T>(EditOp.DELETE, null));
 	}
 
 	/**

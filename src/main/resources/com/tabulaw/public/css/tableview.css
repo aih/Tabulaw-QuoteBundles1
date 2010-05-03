@@ -120,6 +120,10 @@
 	background-color: #EAEAEA;
 }
 
+.tableView .head td *, .tableView .countCol *{
+	color: #838383;
+}
+
 .tableView tr.even {
 	background-color: white;
 }

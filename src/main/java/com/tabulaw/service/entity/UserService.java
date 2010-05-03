@@ -2,6 +2,7 @@ package com.tabulaw.service.entity;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.ValidationException;
 import javax.validation.ValidatorFactory;
@@ -120,6 +121,43 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		}
 	}
 
+	/**
+	 * @return list of all users in the system.
+	 */
+	@Transactional(readOnly = true)
+	public List<User> getAllUsers() {
+		List<User> list = dao.loadAll(User.class);
+		return list;
+	}
+	
+	/**
+	 * Updates a user not including its password.
+	 * @param user
+	 * @return
+	 */
+	@Transactional
+	public User updateUser(User user) {
+		if(user == null) throw new NullPointerException();
+		validate(user);
+
+		User existing;
+		try {
+			existing = dao.load(User.class, user.getId());
+		}
+		catch(EntityNotFoundException e) {
+			// new
+			existing = null;
+		}
+		
+		// clear out existing
+		if(existing == null) {
+			dao.purge(user);
+		}
+		
+		user = dao.persist(user);
+		return user;
+	}
+	
 	/**
 	 * Create a user.
 	 * @param name

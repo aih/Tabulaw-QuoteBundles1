@@ -10,14 +10,15 @@ import com.tabulaw.common.model.ModelKey;
 
 /**
  * Generic model data transport.
+ * @param <E> the entity type
  * @author jpk
  */
-public final class ModelPayload extends ModelDataPayload {
+public final class ModelPayload<E extends IEntity> extends ModelDataPayload {
 
 	/**
 	 * The model.
 	 */
-	private IEntity model;
+	private E model;
 
 	private ModelKey ref;
 
@@ -41,16 +42,16 @@ public final class ModelPayload extends ModelDataPayload {
 	 * @param status
 	 * @param model
 	 */
-	public ModelPayload(Status status, IEntity model) {
+	public ModelPayload(Status status, E model) {
 		super(status);
 		this.model = model;
 	}
 
-	public IEntity getModel() {
+	public E getModel() {
 		return model;
 	}
 
-	public void setModel(IEntity model) {
+	public void setModel(E model) {
 		this.model = model;
 	}
 

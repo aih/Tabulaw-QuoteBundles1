@@ -5,11 +5,15 @@
  */
 package com.tabulaw.client.app.ui;
 
+import com.google.gwt.event.logical.shared.HasSelectionHandlers;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.app.model.ClientModelCache;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.data.rpc.RpcCommand;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
@@ -25,33 +29,33 @@ import com.tabulaw.client.util.GlobalFormat;
 import com.tabulaw.common.data.rpc.UserListPayload;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.User;
+import com.tabulaw.common.model.Authority.AuthorityRoles;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.listhandler.InMemoryListHandler;
 
 /**
- * Lists user entities.
+ * Lists user entities that fires
  * @author jpk
  */
-public class UsersListingWidget extends AbstractModelChangeAwareWidget {
+public class UsersListingWidget extends AbstractModelChangeAwareWidget implements HasSelectionHandlers<User> {
 
 	static class ListingConfig extends AbstractListingConfig {
 
 		static final Sorting defaultSorting = new Sorting("name");
 
-		static final String[] modelProps = new String[] { 
+		static final String[] modelProps = new String[] {
 			"name", "dateCreated", "dateModified", "emailAddress", "locked", "enabled", "expires", "authorities",
 		};
 
-		static final Column[] cols = new Column[] {
-			Column.ROW_COUNT_COLUMN,
-			new Column("Name", "name"),
-			new Column("Created/Modified"), 
-			new Column("Email", "emailAddress"), 
-			new Column("Locked?", GlobalFormat.BOOL_YESNO, "locked"), 
-			new Column("Enabled?", GlobalFormat.BOOL_YESNO, "enabled"), 
-			new Column("Expires", GlobalFormat.DATE, "expires"), 
-			new Column("Roles", "authorities"), 
-		};
+		static final Column[] cols =
+				new Column[] {
+					Column.ROW_COUNT_COLUMN, 
+					new Column("User", "name"), 
+					new Column("Email", "emailAddress"), 
+					new Column("Created", GlobalFormat.DATE, "dateCreated"),
+					new Column("Modified", GlobalFormat.DATE, "dateModified"),
+					new Column("Roles", "authorities"),
+				};
 
 		public ListingConfig() {
 			super("User", modelProps, cols, defaultSorting, 1000);
@@ -68,19 +72,19 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget {
 		}
 	} // ListingConfig
 
-	static class UserListing extends ModelListingWidget<User, UsersListingWidget.Table> /*implements IRpcHandler*/ {
+	static class UserListing extends ModelListingWidget<User, UsersListingWidget.Table> /*implements IRpcHandler*/{
 
-		//final RpcUiHandler rpcui;
-		
+		// final RpcUiHandler rpcui;
+
 		public UserListing() {
 			super(config.getListingId(), config.getListingElementName(), new Table(config), null);
-			//rpcui = new RpcUiHandler(this);
+			// rpcui = new RpcUiHandler(this);
 		}
-		
+
 		Table getTable() {
 			return table;
 		}
-		
+
 		@Override
 		protected Widget createNoDataRowsWidget() {
 			return new Label("Currently, no Users exist.");
@@ -103,31 +107,36 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget {
 
 	static class Table extends ModelListingTable<User> {
 
+		private HasSelectionHandlers<User> selectionDispatcher;
+
+		public void setSelectionDispatcher(HasSelectionHandlers<User> selectionHandler) {
+			this.selectionDispatcher = selectionHandler;
+		}
+
 		public Table(IListingConfig config) {
 			super(config, new ITableCellRenderer<User>() {
 
 				@Override
 				public void renderCell(int rowIndex, int cellIndex, User rowData, Column column, HTMLTable table) {
-					if("Created/Modified".equals(column.getName())) {
-						String created = Fmt.format(rowData.getDateCreated(), GlobalFormat.DATE);
-						String modified = Fmt.format(rowData.getDateModified(), GlobalFormat.DATE);
-						String html = "<div>" + created + "</div><div>" + modified + "</div>";
-						table.setHTML(rowIndex, cellIndex, html);
+					if("Roles".equals(column.getName())) {
+						String val = (String) rowData.getPropertyValue(column.getPropertyName());
+						boolean isAdmin = val.indexOf(AuthorityRoles.ROLE_ADMINISTRATOR.name()) >= 0;
+						val = isAdmin ? "Administrator" : "User";
+						table.setText(rowIndex, cellIndex, val);
 					}
 					else {
 						Object val = rowData.getPropertyValue(column.getPropertyName());
 						table.setText(rowIndex, cellIndex, Fmt.format(val, column.getFormat()));
 					}
 				}
-				
+
 			});
 		}
 
 		@Override
 		protected void onCellClick(int colIndex, int rowIndex) {
-			// TODO impl
-			//if(rowIndex > 0 && colIndex < 2)
-				//ViewManager.get().dispatch(new ShowViewRequest(new DocumentViewInitializer(getRowKey(rowIndex))));
+			User user = getRowData(rowIndex);
+			SelectionEvent.fire(selectionDispatcher, user);
 		}
 	}
 
@@ -138,34 +147,47 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget {
 	private final UserListing listingWidget;
 
 	private final FlowPanel pnl = new FlowPanel();
-	
+
 	/**
 	 * Constructor
 	 */
 	public UsersListingWidget() {
 		super();
-		
+
 		operator = new Operator();
-		
+
 		listingWidget = new UserListing();
+		listingWidget.setOperator(operator);
 		
+		// hack
+		listingWidget.getTable().setSelectionDispatcher(this);
+
 		pnl.add(listingWidget);
-		
+
 		initWidget(pnl);
 	}
 	
+	public UserListing getListingWidget() {
+		return listingWidget;
+	}
+
 	public Operator getOperator() {
 		return operator;
 	}
-	
+
+	@Override
+	public HandlerRegistration addSelectionHandler(SelectionHandler<User> handler) {
+		return addHandler(handler, SelectionEvent.getType());
+	}
+
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
 		listingWidget.onModelChangeEvent(event);
 	}
-	
+
 	class Operator extends DataListingOperator<User, InMemoryListHandler<User>> {
-		
+
 		public Operator() {
 			super(config.getPageSize(), new InMemoryListHandler<User>(), config.getDefaultSorting());
 		}
@@ -173,17 +195,18 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget {
 		@Override
 		public void refresh() {
 			new RpcCommand<UserListPayload>() {
-				
+
 				@Override
 				protected void doExecute() {
 					setSource(listingWidget);
-					ClientModelCache.getUserDataService().getAllUsers(this);
+					Poc.getUserAdminService().getAllUsers(this);
 				}
 
 				@Override
 				protected void handleSuccess(UserListPayload result) {
 					super.handleSuccess(result);
-					listingWidget.setOperator(Operator.this);
+					getDataProvider().setList(result.getUsers());
+					// listingWidget.setOperator(Operator.this);
 					listingWidget.getOperator().firstPage();
 				}
 			}.execute();

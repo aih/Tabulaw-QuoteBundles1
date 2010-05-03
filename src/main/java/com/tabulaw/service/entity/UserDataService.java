@@ -19,7 +19,6 @@ import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.DocUserBinding;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
@@ -44,12 +43,6 @@ public class UserDataService extends AbstractEntityService {
 	@Inject
 	public UserDataService(IEntityDao dao, ValidatorFactory validationFactory) {
 		super(dao, validationFactory);
-	}
-	
-	@Transactional(readOnly = true)
-	public List<User> getAllUsers() {
-		List<User> list = dao.loadAll(User.class);
-		return list;
 	}
 	
 	@Transactional(readOnly = true)
