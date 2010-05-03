@@ -37,7 +37,7 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	class NewQuoteBundleButton extends AbstractNavButton {
+	static class NewQuoteBundleButton extends AbstractNavButton {
 		
 		AddQuoteBundleDialog dialog;
 		

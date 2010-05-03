@@ -7,11 +7,12 @@ package com.tabulaw.client.app.ui.view;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.app.ui.AbstractNavButton;
 import com.tabulaw.client.app.ui.DocSuggestWidget;
 import com.tabulaw.client.app.ui.DocUploadDialog;
 import com.tabulaw.client.app.ui.DocumentsListingWidget;
+import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.mvc.view.ViewOptions;
@@ -48,17 +49,28 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	class DocUploadButton extends PushButton implements ClickHandler {
+	class DocUploadButton extends AbstractNavButton {
 
 		private DocUploadButton() {
-			super("Upload");
-			addClickHandler(this);
+			super("Upload", null);
+			setClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					if(docUploadDialog == null) docUploadDialog = new DocUploadDialog();
+					docUploadDialog.center();
+				}
+			});
 		}
 
 		@Override
-		public void onClick(ClickEvent event) {
-			if(docUploadDialog == null) docUploadDialog = new DocUploadDialog();
-			docUploadDialog.center();
+		protected String getTitleText(String buttonText) {
+			return "Upload one or more documents...";
+		}
+
+		@Override
+		protected IViewInitializer getViewInitializer() {
+			return null;
 		}
 	}
 	

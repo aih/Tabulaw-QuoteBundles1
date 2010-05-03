@@ -106,6 +106,8 @@ a:active {
 	font-weight: bold;
 	border: 0;
 	height: 16px;
+	text-align: center;
+	padding: 3px;
 }
 	.navButton .text {
 	}
@@ -164,11 +166,12 @@ a:active {
 	#navCol .navButton {
 		background-color: #BFBFBF;
 		height: 20px;
-		-moz-border-radius: 2px;
-		-webkit-border-radius: 2px;
+		/*-moz-border-radius: 2px;
+		-webkit-border-radius: 2px;*/
+		border: 1px solid;
 	}
 	#navCol .navButton .text {
-		line-height: 1.49;
+		/*line-height: 1.49;*/
 	}
 	#navCol .viewTitle {
 		font-size: 21px;
@@ -676,7 +679,11 @@ a:active {
 /* Users view */
 .manageUsers {
 }
+	.manageUsersWidget {
+		overflow: hidden;
+	}
 	.manageUsers .tableView {
+		float: left;
 		font-family: Arial, Helvetica, sans-serif !important;
 	}
 	.manageUsers .tableView .head {
@@ -701,7 +708,6 @@ a:active {
 	}
 	
 	.manageUsers .entityEdit {
-		margin-left: 30px;
 		padding: 10px;
 		-moz-border-radius: 6px;
 		-webkit-border-radius: 6px;
@@ -709,6 +715,7 @@ a:active {
 	}
 	.manageUsers .entityEdit .btnRow {
 		margin-top: 10px;
+		text-align: center;
 	}
 	.manageUsers .entityEdit .btnRow button {
 		margin-right: 10px;

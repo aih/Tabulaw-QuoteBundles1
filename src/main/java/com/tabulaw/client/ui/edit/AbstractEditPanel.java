@@ -101,11 +101,9 @@ implements ClickHandler, IHasEditHandlers<T> {
 	 */
 	private final FlowPanel pnlButtonRow = new FlowPanel();
 
-	private String deleteText, cancelText, resetText;
-
 	private final Button btnSave;
 
-	protected Button btnReset, btnDelete, btnCancel;
+	private final Button btnReset, btnDelete, btnCancel;
 
 	/**
 	 * Constructor
@@ -135,13 +133,20 @@ implements ClickHandler, IHasEditHandlers<T> {
 		btnSave.addStyleName(Styles.SAVE);
 		pnlButtonRow.add(btnSave);
 
-		this.deleteText = deleteText;
-		this.cancelText = cancelText;
-		this.resetText = resetText;
+		if(deleteText == null) deleteText = DEFAULT_DELETE_TEXT;
+		btnDelete = new Button(deleteText, this);
+		btnDelete.addStyleName(Styles.DELETE);
+		pnlButtonRow.add(btnDelete);
 
-		showDeleteButton(deleteText != null);
-		showCancelButton(cancelText != null);
-		showResetButton(resetText != null);
+		if(cancelText == null) cancelText = DEFAULT_CANCEL_TEXT;
+		btnCancel = new Button(cancelText, this);
+		btnCancel.addStyleName(Styles.CANCEL);
+		pnlButtonRow.add(btnCancel);
+
+		if(resetText == null) resetText = DEFAULT_RESET_TEXT;
+		btnReset = new Button(resetText, this);
+		btnReset.addStyleName(Styles.RESET);
+		pnlButtonRow.add(btnReset);
 
 		panel.add(portal);
 		panel.add(pnlButtonRow);
@@ -195,34 +200,32 @@ implements ClickHandler, IHasEditHandlers<T> {
 		}
 	}
 
-	public final void showResetButton(boolean show) {
-		if(show && btnReset == null) {
-			if(resetText == null) resetText = DEFAULT_RESET_TEXT;
-			btnReset = new Button(resetText, this);
-			btnReset.addStyleName(Styles.RESET);
-			pnlButtonRow.add(btnReset);
-		}
-		if(btnReset != null) btnReset.setVisible(show);
+	public final void setSaveButtonText(String text) {
+		btnSave.setText(text);
+	}
+
+	public final void setDeleteButtonText(String text) {
+		btnDelete.setText(text);
+	}
+
+	public final void setCancelButtonText(String text) {
+		btnCancel.setText(text);
+	}
+
+	public final void setResetButtonText(String text) {
+		btnReset.setText(text);
 	}
 
 	public final void showDeleteButton(boolean show) {
-		if(show && btnDelete == null) {
-			if(deleteText == null) deleteText = DEFAULT_DELETE_TEXT;
-			btnDelete = new Button(deleteText, this);
-			btnDelete.addStyleName(Styles.DELETE);
-			pnlButtonRow.add(btnDelete);
-		}
-		if(btnDelete != null) btnDelete.setVisible(show);
+		btnDelete.setVisible(show);
 	}
 
 	public final void showCancelButton(boolean show) {
-		if(show && btnCancel == null) {
-			if(cancelText == null) cancelText = DEFAULT_CANCEL_TEXT;
-			btnCancel = new Button(cancelText, this);
-			btnCancel.addStyleName(Styles.CANCEL);
-			pnlButtonRow.add(btnCancel);
-		}
-		if(btnCancel != null) btnCancel.setVisible(show);
+		btnCancel.setVisible(show);
+	}
+
+	public final void showResetButton(boolean show) {
+		btnReset.setVisible(show);
 	}
 
 	@Override

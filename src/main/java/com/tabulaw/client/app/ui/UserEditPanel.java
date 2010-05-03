@@ -7,8 +7,6 @@ package com.tabulaw.client.app.ui;
 
 import java.util.Date;
 
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.tabulaw.client.ui.edit.AbstractEditPanel;
 import com.tabulaw.client.ui.field.FieldGroup;
@@ -18,8 +16,7 @@ import com.tabulaw.common.model.User;
 /**
  * @author jpk
  */
-public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> 
-implements SelectionHandler<User> {
+public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 
 	static final class Styles {
 
@@ -37,19 +34,21 @@ implements SelectionHandler<User> {
 		super("Save", "Delete", null, "Reset", new UserFieldPanel());
 		lblTitle.setStyleName(Styles.TITLE);
 		panel.insert(lblTitle, 0);
-		setVisible(false);
+		getFieldPanel().getFieldGroup().setEnabled(false);
 	}
-
-	public void newUserMode() {
-		getFieldPanel().getFieldGroup().clearValue();
-	}
-
+	
 	@SuppressWarnings("unchecked")
-	@Override
-	public void onSelection(SelectionEvent<User> event) {
-		this.user = event.getSelectedItem();
-		// set title
-		lblTitle.setText("Edit " + user.getName());
+	public void setUser(User user) {
+		if(user.isNew()) {
+			getFieldPanel().getFieldGroup().clearValue();
+			lblTitle.setText("Create User");
+			setSaveButtonText("Create");
+		}
+		else {
+			// set title
+			lblTitle.setText("Edit " + user.getName());
+			setSaveButtonText("Update");
+		}
 		// set fields
 		FieldGroup fg = getFieldPanel().getFieldGroup();
 		fg.getFieldWidget("userName").setValue(user.getName());
@@ -58,7 +57,7 @@ implements SelectionHandler<User> {
 		fg.getFieldWidget("userEnabled").setValue(user.isEnabled());
 		fg.getFieldWidget("userExpires").setValue(user.getExpires());
 
-		setVisible(true);
+		getFieldPanel().getFieldGroup().setEnabled(true);
 	}
 
 	@Override

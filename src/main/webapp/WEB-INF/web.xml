@@ -114,6 +114,7 @@
 		<url-pattern>/poc/userContext</url-pattern>
 		<url-pattern>/poc/usercred</url-pattern>
 		<url-pattern>/poc/userData</url-pattern>
+		<url-pattern>/poc/userAdmin</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
