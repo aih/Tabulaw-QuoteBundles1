@@ -8,7 +8,7 @@ package com.tabulaw.client.app.ui.view;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.DocumentHighlightWidget;
+import com.tabulaw.client.app.ui.DocHighlightWidget;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;
@@ -22,7 +22,7 @@ import com.tabulaw.common.model.ModelKey;
  * Displays a single document allowing quote/bundle editing.
  * @author jpk
  */
-public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
+public class DocView extends AbstractPocView<DocViewInitializer> {
 
 	public static final Class klas = new Class();
 
@@ -41,8 +41,8 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 		}
 
 		@Override
-		public DocumentView newView() {
-			return new DocumentView();
+		public DocView newView() {
+			return new DocView();
 		}
 
 		@Override
@@ -51,14 +51,14 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 		}
 	}
 
-	private final DocumentHighlightWidget docWidget = new DocumentHighlightWidget();
+	private final DocHighlightWidget docWidget = new DocHighlightWidget();
 
 	private ModelKey docKey;
 
 	/**
 	 * Constructor
 	 */
-	public DocumentView() {
+	public DocView() {
 		super();
 		addWidget(docWidget);
 	}
@@ -86,7 +86,7 @@ public class DocumentView extends AbstractPocView<DocumentViewInitializer> {
 	}
 
 	@Override
-	protected void doInitialization(DocumentViewInitializer initializer) {
+	protected void doInitialization(DocViewInitializer initializer) {
 		docKey = initializer.getDocumentKey();
 		if(docKey == null) throw new IllegalArgumentException();
 		docWidget.makeModelChangeAware();

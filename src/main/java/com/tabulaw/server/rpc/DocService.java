@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +28,8 @@ import com.tabulaw.common.data.rpc.IDocService;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.User;
+import com.tabulaw.common.model.Authority.AuthorityRoles;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.dao.EntityExistsException;
@@ -66,33 +70,40 @@ public class DocService extends RpcServlet implements IDocService {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public DocListingPayload getCachedDocs() {
 		Status status = new Status();
+		
+		final List<DocRef> docList;
 
 		// get user doc bindings
 		PersistContext pc = getPersistContext();
 		UserDataService uds = pc.getUserDataService();
 		UserContext uc = getUserContext();
-		String userId = uc.getUser().getId();
-		List<DocRef> docList = uds.getDocsForUser(userId);
-
-		/*
-		try {
-			File docDir = DocUtils.getDocDirRef();
-			Iterator<File> itr = FileUtils.iterateFiles(docDir, new String[] {
-				"htm", "html"
-			}, false);
-			while(itr.hasNext()) {
-				File f = itr.next();
-				DocRef mDoc = DocUtils.deserializeDocument(f);
-				if(mDoc != null) docList.add(mDoc);
+		User user = uc.getUser();
+		if(user.inRole(AuthorityRoles.ROLE_ADMINISTRATOR.name())) {
+			// admins can see all docs
+			docList = new ArrayList<DocRef>();
+			try {
+				File docDir = DocUtils.getDocDirRef();
+				Iterator<File> itr = FileUtils.iterateFiles(docDir, new String[] {
+					"htm", "html"
+				}, false);
+				while(itr.hasNext()) {
+					File f = itr.next();
+					DocRef mDoc = DocUtils.deserializeDocument(f);
+					if(mDoc != null) docList.add(mDoc);
+				}
+			}
+			catch(Exception e) {
+				RpcServlet.exceptionToStatus(e, status);
 			}
 		}
-		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, status);
+		else {
+			// non-admin users only see docs they have previously seen
+			docList = uds.getDocsForUser(user.getId());
 		}
-		*/
 
 		DocListingPayload payload = new DocListingPayload(status, docList);
 

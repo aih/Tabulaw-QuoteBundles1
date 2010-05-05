@@ -19,7 +19,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.MarkOverlay;
-import com.tabulaw.client.app.ui.view.DocumentViewInitializer;
+import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.ui.ImageContainer;
@@ -179,7 +179,7 @@ public abstract class AbstractQuoteWidget extends Composite {
 			public void onClick(ClickEvent event) {
 				// goto hightlight switching current doc if necessary
 				DocRef docRef = quote.getDocument();
-				final DocumentViewInitializer dvi = new DocumentViewInitializer(docRef.getModelKey());
+				final DocViewInitializer dvi = new DocViewInitializer(docRef.getModelKey());
 				ViewManager.get().dispatch(new ShowViewRequest(dvi, new Command() {
 
 					@Override

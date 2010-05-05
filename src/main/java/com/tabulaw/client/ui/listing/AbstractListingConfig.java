@@ -89,11 +89,6 @@ public abstract class AbstractListingConfig implements IListingConfig {
 	}
 
 	@Override
-	public boolean isShowNavBar() {
-		return true; // default
-	}
-
-	@Override
 	public boolean isShowRefreshBtn() {
 		return true; // default
 	}

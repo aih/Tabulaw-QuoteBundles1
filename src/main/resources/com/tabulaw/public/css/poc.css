@@ -47,7 +47,7 @@ a:active {
 
 /* field label required indicator (asterisk) */
 .rqd {
-	color: red !important;
+	color: red;
 }
 
 .gwt-PopupPanelGlass {
@@ -82,6 +82,10 @@ a:active {
 	.gwt-DialogBox .btnRow .cancel {
 		float: right;
 	}
+	
+.tvnav {
+	font-family: Arial, Helvetica, sans-serif;
+}
 
 #container {
 	margin: 20px;
@@ -107,7 +111,7 @@ a:active {
 	border: 0;
 	height: 16px;
 	text-align: center;
-	padding: 3px;
+	padding: 0 3px 0 3px;
 }
 	.navButton .text {
 	}
@@ -145,10 +149,13 @@ a:active {
 	padding-top: 20px;
 	padding-left: 20px;
 }
+	#navCol .vpanel {
+		width: 100%;
+	}
 	#navCol .logo {
 		width: 76px;
 		height: 53px;
-		margin: 0 0 30px 0;
+		margin: 0 0 30px 35px;
 	}
 	#navCol .widget {
 		margin-bottom: 10px;
@@ -157,7 +164,7 @@ a:active {
 		-webkit-border-radius: 5px;
 	}
 	#navCol .gwt-PushButton {
-		width: 100px !important;
+		width: 100%;
 	}
 	#navCol .html-face {
 		text-align: center;
@@ -166,12 +173,9 @@ a:active {
 	#navCol .navButton {
 		background-color: #BFBFBF;
 		height: 20px;
-		/*-moz-border-radius: 2px;
-		-webkit-border-radius: 2px;*/
-		border: 1px solid;
 	}
 	#navCol .navButton .text {
-		/*line-height: 1.49;*/
+		line-height: 1.49;
 	}
 	#navCol .viewTitle {
 		font-size: 21px;
@@ -181,8 +185,6 @@ a:active {
 	#navCol #qbListing {
 		border: 0;
 		border-top: 1px solid #BFBFBF;
-	}
-	#navCol #qbListing table {
 		width: 100%;
 	}
 	#navCol #qbListing .option {
@@ -487,6 +489,13 @@ a:active {
 				width: 500px;
 				margin: 1px 0 1px 0;
 			}
+				/* full text search entry */
+				.gwt-SuggestBoxPopup .item .entry .query {
+					font-weight: bold;
+				}
+				.gwt-SuggestBoxPopup .item .entry .fts {
+					color: gray;
+				}
 				.gwt-SuggestBoxPopup .item .entry .title {
 				}
 				.gwt-SuggestBoxPopup .item .entry .summary {
@@ -588,6 +597,27 @@ a:active {
 /* document listing view styling */
 .documents {
 }
+	.documents .searchDp {
+	}
+	.documents .sheader {
+	}
+	.documents .simage {
+		float: left;
+	}
+	.documents .stext {
+		float: left;
+	}
+
+	.documents .docSearch {
+	}
+		.docSearch .docSuggest {
+		}
+		.docSearch .docSearchListing {
+		}
+	
+	.documents .tableView .portal {
+		height: 200px;
+	}
 	.documents .tableView .head {
 		font-family: Arial, Helvetica, sans-serif !important;
 		text-transform: uppercase !important;
@@ -707,11 +737,19 @@ a:active {
 		background-color: #BFBFBF;
 	}
 	
-	.manageUsers .entityEdit {
-		padding: 10px;
+	.manageUsers .editContainer {
 		-moz-border-radius: 6px;
 		-webkit-border-radius: 6px;
 		border: 3px solid #DFDFDF;
+	}
+	.manageUsers .editContainer .title {
+		background-color: #DFDFDF;
+		height: 20px;
+		font-weight: bold;
+		font-size: 13px;
+	}
+	.manageUsers .entityEdit {
+		margin: 10px;
 	}
 	.manageUsers .entityEdit .btnRow {
 		margin-top: 10px;

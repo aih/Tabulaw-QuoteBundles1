@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.TabBar;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.view.DocumentView;
+import com.tabulaw.client.app.ui.view.DocView;
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -216,7 +216,7 @@ public class NavRowPanel extends AbstractNavPanel {
 
 	private final ArrayList<AbstractNavButton> mainViewButtons = new ArrayList<AbstractNavButton>();
 
-	private final ArrayList<DocumentViewNavButton> openDocNavButtons = new ArrayList<DocumentViewNavButton>();
+	private final ArrayList<DocViewNavButton> openDocNavButtons = new ArrayList<DocViewNavButton>();
 
 	private final TabBar mainViewTabs = new TabBar();
 
@@ -240,7 +240,7 @@ public class NavRowPanel extends AbstractNavPanel {
 	public NavRowPanel(final IUserSessionHandler userSessionHandler) {
 		super();
 
-		DocumentsNavButton nbDocListing = new DocumentsNavButton();
+		DocsNavButton nbDocListing = new DocsNavButton();
 		QuoteBundlesNavButton nbQuoteBundles = new QuoteBundlesNavButton();
 
 		mainViewButtons.add(nbDocListing);
@@ -325,13 +325,13 @@ public class NavRowPanel extends AbstractNavPanel {
 		int i = 0;
 		ViewKey crntViewKey = ViewManager.get().getCurrentViewKey();
 
-		if(crntViewKey.getViewClass() == DocumentView.klas) {
+		if(crntViewKey.getViewClass() == DocView.klas) {
 			int index = getTabIndexFromViewKey(crntViewKey, false);
 			if(index == -1) {
 				// create a doc nav button and tab
-				DocumentView dview = (DocumentView) ViewManager.get().resolveView(crntViewKey);
+				DocView dview = (DocView) ViewManager.get().resolveView(crntViewKey);
 				ModelKey docKey = dview.getDocKey();
-				DocumentViewNavButton dnb = new DocumentViewNavButton(docKey);
+				DocViewNavButton dnb = new DocViewNavButton(docKey);
 				openDocNavButtons.add(0, dnb);
 				openDocTabs.insertTab(dnb, 0);
 				index = 0;
@@ -366,7 +366,7 @@ public class NavRowPanel extends AbstractNavPanel {
 
 	@Override
 	protected void handleViewUnload(ViewKey key) {
-		if(key.getViewClass() == DocumentView.klas) {
+		if(key.getViewClass() == DocView.klas) {
 			int index = getTabIndexFromViewKey(key, false);
 			if(index >= 0) {
 				Log.debug("Removing old doc view: " + key);
@@ -397,6 +397,7 @@ public class NavRowPanel extends AbstractNavPanel {
 		// user loaded
 		if(event.getChangeOp() == ModelChangeOp.LOADED
 				&& EntityType.USER.name().equals(event.getModelKey().getEntityType())) {
+			
 			User liu = (User) event.getModel();
 			if(liu.inRole(AuthorityRoles.ROLE_ADMINISTRATOR.name())) {
 				UsersNavButton nbUsers = new UsersNavButton();
@@ -411,7 +412,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			// remove open doc tab
 			boolean found = false;
 			int i = 0;
-			for(DocumentViewNavButton b : openDocNavButtons) {
+			for(DocViewNavButton b : openDocNavButtons) {
 				if(b.getDocKey().equals(event.getModelKey())) {
 					found = true;
 					break;
@@ -423,9 +424,8 @@ public class NavRowPanel extends AbstractNavPanel {
 				openDocNavButtons.remove(i);
 			}
 		}
-		else {
-			crntQuoteBudleWidget.onModelChangeEvent(event);
-			liuWidget.onModelChangeEvent(event);
-		}
+		
+		crntQuoteBudleWidget.onModelChangeEvent(event);
+		liuWidget.onModelChangeEvent(event);
 	}
 }

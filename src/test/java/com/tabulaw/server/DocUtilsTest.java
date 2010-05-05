@@ -55,7 +55,7 @@ public class DocUtilsTest {
 		String snow = c.get(Calendar.MONTH) + 1 + "/" + c.get(Calendar.DATE) + "/" + c.get(Calendar.YEAR);  
 		String sized = "[casedoc]title:docTitle|date:" + snow + "|hash:docHash|parties:parties|citation:citation|url:url|year:year|\n";
 		
-		DocRef m = DocUtils.deserializeDocument(sized);
+		DocRef m = DocUtils.deserializeDocToken(sized);
 		
 		Assert.assertEquals(m.getTitle(), "docTitle");
 		Assert.assertEquals(m.getDate(), date);

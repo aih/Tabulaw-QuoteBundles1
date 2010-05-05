@@ -34,7 +34,7 @@ public abstract class AbstractListingOperator<R> implements IListingOperator<R> 
 	protected Sorting sorting;
 
 	/**
-	 * The current list size.
+	 * The size of the underlying result set.
 	 */
 	protected int listSize = -1;
 

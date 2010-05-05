@@ -18,17 +18,19 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.view.DocumentViewInitializer;
+import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.data.rpc.RpcCommand;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
+import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.listing.AbstractListingConfig;
 import com.tabulaw.client.ui.listing.Column;
 import com.tabulaw.client.ui.listing.DataListingOperator;
 import com.tabulaw.client.ui.listing.IListingConfig;
 import com.tabulaw.client.ui.listing.ITableCellRenderer;
+import com.tabulaw.client.ui.listing.ListingNavBar;
 import com.tabulaw.client.ui.listing.ModelListingTable;
 import com.tabulaw.client.ui.listing.ModelListingWidget;
 import com.tabulaw.client.util.Fmt;
@@ -43,44 +45,35 @@ import com.tabulaw.listhandler.InMemoryListHandler;
  * Lists documents for a given user.
  * @author jpk
  */
-public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
+public class DocListingWidget extends AbstractModelChangeAwareWidget {
 
 	static class ListingConfig extends AbstractListingConfig {
 
 		static final Sorting defaultSorting = new Sorting("title");
 
-		static final String[] modelProps = new String[] {
-			"title", "date"
+		static final Column[] cols = new Column[] {
+			new Column("Title", null, "title", null, "title"),
+			new Column("Date", GlobalFormat.DATE, "date", null, "date"), 
+			new Column("", null, null, null, "delete"),
 		};
 
-		static final Column[] cols =
-				new Column[] {
-					new Column("Title", null, "title", null, "title"),
-					new Column("Date", GlobalFormat.DATE, "date", null, "date"), 
-					new Column("", null, null, null, "delete"),
-				};
-
 		public ListingConfig() {
-			super("Document", modelProps, cols, defaultSorting, 1000);
+			super("Document", null, cols, defaultSorting, 10);
 		}
 
 		@Override
 		public boolean isShowRefreshBtn() {
 			return false;
 		}
-
-		@Override
-		public boolean isShowNavBar() {
-			return false;
-		}
 	} // ListingConfig
 
-	static class DocListing extends ModelListingWidget<DocRef, DocumentsListingWidget.Table> /*implements IRpcHandler*/{
+	static class DocListing extends ModelListingWidget<DocRef, DocListingWidget.Table> /*implements IRpcHandler*/{
 
 		// final RpcUiHandler rpcui;
 
 		public DocListing() {
-			super(config.getListingId(), config.getListingElementName(), new Table(config), null);
+			super(config.getListingId(), config.getListingElementName(), new Table(config), new ListingNavBar<DocRef>(config,
+					null));
 			// rpcui = new RpcUiHandler(this);
 		}
 
@@ -118,7 +111,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 		@Override
 		protected void onCellClick(int colIndex, int rowIndex) {
 			if(rowIndex > 0 && colIndex < 2)
-				ViewManager.get().dispatch(new ShowViewRequest(new DocumentViewInitializer(getRowKey(rowIndex))));
+				ViewManager.get().dispatch(new ShowViewRequest(new DocViewInitializer(getRowKey(rowIndex))));
 		}
 	}
 
@@ -164,7 +157,7 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
 	static final IListingConfig config = new ListingConfig();
 
-	private Operator operator;
+	private final Operator operator;
 
 	private final DocListing listingWidget;
 
@@ -173,10 +166,13 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 	/**
 	 * Constructor
 	 */
-	public DocumentsListingWidget() {
+	public DocListingWidget() {
 		super();
 
 		listingWidget = new DocListing();
+		operator = new Operator();
+		listingWidget.getTable().setCellRenderer(new CellRenderer());
+		listingWidget.setOperator(operator);
 
 		pnl.add(listingWidget);
 
@@ -209,25 +205,23 @@ public class DocumentsListingWidget extends AbstractModelChangeAwareWidget {
 
 	public void loadData() {
 		// get docs from server
-		if(operator == null) {
-			new RpcCommand<DocListingPayload>() {
+		new RpcCommand<DocListingPayload>() {
 
-				@Override
-				protected void doExecute() {
-					setSource(listingWidget);
-					Poc.getDocService().getCachedDocs(this);
-				}
+			@Override
+			protected void doExecute() {
+				setSource(listingWidget);
+				Poc.getDocService().getCachedDocs(this);
+			}
 
-				@Override
-				protected void handleSuccess(DocListingPayload result) {
-					super.handleSuccess(result);
+			@Override
+			protected void handleSuccess(DocListingPayload result) {
+				super.handleSuccess(result);
+				Notifier.get().showFor(result);
+				if(!result.hasErrors()) {
 					ClientModelCache.get().persistAll(result.getCachedDocs());
-					operator = new Operator();
-					listingWidget.getTable().setCellRenderer(new CellRenderer());
-					listingWidget.setOperator(operator);
 					operator.refresh();
 				}
-			}.execute();
-		}
+			}
+		}.execute();
 	}
 }

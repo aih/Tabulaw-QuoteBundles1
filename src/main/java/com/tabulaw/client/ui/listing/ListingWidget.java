@@ -52,14 +52,25 @@ public class ListingWidget<R, T extends ListingTable<R>> extends Composite imple
 	protected final String listingId, listingElementName;
 
 	/**
+	 * The main "listing" panel containing all widgets comprising this widget.
+	 */
+	protected final FocusPanel focusPanel = new FocusPanel();
+
+	/**
+	 * The sole chile of the focus panel enabling multiple widgets to exist under
+	 * the focus panel.
+	 */
+	protected final FlowPanel tableViewPanel = new FlowPanel();
+
+	/**
+	 * Wrapped around the listing table enabling vertical scrolling.
+	 */
+	protected final ScrollPanel portal = new ScrollPanel();
+
+	/**
 	 * The listing table.
 	 */
 	protected final T table;
-
-	/**
-	 * Displayed in place of the table when no data rows exist.
-	 */
-	private Widget noDataRowsWidget;
 
 	/**
 	 * The listing navigation bar.
@@ -67,14 +78,9 @@ public class ListingWidget<R, T extends ListingTable<R>> extends Composite imple
 	protected final ListingNavBar<R> navBar;
 
 	/**
-	 * The main "listing" panel containing all widgets comprising this widget.
+	 * Displayed in place of the table when no data rows exist.
 	 */
-	protected final FocusPanel focusPanel = new FocusPanel();
-
-	/**
-	 * Wrapped around the listing table enabling vertical scrolling.
-	 */
-	protected final ScrollPanel portal = new ScrollPanel();
+	private Widget noDataRowsWidget;
 
 	/**
 	 * The listing operator
@@ -98,38 +104,25 @@ public class ListingWidget<R, T extends ListingTable<R>> extends Composite imple
 
 		this.listingId = listingId;
 		this.listingElementName = listingElementName;
-
-		final FlowPanel tableViewPanel = new FlowPanel();
 		tableViewPanel.setStylePrimaryName(Styles.TABLE_VIEW);
-
-		// portal
+		focusPanel.add(tableViewPanel);
+		focusPanel.addKeyDownHandler(this);
+		initWidget(focusPanel);
 		portal.setStyleName(Styles.PORTAL);
 		tableViewPanel.add(portal);
 
 		// table
 		portal.add(table);
-		focusPanel.addKeyDownHandler(this);
 		this.table = table;
-
-		// generate nav bar
-		this.navBar = navBar;
-		/*
-		if(config.isShowNavBar()) {
-			navBar = new ListingNavBar<R>(config, getAddRowHandler());
+		
+		// nav bar
+		if(navBar != null) {
+			this.navBar = navBar;
 			tableViewPanel.add(navBar.getWidget());
 		}
 		else {
-			navBar = null;
+			this.navBar = null;
 		}
-
-		// row delegate?
-		final IRowOptionsDelegate rod = getRowOptionsHandler();
-		if(rod != null) rowPopup = new RowContextPopup(2000, table, rod);
-		*/
-
-		focusPanel.add(tableViewPanel);
-
-		initWidget(focusPanel);
 	}
 
 	/**
@@ -158,8 +151,8 @@ public class ListingWidget<R, T extends ListingTable<R>> extends Composite imple
 		operator.setSourcingWidget(this);
 		this.table.setListingOperator(operator);
 		if(navBar != null) navBar.setListingOperator(operator);
-		
-		// why is this needed?
+
+		// trap listing events fired by the operator that is being set
 		addHandler(this, ListingEvent.TYPE);
 	}
 
@@ -242,11 +235,11 @@ public class ListingWidget<R, T extends ListingTable<R>> extends Composite imple
 	public final void setPortalHeight(String height) {
 		portal.setHeight(height);
 	}
-	
+
 	protected Widget createNoDataRowsWidget() {
 		return new Label("Currently, no " + listingElementName + "s exist.");
 	}
-	
+
 	private void handleTableVisibility() {
 		// handle no data rows case
 		boolean noDataRows = table.getRowCount() <= 1;
@@ -256,7 +249,7 @@ public class ListingWidget<R, T extends ListingTable<R>> extends Composite imple
 			noDataRowsWidget = createNoDataRowsWidget();
 			noDataRowsWidget.setStyleName(Styles.NODATA);
 			noDataRowsWidget.setVisible(false);
-			((FlowPanel)portal.getParent()).add(noDataRowsWidget);
+			tableViewPanel.add(noDataRowsWidget);
 		}
 		if(noDataRowsWidget != null) noDataRowsWidget.setVisible(noDataRows);
 	}

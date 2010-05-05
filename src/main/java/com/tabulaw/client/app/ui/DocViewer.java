@@ -35,7 +35,7 @@ import com.tabulaw.common.model.DocRef;
  * set to read-only mode.
  * @author jpk
  */
-public class DocumentViewer extends Composite implements DoubleClickHandler, HasValueChangeHandlers<DocumentViewer.ViewMode> {
+public class DocViewer extends Composite implements DoubleClickHandler, HasValueChangeHandlers<DocViewer.ViewMode> {
 
 	public static enum ViewMode {
 		EDIT,
@@ -122,7 +122,7 @@ public class DocumentViewer extends Composite implements DoubleClickHandler, Has
 	/**
 	 * Constructor
 	 */
-	public DocumentViewer() {
+	public DocViewer() {
 		super();
 
 		header.html.addDoubleClickHandler(this);
@@ -158,7 +158,7 @@ public class DocumentViewer extends Composite implements DoubleClickHandler, Has
 	 * @return the DOM iframe body ref of the contained document.
 	 */
 	public native JavaScriptObject getDocBody() /*-{
-		var frameId = this.@com.tabulaw.client.app.ui.DocumentViewer::getFrameId()();
+		var frameId = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
 		var frame = $wnd.goog.dom.$(frameId);
 		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 		return fbody;
@@ -185,14 +185,14 @@ public class DocumentViewer extends Composite implements DoubleClickHandler, Has
 	}
 
 	public native String getDocHtml() /*-{
-		var fid = this.@com.tabulaw.client.app.ui.DocumentViewer::getFrameId()();
+		var fid = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
 		var frame = $wnd.goog.dom.$(fid);
 		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 		return fbody.innerHTML;
 	}-*/;
 
 	public native void setDocHtml(String html) /*-{
-		var fid = this.@com.tabulaw.client.app.ui.DocumentViewer::getFrameId()();
+		var fid = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
 		var frame = $wnd.goog.dom.$(fid);
 		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 		//$wnd.alert('html: ' + html);

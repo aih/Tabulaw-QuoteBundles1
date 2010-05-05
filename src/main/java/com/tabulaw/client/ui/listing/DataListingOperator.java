@@ -57,7 +57,7 @@ public class DataListingOperator<R, H extends IListHandler<R>> extends AbstractL
 		try {
 			current = dataProvider.getElements(ofst, pageSize, srtg);
 			sorting = srtg;
-			listSize = current.size();
+			listSize = dataProvider.size();
 			offset = ofst;
 		}
 		catch(final EmptyListException e) {

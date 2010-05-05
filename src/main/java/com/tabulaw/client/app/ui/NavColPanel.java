@@ -19,6 +19,11 @@ import com.tabulaw.client.mvc.view.ViewKey;
 public class NavColPanel extends AbstractNavPanel {
 
 	static class Styles {
+		
+		/**
+		 * The wrapped vertical panel that contains the widgets.
+		 */
+		public static final String VPANEL = "vpanel";
 
 		/**
 		 * Style added to all child widgets.
@@ -27,25 +32,28 @@ public class NavColPanel extends AbstractNavPanel {
 	}
 	
 	private ViewKey currentViewKey;
+	
+	private final VerticalPanel vp = new VerticalPanel();
 
 	/**
 	 * Constructor
 	 */
 	public NavColPanel() {
-		initWidget(new VerticalPanel());
+		vp.setStyleName(Styles.VPANEL);
+		initWidget(vp);
 	}
 	
 	public void clear() {
-		((VerticalPanel)getWidget()).clear();
+		vp.clear();
 	}
 	
 	public void addWidget(Widget w) {
 		w.addStyleName(Styles.WIDGET);
-		((VerticalPanel)getWidget()).add(w);
+		vp.add(w);
 	}
 	
 	public void removeWidget(Widget w) {
-		if(((VerticalPanel)getWidget()).remove(w)) {
+		if(vp.remove(w)) {
 			w.removeStyleName(Styles.WIDGET);
 		}
 	}

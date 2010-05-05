@@ -15,8 +15,8 @@ import com.tabulaw.client.app.ui.LoginTopPanel;
 import com.tabulaw.client.app.ui.NavColPanel;
 import com.tabulaw.client.app.ui.NavRowPanel;
 import com.tabulaw.client.app.ui.Portal;
-import com.tabulaw.client.app.ui.view.DocumentView;
-import com.tabulaw.client.app.ui.view.DocumentsView;
+import com.tabulaw.client.app.ui.view.DocView;
+import com.tabulaw.client.app.ui.view.DocsView;
 import com.tabulaw.client.app.ui.view.ManageUsersView;
 import com.tabulaw.client.app.ui.view.QuoteBundlesView;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -187,7 +187,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					ClientModelCache.get().persist(userState, getPortal());
 
 					// show doc listing view by default
-					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocumentsView.klas)));
+					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocsView.klas)));
 				}
 			}
 
@@ -246,7 +246,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 		// TODO temp bypass logins
 		// ViewManager.get().dispatch(new ShowViewRequest(new
-		// StaticViewInitializer(DocumentsView.klas)));
+		// StaticViewInitializer(DocsView.klas)));
 	}
 
 	@Override
@@ -297,8 +297,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	}
 
 	private void populateViewClasses() {
-		ViewClass.addClass(DocumentsView.klas);
-		ViewClass.addClass(DocumentView.klas);
+		ViewClass.addClass(DocsView.klas);
+		ViewClass.addClass(DocView.klas);
 		ViewClass.addClass(QuoteBundlesView.klas);
 		ViewClass.addClass(ManageUsersView.klas);
 	}

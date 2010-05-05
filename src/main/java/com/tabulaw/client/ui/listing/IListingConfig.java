@@ -62,12 +62,6 @@ public interface IListingConfig {
 	Sorting getDefaultSorting();
 
 	/**
-	 * Show the listing nav bar?
-	 * @return true/false
-	 */
-	boolean isShowNavBar();
-
-	/**
 	 * Show the refresh button?
 	 * @return true/false
 	 */

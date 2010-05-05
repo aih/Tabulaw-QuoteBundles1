@@ -9,9 +9,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.ui.AbstractNavButton;
-import com.tabulaw.client.app.ui.DocSuggestWidget;
 import com.tabulaw.client.app.ui.DocUploadDialog;
-import com.tabulaw.client.app.ui.DocumentsListingWidget;
+import com.tabulaw.client.app.ui.DocsWidget;
 import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
@@ -22,7 +21,7 @@ import com.tabulaw.client.mvc.view.ViewOptions;
  * View showing the existing documents.
  * @author jpk
  */
-public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
+public class DocsView extends AbstractPocView<StaticViewInitializer> {
 
 	public static final Class klas = new Class();
 
@@ -39,8 +38,8 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 		}
 
 		@Override
-		public DocumentsView newView() {
-			return new DocumentsView();
+		public DocsView newView() {
+			return new DocsView();
 		}
 
 		@Override
@@ -74,11 +73,7 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	private final DocSuggestWidget docSuggest = new DocSuggestWidget();
-	
-	private final DocumentsListingWidget docListing = new DocumentsListingWidget();
-	
-	// private HandlerRegistration hrModelChangeSuggest;
+	private final DocsWidget docsWidget = new DocsWidget();
 	
 	private DocUploadDialog docUploadDialog;
 	
@@ -87,7 +82,7 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 	/**
 	 * Constructor
 	 */
-	public DocumentsView() {
+	public DocsView() {
 		super();
 	}
 
@@ -108,19 +103,18 @@ public class DocumentsView extends AbstractPocView<StaticViewInitializer> {
 
 	@Override
 	protected void doInitialization(StaticViewInitializer initializer) {
-		addWidget(docSuggest);
-		addWidget(docListing);
-		docListing.makeModelChangeAware();
+		addWidget(docsWidget);
+		docsWidget.makeModelChangeAware();
 	}
 
 	@Override
 	protected final void doRefresh() {
-		docListing.loadData();
+		docsWidget.refresh();
 	}
 
 	@Override
 	protected final void doDestroy() {
-		if(docListing.getOperator() != null) docListing.getOperator().clear();
-		docListing.unmakeModelChangeAware();
+		docsWidget.clearState();
+		docsWidget.unmakeModelChangeAware();
 	}
 }

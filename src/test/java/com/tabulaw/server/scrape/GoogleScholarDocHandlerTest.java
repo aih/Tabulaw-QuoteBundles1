@@ -66,7 +66,7 @@ public class GoogleScholarDocHandlerTest {
 		String searchTerm = "rowe";
 		int offset = 0;
 		int numResults = 4;
-		DocSearchRequest sr = new DocSearchRequest(DocDataProvider.GOOGLE_SCHOLAR, searchTerm, offset, numResults);
+		DocSearchRequest sr = new DocSearchRequest(DocDataProvider.GOOGLE_SCHOLAR, searchTerm, offset, numResults, false);
 		String surl = docHandler.createSearchUrlString(sr);
 		URL url = new URL(surl);
 		

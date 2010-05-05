@@ -9,10 +9,10 @@ import com.tabulaw.client.mvc.view.AbstractDynamicViewInitializer;
 import com.tabulaw.common.model.ModelKey;
 
 /**
- * DocumentViewInitializer
+ * DocViewInitializer
  * @author jpk
  */
-public class DocumentViewInitializer extends AbstractDynamicViewInitializer {
+public class DocViewInitializer extends AbstractDynamicViewInitializer {
 
 	private final ModelKey documentKey;
 
@@ -20,8 +20,8 @@ public class DocumentViewInitializer extends AbstractDynamicViewInitializer {
 	 * Constructor
 	 * @param documentKey
 	 */
-	public DocumentViewInitializer(ModelKey documentKey) {
-		super(DocumentView.klas);
+	public DocViewInitializer(ModelKey documentKey) {
+		super(DocView.klas);
 		this.documentKey = documentKey;
 	}
 

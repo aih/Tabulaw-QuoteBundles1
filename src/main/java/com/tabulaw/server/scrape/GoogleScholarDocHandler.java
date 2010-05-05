@@ -47,7 +47,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 	 *   &as_epq=
 	 *   &as_oq=
 	 *   &as_eq=
-	 *   &as_occt=title
+	 *   &as_occt=title|any
 	 *   &as_sauthors=
 	 *   &as_publication=
 	 *   &as_ylo=
@@ -87,8 +87,9 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 		sb.append("&as_epq=");
 		sb.append("&as_oq=");
 
-		// NOTE: we search title only
-		sb.append("&as_occt=title");
+		// full text search or just by title?
+		sb.append("&as_occt=");
+		sb.append(request.isFullTextSearch() ? "any" : "title");
 
 		sb.append("&as_sauthors=");
 		sb.append("&as_publication=");

@@ -26,6 +26,8 @@ public class DocSearchRequest implements IMarshalable, IDescriptorProvider {
 
 	private int numResults;
 
+	private boolean fullTextSearch;
+
 	/**
 	 * Constructor
 	 */
@@ -39,13 +41,16 @@ public class DocSearchRequest implements IMarshalable, IDescriptorProvider {
 	 * @param searchToken
 	 * @param offset
 	 * @param numResults
+	 * @param fullTextSearch 
 	 */
-	public DocSearchRequest(DocDataProvider dataProvider, String searchToken, int offset, int numResults) {
+	public DocSearchRequest(DocDataProvider dataProvider, String searchToken, int offset, int numResults,
+			boolean fullTextSearch) {
 		super();
 		this.dataProvider = dataProvider;
 		this.searchToken = searchToken;
 		this.offset = offset;
 		this.numResults = numResults;
+		this.fullTextSearch = fullTextSearch;
 	}
 
 	public String getSearchToken() {
@@ -78,6 +83,14 @@ public class DocSearchRequest implements IMarshalable, IDescriptorProvider {
 
 	public void setNumResults(int numResults) {
 		this.numResults = numResults;
+	}
+
+	public boolean isFullTextSearch() {
+		return fullTextSearch;
+	}
+
+	public void setFullTextSearch(boolean fullTextSearch) {
+		this.fullTextSearch = fullTextSearch;
 	}
 
 	@Override

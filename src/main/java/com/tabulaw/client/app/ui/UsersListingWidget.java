@@ -65,11 +65,6 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 		public boolean isShowRefreshBtn() {
 			return false;
 		}
-
-		@Override
-		public boolean isShowNavBar() {
-			return false;
-		}
 	} // ListingConfig
 
 	static class UserListing extends ModelListingWidget<User, UsersListingWidget.Table> /*implements IRpcHandler*/{

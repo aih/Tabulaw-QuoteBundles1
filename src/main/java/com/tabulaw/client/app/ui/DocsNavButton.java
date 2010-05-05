@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.app.ui;
 
-import com.tabulaw.client.app.ui.view.DocumentsView;
+import com.tabulaw.client.app.ui.view.DocsView;
 import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 
@@ -13,16 +13,16 @@ import com.tabulaw.client.mvc.view.StaticViewInitializer;
  * Shows the Document listing view when clicked.
  * @author jpk
  */
-public class DocumentsNavButton extends AbstractNavButton {
+public class DocsNavButton extends AbstractNavButton {
 
 	static class Styles {
 
 		public static final String DOCS = "docs";
 	}
 
-	static final IViewInitializer vi = new StaticViewInitializer(DocumentsView.klas);
+	static final IViewInitializer vi = new StaticViewInitializer(DocsView.klas);
 
-	public DocumentsNavButton() {
+	public DocsNavButton() {
 		super("Documents", Styles.DOCS);
 	}
 

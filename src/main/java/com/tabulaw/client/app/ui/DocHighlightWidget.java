@@ -19,7 +19,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.DOMExt;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
-import com.tabulaw.client.app.ui.DocumentViewer.ViewMode;
+import com.tabulaw.client.app.ui.DocViewer.ViewMode;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;
@@ -46,7 +46,7 @@ import com.tabulaw.common.model.QuoteBundle;
  * existing quotes in the bundle are re-displayed upon widget load.
  * @author jpk
  */
-public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> {
+public class DocHighlightWidget extends AbstractModelChangeAwareWidget implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> {
 
 	class DocQuoteDragHandler extends LoggingDragHandler {
 
@@ -67,7 +67,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 		}
 	} // DocQuoteDragHandler
 
-	private final DocumentViewer wDocViewer = new DocumentViewer();
+	private final DocViewer wDocViewer = new DocViewer();
 
 	private HandlerRegistration hrViewMode;
 
@@ -89,7 +89,7 @@ public class DocumentHighlightWidget extends AbstractModelChangeAwareWidget impl
 	/**
 	 * Constructor
 	 */
-	public DocumentHighlightWidget() {
+	public DocHighlightWidget() {
 		super();
 
 		boundaryPanel = new AbsolutePanel();

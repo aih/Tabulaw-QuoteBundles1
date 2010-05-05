@@ -123,9 +123,13 @@ public class DocUtils {
 	public static String getSerializedDocToken(File fdoc) throws IOException {
 		// for now just load the entire doc as a string for simplicity's sake
 		String s = FileUtils.readFileToString(fdoc, "UTF-8");
-		int index = s.indexOf(']');
-		if(index == -1) return null;
-		return s.substring(0, index);
+		
+		// ensure we hava a doc serialize token at head
+		if(!s.startsWith("[doc]") && !s.startsWith("[casedoc]")) return null; 
+		
+		int index = s.indexOf('\n');
+		if(index == -1 || index >= s.length() - 2) return null;
+		return s.substring(0, index + 1); // include the newline char
 	}
 
 	/**
@@ -135,18 +139,18 @@ public class DocUtils {
 	 */
 	public static DocRef deserializeDocument(File fdoc) throws IOException {
 		String stoken = getSerializedDocToken(fdoc);
-		return stoken == null ? null : deserializeDocument(stoken);
+		return stoken == null ? null : deserializeDocToken(stoken);
 	}
 
 	/**
 	 * Creates a doc ref entity given the serialized doc token.
-	 * @param s serialized doc token
+	 * @param stoken serialized doc token
 	 * @return newly created {@link DocRef} entity or <code>null</code> if the
 	 *         format is un-recognized.
 	 */
-	public static DocRef deserializeDocument(String s) {
+	public static DocRef deserializeDocToken(String stoken) {
 		// check to see if we have a serializer first line
-		if(s.charAt(0) != '[') return null;
+		if(stoken.charAt(0) != '[') return null;
 
 		// doc related
 		String title = null, hash = null;
@@ -155,11 +159,11 @@ public class DocUtils {
 		String parties = null, citation = null, url = null, year = null;
 		Date date = null;
 
-		int nli = s.indexOf('\n');
-		String firstline = s.substring(0, nli);
+		int nli = stoken.indexOf('\n');
+		String firstline = stoken.substring(0, nli);
 		int eti = firstline.indexOf(']');
 
-		String type = s.substring(1, eti);
+		String type = stoken.substring(1, eti);
 		firstline = firstline.substring(eti + 1);
 
 		String[] sarr1 = firstline.split("\\|");

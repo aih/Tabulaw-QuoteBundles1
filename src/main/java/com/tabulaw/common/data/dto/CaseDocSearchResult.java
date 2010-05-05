@@ -7,10 +7,13 @@ package com.tabulaw.common.data.dto;
 
 import java.util.Date;
 
+import com.tabulaw.common.model.IModelKeyProvider;
+import com.tabulaw.common.model.ModelKey;
+
 /**
  * @author jpk
  */
-public class CaseDocSearchResult extends CaseDoc {
+public class CaseDocSearchResult extends CaseDoc implements IModelKeyProvider {
 
 	private String titleHtml, summary;
 
@@ -31,6 +34,11 @@ public class CaseDocSearchResult extends CaseDoc {
 		super(title, date, url, citation);
 		this.titleHtml = titleHtml;
 		this.summary = summary;
+	}
+
+	@Override
+	public ModelKey getModelKey() {
+		return new ModelKey("CaseDocSearchResult", getUrl(), getTitle());
 	}
 
 	public String getTitleHtml() {

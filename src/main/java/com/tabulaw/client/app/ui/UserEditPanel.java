@@ -7,7 +7,6 @@ package com.tabulaw.client.app.ui;
 
 import java.util.Date;
 
-import com.google.gwt.user.client.ui.Label;
 import com.tabulaw.client.ui.edit.AbstractEditPanel;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.common.model.Authority;
@@ -18,13 +17,6 @@ import com.tabulaw.common.model.User;
  */
 public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 
-	static final class Styles {
-
-		public static final String TITLE = "title";
-	}
-
-	private final Label lblTitle = new Label();
-
 	private User user;
 
 	/**
@@ -32,8 +24,6 @@ public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 	 */
 	public UserEditPanel() {
 		super("Save", "Delete", null, "Reset", new UserFieldPanel());
-		lblTitle.setStyleName(Styles.TITLE);
-		panel.insert(lblTitle, 0);
 		getFieldPanel().getFieldGroup().setEnabled(false);
 	}
 	
@@ -41,12 +31,10 @@ public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 	public void setUser(User user) {
 		if(user.isNew()) {
 			getFieldPanel().getFieldGroup().clearValue();
-			lblTitle.setText("Create User");
 			setSaveButtonText("Create");
 		}
 		else {
 			// set title
-			lblTitle.setText("Edit " + user.getName());
 			setSaveButtonText("Update");
 		}
 		// set fields
