@@ -103,6 +103,12 @@ a:active {
 	width: 100%;
 }
 
+/* the font styling for general [section] titles
+.sectionTitle {
+	font-size: 21px;
+	white-space: nowrap;
+}
+*/
 .navButton {
 	white-space: nowrap;
 	font-family: Arial, Helvetica, sans-serif;
@@ -472,38 +478,37 @@ a:active {
 .docSuggest {
 	margin-bottom: 30px;
 }
-	.image {
+	.docSuggest .image {
 	}
-	.gwt-SuggestBox {
-		margin-left: 20px;
+	.docSuggest .gwt-SuggestBox {
 		font-size: 22px;
 		font-weight: bold;
 	}
-	.gwt-SuggestBoxPopup {
+	.docSuggest .gwt-SuggestBoxPopup {
 		
 	} 
-		.gwt-SuggestBoxPopup .item {
-			max-width: 500px;
+		.docSuggest .gwt-SuggestBoxPopup .item {
+			max-width: 400px;
 		}
-			.gwt-SuggestBoxPopup .item .entry {
+			.docSuggest .gwt-SuggestBoxPopup .item .entry {
 				width: 500px;
 				margin: 1px 0 1px 0;
 			}
 				/* full text search entry */
-				.gwt-SuggestBoxPopup .item .entry .query {
+				.docSuggest .gwt-SuggestBoxPopup .item .entry .query {
 					font-weight: bold;
 				}
-				.gwt-SuggestBoxPopup .item .entry .fts {
+				.docSuggest .gwt-SuggestBoxPopup .item .entry .fts {
 					color: gray;
 				}
-				.gwt-SuggestBoxPopup .item .entry .title {
+				.docSuggest .gwt-SuggestBoxPopup .item .entry .title {
 				}
-				.gwt-SuggestBoxPopup .item .entry .summary {
+				.docSuggest .gwt-SuggestBoxPopup .item .entry .summary {
 					color: gray;
 					font-size: smaller;
 					white-space: normal;
 				}
-			.gwt-SuggestBoxPopup .item-selected {
+			.docSuggest .gwt-SuggestBoxPopup .item-selected {
 			} 
 
 /* document viewer widget */
@@ -597,26 +602,64 @@ a:active {
 /* document listing view styling */
 .documents {
 }
+	.documents .viewToolbar {
+		display: none;
+	}
 	.documents .searchDp {
+		margin: 10px 0;
 	}
-	.documents .sheader {
-	}
-	.documents .simage {
-		float: left;
-	}
-	.documents .stext {
-		float: left;
+	.documents .searchDp .header {
+		font-size: 21px;
 	}
 
 	.documents .docSearch {
 	}
-		.docSearch .docSuggest {
+		.docSearch {
+			overflow: hidden;
 		}
+		.docSearch .docSuggest {
+			margin-right: 10px;
+		}
+			.docSearch .docSuggest .poweredBy {
+				overflow: hidden;
+			}
+			.docSearch .docSuggest .poweredBy .gwt-Label {
+				float: right;
+				color: #BFBFBF;
+				margin-right: 5px;
+			}
+			.docSearch .docSuggest .poweredBy img {
+				float: right;
+			}
 		.docSearch .docSearchListing {
 		}
-	
+		.docSearch .docSearchListing .head {
+			display: none;
+		}
+			.docSearch .entry {
+				width: 500px;
+				margin: 1px 0 1px 0;
+			}
+				.docSearch .entry .title {
+				}
+				.docSearch .entry .summary {
+					color: gray;
+					font-size: smaller;
+					white-space: normal;
+				}
+
+	.docListingHeader {
+		margin: 10px 0;
+	}
+		.docListingHeader .title {
+			font-size: 21px;
+		}
+		.docListingHeader .summary {
+			color: #BFBFBF;
+		}
+
 	.documents .tableView .portal {
-		height: 200px;
+		/*height: 200px;*/
 	}
 	.documents .tableView .head {
 		font-family: Arial, Helvetica, sans-serif !important;

@@ -5,10 +5,14 @@
  */
 package com.tabulaw.client.app.ui;
 
+import java.util.Date;
 import java.util.List;
 
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -16,8 +20,10 @@ import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
+import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.data.rpc.IRpcHandler;
+import com.tabulaw.client.data.rpc.RpcCommand;
 import com.tabulaw.client.data.rpc.RpcEvent;
 import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
@@ -33,9 +39,12 @@ import com.tabulaw.client.ui.listing.ModelListingTable;
 import com.tabulaw.client.ui.listing.ModelListingWidget;
 import com.tabulaw.common.data.ListingOp;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
+import com.tabulaw.common.data.rpc.DocFetchPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
+import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.dao.Sorting;
 
 /**
@@ -45,15 +54,15 @@ import com.tabulaw.dao.Sorting;
 public class DocSearchListingWidget extends Composite implements SelectionHandler<String> {
 
 	public static class Styles {
+
 		public static final String DOC_SEARCH_LISTING = "docSearchListing";
 	}
-	
+
 	static class ListingConfig extends AbstractListingConfig {
 
 		static final Sorting defaultSorting = new Sorting("title");
 
-		static final Column[] cols = new Column[] {
-			new Column("Result"),
+		static final Column[] cols = new Column[] { new Column("Result"),
 		};
 
 		public ListingConfig() {
@@ -67,7 +76,7 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 	} // ListingConfig
 
 	static class Operator extends AbstractListingOperator<CaseDocSearchResult> {
-		
+
 		String query;
 
 		/**
@@ -115,7 +124,9 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 
 		@Override
 		public void clear() {
-			throw new UnsupportedOperationException();
+			offset = 0;
+			sorting = null;
+			fireListingEvent(ListingOp.CLEAR, null);
 		}
 
 		@Override
@@ -129,8 +140,8 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 		final RpcUiHandler rpcui;
 
 		public DocListing() {
-			super(config.getListingId(), config.getListingElementName(), new Table(config), new ListingNavBar<CaseDocSearchResult>(config,
-					null));
+			super(config.getListingId(), config.getListingElementName(), new Table(config),
+					new ListingNavBar<CaseDocSearchResult>(config, null));
 			rpcui = new RpcUiHandler(this);
 		}
 
@@ -157,18 +168,64 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 
 		@Override
 		protected void onCellClick(int colIndex, int rowIndex) {
-			if(rowIndex > 0 && colIndex < 2)
-				ViewManager.get().dispatch(new ShowViewRequest(new DocViewInitializer(getRowKey(rowIndex))));
+			if(rowIndex == 0) return;
+			// ViewManager.get().dispatch(new ShowViewRequest(new
+			// DocViewInitializer(getRowKey(rowIndex))));
+			final CaseDocSearchResult caseDoc = getRowData(rowIndex);
+			final String docRemoteUrl = caseDoc.getUrl();
+			new RpcCommand<DocFetchPayload>() {
+
+				@Override
+				protected void doExecute() {
+					this.source = Table.this;
+					Poc.getDocService().fetch(docRemoteUrl, this);
+				}
+
+				@Override
+				protected void handleFailure(Throwable caught) {
+					super.handleFailure(caught);
+					Log.error("Unable to fetch remote document", caught);
+				}
+
+				@Override
+				protected void handleSuccess(DocFetchPayload result) {
+					super.handleSuccess(result);
+					if(result.hasErrors()) {
+						Notifier.get().showFor(result);
+						return;
+					}
+					final DocRef mNewDoc =
+							EntityFactory.get().buildCaseDoc(caseDoc.getTitle(), result.getDocHash(), new Date(), null,
+									caseDoc.getCitation(), caseDoc.getUrl(), null);
+
+					// persist the new doc and propagate through app
+					ClientModelCache.get().persist(mNewDoc, Table.this);
+
+					DeferredCommand.addCommand(new Command() {
+
+						@Override
+						public void execute() {
+							// show the doc (letting the model change event finish
+							// first)
+							final DocViewInitializer dvi = new DocViewInitializer(mNewDoc.getModelKey());
+							ViewManager.get().dispatch(new ShowViewRequest(dvi));
+						}
+					});
+				}
+
+			}.execute();
 		}
 	}
 
 	static class CellRenderer implements ITableCellRenderer<CaseDocSearchResult> {
 
 		@Override
-		public void renderCell(int rowIndex, final int cellIndex, final CaseDocSearchResult rowData, Column column, final HTMLTable table) {
+		public void renderCell(int rowIndex, final int cellIndex, final CaseDocSearchResult rowData, Column column,
+				final HTMLTable table) {
 			// same as doc suggest (for now)
-			String html = "<div class=\"entry\"><div class=\"title\">" + rowData.getTitleHtml() + "</div><div class=\"summary\">"
-				+ rowData.getSummary() + "</div></div>";
+			String html =
+					"<div class=\"entry\"><div class=\"title\">" + rowData.getTitleHtml() + "</div><div class=\"summary\">"
+							+ rowData.getSummary() + "</div></div>";
 			table.setHTML(rowIndex, cellIndex, html);
 		}
 	} // CellRenderer
@@ -204,5 +261,13 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 	public void onSelection(SelectionEvent<String> event) {
 		operator.query = event.getSelectedItem();
 		operator.refresh();
+		setVisible(true);
+	}
+
+	/**
+	 * Removes search results from the listing.
+	 */
+	public void clearData() {
+		operator.clear();
 	}
 }

@@ -20,10 +20,13 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.tabulaw.client.app.Poc;
+import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.data.rpc.IRpcHandler;
@@ -59,6 +62,7 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 		public static final String ENTRY = "entry";
 		public static final String TITLE = "title";
 		public static final String SUMMARY = "summary";
+		public static final String POWERED_BY = "poweredBy";
 	}
 
 	static class DocSuggestion implements Suggestion {
@@ -165,6 +169,8 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 
 	private final FlowPanel pnl = new FlowPanel();
 
+	private final FlowPanel fpPoweredBy = new FlowPanel();
+	
 	private final RpcUiHandler uiHandler;
 
 	/**
@@ -176,6 +182,13 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 
 		pnl.setStyleName(Styles.DOC_SUGGEST);
 		pnl.add(docSuggestBox);
+
+		fpPoweredBy.setStyleName(Styles.POWERED_BY);
+		Image imgGglScholarLogo = new Image(Resources.INSTANCE.googleScholarLogo());
+		fpPoweredBy.add(imgGglScholarLogo);
+		fpPoweredBy.add(new Label("Search powered by "));
+		pnl.add(fpPoweredBy);
+
 		initWidget(pnl);
 
 		addHandler(this, RpcEvent.TYPE);

@@ -203,7 +203,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		}
 	}
 
-	public void loadData() {
+	public void refresh() {
 		// get docs from server
 		new RpcCommand<DocListingPayload>() {
 

@@ -11,9 +11,7 @@ import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 
 /**
@@ -26,20 +24,19 @@ import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
  */
 public class DocsWidget extends AbstractModelChangeAwareWidget {
 
-	static class Styles {
-
+	private static class Styles {
+		public static final String DOC_LISTING_HEADER = "docListingHeader";
+		public static final String DOC_LISTING_HEADER_TITLE = "title";
+		public static final String DOC_LISTING_HEADER_SUMMARY = "summary";
 		public static final String DP_SEARCH = "searchDp";
-		public static final String DP_HEADER = "sheader";
-		public static final String DP_SEARCH_HEADER_IMAGE = "simage";
-		public static final String DP_SEARCH_HEADER_TEXT = "stext";
 	}
 
 	private final FlowPanel panel = new FlowPanel();
 
-	private final DisclosurePanel dp;
-
+	private final DisclosurePanel dpSearch;
 	private final DocSearchWidget docSearch = new DocSearchWidget();
 
+	private final FlowPanel docListingHeader = new FlowPanel();
 	private final DocListingWidget docListing = new DocListingWidget();
 
 	/**
@@ -48,36 +45,37 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 	public DocsWidget() {
 		super();
 
-		Image searchImage = new Image(Resources.INSTANCE.searchImage());
-		searchImage.setStyleName(Styles.DP_SEARCH_HEADER_IMAGE);
-		Label searchText = new Label("Search");
-		searchText.setStyleName(Styles.DP_SEARCH_HEADER_TEXT);
-		FlowPanel dpHeaderWidget = new FlowPanel();
-		dpHeaderWidget.setStyleName(Styles.DP_HEADER);
-		dpHeaderWidget.add(searchImage);
-		dpHeaderWidget.add(searchText);
-
-		dp = new DisclosurePanel();
-		dp.setAnimationEnabled(true);
-		dp.addStyleName(Styles.DP_SEARCH);
-		dp.setHeader(dpHeaderWidget);
-		dp.add(docSearch);
-		dp.addOpenHandler(new OpenHandler<DisclosurePanel>() {
+		dpSearch = new DisclosurePanel("Search");
+		dpSearch.setAnimationEnabled(true);
+		dpSearch.addStyleName(Styles.DP_SEARCH);
+		dpSearch.setContent(docSearch);
+		dpSearch.setOpen(true); // initially open
+		dpSearch.addOpenHandler(new OpenHandler<DisclosurePanel>() {
 
 			@Override
 			public void onOpen(OpenEvent<DisclosurePanel> event) {
-				//docListing.setVisible(false);
+				// docListing.setVisible(false);
 			}
 		});
-		dp.addCloseHandler(new CloseHandler<DisclosurePanel>() {
+		dpSearch.addCloseHandler(new CloseHandler<DisclosurePanel>() {
 
 			@Override
 			public void onClose(CloseEvent<DisclosurePanel> event) {
-				//docListing.setVisible(true);
+				// docListing.setVisible(true);
 			}
 		});
 
-		panel.add(dp);
+		panel.add(dpSearch);
+
+		docListingHeader.setStyleName(Styles.DOC_LISTING_HEADER);
+		Label lblDocuments = new Label("Documents");
+		lblDocuments.setStyleName(Styles.DOC_LISTING_HEADER_TITLE);
+		Label lblSummary = new Label("Includes your written documents and reading history.");
+		lblSummary.setStyleName(Styles.DOC_LISTING_HEADER_SUMMARY);
+		docListingHeader.add(lblDocuments);
+		docListingHeader.add(lblSummary);
+
+		panel.add(docListingHeader);
 		panel.add(docListing);
 
 		initWidget(panel);
@@ -87,14 +85,14 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 	 * Resets the state to that of initial load.
 	 */
 	public void refresh() {
-		// TODO
+		docSearch.reset();
+		docListing.refresh();
 	}
 
 	/**
 	 * Clears out all data but retains the structure.
 	 */
 	public void clearState() {
-		// TODO finish
 		if(docListing.getOperator() != null) docListing.getOperator().clear();
 	}
 }
