@@ -1,7 +1,6 @@
 @CHARSET "utf-8";
 
 body {
-	font-family: Georgia, "Times New Roman", Times, serif;
 	/*text-align: center;*/
 }
 
@@ -49,6 +48,10 @@ a:active {
 .rqd {
 	color: red;
 }
+/* read-only field value display (for consistency) */
+div.ro {
+	font-family: Arial, Helvetica, sans-serif;
+}
 
 .gwt-PopupPanelGlass {
 	background-color: #000;
@@ -91,6 +94,7 @@ a:active {
 	margin: 20px;
 	overflow: hidden;
 	
+	font-family: Georgia, "Times New Roman", Times, serif;
 	/*debug*/
 	/*border: 1px solid skyblue;*/
 }
@@ -758,6 +762,7 @@ a:active {
 	.manageUsers .tableView {
 		float: left;
 		font-family: Arial, Helvetica, sans-serif !important;
+		margin-bottom: 10px; /* when horiz viewing area forces the edit panel below the table */
 	}
 	.manageUsers .tableView .head {
 		color: #7F7F7F;

@@ -169,9 +169,8 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 		@Override
 		protected void onCellClick(int colIndex, int rowIndex) {
 			if(rowIndex == 0) return;
-			// ViewManager.get().dispatch(new ShowViewRequest(new
-			// DocViewInitializer(getRowKey(rowIndex))));
 			final CaseDocSearchResult caseDoc = getRowData(rowIndex);
+			if(caseDoc == null) return;
 			final String docRemoteUrl = caseDoc.getUrl();
 			new RpcCommand<DocFetchPayload>() {
 

@@ -37,6 +37,7 @@ public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 			// set title
 			setSaveButtonText("Update");
 		}
+
 		// set fields
 		FieldGroup fg = getFieldPanel().getFieldGroup();
 		fg.getFieldWidget("userName").setValue(user.getName());
@@ -45,6 +46,10 @@ public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 		fg.getFieldWidget("userEnabled").setValue(user.isEnabled());
 		fg.getFieldWidget("userExpires").setValue(user.getExpires());
 
+		// role
+		String role = user.getAuthorities().get(0).getAuthority();
+		fg.getFieldWidget("userRoles").setValue(role);
+		
 		getFieldPanel().getFieldGroup().setEnabled(true);
 	}
 
@@ -68,5 +73,4 @@ public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 
 		return user;
 	}
-
 }

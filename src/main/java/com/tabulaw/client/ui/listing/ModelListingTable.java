@@ -58,7 +58,7 @@ public class ModelListingTable<T extends IModelKeyProvider> extends ListingTable
 	 * @return the model row data
 	 */
 	protected T getRowData(int row) {
-		return rowDataList.get(row - 1);
+		return row == 0 ? null : rowDataList.get(row - 1);
 	}
 
 	/**

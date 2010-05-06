@@ -43,10 +43,6 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 
 		static final Sorting defaultSorting = new Sorting("name");
 
-		static final String[] modelProps = new String[] {
-			"name", "dateCreated", "dateModified", "emailAddress", "locked", "enabled", "expires", "authorities",
-		};
-
 		static final Column[] cols =
 				new Column[] {
 					Column.ROW_COUNT_COLUMN, 
@@ -58,7 +54,7 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 				};
 
 		public ListingConfig() {
-			super("User", modelProps, cols, defaultSorting, 1000);
+			super("User", null, cols, defaultSorting, 1000);
 		}
 
 		@Override
@@ -131,7 +127,7 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 		@Override
 		protected void onCellClick(int colIndex, int rowIndex) {
 			User user = getRowData(rowIndex);
-			SelectionEvent.fire(selectionDispatcher, user);
+			if(user != null) SelectionEvent.fire(selectionDispatcher, user);
 		}
 	}
 

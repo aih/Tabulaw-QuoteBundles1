@@ -27,8 +27,9 @@ public interface IFieldComposer {
 	 * Adds a field to the canvas. The field label is extracted from the given
 	 * field and if non-<code>null</code>, is added as well.
 	 * @param field The field to add
+	 * @param showLabel Show the field label?
 	 */
-	void addField(IFieldWidget<?> field);
+	void addField(IFieldWidget<?> field, boolean showLabel);
 
 	/**
 	 * Generic add routine.
@@ -52,7 +53,7 @@ public interface IFieldComposer {
 	/**
 	 * Adds a field label and Widget. If the label text is <code>null</code>, no
 	 * label is added. If the Widget is an {@link IFieldWidget},
-	 * {@link #addField(IFieldWidget)} should be called instead.
+	 * {@link #addField(IFieldWidget, boolean)} should be called instead.
 	 * @param label The label text
 	 * @param w The non-IField and non-FieldPanel Widget to add
 	 */

@@ -25,7 +25,7 @@ import com.tabulaw.common.model.User;
  * editing user records.
  * @author jpk
  */
-public class ManageUsersWidget extends Composite {
+public class UsersWidget extends Composite {
 
 	static final class Styles {
 
@@ -47,7 +47,7 @@ public class ManageUsersWidget extends Composite {
 	/**
 	 * Constructor
 	 */
-	public ManageUsersWidget() {
+	public UsersWidget() {
 		super();
 
 		panel = new FlowPanel();
@@ -77,8 +77,11 @@ public class ManageUsersWidget extends Composite {
 			@Override
 			public void onSelection(SelectionEvent<User> event) {
 				User user = event.getSelectedItem();
-				lblTitle.setText("Edit " + user.getName());
+				assert user != null;
+				
+				editPanel.setEditable(!user.isSuperuser());
 				editPanel.setUser(user);
+				lblTitle.setText(user.isSuperuser()? user.getName() : "Edit " + user.getName());
 			}
 		});
 
@@ -103,7 +106,7 @@ public class ManageUsersWidget extends Composite {
 						// listing widget
 						// in order to get the target row updated
 						listing.getListingWidget().onModelChangeEvent(
-								new ModelChangeEvent(ManageUsersWidget.this, ModelChangeOp.UPDATED, user, null));
+								new ModelChangeEvent(UsersWidget.this, ModelChangeOp.UPDATED, user, null));
 						Notifier.get().showFor(result);
 					}
 				}.execute();

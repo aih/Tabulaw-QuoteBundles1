@@ -34,8 +34,7 @@ import com.tabulaw.common.msg.Msg;
  * @param <P> field panel type
  * @author jpk
  */
-public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> extends Composite 
-implements ClickHandler, IHasEditHandlers<T> {
+public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> extends Composite implements ClickHandler, IHasEditHandlers<T> {
 
 	/**
 	 * Styles - (admin.css)
@@ -128,24 +127,30 @@ implements ClickHandler, IHasEditHandlers<T> {
 
 		pnlButtonRow.setStyleName(Styles.BTN_ROW);
 
-		if(saveText == null) saveText = DEFAULT_SAVE_TEXT;
-		btnSave = new Button(saveText, this);
+		String btnText;
+
+		btnText = saveText == null ? DEFAULT_SAVE_TEXT : saveText;
+		btnSave = new Button(btnText, this);
 		btnSave.addStyleName(Styles.SAVE);
+		btnSave.setVisible(saveText != null);
 		pnlButtonRow.add(btnSave);
 
-		if(deleteText == null) deleteText = DEFAULT_DELETE_TEXT;
-		btnDelete = new Button(deleteText, this);
+		btnText = deleteText == null ? DEFAULT_DELETE_TEXT : deleteText;
+		btnDelete = new Button(btnText, this);
 		btnDelete.addStyleName(Styles.DELETE);
+		btnDelete.setVisible(deleteText != null);
 		pnlButtonRow.add(btnDelete);
 
-		if(cancelText == null) cancelText = DEFAULT_CANCEL_TEXT;
-		btnCancel = new Button(cancelText, this);
+		btnText = cancelText == null ? DEFAULT_CANCEL_TEXT : cancelText;
+		btnCancel = new Button(btnText, this);
 		btnCancel.addStyleName(Styles.CANCEL);
+		btnCancel.setVisible(cancelText != null);
 		pnlButtonRow.add(btnCancel);
 
-		if(resetText == null) resetText = DEFAULT_RESET_TEXT;
-		btnReset = new Button(resetText, this);
+		btnText = resetText == null ? DEFAULT_RESET_TEXT : resetText;
+		btnReset = new Button(btnText, this);
 		btnReset.addStyleName(Styles.RESET);
+		btnReset.setVisible(resetText != null);
 		pnlButtonRow.add(btnReset);
 
 		panel.add(portal);
@@ -232,7 +237,7 @@ implements ClickHandler, IHasEditHandlers<T> {
 	public final HandlerRegistration addEditHandler(IEditHandler<T> handler) {
 		return addHandler(handler, EditEvent.TYPE);
 	}
-
+	
 	/**
 	 * Applies field error messages to the fields contained in the member
 	 * {@link AbstractFieldPanel}.
@@ -264,7 +269,7 @@ implements ClickHandler, IHasEditHandlers<T> {
 			errorHandler.handleError(new Error(classifier, fw, emsg), ErrorDisplay.ALL_FLAGS);
 		}
 	}
-	
+
 	/**
 	 * @return The edit content.
 	 */
@@ -284,14 +289,23 @@ implements ClickHandler, IHasEditHandlers<T> {
 			fieldPanel.reset();
 		}
 		else if(sender == btnDelete) {
-			//T editContent = getEditContent();
-			//if(editContent != null) {
-				EditEvent.fireDelete(this);
-			//}
+			// T editContent = getEditContent();
+			// if(editContent != null) {
+			EditEvent.fireDelete(this);
+			// }
 		}
 		else if(sender == btnCancel) {
 			EditEvent.fireCancel(this);
 		}
+	}
+
+	/**
+	 * Turns on/off editability.
+	 * @param editable
+	 */
+	public void setEditable(boolean editable) {
+		fieldPanel.getFieldGroup().setReadOnly(!editable);
+		pnlButtonRow.setVisible(editable);
 	}
 
 	@Override

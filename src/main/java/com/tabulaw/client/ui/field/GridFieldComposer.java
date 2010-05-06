@@ -81,8 +81,12 @@ public class GridFieldComposer extends AbstractFieldComposer {
 		add(label == null ? null : new FieldLabel(label), w);
 	}
 
-	@Override
 	public void addField(IFieldWidget<?> field) {
-		add(field.getFieldLabel(), field.getWidget());
+		addField(field, true);
+	}
+
+	@Override
+	public void addField(IFieldWidget<?> field, boolean showLabel) {
+		add(showLabel ? field.getFieldLabel() : null, field.getWidget());
 	}
 }

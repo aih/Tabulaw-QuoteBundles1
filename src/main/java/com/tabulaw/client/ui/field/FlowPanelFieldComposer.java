@@ -6,7 +6,6 @@
 package com.tabulaw.client.ui.field;
 
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Panel;
@@ -96,9 +95,11 @@ public class FlowPanelFieldComposer extends AbstractFieldComposer implements Has
 		if(fldLbl != null) {
 			fp.add(fldLbl);
 		}
+		/*
 		else if(!atCurrent) {
 			fp.add(new HTML("&nbsp;")); // for spacing
 		}
+		*/
 
 		fp.add(w);
 		getCurrentRow().add(fp);
@@ -115,9 +116,13 @@ public class FlowPanelFieldComposer extends AbstractFieldComposer implements Has
 		add(label == null ? null : new FieldLabel(label), w);
 	}
 
-	@Override
 	public void addField(IFieldWidget<?> field) {
-		add(field.getFieldLabel(), field.getWidget());
+		addField(field, true);
+	}
+
+	@Override
+	public void addField(IFieldWidget<?> field, boolean showLabel) {
+		add(showLabel ? field.getFieldLabel() : null, field.getWidget());
 		field.setFieldContainer(last.getParent());
 		field.setFieldLabelContainer(last.getParent());
 	}

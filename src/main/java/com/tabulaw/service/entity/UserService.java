@@ -194,8 +194,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		// set the user as un-locked by default
 		user.setLocked(false);
 
-		// set the role as user by default
-		user.addAuthority(dao.load(Authority.class, AuthorityRoles.ROLE_ADMINISTRATOR.name()));
+		// set the role as user
+		user.addAuthority(dao.load(Authority.class, AuthorityRoles.ROLE_USER.name()));
 		
 		validate(user);
 

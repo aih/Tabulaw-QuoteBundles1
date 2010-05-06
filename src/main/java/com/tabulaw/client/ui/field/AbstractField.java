@@ -565,27 +565,35 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 		formWidget.setVisible(!readOnly);
 
 		// resolve the containers
-		final Widget fldContainer = container == null ? this : container;
-		final Widget lblContainer = fldLbl == null ? null : labelContainer == null ? fldLbl : labelContainer;
+		//final Widget fldContainer = container == null ? this : container;
+		//final Widget lblContainer = fldLbl == null ? null : labelContainer == null ? fldLbl : labelContainer;
 
 		// apply readOnly property to "containing" widget
 		if(readOnly) {
-			fldContainer.addStyleName(Styles.READ_ONLY);
-			if(lblContainer != null) lblContainer.addStyleName(Styles.READ_ONLY);
+			if(container != null) container.addStyleName(Styles.READ_ONLY);
+			addStyleName(Styles.READ_ONLY);
+			if(fldLbl != null) fldLbl.addStyleName(Styles.READ_ONLY);
+			if(labelContainer != null) labelContainer.removeStyleName(Styles.READ_ONLY);
 		}
 		else {
-			fldContainer.removeStyleName(Styles.READ_ONLY);
-			if(lblContainer != null) lblContainer.removeStyleName(Styles.READ_ONLY);
+			if(container != null) container.removeStyleName(Styles.READ_ONLY);
+			removeStyleName(Styles.READ_ONLY);
+			if(fldLbl != null) fldLbl.removeStyleName(Styles.READ_ONLY);
+			if(labelContainer != null) labelContainer.removeStyleName(Styles.READ_ONLY);
 		}
 
 		// apply enabled property to "containing" widget
 		if(enabled) {
-			fldContainer.removeStyleName(Styles.DISABLED);
-			if(lblContainer != null) lblContainer.removeStyleName(Styles.DISABLED);
+			if(container != null) container.removeStyleName(Styles.DISABLED);
+			removeStyleName(Styles.DISABLED);
+			if(fldLbl != null) fldLbl.removeStyleName(Styles.DISABLED);
+			if(labelContainer != null) labelContainer.removeStyleName(Styles.DISABLED);
 		}
 		else {
-			fldContainer.addStyleName(Styles.DISABLED);
-			if(lblContainer != null) lblContainer.addStyleName(Styles.DISABLED);
+			if(container != null) container.addStyleName(Styles.DISABLED);
+			addStyleName(Styles.DISABLED);
+			if(fldLbl != null) fldLbl.addStyleName(Styles.DISABLED);
+			if(labelContainer != null) labelContainer.addStyleName(Styles.DISABLED);
 		}
 
 		if(!enabled || readOnly) {

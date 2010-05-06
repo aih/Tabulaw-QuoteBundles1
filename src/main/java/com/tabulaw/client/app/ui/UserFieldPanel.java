@@ -67,7 +67,7 @@ public class UserFieldPanel extends AbstractFieldPanel<FlowPanel> {
 			dataMap.put(AuthorityRoles.ROLE_USER.name(), "User");
 			
 			GridRenderer userRolesRenderer = new GridRenderer(2, null);
-			RadioGroupField<String> fuserRoles = FieldFactory.fradiogroup("userRoles", "authorities", "Roles", "The user roles", dataMap, userRolesRenderer);
+			RadioGroupField<String> fuserRoles = FieldFactory.fradiogroup("userRoles", "authorities", null, "The user roles", dataMap, userRolesRenderer);
 			fg.addField(fuserRoles);
 		}
 	}
@@ -104,7 +104,7 @@ public class UserFieldPanel extends AbstractFieldPanel<FlowPanel> {
 				cmpsr.newRow();
 				cmpsr.addField(fg.getFieldWidget("userExpires"));
 				cmpsr.newRow();
-				cmpsr.addField(fg.getFieldWidget("userRoles"));
+				cmpsr.addField(fg.getFieldWidget("userRoles"), false);
 			}
 		};
 	}

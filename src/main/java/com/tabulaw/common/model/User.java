@@ -33,7 +33,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	public static final int MAXLEN_EMAIL_ADDRESS = 128;
 	public static final int MAXLEN_PASSWORD = 255;
 
-	public static final String SUPERUSER = "jpk";
+	public static final String SUPERUSER = "Tabulaw Administrator";
 
 	private String name;
 
@@ -56,6 +56,10 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	public User() {
 		super();
 		authorities = new ArrayList<Authority>(3);
+	}
+	
+	public boolean isSuperuser() {
+		return SUPERUSER.equals(name);
 	}
 
 	@Override

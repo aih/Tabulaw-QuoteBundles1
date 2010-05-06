@@ -9,7 +9,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.ui.AbstractButton;
-import com.tabulaw.client.app.ui.ManageUsersWidget;
+import com.tabulaw.client.app.ui.UsersWidget;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
 
@@ -54,14 +54,14 @@ public class ManageUsersView extends AbstractPocView<StaticViewInitializer> {
 	
 	private final Widget[] navColWidgets;
 	
-	private final ManageUsersWidget widget;
+	private final UsersWidget widget;
 	
 	/**
 	 * Constructor
 	 */
 	public ManageUsersView() {
 		super();
-		widget = new ManageUsersWidget();
+		widget = new UsersWidget();
 		
 		navColWidgets = new Widget[] {
 			new NewUserButton(),
