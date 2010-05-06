@@ -32,6 +32,7 @@ import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;
+import com.tabulaw.client.mvc.view.IViewInitializerProvider;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.mvc.view.UnloadViewRequest;
 import com.tabulaw.client.mvc.view.ViewKey;
@@ -208,13 +209,13 @@ public class NavRowPanel extends AbstractNavPanel {
 		}
 	}
 
-	private static void showView(ArrayList<? extends AbstractNavButton> list, int index) {
+	private static void showView(ArrayList<? extends IViewInitializerProvider> list, int index) {
 		ViewManager.get().dispatch(new ShowViewRequest(list.get(index).getViewInitializer()));
 	}
 
 	private static final int maxNumOpenDocs = 6;
 
-	private final ArrayList<AbstractNavButton> mainViewButtons = new ArrayList<AbstractNavButton>();
+	private final ArrayList<IViewInitializerProvider> mainViewButtons = new ArrayList<IViewInitializerProvider>();
 
 	private final ArrayList<DocViewNavButton> openDocNavButtons = new ArrayList<DocViewNavButton>();
 
@@ -348,7 +349,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			}
 		}
 		else {
-			for(AbstractNavButton navBtn : mainViewButtons) {
+			for(IViewInitializerProvider navBtn : mainViewButtons) {
 				// mainViewTabs.setTabEnabled(i, true);
 				ViewKey aViewKey = navBtn.getViewInitializer().getViewKey();
 				if(crntViewKey.equals(aViewKey)) {
@@ -378,7 +379,7 @@ public class NavRowPanel extends AbstractNavPanel {
 	}
 
 	private int getTabIndexFromViewKey(ViewKey viewKey, boolean mainView) {
-		List<? extends AbstractNavButton> navBtnList = mainView ? mainViewButtons : openDocNavButtons;
+		List<? extends IViewInitializerProvider> navBtnList = mainView ? mainViewButtons : openDocNavButtons;
 		for(int i = 0; i < navBtnList.size(); i++) {
 			ViewKey vk = navBtnList.get(i).getViewInitializer().getViewKey();
 			if(vk.equals(viewKey)) return i;

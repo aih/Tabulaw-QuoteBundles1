@@ -17,6 +17,12 @@ public interface Resources extends ClientBundle {
 
 	Resources INSTANCE = GWT.create(Resources.class);
 
+	@Source("../../public/images/magnifying_glass_alt_24x24.png")
+	ImageResource magnifyingGlass();
+
+	@Source("../../public/images/google-scholar.png")
+	ImageResource googleScholarLogo();
+
 	@Source("../../public/images/permalink.gif")
 	ImageResource permalink();
 

@@ -7,6 +7,7 @@ package com.tabulaw.client.app.ui;
 
 import com.tabulaw.client.app.ui.view.QuoteBundlesView;
 import com.tabulaw.client.mvc.view.IViewInitializer;
+import com.tabulaw.client.mvc.view.IViewInitializerProvider;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 
 
@@ -14,7 +15,7 @@ import com.tabulaw.client.mvc.view.StaticViewInitializer;
  * Shows the Quote Bundles view when clicked.
  * @author jpk
  */
-public class QuoteBundlesNavButton extends AbstractNavButton {
+public class QuoteBundlesNavButton extends AbstractButton implements IViewInitializerProvider {
 
 	static class Styles {
 
@@ -28,7 +29,7 @@ public class QuoteBundlesNavButton extends AbstractNavButton {
 	}
 
 	@Override
-	protected IViewInitializer getViewInitializer() {
+	public IViewInitializer getViewInitializer() {
 		return vi;
 	}
 }

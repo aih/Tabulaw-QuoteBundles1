@@ -8,9 +8,8 @@ package com.tabulaw.client.app.ui.view;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.app.ui.AbstractNavButton;
+import com.tabulaw.client.app.ui.AbstractButton;
 import com.tabulaw.client.app.ui.ManageUsersWidget;
-import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
 
@@ -34,7 +33,7 @@ public class ManageUsersView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	static class NewUserButton extends AbstractNavButton {
+	static class NewUserButton extends AbstractButton {
 		
 		public NewUserButton() {
 			super("New User", Styles.PLUS);
@@ -50,11 +49,6 @@ public class ManageUsersView extends AbstractPocView<StaticViewInitializer> {
 		@Override
 		protected String getTitleText(String buttonText) {
 			return "Create a new User...";
-		}
-
-		@Override
-		protected IViewInitializer getViewInitializer() {
-			return null;
 		}
 	}
 	

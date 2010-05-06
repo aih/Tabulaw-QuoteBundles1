@@ -9,13 +9,12 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.tabulaw.client.mvc.view.IViewInitializer;
 
 /**
  * Button like widget intended for use in a nav panel.
  * @author jpk
  */
-public abstract class AbstractNavButton extends Composite {
+public abstract class AbstractButton extends Composite {
 
 	public static class Styles {
 
@@ -40,7 +39,7 @@ public abstract class AbstractNavButton extends Composite {
 	/**
 	 * Constructor - No ui content is set.
 	 */
-	public AbstractNavButton() {
+	public AbstractButton() {
 		this(null, null);
 	}
 
@@ -49,7 +48,7 @@ public abstract class AbstractNavButton extends Composite {
 	 * @param buttonText
 	 * @param buttonSecondaryStyle E.G: "arrow", "plus" or <code>null</code>
 	 */
-	public AbstractNavButton(String buttonText, String buttonSecondaryStyle) {
+	public AbstractButton(String buttonText, String buttonSecondaryStyle) {
 		super();
 		html = new HTML();
 		initWidget(html);
@@ -92,31 +91,4 @@ public abstract class AbstractNavButton extends Composite {
 		if(clickRegiseration != null) clickRegiseration.removeHandler();
 		clickRegiseration = html.addClickHandler(handler);
 	}
-
-	/**
-	 * @return The view init to which this nav button points.
-	 */
-	protected abstract IViewInitializer getViewInitializer();
-
-	@Override
-	public final int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		IViewInitializer vi = getViewInitializer();
-		result = prime * result + ((vi == null) ? 0 : vi.hashCode());
-		return result;
-	}
-
-	@Override
-	public final boolean equals(Object obj) {
-		if(this == obj) return true;
-		if(obj == null) return false;
-		if(getClass() != obj.getClass()) return false;
-		AbstractNavButton other = (AbstractNavButton) obj;
-		IViewInitializer vi = getViewInitializer(), otherVi = other.getViewInitializer();
-		if(vi == null && otherVi != null) return false;
-		if(vi != null && !vi.equals(otherVi)) return false;
-		return true;
-	}
-
 }

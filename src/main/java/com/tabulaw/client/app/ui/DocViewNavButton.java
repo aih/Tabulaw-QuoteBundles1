@@ -7,13 +7,14 @@ package com.tabulaw.client.app.ui;
 
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.mvc.view.IViewInitializer;
+import com.tabulaw.client.mvc.view.IViewInitializerProvider;
 import com.tabulaw.common.model.ModelKey;
 
 /**
  * Routes to an open document when clicked.
  * @author jpk
  */
-public class DocViewNavButton extends AbstractNavButton {
+public class DocViewNavButton extends AbstractButton implements IViewInitializerProvider {
 
 	static class Styles {
 
@@ -35,7 +36,7 @@ public class DocViewNavButton extends AbstractNavButton {
 	}
 
 	@Override
-	protected IViewInitializer getViewInitializer() {
+	public IViewInitializer getViewInitializer() {
 		return new DocViewInitializer(documentKey);
 	}
 

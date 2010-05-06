@@ -8,10 +8,9 @@ package com.tabulaw.client.app.ui.view;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.app.ui.AbstractNavButton;
+import com.tabulaw.client.app.ui.AbstractButton;
 import com.tabulaw.client.app.ui.DocUploadDialog;
 import com.tabulaw.client.app.ui.DocsWidget;
-import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.mvc.view.ViewOptions;
@@ -34,7 +33,7 @@ public class DocsView extends AbstractPocView<StaticViewInitializer> {
 		
 		@Override
 		public String getName() {
-			return "Documents";
+			return "documents";
 		}
 
 		@Override
@@ -48,7 +47,7 @@ public class DocsView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	class DocUploadButton extends AbstractNavButton {
+	class DocUploadButton extends AbstractButton {
 
 		private DocUploadButton() {
 			super("Upload", null);
@@ -65,11 +64,6 @@ public class DocsView extends AbstractPocView<StaticViewInitializer> {
 		@Override
 		protected String getTitleText(String buttonText) {
 			return "Upload one or more documents...";
-		}
-
-		@Override
-		protected IViewInitializer getViewInitializer() {
-			return null;
 		}
 	}
 	

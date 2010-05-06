@@ -7,12 +7,13 @@ package com.tabulaw.client.app.ui;
 
 import com.tabulaw.client.app.ui.view.ManageUsersView;
 import com.tabulaw.client.mvc.view.IViewInitializer;
+import com.tabulaw.client.mvc.view.IViewInitializerProvider;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 
 /**
  * @author jpk
  */
-public class UsersNavButton extends AbstractNavButton {
+	public class UsersNavButton extends AbstractButton implements IViewInitializerProvider {
 
 	static final IViewInitializer vi = new StaticViewInitializer(ManageUsersView.klas);
 
@@ -21,7 +22,7 @@ public class UsersNavButton extends AbstractNavButton {
 	}
 
 	@Override
-	protected IViewInitializer getViewInitializer() {
+	public IViewInitializer getViewInitializer() {
 		return vi;
 	}
 

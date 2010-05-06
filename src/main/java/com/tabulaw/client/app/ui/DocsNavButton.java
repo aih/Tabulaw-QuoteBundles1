@@ -7,13 +7,14 @@ package com.tabulaw.client.app.ui;
 
 import com.tabulaw.client.app.ui.view.DocsView;
 import com.tabulaw.client.mvc.view.IViewInitializer;
+import com.tabulaw.client.mvc.view.IViewInitializerProvider;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 
 /**
  * Shows the Document listing view when clicked.
  * @author jpk
  */
-public class DocsNavButton extends AbstractNavButton {
+public class DocsNavButton extends AbstractButton implements IViewInitializerProvider {
 
 	static class Styles {
 
@@ -27,8 +28,7 @@ public class DocsNavButton extends AbstractNavButton {
 	}
 
 	@Override
-	protected IViewInitializer getViewInitializer() {
+	public IViewInitializer getViewInitializer() {
 		return vi;
 	}
-
 }

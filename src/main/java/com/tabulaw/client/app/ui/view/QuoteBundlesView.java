@@ -9,10 +9,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.app.ui.AbstractNavButton;
+import com.tabulaw.client.app.ui.AbstractButton;
 import com.tabulaw.client.app.ui.AddQuoteBundleDialog;
 import com.tabulaw.client.app.ui.QuoteBundlesManageWidget;
-import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
 
@@ -37,7 +36,7 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	static class NewQuoteBundleButton extends AbstractNavButton {
+	static class NewQuoteBundleButton extends AbstractButton {
 		
 		AddQuoteBundleDialog dialog;
 		
@@ -57,11 +56,6 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 		@Override
 		protected String getTitleText(String buttonText) {
 			return "Create a Quote Bundle...";
-		}
-
-		@Override
-		protected IViewInitializer getViewInitializer() {
-			return null;
 		}
 	}
 	
