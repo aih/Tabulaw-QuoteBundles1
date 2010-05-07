@@ -62,6 +62,12 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 		UserService svc = pc.getUserService();
 
 		List<User> list = svc.getAllUsers();
+		
+		// clear out password
+		if(list != null) {
+			for(User user : list) user.setPassword(null);
+		}
+		
 		payload.setUsers(list);
 
 		status.addMsg("Users retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
@@ -77,9 +83,27 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 		UserService svc = pc.getUserService();
 
 		user = svc.updateUser(user);
+		
+		// clear out password
+		user.setPassword(null);
+		
 		payload.setModel(user);
 
-		status.addMsg("Users retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		status.addMsg("Users updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		return payload;
+	}
+
+	@Override
+	public Payload deleteUser(String userId) {
+		final Status status = new Status();
+		Payload payload = new Payload(status);
+		
+		final PersistContext pc = getPersistContext();
+		UserService svc = pc.getUserService();
+
+		svc.deleteUser(userId);
+		
+		status.addMsg("Users updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		return payload;
 	}
 

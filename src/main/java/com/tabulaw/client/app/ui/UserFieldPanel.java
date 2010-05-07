@@ -22,14 +22,15 @@ import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.ui.field.RadioGroupField;
 import com.tabulaw.client.ui.field.TextField;
 import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.Authority.AuthorityRoles;
+import com.tabulaw.common.model.User.Role;
 import com.tabulaw.schema.PropertyMetadata;
+import com.tabulaw.util.StringUtil;
 
 /**
  * @author jpk
  */
 public class UserFieldPanel extends AbstractFieldPanel<FlowPanel> {
-	
+
 	static class FieldProvider extends AbstractFieldGroupProvider {
 
 		@Override
@@ -40,11 +41,11 @@ public class UserFieldPanel extends AbstractFieldPanel<FlowPanel> {
 		@Override
 		protected void populateFieldGroup(FieldGroup fg) {
 			Map<String, PropertyMetadata> metamap = EntityMetadataProvider.get().getEntityMetadata(EntityType.USER);
-			
-			TextField fname = FieldFactory.femail("userName", "name", "Name", "Name", 40);
-			fname.setPropertyMetadata(metamap.get("emailAddress"));
+
+			TextField fname = FieldFactory.ftext("userName", "name", "Name", "Name", 40);
+			fname.setPropertyMetadata(metamap.get("name"));
 			fg.addField(fname);
-			
+
 			TextField femail = FieldFactory.femail("userEmail", "emailAddress", "Email Address", "Your email address", 40);
 			femail.setPropertyMetadata(metamap.get("emailAddress"));
 			femail.setReadOnly(true);
@@ -57,23 +58,25 @@ public class UserFieldPanel extends AbstractFieldPanel<FlowPanel> {
 			CheckboxField fenabled = FieldFactory.fcheckbox("userEnabled", "enabled", "Enabled?", "User enabled?");
 			fenabled.setPropertyMetadata(metamap.get("enabled"));
 			fg.addField(fenabled);
-			
+
 			DateField fexpires = FieldFactory.fdate("userExpires", "expires", "Expiry Date", "Date user account expires");
 			fexpires.setPropertyMetadata(metamap.get("expires"));
 			fg.addField(fexpires);
-			
-			HashMap<String, String> dataMap = new HashMap<String, String>();
-			dataMap.put(AuthorityRoles.ROLE_ADMINISTRATOR.name(), "Administrator");
-			dataMap.put(AuthorityRoles.ROLE_USER.name(), "User");
-			
-			GridRenderer userRolesRenderer = new GridRenderer(2, null);
-			RadioGroupField<String> fuserRoles = FieldFactory.fradiogroup("userRoles", "authorities", null, "The user roles", dataMap, userRolesRenderer);
+
+			HashMap<Role, String> dataMap = new HashMap<Role, String>();
+			for(Role role : Role.values()) {
+				dataMap.put(role, StringUtil.enumStyleToPresentation(role.name()));
+			}
+
+			GridRenderer userRolesRenderer = new GridRenderer(Role.values().length, null);
+			RadioGroupField<Role> fuserRoles =
+					FieldFactory.fradiogroup("userRoles", "authorities", null, "The user roles", dataMap, userRolesRenderer);
 			fg.addField(fuserRoles);
 		}
 	}
 
 	private final FlowPanel panel = new FlowPanel();
-	
+
 	/**
 	 * Constructor
 	 */

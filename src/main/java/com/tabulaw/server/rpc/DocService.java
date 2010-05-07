@@ -29,7 +29,7 @@ import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.Authority.AuthorityRoles;
+import com.tabulaw.common.model.User.Role;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.dao.EntityExistsException;
@@ -82,7 +82,7 @@ public class DocService extends RpcServlet implements IDocService {
 		UserDataService uds = pc.getUserDataService();
 		UserContext uc = getUserContext();
 		User user = uc.getUser();
-		if(user.inRole(AuthorityRoles.ROLE_ADMINISTRATOR.name())) {
+		if(user.inRole(Role.ADMINISTRATOR)) {
 			// admins can see all docs
 			docList = new ArrayList<DocRef>();
 			try {

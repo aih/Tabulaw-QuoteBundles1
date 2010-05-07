@@ -18,6 +18,8 @@ import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.edit.EditEvent;
 import com.tabulaw.client.ui.edit.IEditHandler;
 import com.tabulaw.common.data.ModelPayload;
+import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.User;
 
 /**
@@ -69,6 +71,7 @@ public class UsersWidget extends Composite {
 		editPanel = new UserEditPanel();
 		editContainer.add(editPanel);
 		rightPanel.add(editContainer);
+		editContainer.setVisible(false); // hide initially
 
 		initWidget(panel);
 
@@ -78,10 +81,11 @@ public class UsersWidget extends Composite {
 			public void onSelection(SelectionEvent<User> event) {
 				User user = event.getSelectedItem();
 				assert user != null;
-				
+
 				editPanel.setEditable(!user.isSuperuser());
 				editPanel.setUser(user);
-				lblTitle.setText(user.isSuperuser()? user.getName() : "Edit " + user.getName());
+				lblTitle.setText(user.isSuperuser() ? user.getName() : "Edit " + user.getName());
+				editContainer.setVisible(true);
 			}
 		});
 
@@ -89,37 +93,73 @@ public class UsersWidget extends Composite {
 
 			@Override
 			public void onEdit(EditEvent<User> event) {
-				final User updatedUser = event.getContent();
-				new RpcCommand<ModelPayload<User>>() {
+				switch(event.getOp()) {
+					default:
+					case CANCEL:
+						listing.setVisible(true);
+						break;
+					case SAVE: {
+						final User updatedUser = event.getContent();
+						new RpcCommand<ModelPayload<User>>() {
 
-					@Override
-					protected void doExecute() {
-						setSource(listing);
-						Poc.getUserAdminService().updateUser(updatedUser, this);
-					}
+							@Override
+							protected void doExecute() {
+								setSource(listing);
+								Poc.getUserAdminService().updateUser(updatedUser, this);
+							}
 
-					@Override
-					protected void handleSuccess(ModelPayload<User> result) {
-						super.handleSuccess(result);
-						User user = result.getModel();
-						// hack - fire a manually created model change event on the user
-						// listing widget
-						// in order to get the target row updated
-						listing.getListingWidget().onModelChangeEvent(
-								new ModelChangeEvent(UsersWidget.this, ModelChangeOp.UPDATED, user, null));
-						Notifier.get().showFor(result);
+							@Override
+							protected void handleSuccess(ModelPayload<User> result) {
+								super.handleSuccess(result);
+								Notifier.get().showFor(result);
+								Poc.fireModelChangeEvent(new ModelChangeEvent(UsersWidget.this, ModelChangeOp.UPDATED, result.getModel(), null));
+							}
+						}.execute();
+						break;
 					}
-				}.execute();
+					case DELETE: {
+						final ModelKey key = editPanel.user.getModelKey();
+						new RpcCommand<Payload>() {
+
+							@Override
+							protected void doExecute() {
+								setSource(listing);
+								Poc.getUserAdminService().deleteUser(key.getId(), this);
+							}
+
+							@Override
+							protected void handleSuccess(Payload result) {
+								super.handleSuccess(result);
+								Notifier.get().showFor(result);
+								Poc.fireModelChangeEvent(new ModelChangeEvent(UsersWidget.this, ModelChangeOp.DELETED, null, key));
+							}
+						}.execute();
+						break;
+					}
+				}
 			}
 		});
+	}
+
+	@Override
+	protected void onLoad() {
+		super.onLoad();
+		listing.makeModelChangeAware();
+	}
+
+	@Override
+	protected void onUnload() {
+		super.onUnload();
+		listing.unmakeModelChangeAware();
 	}
 
 	public void refresh() {
 		listing.getOperator().refresh();
 	}
-	
+
 	public void newUserMode() {
-		//listing.setVisible(false);
+		listing.setVisible(false);
+		editContainer.setVisible(true);
 		lblTitle.setText("Create User");
 		User user = new User();
 		editPanel.setUser(user);

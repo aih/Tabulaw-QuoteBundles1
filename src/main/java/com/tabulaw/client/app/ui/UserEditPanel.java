@@ -9,15 +9,17 @@ import java.util.Date;
 
 import com.tabulaw.client.ui.edit.AbstractEditPanel;
 import com.tabulaw.client.ui.field.FieldGroup;
-import com.tabulaw.common.model.Authority;
+import com.tabulaw.client.validate.ErrorHandlerBuilder;
+import com.tabulaw.client.validate.ErrorHandlerDelegate;
 import com.tabulaw.common.model.User;
+import com.tabulaw.common.model.User.Role;
 
 /**
  * @author jpk
  */
 public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 
-	private User user;
+	User user;
 
 	/**
 	 * Constructor
@@ -25,21 +27,18 @@ public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 	public UserEditPanel() {
 		super("Save", "Delete", null, "Reset", new UserFieldPanel());
 		getFieldPanel().getFieldGroup().setEnabled(false);
+		ErrorHandlerDelegate errorHandler = ErrorHandlerBuilder.build(false, true, null);
+		getFieldPanel().getFieldGroup().setErrorHandler(errorHandler);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void setUser(User user) {
-		if(user.isNew()) {
-			getFieldPanel().getFieldGroup().clearValue();
-			setSaveButtonText("Create");
-		}
-		else {
-			// set title
-			setSaveButtonText("Update");
-		}
+		FieldGroup fg = getFieldPanel().getFieldGroup();
+		fg.clearValue();
+		
+		setSaveButtonText(user.isNew()? "Create" : "Update");
 
 		// set fields
-		FieldGroup fg = getFieldPanel().getFieldGroup();
 		fg.getFieldWidget("userName").setValue(user.getName());
 		fg.getFieldWidget("userEmail").setValue(user.getEmailAddress());
 		fg.getFieldWidget("userLocked").setValue(user.isLocked());
@@ -47,7 +46,11 @@ public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 		fg.getFieldWidget("userExpires").setValue(user.getExpires());
 
 		// role
-		String role = user.getAuthorities().get(0).getAuthority();
+		if(user.getNumRoles() == 0) {
+			// presume user role
+			user.addRole(Role.USER);
+		}
+		Role role = user.getRoles().get(0);
 		fg.getFieldWidget("userRoles").setValue(role);
 		
 		getFieldPanel().getFieldGroup().setEnabled(true);
@@ -68,8 +71,8 @@ public class UserEditPanel extends AbstractEditPanel<User, UserFieldPanel> {
 		user.setExpires((Date) fg.getFieldWidget("userExpires").getValue());
 
 		String role = fg.getFieldWidget("userRoles").getFieldValue();
-		user.getAuthorities().clear();
-		user.addAuthority(new Authority(role));
+		user.getRoles().clear();
+		user.addRole(Enum.valueOf(Role.class, role));
 
 		return user;
 	}

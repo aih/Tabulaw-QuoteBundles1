@@ -27,7 +27,6 @@ import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
-import com.tabulaw.common.model.Authority;
 import com.tabulaw.common.model.BundleUserBinding;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
@@ -118,7 +117,6 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 	 */
 	protected void configureConfiguration(EmbeddedConfiguration c) {
 		CommonConfiguration cc = c.common();
-		cc.objectClass(Authority.class).updateDepth(1);
 		cc.objectClass(User.class).updateDepth(2);
 		cc.objectClass(UserState.class).updateDepth(1);
 		cc.objectClass(CaseRef.class).updateDepth(1);

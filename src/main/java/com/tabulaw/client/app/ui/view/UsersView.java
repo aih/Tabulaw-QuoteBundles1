@@ -16,7 +16,7 @@ import com.tabulaw.client.mvc.view.ViewClass;
 /**
  * @author jpk
  */
-public class ManageUsersView extends AbstractPocView<StaticViewInitializer> {
+public class UsersView extends AbstractPocView<StaticViewInitializer> {
 
 	public static final Class klas = new Class();
 
@@ -28,12 +28,12 @@ public class ManageUsersView extends AbstractPocView<StaticViewInitializer> {
 		}
 
 		@Override
-		public ManageUsersView newView() {
-			return new ManageUsersView();
+		public UsersView newView() {
+			return new UsersView();
 		}
 	}
 	
-	static class NewUserButton extends AbstractButton {
+	class NewUserButton extends AbstractButton {
 		
 		public NewUserButton() {
 			super("New User", Styles.PLUS);
@@ -41,7 +41,7 @@ public class ManageUsersView extends AbstractPocView<StaticViewInitializer> {
 				
 				@Override
 				public void onClick(ClickEvent event) {
-					// TODO
+					widget.newUserMode();
 				}
 			});
 		}
@@ -59,7 +59,7 @@ public class ManageUsersView extends AbstractPocView<StaticViewInitializer> {
 	/**
 	 * Constructor
 	 */
-	public ManageUsersView() {
+	public UsersView() {
 		super();
 		widget = new UsersWidget();
 		

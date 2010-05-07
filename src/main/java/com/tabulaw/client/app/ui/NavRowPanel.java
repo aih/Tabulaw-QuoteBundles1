@@ -44,7 +44,6 @@ import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.Authority.AuthorityRoles;
 
 /**
  * The top nav row.
@@ -400,7 +399,7 @@ public class NavRowPanel extends AbstractNavPanel {
 				&& EntityType.USER.name().equals(event.getModelKey().getEntityType())) {
 			
 			User liu = (User) event.getModel();
-			if(liu.inRole(AuthorityRoles.ROLE_ADMINISTRATOR.name())) {
+			if(liu.inRole(User.Role.ADMINISTRATOR)) {
 				UsersNavButton nbUsers = new UsersNavButton();
 				mainViewButtons.add(nbUsers);
 				mainViewTabs.addTab(nbUsers);

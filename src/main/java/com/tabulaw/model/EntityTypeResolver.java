@@ -5,7 +5,6 @@
  */
 package com.tabulaw.model;
 
-import com.tabulaw.common.model.Authority;
 import com.tabulaw.common.model.BundleUserBinding;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
@@ -26,8 +25,6 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 	public Class<? extends IEntity> resolveEntityClass(String entityType) throws IllegalArgumentException {
 		EntityType et = EntityType.fromString(entityType);
 		switch(et) {
-			case AUTHORITY:
-				return Authority.class;
 			case BUNDLE_USER_BINDING:
 				return BundleUserBinding.class;
 			case DOC_USER_BINDING:
@@ -50,10 +47,7 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 
 	@Override
 	public String resolveEntityType(Class<? extends IEntity> clz) throws IllegalArgumentException {
-		if(clz == Authority.class) {
-			return EntityType.AUTHORITY.name();
-		}
-		else if(clz == BundleUserBinding.class) {
+		if(clz == BundleUserBinding.class) {
 			return EntityType.BUNDLE_USER_BINDING.name();
 		}
 		else if(clz == DocUserBinding.class) {

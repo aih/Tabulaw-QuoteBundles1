@@ -14,10 +14,9 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
-import com.tabulaw.common.model.Authority;
 import com.tabulaw.common.model.IUserRef;
 import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.Authority.AuthorityRoles;
+import com.tabulaw.common.model.User.Role;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.EntityExistsException;
@@ -83,26 +82,22 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	@Transactional
 	public void init() {
 
-		// stub authorities if not present
-		for(AuthorityRoles role : AuthorityRoles.values()) {
-			try {
-				dao.load(Authority.class, role.name());
-			}
-			catch(EntityNotFoundException e) {
-				dao.persist(new Authority(role.name()));
-			}
-		}
-
 		try {
 			// load admin account and create if not present
-			dao.load(User.class, "admin@tabulaw.com");
+			User superadmin = dao.load(User.class, "admin@tabulaw.com");
 			log.debug("Admin user retrieved.");
+
+			// HACK: retro-fit user's role as we no longer have Authority entities
+			if(superadmin.getRoles().size() == 0) {
+				superadmin.addRole(Role.ADMINISTRATOR);
+				dao.persist(superadmin);
+			}
+			// END HACK
 		}
 		catch(EntityNotFoundException e) {
 			// create the admin user
 			User adminUser = new User();
-			Authority adminAuth = dao.load(Authority.class, AuthorityRoles.ROLE_ADMINISTRATOR.name());
-			adminUser.addAuthority(adminAuth);
+			adminUser.addRole(Role.ADMINISTRATOR);
 			Date now = new Date();
 			adminUser.setDateCreated(now);
 			adminUser.setDateModified(now);
@@ -129,7 +124,20 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		List<User> list = dao.loadAll(User.class);
 		return list;
 	}
-	
+
+	/**
+	 * Purges a user given its id from the system entirely.
+	 * @param userId
+	 * @throws EntityNotFoundException When the user of the given id isn't found
+	 */
+	@Transactional
+	public void deleteUser(String userId) throws EntityNotFoundException {
+		if(userId == null) throw new NullPointerException();
+		User existing = dao.load(User.class, userId);
+		assert existing != null;
+		dao.purge(existing);
+	}
+
 	/**
 	 * Updates a user not including its password.
 	 * @param user
@@ -138,26 +146,31 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	@Transactional
 	public User updateUser(User user) {
 		if(user == null) throw new NullPointerException();
-		validate(user);
 
 		User existing;
 		try {
 			existing = dao.load(User.class, user.getId());
+
+			// transfer password as we don't require this for update
+			// nor do we actually update it
+			user.setPassword(existing.getPassword());
 		}
 		catch(EntityNotFoundException e) {
 			// new
 			existing = null;
 		}
-		
+
 		// clear out existing
-		if(existing == null) {
-			dao.purge(user);
-		}
-		
+		if(existing != null) dao.purge(existing);
+
+		validate(user);
+
 		user = dao.persist(user);
-		return user;
+
+		// clone to ensure distinct from datastore ref
+		return (User) user.clone();
 	}
-	
+
 	/**
 	 * Create a user.
 	 * @param name
@@ -168,9 +181,10 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 * @throws EntityExistsException
 	 */
 	@Transactional
-	public User create(String name, String emailAddress, String password) throws ValidationException, EntityExistsException {
+	public User create(String name, String emailAddress, String password) throws ValidationException,
+			EntityExistsException {
 		if(name == null || emailAddress == null || password == null) throw new NullPointerException();
-		
+
 		final User user = new User();
 
 		String encPassword = null;
@@ -195,8 +209,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		user.setLocked(false);
 
 		// set the role as user
-		user.addAuthority(dao.load(Authority.class, AuthorityRoles.ROLE_USER.name()));
-		
+		user.addRole(Role.USER);
+
 		validate(user);
 
 		dao.persist(user);
@@ -237,7 +251,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	}
 
 	@Transactional(rollbackFor = {
-		ChangeUserCredentialsFailedException.class, RuntimeException.class })
+		ChangeUserCredentialsFailedException.class, RuntimeException.class
+	})
 	@Override
 	public String resetPassword(String userId) throws ChangeUserCredentialsFailedException {
 

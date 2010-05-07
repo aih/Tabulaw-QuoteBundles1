@@ -29,7 +29,6 @@ import com.tabulaw.client.util.GlobalFormat;
 import com.tabulaw.common.data.rpc.UserListPayload;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.Authority.AuthorityRoles;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.listhandler.InMemoryListHandler;
 
@@ -45,12 +44,9 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 
 		static final Column[] cols =
 				new Column[] {
-					Column.ROW_COUNT_COLUMN, 
-					new Column("User", "name"), 
-					new Column("Email", "emailAddress"), 
+					Column.ROW_COUNT_COLUMN, new Column("User", "name"), new Column("Email", "emailAddress"),
 					new Column("Created", GlobalFormat.DATE, "dateCreated"),
-					new Column("Modified", GlobalFormat.DATE, "dateModified"),
-					new Column("Roles", "authorities"),
+					new Column("Modified", GlobalFormat.DATE, "dateModified"), new Column("Roles", "roles"),
 				};
 
 		public ListingConfig() {
@@ -81,6 +77,10 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 			return new Label("Currently, no Users exist.");
 		}
 
+		/*
+		 * We override to re-fetch all from server 
+		 * as we don't track user entities client-side save for the logged in user
+		 */
 		@Override
 		public void onModelChangeEvent(ModelChangeEvent event) {
 			if(event.getModelKey() != null && event.getModelKey().getEntityType().equals(EntityType.USER.name())) {
@@ -111,7 +111,7 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 				public void renderCell(int rowIndex, int cellIndex, User rowData, Column column, HTMLTable table) {
 					if("Roles".equals(column.getName())) {
 						String val = (String) rowData.getPropertyValue(column.getPropertyName());
-						boolean isAdmin = val.indexOf(AuthorityRoles.ROLE_ADMINISTRATOR.name()) >= 0;
+						boolean isAdmin = val.indexOf(User.Role.ADMINISTRATOR.name()) >= 0;
 						val = isAdmin ? "Administrator" : "User";
 						table.setText(rowIndex, cellIndex, val);
 					}
@@ -149,7 +149,7 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 
 		listingWidget = new UserListing();
 		listingWidget.setOperator(operator);
-		
+
 		// hack
 		listingWidget.getTable().setSelectionDispatcher(this);
 
@@ -157,7 +157,7 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 
 		initWidget(pnl);
 	}
-	
+
 	public UserListing getListingWidget() {
 		return listingWidget;
 	}
@@ -185,6 +185,7 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 
 		@Override
 		public void refresh() {
+			listingGenerated = false; // force the data to re-pop into the table
 			new RpcCommand<UserListPayload>() {
 
 				@Override
@@ -197,8 +198,7 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 				protected void handleSuccess(UserListPayload result) {
 					super.handleSuccess(result);
 					getDataProvider().setList(result.getUsers());
-					// listingWidget.setOperator(Operator.this);
-					listingWidget.getOperator().firstPage();
+					firstPage();
 				}
 			}.execute();
 		}

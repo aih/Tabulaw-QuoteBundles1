@@ -386,7 +386,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
 		IEntity m = event.getModel();
-		EntityType et = EntityType.fromString(m.getEntityType());
+		EntityType et = EntityType.fromString(event.getModelKey().getEntityType());
 		if(et == EntityType.QUOTE_BUNDLE) {
 			QuoteBundle qb = (QuoteBundle) m;
 			switch(event.getChangeOp()) {

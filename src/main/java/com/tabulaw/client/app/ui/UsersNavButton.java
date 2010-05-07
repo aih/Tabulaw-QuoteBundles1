@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.app.ui;
 
-import com.tabulaw.client.app.ui.view.ManageUsersView;
+import com.tabulaw.client.app.ui.view.UsersView;
 import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.IViewInitializerProvider;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
@@ -15,7 +15,7 @@ import com.tabulaw.client.mvc.view.StaticViewInitializer;
  */
 	public class UsersNavButton extends AbstractButton implements IViewInitializerProvider {
 
-	static final IViewInitializer vi = new StaticViewInitializer(ManageUsersView.klas);
+	static final IViewInitializer vi = new StaticViewInitializer(UsersView.klas);
 
 	public UsersNavButton() {
 		super("Users", null);

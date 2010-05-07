@@ -17,8 +17,8 @@ import com.tabulaw.client.app.ui.NavRowPanel;
 import com.tabulaw.client.app.ui.Portal;
 import com.tabulaw.client.app.ui.view.DocView;
 import com.tabulaw.client.app.ui.view.DocsView;
-import com.tabulaw.client.app.ui.view.ManageUsersView;
 import com.tabulaw.client.app.ui.view.QuoteBundlesView;
+import com.tabulaw.client.app.ui.view.UsersView;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;
@@ -50,7 +50,7 @@ import com.tabulaw.common.model.UserState;
 public class Poc implements EntryPoint, IUserSessionHandler {
 
 	private static IUserAdminServiceAsync userAdminService;
-	
+
 	private static final IUserContextServiceAsync userContextService;
 
 	private static IUserCredentialsServiceAsync userCredentialsService;
@@ -122,6 +122,14 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		}
 	}
 
+	/**
+	 * Manual firing of a model change event throughout the client app.
+	 * @param mce model change event to fire
+	 */
+	public static void fireModelChangeEvent(ModelChangeEvent mce) {
+		getPortal().fireEvent(mce);
+	}
+
 	public static NavRowPanel getNavRow() {
 		return (NavRowPanel) RootPanel.get("navRow").getWidget(0);
 	}
@@ -165,7 +173,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 					// load up user bundles
 					List<QuoteBundle> userBundles = result.getBundles();
-					
+
 					// we need to individually add the contained qoutes as well but don't
 					// throw model changes events for quotes
 					for(QuoteBundle qb : userBundles) {
@@ -174,7 +182,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 							ClientModelCache.get().persist(q, null);
 						}
 					}
-					
+
 					// cache bundles and notify
 					ClientModelCache.get().persistAll(userBundles, getPortal());
 
@@ -271,7 +279,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		Portal portal = new Portal();
 		portal.setVisible(false);
 		RootPanel.get("portal").add(portal);
-		
+
 		ClientModelCache.init(portal);
 
 		// add the nav row panel
@@ -300,6 +308,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		ViewClass.addClass(DocsView.klas);
 		ViewClass.addClass(DocView.klas);
 		ViewClass.addClass(QuoteBundlesView.klas);
-		ViewClass.addClass(ManageUsersView.klas);
+		ViewClass.addClass(UsersView.klas);
 	}
 }

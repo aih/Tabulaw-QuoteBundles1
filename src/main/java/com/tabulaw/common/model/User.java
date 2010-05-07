@@ -16,6 +16,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.tabulaw.IMarshalable;
 import com.tabulaw.schema.BusinessKeyDef;
 import com.tabulaw.schema.BusinessObject;
 
@@ -26,6 +27,16 @@ import com.tabulaw.schema.BusinessObject;
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress"
 }))
 public class User extends TimeStampEntity implements IUserRef, INamedEntity, Comparable<User> {
+
+	/**
+	 * Role
+	 * @author jpk
+	 */
+	public static enum Role implements IMarshalable {
+		ADMINISTRATOR,
+		USER,
+		ANONYMOUS;
+	}
 
 	private static final long serialVersionUID = -6126885590318834318L;
 
@@ -47,15 +58,14 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 	private Date expires;
 
-	// NOTE make sure this is non-final for gwt rpc
-	private ArrayList<Authority> authorities;
+	private ArrayList<Role> roles;
 	
 	/**
 	 * Constructor
 	 */
 	public User() {
 		super();
-		authorities = new ArrayList<Authority>(3);
+		//roles = new ArrayList<Role>(3);
 	}
 	
 	public boolean isSuperuser() {
@@ -94,10 +104,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		super.doClone(cln);
 		User u = (User) cln;
 		
-		ArrayList<Authority> cauth = authorities == null ? null : new ArrayList<Authority>(authorities.size());
-		for(Authority a : authorities) {
-			cauth.add((Authority)a.clone());
-		}
+		ArrayList<Role> croles = roles == null ? null : new ArrayList<Role>(roles);
 
 		u.name = name;
 		u.emailAddress = emailAddress;
@@ -105,7 +112,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		u.locked = locked;
 		u.enabled = enabled;
 		u.expires = expires;
-		u.authorities = cauth;
+		u.roles = croles;
 	}
 
 	@Override
@@ -184,16 +191,16 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	}
 
 	/**
-	 * @return authorities
+	 * @return roles
 	 */
 	@Valid
-	public List<Authority> getAuthorities() {
-		if(authorities == null) return Collections.emptyList();
-		return new ArrayList<Authority>(authorities);
+	public List<Role> getRoles() {
+		if(roles == null) return Collections.emptyList();
+		return new ArrayList<Role>(roles);
 	}
 
-	public void setAuthorities(Collection<Authority> authorities) {
-		this.authorities = new ArrayList<Authority>(authorities);
+	public void setRoles(Collection<Role> roles) {
+		this.roles = roles == null ? null : new ArrayList<Role>(roles);
 	}
 
 	/**
@@ -201,31 +208,25 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	 * @param role the role as a string
 	 * @return true if this user is "in" the given role, false otherwise.
 	 */
-	public boolean inRole(String role) {
-		if(authorities == null) return false;
-		for(final Authority a : authorities) {
-			if(a.getAuthority().equals(role)) return true;
+	public boolean inRole(Role role) {
+		if(roles == null) return false;
+		for(final Role a : roles) {
+			if(a == role) return true;
 		}
 		return false;
 	}
 
-	public Authority getAuthority(String nme) {
-		for(Authority a : authorities) {
-			if(a.getName().equals(nme)) return a;
-		}
-		return null;
+	public void addRole(Role role) {
+		if(roles == null) roles = new ArrayList<Role>(2);
+		roles.add(role);
 	}
 
-	public void addAuthority(Authority authority) {
-		authorities.add(authority);
+	public void removeRole(Role role) {
+		if(roles != null) roles.remove(role);
 	}
 
-	public void removeAuthority(Authority authority) {
-		authorities.remove(authority);
-	}
-
-	public int getNumAuthorities() {
-		return authorities.size();
+	public int getNumRoles() {
+		return roles == null ? 0 : roles.size();
 	}
 
 	public void setUsername(String username) {
@@ -272,11 +273,11 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		else if("expires".equals(propertyPath)) {
 			return getExpires();
 		}
-		else if("authorities".equals(propertyPath)) {
+		else if("roles".equals(propertyPath)) {
 			StringBuilder sb = new StringBuilder();
-			for(Authority a : getAuthorities()) {
+			for(Role a : getRoles()) {
 				sb.append(",");
-				sb.append(a.getAuthority());
+				sb.append(a.name());
 			}
 			return sb.length() > 0 ? sb.substring(1) : "";
 		}
