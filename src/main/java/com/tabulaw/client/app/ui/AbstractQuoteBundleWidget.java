@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -12,6 +14,7 @@ import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.convert.IConverter;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
+import com.tabulaw.client.ui.edit.EditableTextWidget;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 
@@ -69,6 +72,7 @@ extends AbstractModelChangeAwareWidget {
 		protected final FlowPanel header = new FlowPanel();
 
 		protected final Label lblQb;
+		private final EditableTextWidget pName, pDesc;
 
 		protected QuoteBundle bundle;
 
@@ -83,6 +87,72 @@ extends AbstractModelChangeAwareWidget {
 			header.add(lblQb);
 			
 			initWidget(header);
+
+			pName = new EditableTextWidget();
+			pName.addStyleName(AbstractQuoteBundleWidget.Styles.NAME);
+			pName.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<String> event) {
+					bundle.setName(event.getValue());
+					// save the quote bundle
+					ClientModelCache.get().persist(bundle, Header.this);
+					// server side
+					ClientModelCache.get().updateBundleProps(bundle);
+				}
+			});
+			header.add(pName);
+
+			pDesc = new EditableTextWidget(headerDescTextExtractor, headerDescInnerHtmlSetter);
+			pDesc.addStyleName(AbstractQuoteBundleWidget.Styles.DESC);
+			pDesc.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<String> event) {
+					bundle.setDescription(event.getValue());
+					// save the quote bundle
+					ClientModelCache.get().persist(bundle, Header.this);
+					// server side
+					ClientModelCache.get().updateBundleProps(bundle);
+				}
+			});
+			header.add(pDesc);
+			
+			/*
+			save = new Image(Resources.INSTANCE.save());
+			save.setStyleName(Styles.SAVE);
+			save.setTitle("Save Name and Description");
+			save.setVisible(false);
+			save.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					// save the quote bundle
+					ClientModelCache.get().persist(bundle, EditHeader.this);
+					// server side
+					ClientModelCache.get().updateBundleProps(bundle);
+
+					save.setVisible(false);
+					undo.setVisible(false);
+				}
+			});
+
+			undo = new Image(Resources.INSTANCE.undo());
+			undo.setStyleName(Styles.UNDO);
+			undo.setTitle("Revert Name and Description");
+			undo.setVisible(false);
+			undo.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					// revert
+					pName.revert();
+					pDesc.revert(); 
+					save.setVisible(false);
+					undo.setVisible(false);
+				}
+			});
+			*/
 		}
 
 		/**
@@ -90,6 +160,10 @@ extends AbstractModelChangeAwareWidget {
 		 * @param bundle the quote bundle model data
 		 */
 		public void setModel(QuoteBundle bundle) {
+			String name = bundle.getName();
+			String desc = bundle.getDescription();
+			pName.setText(name == null ? "" : name);
+			pDesc.setHTML(headerDescInnerHtmlSetter.convert(desc));
 			this.bundle = bundle;
 		}
 

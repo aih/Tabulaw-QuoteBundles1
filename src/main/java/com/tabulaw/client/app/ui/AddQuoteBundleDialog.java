@@ -16,7 +16,6 @@ import com.tabulaw.client.ui.edit.IEditHandler;
 import com.tabulaw.client.ui.edit.EditEvent.EditOp;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
-import com.tabulaw.client.validate.ErrorHandlerDelegate;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.QuoteBundle;
@@ -39,6 +38,9 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 
 		setText("Add Quote Bundle");
 		setAnimationEnabled(true);
+
+		// set error hander for edit panel
+		editPanel.setErrorHandler(ErrorHandlerBuilder.build(false, true, null), true);
 
 		editPanel.addEditHandler(this);
 
@@ -78,11 +80,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 	@Override
 	public void show() {
 		super.show();
-
-		// set error hander for edit panel
-		ErrorHandlerDelegate ehd = ErrorHandlerBuilder.build(false, true, null);
-		editPanel.setErrorHandler(ehd, true);
-		
+		editPanel.getErrorHandler().clear();
 		DeferredCommand.addCommand(new FocusCommand(fieldPanel.getFocusable(), true));
 	}
 }

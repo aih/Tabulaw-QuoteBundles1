@@ -11,8 +11,6 @@ import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -23,7 +21,6 @@ import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
-import com.tabulaw.client.ui.edit.EditableTextWidget;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 
@@ -56,68 +53,13 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 	 */
 	static class EditHeader extends AbstractQuoteBundleWidget.Header {
 
-		private final EditableTextWidget pName, pDesc;
-		private final Image save, undo, delete, current, close;
+		private final Image /*save, undo, */delete, current, close;
 
 		/**
 		 * Constructor
 		 */
 		public EditHeader() {
 			super();
-
-			pName = new EditableTextWidget();
-			pName.addStyleName(AbstractQuoteBundleWidget.Styles.NAME);
-			pName.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-				@Override
-				public void onValueChange(ValueChangeEvent<String> event) {
-					bundle.setName(event.getValue());
-				}
-			});
-
-			pDesc = new EditableTextWidget(headerDescTextExtractor, headerDescInnerHtmlSetter);
-			pDesc.addStyleName(AbstractQuoteBundleWidget.Styles.DESC);
-			pDesc.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-				@Override
-				public void onValueChange(ValueChangeEvent<String> event) {
-					bundle.setDescription(event.getValue());
-				}
-			});
-			
-			save = new Image(Resources.INSTANCE.save());
-			save.setStyleName(Styles.SAVE);
-			save.setTitle("Save Name and Description");
-			save.setVisible(false);
-			save.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					// save the quote bundle
-					ClientModelCache.get().persist(bundle, EditHeader.this);
-					// server side
-					ClientModelCache.get().updateBundleProps(bundle);
-
-					save.setVisible(false);
-					undo.setVisible(false);
-				}
-			});
-
-			undo = new Image(Resources.INSTANCE.undo());
-			undo.setStyleName(Styles.UNDO);
-			undo.setTitle("Revert Name and Description");
-			undo.setVisible(false);
-			undo.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					// revert
-					pName.revert();
-					pDesc.revert(); 
-					save.setVisible(false);
-					undo.setVisible(false);
-				}
-			});
 
 			delete = new Image(Resources.INSTANCE.delete());
 			delete.setTitle("Delete Quote Bundle..");
@@ -126,8 +68,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 
 				@Override
 				public void onClick(ClickEvent event) {
-					if(Window.confirm("Completely delete " + bundle
-							+ "?\nNote: Any and all contained quotes will be deleted.")) {
+					if(Window.confirm("Remove '" + bundle.descriptor() + "'?")) {
 
 						// client side
 						List<Quote> quotes = bundle.getQuotes();
@@ -166,42 +107,18 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 
 			FlowPanel buttons = new FlowPanel();
 			buttons.setStyleName(Styles.BUTTONS);
-			buttons.add(save);
-			buttons.add(undo);
+			//buttons.add(save);
+			//buttons.add(undo);
 			buttons.add(delete);
 			buttons.add(current);
 			buttons.add(close);
 
-			header.add(pName);
-			header.add(pDesc);
 			header.insert(buttons, 0);
-
-			pName.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-				@Override
-				public void onValueChange(ValueChangeEvent<String> event) {
-					save.setVisible(true);
-					undo.setVisible(true);
-				}
-			});
-			
-			pDesc.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-				@Override
-				public void onValueChange(ValueChangeEvent<String> event) {
-					save.setVisible(true);
-					undo.setVisible(true);
-				}
-			});
 		}
 		
 		@Override
 		public void setModel(QuoteBundle mQuoteBundle) {
 			super.setModel(mQuoteBundle);
-			String name = bundle.getName();
-			String desc = bundle.getDescription();
-			pName.setText(name == null ? "" : name);
-			pDesc.setHTML(headerDescInnerHtmlSetter.convert(desc));
 			currentQuoteBundleCheck();
 		}
 

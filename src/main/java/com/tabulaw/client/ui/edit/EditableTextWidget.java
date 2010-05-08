@@ -191,4 +191,12 @@ public class EditableTextWidget extends TextField implements HasHTML {
 		// no-op - we manage it
 	}
 
+	/**
+	 * We need to eat these events as we only want to issue them on key enter.
+	 */
+	@Override
+	public void onValueChange(ValueChangeEvent<String> event) {
+		// no-op
+	}
+
 }

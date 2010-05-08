@@ -655,7 +655,7 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 	}
 
 	@Override
-	public final void onValueChange(ValueChangeEvent<V> event) {
+	public void onValueChange(ValueChangeEvent<V> event) {
 		assert event.getSource() == getEditable();
 		final V old = oldValue;
 		oldValue = event.getValue();

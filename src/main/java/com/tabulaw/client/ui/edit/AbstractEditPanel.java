@@ -215,6 +215,10 @@ public abstract class AbstractEditPanel<T> extends Composite implements ClickHan
 		}
 		this.errorHandler = errorHandler;
 	}
+	
+	public final ErrorHandlerDelegate getErrorHandler() {
+		return errorHandler;
+	}
 
 	public final void setSaveButtonText(String text) {
 		btnSave.setText(text);
