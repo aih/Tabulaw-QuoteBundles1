@@ -163,7 +163,18 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 	static class Table extends ModelListingTable<CaseDocSearchResult> {
 
 		public Table(IListingConfig config) {
-			super(config, null);
+			super(config, new ITableCellRenderer<CaseDocSearchResult>() {
+
+				@Override
+				public void renderCell(int rowIndex, int cellIndex, CaseDocSearchResult rowData, Column column, HTMLTable table) {
+					// same as doc suggest (for now)
+					String html =
+							"<div class=\"entry\"><div class=\"title\">" + rowData.getTitleHtml() + "</div><div class=\"summary\">"
+									+ rowData.getSummary() + "</div></div>";
+					table.setHTML(rowIndex, cellIndex, html);
+				}
+
+			});
 		}
 
 		@Override
@@ -216,19 +227,6 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 		}
 	}
 
-	static class CellRenderer implements ITableCellRenderer<CaseDocSearchResult> {
-
-		@Override
-		public void renderCell(int rowIndex, final int cellIndex, final CaseDocSearchResult rowData, Column column,
-				final HTMLTable table) {
-			// same as doc suggest (for now)
-			String html =
-					"<div class=\"entry\"><div class=\"title\">" + rowData.getTitleHtml() + "</div><div class=\"summary\">"
-							+ rowData.getSummary() + "</div></div>";
-			table.setHTML(rowIndex, cellIndex, html);
-		}
-	} // CellRenderer
-
 	static final IListingConfig config = new ListingConfig();
 
 	private final Operator operator;
@@ -245,7 +243,6 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 
 		listingWidget = new DocListing();
 		operator = new Operator();
-		listingWidget.getTable().setCellRenderer(new CellRenderer());
 		listingWidget.setOperator(operator);
 		pnl.add(listingWidget);
 

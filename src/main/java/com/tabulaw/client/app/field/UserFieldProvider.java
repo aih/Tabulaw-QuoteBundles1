@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.app.field;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.tabulaw.client.app.model.EntityMetadataProvider;
@@ -35,9 +35,17 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 		LOGIN,
 		REGISTER,
 		UPDATE,
-		CREATE;
+		CREATE,
+		PASSWORD_SET;
 	}
-
+	
+	/**
+	 * To retain ordinality
+	 */
+	private static final Role[] roles = new Role[] {
+		Role.USER, Role.ANONYMOUS, Role.ADMINISTRATOR,
+	};
+	
 	private final UserUseCase useCase;
 
 	/**
@@ -52,7 +60,7 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 
 	@Override
 	protected String getFieldGroupName() {
-		return "User";
+		return "User " + StringUtil.enumStyleToPresentation(useCase.name());
 	}
 
 	@Override
@@ -67,10 +75,12 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 			fg.addField(fname);
 		}
 
-		// email
-		TextField femail = femail("userEmail", "emailAddress", "Email Address", "Your email address", visibleLen);
-		femail.setPropertyMetadata(metamap.get("emailAddress"));
-		fg.addField(femail);
+		if(useCase != UserUseCase.PASSWORD_SET) {
+			// email
+			TextField femail = femail("userEmail", "emailAddress", "Email Address", "Your email address", visibleLen);
+			femail.setPropertyMetadata(metamap.get("emailAddress"));
+			fg.addField(femail);
+		}
 
 		if(useCase == UserUseCase.UPDATE) {
 			// locked
@@ -82,34 +92,34 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 			CheckboxField fenabled = fcheckbox("userEnabled", "enabled", "Enabled?", "User enabled?");
 			fenabled.setPropertyMetadata(metamap.get("enabled"));
 			fg.addField(fenabled);
-		}
-		
-		// expires
-		if(useCase == UserUseCase.CREATE || useCase == UserUseCase.UPDATE) {
+			
+			// expires
 			DateField fexpires = fdate("userExpires", "expires", "Expiry Date", "Date user account expires");
 			fexpires.setPropertyMetadata(metamap.get("expires"));
 			fg.addField(fexpires);
-	
-			HashMap<Role, String> dataMap = new HashMap<Role, String>();
-			for(Role role : Role.values()) {
+		}
+		
+		// roles
+		if(useCase == UserUseCase.CREATE || useCase == UserUseCase.UPDATE) {
+			Map<Role, String> dataMap = new LinkedHashMap<Role, String>();
+			for(Role role : roles) {
 				dataMap.put(role, StringUtil.enumStyleToPresentation(role.name()));
 			}
-	
-			GridRenderer userRolesRenderer = new GridRenderer(Role.values().length, null);
+			GridRenderer userRolesRenderer = new GridRenderer(roles.length, null);
 			RadioGroupField<Role> fuserRoles =
-					FieldFactory.fradiogroup("userRoles", "roles", null, "The user roles", dataMap, userRolesRenderer);
+					FieldFactory.fradiogroup("userRoles", "roles", "Role", "The user roles", dataMap, userRolesRenderer);
 			fg.addField(fuserRoles);
 		}
 
 		// password
-		if(useCase == UserUseCase.LOGIN || useCase == UserUseCase.REGISTER || useCase == UserUseCase.CREATE) {
+		if(useCase == UserUseCase.PASSWORD_SET || useCase == UserUseCase.LOGIN || useCase == UserUseCase.REGISTER || useCase == UserUseCase.CREATE) {
 			PasswordField password = FieldFactory.fpassword("userPswd", "password", "Password", "Specify a password", visibleLen);
 			password.setPropertyMetadata(metamap.get("password"));
 			fg.addField(password);
 		}
 		
 		// confirm password
-		if(useCase == UserUseCase.REGISTER || useCase == UserUseCase.CREATE) {
+		if(useCase == UserUseCase.PASSWORD_SET || useCase == UserUseCase.REGISTER || useCase == UserUseCase.CREATE) {
 			PasswordField passwordConfirm =
 					FieldFactory.fpassword("userPswdConfirm", "passwordConfirm", "Confirm Password", "Confirm your password", visibleLen);
 			passwordConfirm.setPropertyMetadata(metamap.get("password"));

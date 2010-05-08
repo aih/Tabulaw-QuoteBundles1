@@ -44,9 +44,12 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 
 		static final Column[] cols =
 				new Column[] {
-					Column.ROW_COUNT_COLUMN, new Column("User", "name"), new Column("Email", "emailAddress"),
+					Column.ROW_COUNT_COLUMN, 
+					new Column("User", "name"), 
+					new Column("Email", "emailAddress"),
 					new Column("Created", GlobalFormat.DATE, "dateCreated"),
-					new Column("Modified", GlobalFormat.DATE, "dateModified"), new Column("Roles", "roles"),
+					new Column("Modified", GlobalFormat.DATE, "dateModified"), 
+					new Column("Roles", "roles"),
 				};
 
 		public ListingConfig() {
@@ -99,16 +102,17 @@ public class UsersListingWidget extends AbstractModelChangeAwareWidget implement
 	static class Table extends ModelListingTable<User> {
 
 		private HasSelectionHandlers<User> selectionDispatcher;
-
+		
 		public void setSelectionDispatcher(HasSelectionHandlers<User> selectionHandler) {
 			this.selectionDispatcher = selectionHandler;
 		}
 
 		public Table(IListingConfig config) {
-			super(config, new ITableCellRenderer<User>() {
+			super(config);
+			setCellRenderer(new ITableCellRenderer<User>() {
 
 				@Override
-				public void renderCell(int rowIndex, int cellIndex, User rowData, Column column, HTMLTable table) {
+				public void renderCell(int rowIndex, int cellIndex, final User rowData, Column column, HTMLTable table) {
 					if("Roles".equals(column.getName())) {
 						String val = (String) rowData.getPropertyValue(column.getPropertyName());
 						boolean isAdmin = val.indexOf(User.Role.ADMINISTRATOR.name()) >= 0;

@@ -29,9 +29,10 @@ public class ModelListingTable<T extends IModelKeyProvider> extends ListingTable
 
 	/**
 	 * Constructor
+	 * @param config
 	 */
-	public ModelListingTable() {
-		super();
+	public ModelListingTable(IListingConfig config) {
+		super(config);
 	}
 
 	/**

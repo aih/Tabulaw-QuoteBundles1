@@ -1,6 +1,7 @@
 package com.tabulaw.service.entity;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import com.tabulaw.dao.IEntityDao;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
 import com.tabulaw.service.IForgotPasswordHandler;
 import com.tabulaw.util.CryptoUtil;
+import com.tabulaw.util.StringUtil;
 
 /**
  * Manages the persistence of {@link User}s.
@@ -122,11 +124,13 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	@Transactional(readOnly = true)
 	public List<User> getAllUsers() {
 		List<User> list = dao.loadAll(User.class);
+		if(list == null) return Collections.emptyList();
 		return list;
 	}
 
 	/**
 	 * Purges a user given its id from the system entirely.
+	 * <p><b>WARNING:</b>All user dependent quote and bundle data is also deleted.
 	 * @param userId
 	 * @throws EntityNotFoundException When the user of the given id isn't found
 	 */
@@ -136,6 +140,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		User existing = dao.load(User.class, userId);
 		assert existing != null;
 		dao.purge(existing);
+		// TODO delete user related entities
 	}
 
 	/**
@@ -160,13 +165,13 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 			existing = null;
 		}
 
+		validate(user);
+
 		// clear out existing
 		if(existing != null) dao.purge(existing);
 
-		validate(user);
-
 		user = dao.persist(user);
-		
+
 		return user;
 	}
 
@@ -198,9 +203,9 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		user.setPassword(encPassword);
 		user.setName(name);
 
-		// set default expiry date to 6 months from now
+		// set default expiry date to 6 years from now
 		final Calendar clndr = Calendar.getInstance();
-		clndr.add(Calendar.MONTH, 6);
+		clndr.add(Calendar.YEAR, 6);
 		final Date expires = clndr.getTime();
 		user.setExpires(expires);
 
@@ -243,12 +248,6 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		return user;
 	}
 
-	@Transactional
-	public void purge(User user) throws EntityNotFoundException {
-		dao.purge(user);
-		// updateSecurityContextIfNecessary(user.getUsername(), null, null, true);
-	}
-
 	@Transactional(rollbackFor = {
 		ChangeUserCredentialsFailedException.class, RuntimeException.class
 	})
@@ -271,6 +270,46 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 			// updateSecurityContextIfNecessary(username, username, random, false);
 
 			return random;
+		}
+		catch(final EntityNotFoundException nfe) {
+			throw new ChangeUserCredentialsFailedException("Unable to re-set user password: User of id: " + userId
+					+ " not found");
+		}
+
+	}
+
+	/**
+	 * Manually sets a user's password.
+	 * @param userId id of the user for which to set the password
+	 * @param password the new un-encoded password to set
+	 * @throws ChangeUserCredentialsFailedException when the password set fails
+	 */
+	@Transactional(rollbackFor = {
+		ChangeUserCredentialsFailedException.class, RuntimeException.class
+	})
+	public void setPassword(String userId, String password) throws ChangeUserCredentialsFailedException {
+		if(userId == null || password == null) throw new NullPointerException();
+
+		// TODO add more constraints for a valid password
+		if(StringUtil.isEmpty(password)) throw new IllegalArgumentException("Invalid password");
+
+		try {
+			// get the user
+			final User user = dao.load(User.class, userId);
+			final String username = user.getEmailAddress();
+
+			// encode the new password
+			final String encNewPassword = encodePassword(password, username);
+
+			// set the credentials
+			user.setPassword(encNewPassword);
+			dao.persist(user);
+
+			// updateSecurityContextIfNecessary(username, username, random, false);
+		}
+		catch(final IllegalArgumentException e) {
+			throw new ChangeUserCredentialsFailedException("Unable to re-set user password: User of id: " + userId + ": "
+					+ e.getMessage());
 		}
 		catch(final EntityNotFoundException nfe) {
 			throw new ChangeUserCredentialsFailedException("Unable to re-set user password: User of id: " + userId

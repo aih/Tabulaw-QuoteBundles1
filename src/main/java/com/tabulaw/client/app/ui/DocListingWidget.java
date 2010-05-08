@@ -105,7 +105,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 	static class Table extends ModelListingTable<DocRef> {
 
 		public Table(IListingConfig config) {
-			super(config, null);
+			super(config);
 		}
 
 		@Override

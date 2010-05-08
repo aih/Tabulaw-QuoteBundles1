@@ -124,21 +124,31 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 	/**
 	 * Constructor
 	 * @param config
-	 * @param cellRenderer 
 	 */
-	public ListingTable(IListingConfig config, ITableCellRenderer<R> cellRenderer) {
+	public ListingTable(IListingConfig config) {
 		this();
-		initialize(config, cellRenderer);
+		initialize(config);
 	}
 
 	/**
-	 * Initializes the table.
+	 * Constructor
+	 * @param config
+	 * @param cellRenderer
 	 */
-	protected void initialize(IListingConfig config, ITableCellRenderer<R> cellRndrer) {
-		assert config != null;
+	public ListingTable(IListingConfig config, ITableCellRenderer<R> cellRenderer) {
+		this();
+		initialize(config);
+		setCellRenderer(cellRenderer);
+	}
+
+	/**
+	 * Init from config.
+	 * @param config
+	 */
+	protected void initialize(IListingConfig config) {
+		if(config == null) throw new NullPointerException();
 
 		this.columns = config.getColumns();
-		this.cellRenderer = cellRndrer;
 		this.ignoreCaseWhenSorting = config.isIgnoreCaseWhenSorting();
 
 		int rn = -1;
@@ -158,6 +168,15 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 		setStyleName(Styles.TABLE);
 
 		addHeaderRow(config);
+	}
+
+	/**
+	 * Sets the table cell renderer.
+	 * @param cellRenderer
+	 */
+	public final void setCellRenderer(ITableCellRenderer<R> cellRenderer) {
+		if(cellRenderer == null) throw new NullPointerException();
+		this.cellRenderer = cellRenderer;
 	}
 
 	/**
@@ -327,10 +346,6 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 			}
 		}
 	}
-	
-	public final void setCellRenderer(ITableCellRenderer<R> cellRenderer) {
-		this.cellRenderer = cellRenderer;
-	}
 
 	/**
 	 * Sets row data.
@@ -343,7 +358,7 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 	 */
 	protected void setRowData(int rowIndex, int rowNum, R rowData, boolean overwriteOnNull) {
 		if(cellRenderer == null) throw new IllegalStateException("No table cell renderer specified");
-		
+
 		if(rowIndex == 0) {
 			return; // header row
 		}
@@ -437,7 +452,7 @@ public class ListingTable<R> extends Grid implements ClickHandler, KeyDownHandle
 			onCellClick(cell.getCellIndex(), cell.getRowIndex());
 		}
 	}
-	
+
 	/**
 	 * Called when a table cell is clicked
 	 * @param colIndex

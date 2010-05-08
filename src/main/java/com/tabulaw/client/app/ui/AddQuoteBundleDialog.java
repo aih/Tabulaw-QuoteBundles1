@@ -51,9 +51,6 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 		if(event.getOp() == EditOp.SAVE) {
 			FieldGroup fieldGroup = event.getContent();
 
-			// validate
-			if(!fieldGroup.isValid()) return;
-
 			String qbName = (String) fieldGroup.getFieldWidget("qbName").getValue();
 			String qbDesc = (String) fieldGroup.getFieldWidget("qbDesc").getValue();
 

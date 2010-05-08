@@ -22,4 +22,6 @@ public interface IUserAdminServiceAsync {
 	void updateUser(User user, AsyncCallback<ModelPayload<User>> callback);
 
 	void deleteUser(String userId, AsyncCallback<Payload> callback);
+	
+	void setUserPassword(String userId, String password, AsyncCallback<Payload> callback);
 }

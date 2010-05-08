@@ -44,4 +44,12 @@ public interface IUserAdminService extends RemoteService {
 	 * @return payload containing the resultant status
 	 */
 	Payload deleteUser(String userId);
+	
+	/**
+	 * Sets a user's password.
+	 * @param userId id of the user for which to set the password
+	 * @param password un-encoded new password to set
+	 * @return payload containing the resultant status
+	 */
+	Payload setUserPassword(String userId, String password);
 }

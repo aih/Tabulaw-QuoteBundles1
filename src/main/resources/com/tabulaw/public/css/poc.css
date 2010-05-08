@@ -799,6 +799,9 @@ div.ro {
 	.manageUsers .entityEdit {
 		margin: 10px;
 	}
+	.manageUsers .entityEdit #spw {
+		margin-left: 20px;
+	}
 	.manageUsers .entityEdit .btnRow {
 		margin-top: 10px;
 		text-align: center;

@@ -7,6 +7,7 @@ package com.tabulaw.client.app.ui;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -90,6 +91,7 @@ public class UsersWidget extends Composite {
 
 			@Override
 			public void onEdit(EditEvent<User> event) {
+				final User editedUser = event.getContent();
 				switch(event.getOp()) {
 					default:
 					case CANCEL:
@@ -97,7 +99,6 @@ public class UsersWidget extends Composite {
 						editContainer.setVisible(false);
 						break;
 					case SAVE: {
-						final User editedUser = event.getContent();
 						new RpcCommand<ModelPayload<User>>() {
 
 							@Override
@@ -105,38 +106,46 @@ public class UsersWidget extends Composite {
 								setSource(listing);
 								if(editedUser.isNew()) {
 									Poc.getUserAdminService().createUser(editedUser, this);
+									editContainer.setVisible(false);
 								}
 								else {
 									Poc.getUserAdminService().updateUser(editedUser, this);
 								}
+								listing.setVisible(true);
 							}
 
 							@Override
 							protected void handleSuccess(ModelPayload<User> result) {
 								super.handleSuccess(result);
 								Notifier.get().showFor(result);
-								Poc.fireModelChangeEvent(new ModelChangeEvent(UsersWidget.this, ModelChangeOp.UPDATED, result.getModel(), null));
+								User updatedUser = result.getModel();
+								// update the user in the edit panel since it remains visible 
+								if(!editedUser.isNew()) editPanel.setUser(updatedUser);
+								Poc.fireModelChangeEvent(new ModelChangeEvent(UsersWidget.this, ModelChangeOp.UPDATED, updatedUser, null));
 							}
 						}.execute();
 						break;
 					}
 					case DELETE: {
 						final ModelKey key = editPanel.getUser().getModelKey();
-						new RpcCommand<Payload>() {
-
-							@Override
-							protected void doExecute() {
-								setSource(listing);
-								Poc.getUserAdminService().deleteUser(key.getId(), this);
-							}
-
-							@Override
-							protected void handleSuccess(Payload result) {
-								super.handleSuccess(result);
-								Notifier.get().showFor(result);
-								Poc.fireModelChangeEvent(new ModelChangeEvent(UsersWidget.this, ModelChangeOp.DELETED, null, key));
-							}
-						}.execute();
+						if(Window.confirm("Delete user: " + key.descriptor() + "?")) {
+							new RpcCommand<Payload>() {
+	
+								@Override
+								protected void doExecute() {
+									setSource(listing);
+									Poc.getUserAdminService().deleteUser(key.getId(), this);
+									editContainer.setVisible(false);
+								}
+	
+								@Override
+								protected void handleSuccess(Payload result) {
+									super.handleSuccess(result);
+									Notifier.get().showFor(result);
+									Poc.fireModelChangeEvent(new ModelChangeEvent(UsersWidget.this, ModelChangeOp.DELETED, null, key));
+								}
+							}.execute();
+						}
 						break;
 					}
 				}

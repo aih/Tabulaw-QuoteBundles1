@@ -4,6 +4,7 @@
  */
 package com.tabulaw.server.rpc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +48,7 @@ import com.tabulaw.util.StringUtil;
 /**
  * @author jpk
  */
-public class UserServiceRpc extends RpcServlet 
-implements IUserContextService, IUserCredentialsService, IUserDataService, IUserAdminService {
+public class UserServiceRpc extends RpcServlet implements IUserContextService, IUserCredentialsService, IUserDataService, IUserAdminService {
 
 	private static final long serialVersionUID = 7908647379731614097L;
 
@@ -64,22 +64,26 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 
 		try {
 			List<User> list = svc.getAllUsers();
-			
-			// clear out password
-			if(list != null) {
-				for(User user : list) user.setPassword(null);
+			assert list != null;
+
+			// clear out passwords
+			ArrayList<User> userList = new ArrayList<User>(list.size());
+			for(User user : list) {
+				User clnUser = (User) user.clone();
+				clnUser.setPassword(null);
+				userList.add(clnUser);
 			}
-			
-			payload.setUsers(list);
+
+			payload.setUsers(userList);
 			status.addMsg("Users retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			pc.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;
@@ -89,14 +93,14 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 	public Payload registerUser(UserRegistrationRequest request) {
 		Status status = new Status();
 		Payload payload = new Payload(status);
-	
+
 		PersistContext persistContext = getPersistContext();
 		UserService userService = persistContext.getUserService();
-	
+
 		String name = request.getName();
 		String emailAddress = request.getEmailAddress();
 		String password = request.getPassword();
-	
+
 		try {
 			userService.create(name, emailAddress, password);
 		}
@@ -104,14 +108,14 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 			status.addMsg("Email already exists", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag | MsgAttr.FIELD.flag, "userEmail");
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			persistContext.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
-	
+
 		return payload;
 	}
 
@@ -119,42 +123,42 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 	public ModelPayload<User> createUser(User user) {
 		final Status status = new Status();
 		ModelPayload<User> payload = new ModelPayload<User>(status);
-		
+
 		final PersistContext pc = getPersistContext();
 		UserService svc = pc.getUserService();
 
 		try {
 			String name = user.getName(), email = user.getEmailAddress(), password = user.getPassword();
 			User createdUser = svc.create(name, email, password);
-			
-			// set other properties
+
+			// set remaining user properties
 			createdUser.setEnabled(user.isEnabled());
 			createdUser.setLocked(user.isLocked());
-			createdUser.setExpires(user.getExpires());
 			createdUser.setRoles(user.getRoles());
 			createdUser = svc.updateUser(createdUser);
-			
+
 			// clear out password
-			createdUser.setPassword(null);
-			
-			payload.setModel(createdUser);
+			User clnUser = (User) createdUser.clone();
+			clnUser.setPassword(null);
+
+			payload.setModel(clnUser);
 			status.addMsg("User created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final ValidationException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final EntityExistsException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			pc.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
-		
+
 		return payload;
 	}
 
@@ -162,31 +166,60 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 	public ModelPayload<User> updateUser(User user) {
 		final Status status = new Status();
 		ModelPayload<User> payload = new ModelPayload<User>(status);
-		
+
 		final PersistContext pc = getPersistContext();
 		UserService svc = pc.getUserService();
 
 		try {
-			user = svc.updateUser(user);
-			
-			// clear out password
+			User updatedUser = svc.updateUser(user);
+
+			// clone updated user and clear out password
+			user = (User) updatedUser.clone();
 			user.setPassword(null);
-			
+
 			payload.setModel(user);
 			status.addMsg("User updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			pc.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
-		
+
+		return payload;
+	}
+
+	@Override
+	public Payload setUserPassword(String userId, String password) {
+		final Status status = new Status();
+		ModelPayload<User> payload = new ModelPayload<User>(status);
+
+		final PersistContext pc = getPersistContext();
+		UserService svc = pc.getUserService();
+
+		try {
+			svc.setPassword(userId, password);
+			status.addMsg("User password set.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final ChangeUserCredentialsFailedException e) {
+			exceptionToStatus(e, status);
+			pc.getExceptionHandler().handleException(e);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
 		return payload;
 	}
 
@@ -194,7 +227,7 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 	public Payload deleteUser(String userId) {
 		final Status status = new Status();
 		Payload payload = new Payload(status);
-		
+
 		final PersistContext pc = getPersistContext();
 		UserService svc = pc.getUserService();
 
@@ -203,17 +236,17 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 			status.addMsg("User deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			pc.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
-		
+
 		return payload;
 	}
 
@@ -249,7 +282,7 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 		final PersistContext pc = getPersistContext();
 
 		try {
-			
+
 			// get the retained user state if there is one
 			try {
 				UserState userState = pc.getUserDataService().getUserState(user.getId());
@@ -264,7 +297,7 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 			if(bundles != null) {
 				payload.setBundles(bundles);
 			}
-			
+
 			// get the next ids for client-side use
 			Map<String, Integer[]> nextIds = getNextIdMap();
 			payload.setNextIds(nextIds);
@@ -272,14 +305,14 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 			status.addMsg("User Context retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			pc.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
-		
+
 		return payload;
 	}
 
@@ -287,24 +320,24 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 	public Payload addBundleUserBinding(String userId, String bundleId) {
 		final Status status = new Status();
 		Payload payload = new Payload(status);
-		
+
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
-		
+
 		try {
 			userDataService.addBundleUserBinding(userId, bundleId);
 			status.addMsg("User Bundle binding created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityExistsException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			context.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;
@@ -314,24 +347,24 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 	public Payload addDocUserBinding(String userId, String docId) {
 		final Status status = new Status();
 		Payload payload = new Payload(status);
-		
+
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
-		
+
 		try {
 			userDataService.addDocUserBinding(userId, docId);
 			status.addMsg("User Document binding created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityExistsException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			context.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;
@@ -341,24 +374,24 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 	public Payload removeBundleUserBinding(String userId, String bundleId) {
 		final Status status = new Status();
 		Payload payload = new Payload(status);
-		
+
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
-		
+
 		try {
 			userDataService.removeBundleUserBinding(userId, bundleId);
 			status.addMsg("User Bundle binding removed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			context.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;
@@ -368,24 +401,24 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 	public Payload removeDocUserBinding(String userId, String docId) {
 		final Status status = new Status();
 		Payload payload = new Payload(status);
-		
+
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
-		
+
 		try {
 			userDataService.removeDocUserBinding(userId, docId);
 			status.addMsg("User Document binding removed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			context.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;
@@ -430,7 +463,7 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 
 		return p;
 	}
-	
+
 	private Map<String, Integer[]> getNextIdMap() {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
@@ -449,7 +482,7 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 		HashMap<String, Integer[]> idMap = new HashMap<String, Integer[]>(2);
 		idMap.put(EntityType.QUOTE_BUNDLE.name(), iBundleIdRange);
 		idMap.put(EntityType.QUOTE.name(), iQuoteIdRange);
-		
+
 		return idMap;
 	}
 
@@ -476,18 +509,18 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 			status.addMsg("Bundle created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityExistsException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final ConstraintViolationException cve) {
 			PersistHelper.handleValidationException(context, cve, payload);
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			context.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;
@@ -507,18 +540,18 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 			status.addMsg("Quote added.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityExistsException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final ConstraintViolationException ise) {
 			PersistHelper.handleValidationException(context, ise, payload);
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			context.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;
@@ -537,15 +570,15 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 			status.addMsg("Bundle deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			context.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;
@@ -564,15 +597,15 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 			status.addMsg("Quote removed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			context.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;
@@ -592,18 +625,18 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 			status.addMsg("Bundle saved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityExistsException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final ConstraintViolationException ise) {
 			PersistHelper.handleValidationException(context, ise, payload);
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			context.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;
@@ -622,18 +655,18 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 			status.addMsg("Quote Bundle properties saved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityExistsException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 		catch(final ConstraintViolationException ise) {
 			PersistHelper.handleValidationException(context, ise, payload);
 		}
 		catch(final RuntimeException e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 			context.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			exceptionToStatus(e, payload.getStatus());
 		}
 
 		return payload;

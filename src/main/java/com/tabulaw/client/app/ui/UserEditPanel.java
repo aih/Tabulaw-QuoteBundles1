@@ -7,9 +7,13 @@ package com.tabulaw.client.app.ui;
 
 import java.util.Date;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.UIObject;
 import com.tabulaw.client.app.field.UserFieldProvider;
 import com.tabulaw.client.app.field.UserFieldProvider.UserUseCase;
+import com.tabulaw.client.ui.SimpleHyperLink;
 import com.tabulaw.client.ui.edit.AbstractEditPanel;
 import com.tabulaw.client.ui.field.AbstractFieldPanel;
 import com.tabulaw.client.ui.field.FieldGroup;
@@ -45,17 +49,27 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 					cmpsr.addField(fg.getFieldWidget("userEmail"));
 					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userPswd"));
+					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userPswdConfirm"));
 					cmpsr.newRow();
-					cmpsr.addField(fg.getFieldWidget("userExpires"));
-					cmpsr.newRow();
-					cmpsr.addField(fg.getFieldWidget("userRoles"), false);
+					cmpsr.addField(fg.getFieldWidget("userRoles"), true);
 				}
 			};
 		}
 	}
 
 	static class UpdateUserFieldPanel extends AbstractFieldPanel {
+		
+		private final SimpleHyperLink lnkSetPassword;
+
+		/**
+		 * Constructor
+		 * @param lnkSetPassword optional
+		 */
+		public UpdateUserFieldPanel(SimpleHyperLink lnkSetPassword) {
+			super();
+			this.lnkSetPassword = lnkSetPassword;
+		}
 
 		@Override
 		protected FieldGroup generateFieldGroup() {
@@ -70,6 +84,7 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 
 				@Override
 				public void render(FlowPanel widget, FieldGroup fg) {
+
 					final FlowPanelFieldComposer cmpsr = new FlowPanelFieldComposer();
 					cmpsr.setCanvas(widget);
 					cmpsr.addField(fg.getFieldWidget("userName"));
@@ -77,13 +92,16 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 					IFieldWidget<?> femail = fg.getFieldWidget("userEmail");
 					femail.setReadOnly(true);
 					cmpsr.addField(femail);
+					
+					if(lnkSetPassword != null) cmpsr.addWidget("&nbsp;", lnkSetPassword);
+					
 					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userEnabled"));
 					cmpsr.addField(fg.getFieldWidget("userLocked"));
 					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userExpires"));
 					cmpsr.newRow();
-					cmpsr.addField(fg.getFieldWidget("userRoles"), false);
+					cmpsr.addField(fg.getFieldWidget("userRoles"), true);
 				}
 			};
 		}
@@ -93,10 +111,14 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 	 * user under edit.
 	 */
 	private User user;
-
+	
 	private UserUseCase mode;
 
 	private AbstractFieldPanel fpCreate, fpUpdate;
+	
+	private SimpleHyperLink lnkSetPassword;
+
+	private final UserPasswordSetDialog dlgResetPassword = new UserPasswordSetDialog();
 
 	/**
 	 * Constructor
@@ -119,7 +141,7 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 	public void setUser(User user) {
 		// first set mode
 		setMode(user.isNew() ? UserUseCase.CREATE : UserUseCase.UPDATE);
-
+		
 		FieldGroup fg = getFieldPanel().getFieldGroup();
 		fg.clearValue();
 
@@ -131,8 +153,8 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 		if(!user.isNew()) {
 			fg.getFieldWidget("userLocked").setValue(user.isLocked());
 			fg.getFieldWidget("userEnabled").setValue(user.isEnabled());
+			fg.getFieldWidget("userExpires").setValue(user.getExpires());
 		}
-		fg.getFieldWidget("userExpires").setValue(user.getExpires());
 
 		// role
 		if(user.getNumRoles() == 0) {
@@ -142,16 +164,14 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 		Role role = user.getRoles().get(0);
 		fg.getFieldWidget("userRoles").setValue(role);
 
-		if(user.isNew()) {
-			// new user mode
-			fg.getFieldWidget("userEmail").setReadOnly(false);
-		}
-
 		getFieldPanel().getFieldGroup().setEnabled(true);
-		
-		// don't allow superuser editing
+
+		// don't allow superuser editing - this is their id!
 		setEditable(!user.isSuperuser());
-		
+
+		// can't edit email once user exists
+		if(!user.isSuperuser()) fg.getFieldWidget("userEmail").setReadOnly(!user.isNew());
+
 		this.user = user;
 	}
 
@@ -165,11 +185,11 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 		if(!user.isNew()) {
 			user.setLocked((Boolean) fg.getFieldWidget("userLocked").getValue());
 			user.setEnabled((Boolean) fg.getFieldWidget("userEnabled").getValue());
+			user.setExpires((Date) fg.getFieldWidget("userExpires").getValue());
 		}
 		else {
 			user.setPassword(fg.getFieldWidget("userPswd").getFieldValue());
 		}
-		user.setExpires((Date) fg.getFieldWidget("userExpires").getValue());
 
 		String role = fg.getFieldWidget("userRoles").getFieldValue();
 		user.getRoles().clear();
@@ -192,7 +212,20 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 				showDeleteButton(false);
 				break;
 			case UPDATE:
-				if(fpUpdate == null) fpUpdate = new UpdateUserFieldPanel();
+				if(fpUpdate == null) {
+					lnkSetPassword = new SimpleHyperLink("Set password", new ClickHandler() {
+						
+						@Override
+						public void onClick(ClickEvent event) {
+							event.getNativeEvent().stopPropagation();
+							dlgResetPassword.set(user.getId(), user.getName(), user.getEmailAddress());
+							dlgResetPassword.showRelativeTo((UIObject) event.getSource());
+						}
+					});
+					lnkSetPassword.getElement().setId("spw");
+					lnkSetPassword.setTitle("Set password..");
+					fpUpdate = new UpdateUserFieldPanel(lnkSetPassword);
+				}
 				setFieldPanel(fpUpdate);
 				showCancelButton(false);
 				showResetButton(true);

@@ -48,7 +48,7 @@ public final class CheckboxField extends AbstractField<Boolean> {
 	 * This text overrides the base field label text mechanism in order to have
 	 * the text appear to the right of the form control.
 	 */
-	protected String cblabelText;
+	//protected String cblabelText;
 
 	/**
 	 * Constructor
@@ -60,7 +60,7 @@ public final class CheckboxField extends AbstractField<Boolean> {
 	CheckboxField(String name, String propName, String labelText, String helpText) {
 		super(name, propName, labelText, helpText);
 		setConverter(ToBooleanConverter.DEFAULT);
-		cb = new Impl(name, cblabelText);
+		cb = new Impl(name, /*cblabelText*/"");
 		cb.addFocusHandler(this);
 		cb.addBlurHandler(this);
 		cb.addValueChangeHandler(this);
@@ -85,12 +85,14 @@ public final class CheckboxField extends AbstractField<Boolean> {
 		super.setEnabled(enabled);
 	}
 
+	/*
 	@Override
 	public void setReadOnly(boolean readOnly) {
 		if(cb != null) cb.setText(readOnly ? "" : cblabelText);
 		super.setReadOnly(readOnly);
 	}
-
+	*/
+	
 	@Override 
 	public String doGetText() {
 		return ToStringConverter.INSTANCE.convert(getValue());
@@ -100,6 +102,7 @@ public final class CheckboxField extends AbstractField<Boolean> {
 		throw new UnsupportedOperationException();
 	}
 
+	/*
 	@Override
 	public String getLabelText() {
 		return cblabelText;
@@ -111,4 +114,5 @@ public final class CheckboxField extends AbstractField<Boolean> {
 		if(cb != null) cb.setText(cblabelText);
 		super.setLabelText(labelText);
 	}
+	*/
 }
