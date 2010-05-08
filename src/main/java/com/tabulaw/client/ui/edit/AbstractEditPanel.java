@@ -25,16 +25,14 @@ import com.tabulaw.client.validate.Error;
 import com.tabulaw.client.validate.ErrorClassifier;
 import com.tabulaw.client.validate.ErrorDisplay;
 import com.tabulaw.client.validate.ErrorHandlerDelegate;
-import com.tabulaw.client.validate.IErrorHandler;
 import com.tabulaw.common.msg.Msg;
 
 /**
  * Wraps a panel holding editable content that fires edit events.
  * @param <T> edit content type
- * @param <P> field panel type
  * @author jpk
  */
-public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> extends Composite implements ClickHandler, IHasEditHandlers<T> {
+public abstract class AbstractEditPanel<T> extends Composite implements ClickHandler, IHasEditHandlers<T> {
 
 	/**
 	 * Styles - (admin.css)
@@ -87,13 +85,13 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 	/**
 	 * Contains the actual edit fields.
 	 */
-	protected P fieldPanel;
+	protected AbstractFieldPanel fieldPanel;
 
 	/**
-	 * Ref to the optional message display which is gotten from the error handler
-	 * when set.
+	 * The optional set error handler which get passed into the field group in the
+	 * current field panel.
 	 */
-	protected IMsgDisplay msgDisplay;
+	protected ErrorHandlerDelegate errorHandler;
 
 	/**
 	 * The panel containing the edit buttons
@@ -132,7 +130,6 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 		btnText = saveText == null ? DEFAULT_SAVE_TEXT : saveText;
 		btnSave = new Button(btnText, this);
 		btnSave.addStyleName(Styles.SAVE);
-		btnSave.setVisible(saveText != null);
 		pnlButtonRow.add(btnSave);
 
 		btnText = deleteText == null ? DEFAULT_DELETE_TEXT : deleteText;
@@ -171,7 +168,7 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 	 *        button is not displayed.
 	 * @param fieldPanel the field panel
 	 */
-	public AbstractEditPanel(String saveText, String deleteText, String cancelText, String resetText, P fieldPanel) {
+	public AbstractEditPanel(String saveText, String deleteText, String cancelText, String resetText, AbstractFieldPanel fieldPanel) {
 		this(saveText, deleteText, cancelText, resetText);
 		setFieldPanel(fieldPanel);
 	}
@@ -180,15 +177,18 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 		return portal;
 	}
 
-	public final P getFieldPanel() {
+	public final AbstractFieldPanel getFieldPanel() {
 		return fieldPanel;
 	}
 
-	public final void setFieldPanel(P fieldPanel) {
+	public final void setFieldPanel(AbstractFieldPanel fieldPanel) {
 		if(fieldPanel == null) throw new IllegalArgumentException("A field panel must be specified.");
-		if(this.fieldPanel != null) throw new IllegalStateException("Field panel already set.");
+		if(this.fieldPanel == fieldPanel) return;
 		this.fieldPanel = fieldPanel;
 		portal.setWidget(fieldPanel);
+		
+		// transfer over the error handler
+		if(errorHandler != null) fieldPanel.setErrorHandler(errorHandler);
 	}
 
 	/**
@@ -198,11 +198,22 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 	 * @param addMsgDisplay add the held msg display to this panel?
 	 */
 	public void setErrorHandler(ErrorHandlerDelegate errorHandler, boolean addMsgDisplay) {
-		fieldPanel.setErrorHandler(errorHandler);
-		msgDisplay = errorHandler.getMsgDisplay();
-		if(addMsgDisplay && msgDisplay != null) {
-			panel.insert(msgDisplay.getDisplayWidget(), 0);
+		if(errorHandler == null) throw new NullPointerException();
+		if(this.errorHandler == errorHandler) return;
+		
+		// remove old error handler
+		if(this.errorHandler != null) {
+			IMsgDisplay msgDisplay = this.errorHandler.getMsgDisplay();
+			if(msgDisplay != null) msgDisplay.getDisplayWidget().removeFromParent();
 		}
+		
+		// set new error handler
+		if(fieldPanel != null) fieldPanel.setErrorHandler(errorHandler);
+		if(addMsgDisplay) {
+			IMsgDisplay msgDisplay = errorHandler.getMsgDisplay();
+			if(msgDisplay != null) panel.insert(msgDisplay.getDisplayWidget(), 0);
+		}
+		this.errorHandler = errorHandler;
 	}
 
 	public final void setSaveButtonText(String text) {
@@ -237,7 +248,7 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 	public final HandlerRegistration addEditHandler(IEditHandler<T> handler) {
 		return addHandler(handler, EditEvent.TYPE);
 	}
-	
+
 	/**
 	 * Applies field error messages to the fields contained in the member
 	 * {@link AbstractFieldPanel}.
@@ -255,7 +266,6 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 			// presume field group not initialized yet
 			return;
 		}
-		final IErrorHandler errorHandler = root.getErrorHandler();
 		if(clearExisting) errorHandler.clear(classifier);
 		for(final Msg msg : msgs) {
 			final IFieldWidget<?> fw = root.getFieldWidgetByProperty(msg.getRefToken());
@@ -286,7 +296,7 @@ public abstract class AbstractEditPanel<T, P extends AbstractFieldPanel<?>> exte
 			}
 		}
 		else if(sender == btnReset) {
-			fieldPanel.reset();
+			fieldPanel.getFieldGroup().reset();
 		}
 		else if(sender == btnDelete) {
 			// T editContent = getEditContent();

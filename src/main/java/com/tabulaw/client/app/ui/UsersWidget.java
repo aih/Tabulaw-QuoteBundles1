@@ -35,7 +35,6 @@ public class UsersWidget extends Composite {
 		public static final String CREATE_USER = "createUser";
 		public static final String EDIT_CONTAINER = "editContainer";
 		public static final String TITLE = "title";
-		public static final String RIGHT = "right";
 	}
 
 	private final UsersListingWidget listing;
@@ -44,7 +43,7 @@ public class UsersWidget extends Composite {
 
 	private final UserEditPanel editPanel;
 
-	private final FlowPanel panel, editContainer, rightPanel;
+	private final FlowPanel panel, editContainer, userFloatPanel;
 
 	/**
 	 * Constructor
@@ -61,16 +60,15 @@ public class UsersWidget extends Composite {
 		lblTitle.setStyleName(Styles.TITLE);
 		editContainer.add(lblTitle);
 
-		rightPanel = new FlowPanel();
-		rightPanel.setStyleName(Styles.RIGHT);
+		userFloatPanel = new FlowPanel();
 
 		listing = new UsersListingWidget();
 		panel.add(listing);
-		panel.add(rightPanel);
+		panel.add(userFloatPanel);
 
 		editPanel = new UserEditPanel();
 		editContainer.add(editPanel);
-		rightPanel.add(editContainer);
+		userFloatPanel.add(editContainer);
 		editContainer.setVisible(false); // hide initially
 
 		initWidget(panel);
@@ -79,10 +77,9 @@ public class UsersWidget extends Composite {
 
 			@Override
 			public void onSelection(SelectionEvent<User> event) {
+				userFloatPanel.setStyleName("right");
 				User user = event.getSelectedItem();
 				assert user != null;
-
-				editPanel.setEditable(!user.isSuperuser());
 				editPanel.setUser(user);
 				lblTitle.setText(user.isSuperuser() ? user.getName() : "Edit " + user.getName());
 				editContainer.setVisible(true);
@@ -97,15 +94,21 @@ public class UsersWidget extends Composite {
 					default:
 					case CANCEL:
 						listing.setVisible(true);
+						editContainer.setVisible(false);
 						break;
 					case SAVE: {
-						final User updatedUser = event.getContent();
+						final User editedUser = event.getContent();
 						new RpcCommand<ModelPayload<User>>() {
 
 							@Override
 							protected void doExecute() {
 								setSource(listing);
-								Poc.getUserAdminService().updateUser(updatedUser, this);
+								if(editedUser.isNew()) {
+									Poc.getUserAdminService().createUser(editedUser, this);
+								}
+								else {
+									Poc.getUserAdminService().updateUser(editedUser, this);
+								}
 							}
 
 							@Override
@@ -118,7 +121,7 @@ public class UsersWidget extends Composite {
 						break;
 					}
 					case DELETE: {
-						final ModelKey key = editPanel.user.getModelKey();
+						final ModelKey key = editPanel.getUser().getModelKey();
 						new RpcCommand<Payload>() {
 
 							@Override
@@ -158,6 +161,7 @@ public class UsersWidget extends Composite {
 	}
 
 	public void newUserMode() {
+		userFloatPanel.setStyleName("left");
 		listing.setVisible(false);
 		editContainer.setVisible(true);
 		lblTitle.setText("Create User");

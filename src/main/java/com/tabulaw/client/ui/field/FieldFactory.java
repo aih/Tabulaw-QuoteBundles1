@@ -16,7 +16,7 @@ import com.tabulaw.client.validate.EmailAddressValidator;
 import com.tabulaw.client.validate.EnumValidator;
 
 /**
- * FieldFactory
+ * FieldGroupFactory
  * @author jpk
  */
 public abstract class FieldFactory {

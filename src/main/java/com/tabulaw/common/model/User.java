@@ -52,7 +52,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 	private String password;
 
-	private boolean locked = true;
+	private boolean locked = false;
 
 	private boolean enabled = true;
 
@@ -65,7 +65,6 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	 */
 	public User() {
 		super();
-		//roles = new ArrayList<Role>(3);
 	}
 	
 	public boolean isSuperuser() {

@@ -29,8 +29,15 @@ public interface IUserAdminService extends RemoteService {
 	 * @param user
 	 * @return payload containing the persisted user
 	 */
-	ModelPayload<User> updateUser(User user);
+	ModelPayload<User> createUser(User user);
 
+	/**
+	 * Updates a single user record.
+	 * @param user
+	 * @return payload containing the persisted user
+	 */
+	ModelPayload<User> updateUser(User user);
+	
 	/**
 	 * Deletes a single user record entirely from the system.
 	 * @param userId id of the user to delete

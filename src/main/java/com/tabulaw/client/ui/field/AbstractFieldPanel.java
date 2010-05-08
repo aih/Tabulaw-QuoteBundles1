@@ -7,18 +7,16 @@ package com.tabulaw.client.ui.field;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.tabulaw.client.validate.IErrorHandler;
 import com.tabulaw.client.validate.IHasErrorHandler;
 
 
 /**
  * Base class for all concrete field panels.
- * <p>
- * @param <W> The widget type employed for field rendering
  * @author jpk
  */
-public abstract class AbstractFieldPanel<W extends Widget> extends Composite implements IHasFieldGroup, IHasErrorHandler {
+public abstract class AbstractFieldPanel extends Composite implements IHasFieldGroup, IHasErrorHandler {
 
 	/**
 	 * Styles (field.css)
@@ -33,6 +31,11 @@ public abstract class AbstractFieldPanel<W extends Widget> extends Composite imp
 	}
 
 	/**
+	 * The actual panel.
+	 */
+	protected final FlowPanel panel = new FlowPanel();
+	
+	/**
 	 * The field group.
 	 */
 	protected FieldGroup group;
@@ -45,19 +48,12 @@ public abstract class AbstractFieldPanel<W extends Widget> extends Composite imp
 	private boolean drawn;
 
 	/**
-	 * @return The composite wrapped {@link Widget} the type of which
-	 *         <em>must</em> be that of the render widget type.
+	 * Constructor
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public final W getWidget() {
-		return (W) super.getWidget();
-	}
-
-	@Override
-	protected void initWidget(Widget widget) {
-		widget.addStyleName(Styles.FIELD_PANEL);
-		super.initWidget(widget);
+	public AbstractFieldPanel() {
+		super();
+		panel.setStyleName(Styles.FIELD_PANEL);
+		initWidget(panel);
 	}
 
 	@Override
@@ -113,6 +109,7 @@ public abstract class AbstractFieldPanel<W extends Widget> extends Composite imp
 		if(this.group == fields) return;
 		this.group = fields;
 		this.group.setWidget(this);
+		drawn = false; // force a re-draw
 
 		// propagate the binding's error handler and model change tracker
 		if(errorHandler != null) {
@@ -125,7 +122,7 @@ public abstract class AbstractFieldPanel<W extends Widget> extends Composite imp
 	 * Provides the field panel renderer (drawer).
 	 * @return the renderer
 	 */
-	protected abstract IFieldRenderer<W> getRenderer();
+	protected abstract IFieldRenderer<FlowPanel> getRenderer();
 
 	/**
 	 * Responsible for rendering the group in the ui. The default is to employ the
@@ -134,27 +131,11 @@ public abstract class AbstractFieldPanel<W extends Widget> extends Composite imp
 	 * {@link #getRenderer()}.
 	 */
 	protected void draw() {
-		final IFieldRenderer<W> renderer = getRenderer();
+		final IFieldRenderer<FlowPanel> renderer = getRenderer();
 		if(renderer != null) {
 			Log.debug(this + ": rendering..");
-			renderer.render(getWidget(), getFieldGroup());
+			renderer.render(panel, getFieldGroup());
 		}
-	}
-
-	/**
-	 * Resets the state of the fields to reflect the current state of model data.
-	 */
-	public void reset() {
-		if(group == null) group.reset();
-	}
-
-	/**
-	 * Enables or disables the field bound widget. When disabling, all shown
-	 * member fields shall be rendered non-interactable.
-	 * @param enable Enable or disable?
-	 */
-	public void enable(boolean enable) {
-		if(group == null) group.setEnabled(enable);
 	}
 
 	@Override

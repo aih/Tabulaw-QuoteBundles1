@@ -489,7 +489,7 @@ public final class FieldGroup implements IField, Iterable<IField> {
 	 *        fields' property names remain un-altered.
 	 * @param flds The fields to add
 	 */
-	public void addFields(String parentPropPath, IField[] flds) {
+	public void addFields(String parentPropPath, IField... flds) {
 		if(flds != null) {
 			for(final IField fld : flds) {
 				addField(parentPropPath, fld);
@@ -549,12 +549,12 @@ public final class FieldGroup implements IField, Iterable<IField> {
 
 	/**
 	 * Removes a collection of fields from this group.
-	 * @param clc The collection of fields to remove
 	 * @param clearErrors Remove errors bound to the given fields?
+	 * @param flds The fields to remove
 	 */
-	public void removeFields(Iterable<IField> clc, final boolean clearErrors) {
-		if(clc != null) {
-			for(final IField fld : clc) {
+	public void removeFields(final boolean clearErrors, IField... flds) {
+		if(flds != null) {
+			for(final IField fld : flds) {
 				removeField(fld, clearErrors);
 			}
 		}

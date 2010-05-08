@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
 
 import org.springframework.mail.MailSendException;
 
@@ -61,16 +62,99 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 		final PersistContext pc = getPersistContext();
 		UserService svc = pc.getUserService();
 
-		List<User> list = svc.getAllUsers();
+		try {
+			List<User> list = svc.getAllUsers();
+			
+			// clear out password
+			if(list != null) {
+				for(User user : list) user.setPassword(null);
+			}
+			
+			payload.setUsers(list);
+			status.addMsg("Users retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload registerUser(UserRegistrationRequest request) {
+		Status status = new Status();
+		Payload payload = new Payload(status);
+	
+		PersistContext persistContext = getPersistContext();
+		UserService userService = persistContext.getUserService();
+	
+		String name = request.getName();
+		String emailAddress = request.getEmailAddress();
+		String password = request.getPassword();
+	
+		try {
+			userService.create(name, emailAddress, password);
+		}
+		catch(EntityExistsException e) {
+			status.addMsg("Email already exists", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag | MsgAttr.FIELD.flag, "userEmail");
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			persistContext.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+	
+		return payload;
+	}
+
+	@Override
+	public ModelPayload<User> createUser(User user) {
+		final Status status = new Status();
+		ModelPayload<User> payload = new ModelPayload<User>(status);
 		
-		// clear out password
-		if(list != null) {
-			for(User user : list) user.setPassword(null);
+		final PersistContext pc = getPersistContext();
+		UserService svc = pc.getUserService();
+
+		try {
+			String name = user.getName(), email = user.getEmailAddress(), password = user.getPassword();
+			User createdUser = svc.create(name, email, password);
+			
+			// set other properties
+			createdUser.setEnabled(user.isEnabled());
+			createdUser.setLocked(user.isLocked());
+			createdUser.setExpires(user.getExpires());
+			createdUser.setRoles(user.getRoles());
+			createdUser = svc.updateUser(createdUser);
+			
+			// clear out password
+			createdUser.setPassword(null);
+			
+			payload.setModel(createdUser);
+			status.addMsg("User created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final ValidationException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final EntityExistsException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
 		}
 		
-		payload.setUsers(list);
-
-		status.addMsg("Users retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		return payload;
 	}
 
@@ -82,14 +166,27 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 		final PersistContext pc = getPersistContext();
 		UserService svc = pc.getUserService();
 
-		user = svc.updateUser(user);
+		try {
+			user = svc.updateUser(user);
+			
+			// clear out password
+			user.setPassword(null);
+			
+			payload.setModel(user);
+			status.addMsg("User updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityNotFoundException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
 		
-		// clear out password
-		user.setPassword(null);
-		
-		payload.setModel(user);
-
-		status.addMsg("Users updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		return payload;
 	}
 
@@ -101,17 +198,37 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 		final PersistContext pc = getPersistContext();
 		UserService svc = pc.getUserService();
 
-		svc.deleteUser(userId);
+		try {
+			svc.deleteUser(userId);
+			status.addMsg("User deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityNotFoundException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+		}
 		
-		status.addMsg("Users updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		return payload;
 	}
 
 	@Override
 	public void saveUserState(UserState userState) {
 		final PersistContext pc = getPersistContext();
-		UserDataService svc = pc.getUserDataService();
-		svc.saveUserState(userState);
+		try {
+			UserDataService svc = pc.getUserDataService();
+			svc.saveUserState(userState);
+		}
+		catch(final Exception e) {
+			pc.getExceptionHandler().handleException(e);
+			if(e instanceof RuntimeException) throw (RuntimeException) e;
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -131,48 +248,39 @@ implements IUserContextService, IUserCredentialsService, IUserDataService, IUser
 
 		final PersistContext pc = getPersistContext();
 
-		// get the retained user state if there is one
 		try {
-			UserState userState = pc.getUserDataService().getUserState(user.getId());
-			payload.setUserState(userState);
-		}
-		catch(EntityNotFoundException e) {
-			// ok
-		}
+			
+			// get the retained user state if there is one
+			try {
+				UserState userState = pc.getUserDataService().getUserState(user.getId());
+				payload.setUserState(userState);
+			}
+			catch(EntityNotFoundException e) {
+				// ok
+			}
 
-		// get the user's quote bundles
-		List<QuoteBundle> bundles = pc.getUserDataService().getBundlesForUser(user.getId());
-		if(bundles != null) {
-			payload.setBundles(bundles);
+			// get the user's quote bundles
+			List<QuoteBundle> bundles = pc.getUserDataService().getBundlesForUser(user.getId());
+			if(bundles != null) {
+				payload.setBundles(bundles);
+			}
+			
+			// get the next ids for client-side use
+			Map<String, Integer[]> nextIds = getNextIdMap();
+			payload.setNextIds(nextIds);
+
+			status.addMsg("User Context retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final RuntimeException e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, payload.getStatus());
 		}
 		
-		// get the next ids for client-side use
-		Map<String, Integer[]> nextIds = getNextIdMap();
-		payload.setNextIds(nextIds);
-
-		status.addMsg("User Context retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		return payload;
-	}
-
-	@Override
-	public Payload registerUser(UserRegistrationRequest request) {
-		Status status = new Status();
-
-		PersistContext persistContext = getPersistContext();
-		UserService userService = persistContext.getUserService();
-
-		String name = request.getName();
-		String emailAddress = request.getEmailAddress();
-		String password = request.getPassword();
-
-		try {
-			userService.create(name, emailAddress, password);
-		}
-		catch(EntityExistsException e) {
-			status.addMsg("Email already exists", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag | MsgAttr.FIELD.flag, "userEmail");
-		}
-
-		return new Payload(status);
 	}
 
 	@Override

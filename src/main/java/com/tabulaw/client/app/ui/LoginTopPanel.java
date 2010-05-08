@@ -5,7 +5,6 @@ package com.tabulaw.client.app.ui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,37 +27,30 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.tabulaw.IDescriptorProvider;
 import com.tabulaw.client.app.Poc;
-import com.tabulaw.client.app.model.EntityMetadataProvider;
+import com.tabulaw.client.app.field.UserFieldProvider;
+import com.tabulaw.client.app.field.UserFieldProvider.UserUseCase;
 import com.tabulaw.client.data.rpc.IHasRpcHandlers;
 import com.tabulaw.client.data.rpc.IRpcHandler;
 import com.tabulaw.client.data.rpc.RpcEvent;
 import com.tabulaw.client.ui.FocusCommand;
 import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.ui.SimpleHyperLink;
-import com.tabulaw.client.ui.field.AbstractFieldGroupProvider;
 import com.tabulaw.client.ui.field.AbstractFieldPanel;
-import com.tabulaw.client.ui.field.FieldFactory;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.ui.field.GridFieldComposer;
 import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.ui.field.IFieldWidget;
-import com.tabulaw.client.ui.field.PasswordField;
-import com.tabulaw.client.ui.field.TextField;
 import com.tabulaw.client.ui.login.IHasUserSessionHandlers;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
 import com.tabulaw.client.ui.login.UserSessionEvent;
 import com.tabulaw.client.ui.msg.GlobalMsgPanel;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
 import com.tabulaw.client.validate.ErrorHandlerDelegate;
-import com.tabulaw.client.validate.IValidator;
-import com.tabulaw.client.validate.ValidationException;
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.rpc.UserRegistrationRequest;
-import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.msg.Msg;
 import com.tabulaw.common.msg.Msg.MsgLevel;
-import com.tabulaw.schema.PropertyMetadata;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -74,66 +66,7 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 	 * package level visibility only
 	 * @author jpk
 	 */
-	static class FieldPanel extends AbstractFieldPanel<FlowPanel> {
-
-		/**
-		 * Provides login or user register fields depending on the flag provided upon
-		 * construction.
-		 * @author jpk
-		 */
-		class UserFieldProvider extends AbstractFieldGroupProvider {
-
-			@Override
-			protected String getFieldGroupName() {
-				return mode == Mode.LOGIN ? "Login" : "User Registration";
-			}
-
-			@Override
-			protected void populateFieldGroup(final FieldGroup fg) {
-
-				int visibleFieldLen = 30;
-				
-				Map<String, PropertyMetadata> metamap = EntityMetadataProvider.get().getEntityMetadata(EntityType.USER);
-				
-				TextField email = FieldFactory.femail("userEmail", "emailAddress", "Email Address", "Your email address", visibleFieldLen);
-				email.setPropertyMetadata(metamap.get("emailAddress"));
-				fg.addField(email);
-
-				PasswordField password = FieldFactory.fpassword("userPswd", "password", "Password", "Specify a password", visibleFieldLen);
-				password.setPropertyMetadata(metamap.get("password"));
-				fg.addField(password);
-
-				if(mode == Mode.REGISTER) {
-					TextField fname = FieldFactory.ftext("userName", "name", "Name", "Your name", visibleFieldLen);
-					fname.setPropertyMetadata(metamap.get("name"));
-					fg.addField(fname);
-					
-					PasswordField passwordConfirm =
-							FieldFactory.fpassword("userPswdConfirm", "passwordConfirm", "Confirm Password", "Confirm your password",
-									visibleFieldLen);
-					passwordConfirm.setPropertyMetadata(metamap.get("password"));
-					fg.addField(passwordConfirm);
-
-					fg.addValidator(new IValidator() {
-
-						@Override
-						public Object validate(Object value) throws ValidationException {
-							// password/confirm password match
-							String p = (String) fg.getFieldWidget("userPswd").getValue();
-							String pc = (String) fg.getFieldWidget("userPswdConfirm").getValue();
-							if(p != null && pc != null && !p.equals(pc)) {
-								throw new ValidationException("Password and Confirm Password do not match.");
-							}
-							return null;
-						}
-					});
-				}
-
-				fg.validateIncrementally(false);
-			}
-		}
-
-		private final FlowPanel panel = new FlowPanel();
+	static class FieldPanel extends AbstractFieldPanel {
 
 		private final Mode mode;
 
@@ -145,12 +78,21 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 			super();
 			if(mode == null) throw new NullPointerException();
 			this.mode = mode;
-			initWidget(panel);
 		}
 
 		@Override
 		protected FieldGroup generateFieldGroup() {
-			return new UserFieldProvider().getFieldGroup();
+			UserUseCase userMode;
+			switch(mode) {
+				default:
+				case LOGIN:
+					userMode = UserUseCase.LOGIN;
+					break;
+				case REGISTER:
+					userMode = UserUseCase.REGISTER;
+					break;
+			}
+			return new UserFieldProvider(userMode).getFieldGroup();
 		}
 
 		@Override

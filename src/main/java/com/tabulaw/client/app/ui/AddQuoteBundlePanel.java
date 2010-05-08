@@ -28,7 +28,7 @@ import com.tabulaw.schema.PropertyType;
  * UI handling of adding a new quote bundle.
  * @author jpk
  */
-public class AddQuoteBundlePanel extends AbstractFieldPanel<FlowPanel> {
+public class AddQuoteBundlePanel extends AbstractFieldPanel {
 
 	static class FieldProvider extends AbstractFieldGroupProvider {
 
@@ -89,11 +89,11 @@ public class AddQuoteBundlePanel extends AbstractFieldPanel<FlowPanel> {
 		}
 	}
 
-	private final FlowPanel panel = new FlowPanel();
-
+	/**
+	 * Constructor
+	 */
 	public AddQuoteBundlePanel() {
 		super();
-		initWidget(panel);
 	}
 
 	@Override

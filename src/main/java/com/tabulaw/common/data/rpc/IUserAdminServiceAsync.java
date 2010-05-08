@@ -17,6 +17,8 @@ public interface IUserAdminServiceAsync {
 
 	void getAllUsers(AsyncCallback<UserListPayload> callback);
 
+	void createUser(User user, AsyncCallback<ModelPayload<User>> callback);
+
 	void updateUser(User user, AsyncCallback<ModelPayload<User>> callback);
 
 	void deleteUser(String userId, AsyncCallback<Payload> callback);

@@ -12,7 +12,7 @@ import com.tabulaw.client.ui.field.FieldGroup;
  * Edit panel whose edit content is a {@link FieldGroup}.
  * @author jpk
  */
-public class FieldGroupEditPanel extends AbstractEditPanel<FieldGroup, AbstractFieldPanel<?>> {
+public class FieldGroupEditPanel extends AbstractEditPanel<FieldGroup> {
 
 	/**
 	 * Constructor
@@ -30,7 +30,7 @@ public class FieldGroupEditPanel extends AbstractEditPanel<FieldGroup, AbstractF
 	 * @param fieldPanel
 	 */
 	public FieldGroupEditPanel(String saveText, String deleteText, String cancelText, String resetText,
-			AbstractFieldPanel<?> fieldPanel) {
+			AbstractFieldPanel fieldPanel) {
 		super(saveText, deleteText, cancelText, resetText, fieldPanel);
 	}
 

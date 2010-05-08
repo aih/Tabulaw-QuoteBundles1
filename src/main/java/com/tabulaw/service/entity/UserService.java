@@ -166,9 +166,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		validate(user);
 
 		user = dao.persist(user);
-
-		// clone to ensure distinct from datastore ref
-		return (User) user.clone();
+		
+		return user;
 	}
 
 	/**

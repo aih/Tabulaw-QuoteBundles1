@@ -89,12 +89,23 @@ public class UserDataService extends AbstractEntityService {
 		return idRange;
 	}
 
+	/**
+	 * Gets the user state for the given user id
+	 * @param userId
+	 * @return the user's state entity
+	 * @throws EntityNotFoundException
+	 */
 	@Transactional(readOnly = true)
 	public UserState getUserState(String userId) throws EntityNotFoundException {
 		if(userId == null) throw new NullPointerException();
 		return dao.load(UserState.class, userId);
 	}
 
+	/**
+	 * Saves user state.
+	 * @param userState
+	 * @throws EntityExistsException 
+	 */
 	@Transactional
 	public void saveUserState(UserState userState) throws EntityExistsException {
 		if(userState == null) throw new NullPointerException();
