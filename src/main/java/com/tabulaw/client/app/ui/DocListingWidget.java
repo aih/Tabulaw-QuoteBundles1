@@ -156,6 +156,20 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		}
 	} // CellRenderer
 
+	public static class Operator extends DataListingOperator<DocRef, InMemoryListHandler<DocRef>> {
+	
+		public Operator() {
+			super(config.getPageSize(), new InMemoryListHandler<DocRef>(), config.getDefaultSorting());
+		}
+	
+		@SuppressWarnings("unchecked")
+		@Override
+		public void refresh() {
+			getDataProvider().setList((List<DocRef>) ClientModelCache.get().getAll(EntityType.DOCUMENT));
+			super.refresh();
+		}
+	}
+
 	static final IListingConfig config = new ListingConfig();
 
 	private final Operator operator;
@@ -188,20 +202,6 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
 		listingWidget.onModelChangeEvent(event);
-	}
-
-	public static class Operator extends DataListingOperator<DocRef, InMemoryListHandler<DocRef>> {
-
-		public Operator() {
-			super(config.getPageSize(), new InMemoryListHandler<DocRef>(), config.getDefaultSorting());
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public void refresh() {
-			getDataProvider().setList((List<DocRef>) ClientModelCache.get().getAll(EntityType.DOCUMENT));
-			super.refresh();
-		}
 	}
 
 	public void refresh() {

@@ -32,7 +32,6 @@ import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.User.Role;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
-import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.server.DocUtils;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
@@ -198,15 +197,10 @@ public class DocService extends RpcServlet implements IDocService {
 			payload.setDocHash(docHash);
 
 			// persist the doc user binding
-			try {
-				PersistContext pc = getPersistContext();
-				UserContext uc = getUserContext();
-				UserDataService uds = pc.getUserDataService();
-				uds.saveDocForUser(uc.getUser().getId(), mDoc);
-			}
-			catch(EntityExistsException e) {
-				// ok - presume the doc file was deleted but was retained in the datastore
-			}
+			PersistContext pc = getPersistContext();
+			UserContext uc = getUserContext();
+			UserDataService uds = pc.getUserDataService();
+			uds.saveDocForUser(uc.getUser().getId(), mDoc);
 		}
 		catch(MalformedURLException e) {
 			e.printStackTrace();

@@ -12,6 +12,7 @@ import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 
 /**
@@ -94,5 +95,11 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 	 */
 	public void clearState() {
 		if(docListing.getOperator() != null) docListing.getOperator().clear();
+	}
+
+	@Override
+	public void onModelChangeEvent(ModelChangeEvent event) {
+		super.onModelChangeEvent(event);
+		docListing.onModelChangeEvent(event);
 	}
 }

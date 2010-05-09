@@ -274,7 +274,7 @@ public class ClientModelCache {
 	public void removeDocUserBinding(String docId) {
 		if(!doServerPersist) return;
 		String userId = getUser().getId();
-		userDataService.removeBundleUserBinding(userId, docId, new AsyncCallback<Payload>() {
+		userDataService.removeDocUserBinding(userId, docId, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

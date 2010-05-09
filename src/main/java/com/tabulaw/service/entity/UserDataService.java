@@ -165,6 +165,7 @@ public class UserDataService extends AbstractEntityService {
 	 * @return the saved doc
 	 * @throws ConstraintViolationException When the given doc isn't valid
 	 */
+	@Transactional
 	public DocRef saveDocForUser(String userId, DocRef doc) throws ConstraintViolationException {
 		if(userId == null || doc == null) throw new NullPointerException();
 		
@@ -180,12 +181,22 @@ public class UserDataService extends AbstractEntityService {
 		}
 
 		// save the doc
-		DocRef persisted = dao.persist(doc);
+		if(existing == null) {
+			doc = dao.persist(doc);
+		}
+		else {
+			doc = existing;
+		}
 		
-		// create binding if this is a new bundle
-		if(existing == null) addDocUserBinding(userId, doc.getId());
+		// create binding
+		try {
+			addDocUserBinding(userId, doc.getId());
+		}
+		catch(EntityExistsException e) {
+			// ok
+		}
 
-		return persisted;
+		return doc;
 	}
 
 	/**

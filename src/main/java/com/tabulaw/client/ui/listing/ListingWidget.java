@@ -244,6 +244,7 @@ public class ListingWidget<R, T extends ListingTable<R>> extends Composite imple
 		// handle no data rows case
 		boolean noDataRows = table.getRowCount() <= 1;
 		portal.setVisible(!noDataRows);
+		if(navBar != null) navBar.setVisible(!noDataRows);
 		if(noDataRowsWidget == null) {
 			// no data rows widget
 			noDataRowsWidget = createNoDataRowsWidget();
