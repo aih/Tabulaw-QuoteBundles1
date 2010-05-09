@@ -13,11 +13,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
  */
 public class DocSearchWidget extends Composite {
 
-	static class Styles {
-
-		public static final String DOC_SEARCH = "docSearch";
-	}
-
 	private final DocSearchListingWidget docSearchListing = new DocSearchListingWidget();
 
 	private final DocSuggestWidget docSuggest = new DocSuggestWidget();
@@ -33,7 +28,7 @@ public class DocSearchWidget extends Composite {
 		panel.add(docSuggest);
 		panel.add(docSearchListing);
 
-		panel.setStyleName(Styles.DOC_SEARCH);
+		panel.setStyleName("docSearch");
 		initWidget(panel);
 
 		docSuggest.addSelectionHandler(docSearchListing);

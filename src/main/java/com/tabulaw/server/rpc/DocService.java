@@ -192,6 +192,9 @@ public class DocService extends RpcServlet implements IDocService {
 				String sdoc = DocUtils.serializeDocument(mDoc);
 				FileUtils.writeStringToFile(f, sdoc + htmlContent);
 			}
+			else {
+				mDoc = DocUtils.deserializeDocument(f);
+			}
 			payload.setDocHash(docHash);
 
 			// persist the doc user binding

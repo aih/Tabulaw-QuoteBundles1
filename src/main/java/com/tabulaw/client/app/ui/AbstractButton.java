@@ -16,24 +16,6 @@ import com.google.gwt.user.client.ui.HTML;
  */
 public abstract class AbstractButton extends Composite {
 
-	public static class Styles {
-
-		/**
-		 * The button's *primary* sytle.
-		 */
-		public static final String NAV = "navButton";
-
-		/**
-		 * Wraps the button text in a span with this style.
-		 */
-		public static final String TEXT = "text";
-		
-		/**
-		 * A '+' icon displays to the right of the text.
-		 */
-		public static final String PLUS = "plus";
-	}
-
 	private final HTML html;
 
 	/**
@@ -65,8 +47,8 @@ public abstract class AbstractButton extends Composite {
 	 * @param buttonSecondaryStyle
 	 */
 	protected void setDisplay(String buttonText, String buttonSecondaryStyle) {
-		html.setHTML("<span class=\"" + Styles.TEXT + "\">" + (buttonText == null ? "" : buttonText) + "</span>");
-		html.setStylePrimaryName(Styles.NAV);
+		html.setHTML("<span class=\"" + "text" + "\">" + (buttonText == null ? "" : buttonText) + "</span>");
+		html.setStylePrimaryName("navButton");
 		html.setTitle(getTitleText(buttonText));
 		if(buttonSecondaryStyle != null) {
 			html.addStyleDependentName(buttonSecondaryStyle);

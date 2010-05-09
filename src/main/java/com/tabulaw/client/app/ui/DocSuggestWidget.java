@@ -57,7 +57,6 @@ import com.tabulaw.common.msg.Msg;
 public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelectionHandlers<String> {
 
 	public static class Styles {
-
 		public static final String DOC_SUGGEST = "docSuggest";
 		public static final String ENTRY = "entry";
 		public static final String TITLE = "title";

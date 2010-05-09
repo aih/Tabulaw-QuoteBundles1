@@ -22,7 +22,7 @@ import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
-import com.tabulaw.client.ui.ImageContainer;
+import com.tabulaw.client.ui.toolbar.Toolbar;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
@@ -33,104 +33,76 @@ import com.tabulaw.common.model.Quote;
  */
 public abstract class AbstractQuoteWidget extends Composite {
 
-	static class Styles {
+	static class Header extends Composite {
 
-		/**
-		 * Overall widget style.
-		 */
-		public static final String WQUOTE = "wquote";
-		/**
-		 * Style for entire header block (cite and delete button).
-		 */
-		public static final String HEADER = "qheader";
-		/**
-		 * X icon in cite header.
-		 */
-		public static final String X = "x";
-		/**
-		 * link to doc and highlight.
-		 */
-		public static final String HLINK = "hlink";
-		/**
-		 * Quote block below cite block.
-		 */
-		public static final String QUOTED = "quoted";
-	} // Styles
+		private final FlowPanel panel = new FlowPanel();
 
-	protected static class CiteBlock extends HTML {
+		protected final HTML title, citation;
 
-		static class Styles {
+		private final HorizontalPanel topRow = new HorizontalPanel();
+		private final Toolbar buttonsPanel = new Toolbar();
 
-			/**
-			 * Style for cite portion of the header.
-			 */
-			public static final String CITE = "cite";
-			/**
-			 * Title in cite header.
-			 */
-			public static final String TITLE = "title";
-			/**
-			 * Subtitle block in cite header.
-			 */
-			public static final String SUBTITLE = "subtitle";
-		} // Styles
+		protected final FocusPanel dragHandle;
 
-		public CiteBlock() {
+		public Header() {
 			super();
-			setStyleName(Styles.CITE);
+			initWidget(panel);
+
+			panel.setStyleName("qheader");
+
+			title = new HTML();
+			dragHandle = new FocusPanel(title);
+			dragHandle.setStyleName("title");
+
+			buttonsPanel.setStyleName("buttons");
+
+			topRow.setStyleName("topRow");
+			topRow.add(dragHandle);
+			topRow.add(buttonsPanel);
+
+			citation = new HTML();
+			citation.setStyleName("citation");
+
+			panel.add(topRow);
+			panel.add(citation);
 		}
-
-		public void set(String title, String subtitle) {
-			StringBuilder sb = new StringBuilder();
-
-			sb.append("<p class=\"");
-			sb.append(Styles.TITLE);
-			sb.append("\">");
-			sb.append(title);
-			sb.append("</p>");
-
-			sb.append("<p class=\"");
-			sb.append(Styles.SUBTITLE);
-			sb.append("\">");
-			sb.append(subtitle);
-			sb.append("</p>");
-
-			setHTML(sb.toString());
-		}
-
-	} // CiteBlock
-	
-	protected static class QuoteBlock extends HTML {
 		
-		static class Styles {
-			/**
-			 * Quote block below cite block.
-			 */
-			public static final String QUOTED = "quoted";
-		} // Styles
+		public void addButton(Widget button) {
+			buttonsPanel.add(button);
+		}
+
+		public void setQuoteTitle(String title) {
+			this.title.setHTML("<p>" + title + "</p>");
+		}
+
+		public void setQuoteCitation(String citation) {
+			this.citation.setHTML("<p>" + citation + "</p>");
+		}
+	}
+
+	static class QuoteBlock extends Composite {
+
+		private final HTML html = new HTML();
 
 		public QuoteBlock() {
 			super();
-			setStyleName(Styles.QUOTED);
+			html.setStyleName("quoted");
+			initWidget(html);
 		}
-		
-		public void set(String quote) {
-			setHTML("<p>" + (quote == null? "" : quote) + "</p>");
+
+		public void setQuotedText(String quoteText) {
+			html.setHTML("<p>" + (quoteText == null ? "" : quoteText) + "</p>");
 		}
 	} // QuoteBlock
 
 	protected final FlowPanel panel = new FlowPanel();
 
-	protected final HorizontalPanel header = new HorizontalPanel();
-	
-	protected final CiteBlock citeBlock = new CiteBlock();
-	
-	protected final FocusPanel dragHandle;
+	protected final Header header = new Header();
 
 	protected final QuoteBlock quoteBlock = new QuoteBlock();
 
 	protected final AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget;
-	
+
 	protected boolean draggable;
 
 	protected Quote quote;
@@ -142,15 +114,13 @@ public abstract class AbstractQuoteWidget extends Composite {
 	public AbstractQuoteWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget) {
 		super();
 		this.parentQuoteBundleWidget = parentQuoteBundleWidget;
-		
-		panel.setStyleName(AbstractQuoteWidget.Styles.WQUOTE);
-		header.setStyleName(AbstractQuoteWidget.Styles.HEADER);
-		dragHandle = new FocusPanel(citeBlock);
-		header.add(dragHandle);
+
+		panel.setStyleName("wquote");
 		panel.add(header);
 		panel.add(quoteBlock);
+		initWidget(panel);
 
-		ImageContainer ic;
+		Image img;
 
 		/*
 		// add delete icon
@@ -166,15 +136,15 @@ public abstract class AbstractQuoteWidget extends Composite {
 				}
 			}
 		});
-		header.add(ic);
+		header.addButton(ic);
 		*/
-		
+
 		// add link to highlight icon
-		ic = new ImageContainer(new Image(Resources.INSTANCE.permalink()));
-		ic.setTitle("Goto highlight");
-		ic.addStyleName(Styles.HLINK);
-		ic.getImage().addClickHandler(new ClickHandler() {
-			
+		img = new Image(Resources.INSTANCE.gotoHighlight());
+		img.setTitle("Goto highlight");
+		img.addStyleName("hlink");
+		img.addClickHandler(new ClickHandler() {
+
 			@Override
 			public void onClick(ClickEvent event) {
 				// goto hightlight switching current doc if necessary
@@ -196,14 +166,14 @@ public abstract class AbstractQuoteWidget extends Composite {
 				}));
 			}
 		});
-		header.add(ic);
+		header.addButton(img);
 
 		// add X icon
-		ic = new ImageContainer(new Image(Resources.INSTANCE.XButton()));
-		ic.setTitle(getXTitle());
-		ic.addStyleName(Styles.X);
-		ic.getImage().addClickHandler(new ClickHandler() {
-			
+		img = new Image(Resources.INSTANCE.XButton());
+		img.setTitle(getXTitle());
+		img.addStyleName("x");
+		img.addClickHandler(new ClickHandler() {
+
 			@Override
 			public void onClick(ClickEvent event) {
 				if(allowXClick()) {
@@ -211,11 +181,9 @@ public abstract class AbstractQuoteWidget extends Composite {
 				}
 			}
 		});
-		header.add(ic);
-		
-		initWidget(panel);
+		header.addButton(img);
 	}
-	
+
 	/**
 	 * Constructor
 	 * @param parentQuoteBundleWidget
@@ -231,7 +199,7 @@ public abstract class AbstractQuoteWidget extends Composite {
 	}
 
 	public final Widget getDragHandle() {
-		return dragHandle;
+		return header.dragHandle;
 	}
 
 	public final Quote getModel() {
@@ -240,11 +208,12 @@ public abstract class AbstractQuoteWidget extends Composite {
 
 	public void setModel(Quote quote) {
 		this.quote = quote;
-		
-		String title, subtitle = "", quoteText = quote.getQuote();
+
+		String title, citation = "", quoteText = quote.getQuote();
 		DocRef doc = quote.getDocument();
 		title = doc.getTitle();
-		
+		header.setQuoteTitle(title);
+
 		// case doc?
 		CaseRef caseRef = doc.getCaseRef();
 		if(caseRef != null) {
@@ -252,23 +221,27 @@ public abstract class AbstractQuoteWidget extends Composite {
 			if(parties != null && parties.length() > 0 && !"null".equals(parties)) {
 				title = parties;
 			}
-			subtitle = caseRef.getCitation();
+			citation = caseRef.getCitation();
 		}
-		
-		citeBlock.set(title, subtitle);
-		quoteBlock.set(quoteText);
+		header.setQuoteCitation(citation);
+
+		quoteBlock.setQuotedText(quoteText);
 	}
-	
+
+	public void addHeaderButton(Widget button) {
+		header.addButton(button);
+	}
+
 	/**
 	 * @return The title text to show when mouse hovers the x icon.
 	 */
 	protected abstract String getXTitle();
-	
+
 	/**
 	 * @return <code>true</code> if X click action should occur.
 	 */
 	protected abstract boolean allowXClick();
-	
+
 	/**
 	 * Handles the X click action.
 	 */

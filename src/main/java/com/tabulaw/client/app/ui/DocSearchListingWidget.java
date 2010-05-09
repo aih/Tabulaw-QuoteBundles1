@@ -13,7 +13,6 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLTable;
@@ -53,11 +52,6 @@ import com.tabulaw.dao.Sorting;
  */
 public class DocSearchListingWidget extends Composite implements SelectionHandler<String> {
 
-	public static class Styles {
-
-		public static final String DOC_SEARCH_LISTING = "docSearchListing";
-	}
-
 	static class ListingConfig extends AbstractListingConfig {
 
 		static final Sorting defaultSorting = new Sorting("title");
@@ -66,7 +60,7 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 		};
 
 		public ListingConfig() {
-			super("Document", null, cols, defaultSorting, 10);
+			super("Document", null, cols, defaultSorting, 5);
 		}
 
 		@Override
@@ -90,11 +84,18 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 
 		@Override
 		protected void doFetch(final int ofst, Sorting srtg) {
-			DocSearchRequest dsr = new DocSearchRequest(DocDataProvider.GOOGLE_SCHOLAR, query, ofst, getPageSize(), true);
-			Poc.getDocService().search(dsr, new AsyncCallback<DocSearchPayload>() {
+			new RpcCommand<DocSearchPayload>() {
 
 				@Override
-				public void onSuccess(DocSearchPayload result) {
+				protected void doExecute() {
+					setSource(Operator.this.sourcingWidget);
+					DocSearchRequest dsr = new DocSearchRequest(DocDataProvider.GOOGLE_SCHOLAR, query, ofst, getPageSize(), true);
+					Poc.getDocService().search(dsr, this);
+				}
+
+				@Override
+				protected void handleSuccess(DocSearchPayload result) {
+					super.handleSuccess(result);
 					if(result.hasErrors()) {
 						Notifier.get().showFor(result);
 					}
@@ -106,10 +107,11 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 				}
 
 				@Override
-				public void onFailure(Throwable caught) {
+				protected void handleFailure(Throwable caught) {
+					super.handleFailure(caught);
 					Notifier.get().showFor(caught);
 				}
-			});
+			}.execute();
 		}
 
 		@Override
@@ -143,10 +145,7 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 			super(config.getListingId(), config.getListingElementName(), new Table(config),
 					new ListingNavBar<CaseDocSearchResult>(config, null));
 			rpcui = new RpcUiHandler(this);
-		}
-
-		Table getTable() {
-			return table;
+			addHandler(this, RpcEvent.TYPE);
 		}
 
 		@Override
@@ -160,7 +159,9 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 		}
 	}
 
-	static class Table extends ModelListingTable<CaseDocSearchResult> {
+	static class Table extends ModelListingTable<CaseDocSearchResult> implements IRpcHandler {
+
+		final RpcUiHandler rpcui;
 
 		public Table(IListingConfig config) {
 			super(config, new ITableCellRenderer<CaseDocSearchResult>() {
@@ -175,6 +176,12 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 				}
 
 			});
+			rpcui = new RpcUiHandler(this);
+		}
+
+		@Override
+		public void onRpcEvent(RpcEvent event) {
+			rpcui.onRpcEvent(event);
 		}
 
 		@Override
@@ -246,7 +253,7 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 		listingWidget.setOperator(operator);
 		pnl.add(listingWidget);
 
-		pnl.setStyleName(Styles.DOC_SEARCH_LISTING);
+		pnl.setStyleName("docSearchListing");
 		initWidget(pnl);
 	}
 

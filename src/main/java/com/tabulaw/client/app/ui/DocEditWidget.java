@@ -25,29 +25,21 @@ import com.tabulaw.client.ui.toolbar.Toolbar;
  */
 public class DocEditWidget extends Composite implements HasHTML {
 
-	public static class Styles {
-		public static final String EDIT_BAR = "editBar";
-		
-		public static final String DOC_EDIT = "docEdit";
-		
-		public static final String PENCIL = "pencil";
-	}
-	
 	class EditBar extends Composite implements ClickHandler {
 		private final FlowPanel pnl = new FlowPanel();
 		private final Toolbar toolbar = new Toolbar();
-		private final Image imgPencil = new Image(Resources.INSTANCE.pencil());
+		private final Image imgPencil = new Image(Resources.INSTANCE.edit());
 		private final PushButton btnBold;
 
 		public EditBar() {
 			super();
-			imgPencil.setStyleName(DocEditWidget.Styles.PENCIL);
+			imgPencil.setStyleName("pencil");
 			btnBold = new PushButton("bold", this);
 			
 			toolbar.add(imgPencil);
 			toolbar.addButton(btnBold, "Toggle Bold");
 			
-			pnl.setStyleName(Styles.EDIT_BAR);
+			pnl.setStyleName("editBar");
 			pnl.add(toolbar);
 			
 			initWidget(pnl);
@@ -72,7 +64,7 @@ public class DocEditWidget extends Composite implements HasHTML {
 	 */
 	public DocEditWidget() {
 		super();
-		pnl.addStyleName(Styles.DOC_EDIT);
+		pnl.addStyleName("docEdit");
 		pnl.add(rta);
 		initWidget(pnl);
 	}

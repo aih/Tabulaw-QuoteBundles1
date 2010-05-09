@@ -45,11 +45,9 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 					final FlowPanelFieldComposer cmpsr = new FlowPanelFieldComposer();
 					cmpsr.setCanvas(widget);
 					cmpsr.addField(fg.getFieldWidget("userName"));
-					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userEmail"));
 					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userPswd"));
-					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userPswdConfirm"));
 					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userRoles"), true);
@@ -210,6 +208,8 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 				showCancelButton(true);
 				showResetButton(false);
 				showDeleteButton(false);
+				addStyleName("createUser");
+				removeStyleName("updateUser");
 				break;
 			case UPDATE:
 				if(fpUpdate == null) {
@@ -230,6 +230,8 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 				showCancelButton(false);
 				showResetButton(true);
 				showDeleteButton(true);
+				removeStyleName("createUser");
+				addStyleName("updateUser");
 				break;
 			default:
 				throw new IllegalStateException();

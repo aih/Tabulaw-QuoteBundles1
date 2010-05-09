@@ -16,15 +16,10 @@ import com.tabulaw.client.mvc.view.StaticViewInitializer;
  */
 public class DocsNavButton extends AbstractButton implements IViewInitializerProvider {
 
-	static class Styles {
-
-		public static final String DOCS = "docs";
-	}
-
 	static final IViewInitializer vi = new StaticViewInitializer(DocsView.klas);
 
 	public DocsNavButton() {
-		super("Documents", Styles.DOCS);
+		super("Documents", "docs");
 	}
 
 	@Override

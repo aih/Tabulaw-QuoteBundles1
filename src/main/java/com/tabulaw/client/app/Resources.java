@@ -23,25 +23,21 @@ public interface Resources extends ClientBundle {
 	@Source("../../public/images/google-scholar.png")
 	ImageResource googleScholarLogo();
 
-	@Source("../../public/images/permalink.gif")
-	ImageResource permalink();
+	@Source("../../public/images/go-to-highlight2.png")
+	ImageResource gotoHighlight();
 
 	@Source("../../public/images/note-icon.png")
 	ImageResource searchImage();
 
-	@Source("../../public/images/undo.gif")
-	ImageResource undo();
+	@Source("../../public/images/edit-icon.png")
+	ImageResource edit();
 	
-	// TODO point to a real save icon
-	@Source("../../public/images/pencil.gif")
-	ImageResource save();
-	
-	@Source("../../public/images/pencil.gif")
-	ImageResource pencil();
-	
-	@Source("../../public/images/delete.gif")
+	@Source("../../public/images/delete-button.png")
 	ImageResource delete();
 
+	@Source("../../public/images/delete-button-larger.png")
+	ImageResource deleteLarger();
+	
 	@Source("../../public/images/x-button.png")
 	ImageResource XButton();
 
@@ -50,4 +46,7 @@ public interface Resources extends ClientBundle {
 
 	@Source("../../public/images/quote-bundle-icon.png")
 	ImageResource quoteBundleIcon();
+	
+	@Source("../../public/images/plus.png")
+	ImageResource plus();
 }

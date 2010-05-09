@@ -9,8 +9,6 @@ import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DoubleClickEvent;
-import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -18,10 +16,12 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
-import com.tabulaw.client.ui.DblClickHTML;
+import com.tabulaw.client.app.Resources;
 import com.tabulaw.common.model.DocRef;
 
 /**
@@ -35,30 +35,7 @@ import com.tabulaw.common.model.DocRef;
  * set to read-only mode.
  * @author jpk
  */
-public class DocViewer extends Composite implements DoubleClickHandler, HasValueChangeHandlers<DocViewer.ViewMode> {
-
-	public static enum ViewMode {
-		EDIT,
-		STATIC;
-	}
-
-	static class DocViewHeader extends Composite {
-
-		private final FlowPanel pnl = new FlowPanel();
-		private final DblClickHTML html = new DblClickHTML();
-
-		public DocViewHeader() {
-			super();
-			pnl.setStyleName(Styles.DOC_HEADER);
-			html.setStyleName(Styles.DOC_HEADER_LABEL);
-			pnl.add(html);
-			initWidget(pnl);
-		}
-
-		public void insert(Widget w, int beforeIndex) {
-			pnl.insert(w, 0);
-		}
-	}
+public class DocViewer extends Composite implements HasValueChangeHandlers<DocViewer.ViewMode> {
 
 	public static class Styles {
 
@@ -93,6 +70,33 @@ public class DocViewer extends Composite implements DoubleClickHandler, HasValue
 		public static final String EDIT = "edit";
 	} // Styles
 
+	public static enum ViewMode {
+		EDIT,
+		STATIC;
+	}
+
+	static class DocViewHeader extends Composite {
+
+		private final FlowPanel pnl = new FlowPanel();
+		private final Image imgEdit = new Image(Resources.INSTANCE.edit());
+		private final HTML html = new HTML();
+
+		public DocViewHeader() {
+			super();
+			pnl.setStyleName(Styles.DOC_HEADER);
+			imgEdit.setStyleName("imgEdit");
+			imgEdit.setTitle("Edit document");
+			html.setStyleName(Styles.DOC_HEADER_LABEL);
+			pnl.add(html);
+			pnl.add(imgEdit);
+			initWidget(pnl);
+		}
+
+		public void insert(Widget w, int beforeIndex) {
+			pnl.insert(w, 0);
+		}
+	}
+
 	/**
 	 * docView
 	 */
@@ -124,8 +128,6 @@ public class DocViewer extends Composite implements DoubleClickHandler, HasValue
 	 */
 	public DocViewer() {
 		super();
-
-		header.html.addDoubleClickHandler(this);
 
 		pnl.setStyleName(Styles.DOC_VIEW);
 		pnl.add(header);
@@ -175,7 +177,49 @@ public class DocViewer extends Composite implements DoubleClickHandler, HasValue
 		// header
 		String html = mDocument.getTitle();
 		header.html.setHTML("<p>" + html + "</p>");
-		header.html.setTitle("Double click to edit");
+		//header.html.setTitle("Double click to edit");
+		
+		header.imgEdit.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(dew == null) {
+
+					// wire up save/cancel buttons
+					assert btnSave == null;
+					assert btnCancel == null;
+					btnSave = new PushButton("Save", new ClickHandler() {
+
+						@Override
+						public void onClick(ClickEvent clkEvt) {
+							// save the doc
+							setDocHtml(dew.getHTML());
+							staticMode();
+						}
+					});
+					btnSave.setTitle("Save Document");
+					btnCancel = new PushButton("Cancel", new ClickHandler() {
+
+						@Override
+						public void onClick(ClickEvent clkEvt) {
+							staticMode();
+						}
+					});
+					btnCancel.setTitle("Revert Document");
+
+					dew = new DocEditWidget();
+					dew.setVisible(false);
+					portal.add(dew);
+				}
+
+				if(!dew.isVisible()) {
+					editMode();
+				}
+			}
+		});
+		
+		// disallow doc editing for case type docs
+		header.imgEdit.setVisible(mDocument.getCaseRef() == null);	
 
 		// doc content
 		frame.getElement().setId(getFrameId());
@@ -202,42 +246,6 @@ public class DocViewer extends Composite implements DoubleClickHandler, HasValue
 	@Override
 	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<ViewMode> handler) {
 		return addHandler(handler, ValueChangeEvent.getType());
-	}
-
-	@Override
-	public void onDoubleClick(DoubleClickEvent event) {
-		if(dew == null) {
-
-			// wire up save/cancel buttons
-			assert btnSave == null;
-			assert btnCancel == null;
-			btnSave = new PushButton("Save", new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent clkEvt) {
-					// save the doc
-					setDocHtml(dew.getHTML());
-					staticMode();
-				}
-			});
-			btnSave.setTitle("Save Document");
-			btnCancel = new PushButton("Cancel", new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent clkEvt) {
-					staticMode();
-				}
-			});
-			btnCancel.setTitle("Revert Document");
-
-			dew = new DocEditWidget();
-			dew.setVisible(false);
-			portal.add(dew);
-		}
-
-		if(!dew.isVisible()) {
-			editMode();
-		}
 	}
 
 	public DocEditWidget getDocEditWidget() {

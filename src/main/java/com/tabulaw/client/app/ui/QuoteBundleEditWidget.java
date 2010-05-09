@@ -12,7 +12,6 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
@@ -32,11 +31,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 
 	static class Styles {
 
-		public static final String BUTTONS = "buttons";
-
-		public static final String SAVE = "save";
-
-		public static final String UNDO = "undo";
+		public static final String BUTTONS = "qbbuttons";
 
 		public static final String DELETE = "delete";
 
@@ -61,7 +56,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 		public EditHeader() {
 			super();
 
-			delete = new Image(Resources.INSTANCE.delete());
+			delete = new Image(Resources.INSTANCE.deleteLarger());
 			delete.setTitle("Delete Quote Bundle..");
 			delete.setStyleName(Styles.DELETE);
 			delete.addClickHandler(new ClickHandler() {
@@ -105,15 +100,11 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 				}
 			});
 
-			FlowPanel buttons = new FlowPanel();
-			buttons.setStyleName(Styles.BUTTONS);
 			//buttons.add(save);
 			//buttons.add(undo);
 			buttons.add(delete);
 			buttons.add(current);
 			buttons.add(close);
-
-			header.insert(buttons, 0);
 		}
 		
 		@Override

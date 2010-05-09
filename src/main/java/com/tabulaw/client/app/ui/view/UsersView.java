@@ -36,7 +36,7 @@ public class UsersView extends AbstractPocView<StaticViewInitializer> {
 	class NewUserButton extends AbstractButton {
 		
 		public NewUserButton() {
-			super("New User", Styles.PLUS);
+			super("New User", "plus");
 			setClickHandler(new ClickHandler() {
 				
 				@Override

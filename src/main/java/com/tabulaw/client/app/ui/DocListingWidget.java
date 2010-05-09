@@ -67,14 +67,15 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		}
 	} // ListingConfig
 
-	static class DocListing extends ModelListingWidget<DocRef, DocListingWidget.Table> /*implements IRpcHandler*/{
+	static class DocListing extends ModelListingWidget<DocRef, DocListingWidget.Table> /*implements IRpcHandler*/ {
 
-		// final RpcUiHandler rpcui;
+		//final RpcUiHandler rpcui;
 
 		public DocListing() {
 			super(config.getListingId(), config.getListingElementName(), new Table(config), new ListingNavBar<DocRef>(config,
 					null));
-			// rpcui = new RpcUiHandler(this);
+			//rpcui = new RpcUiHandler(this);
+			//addHandler(this, RpcEvent.TYPE);
 		}
 
 		Table getTable() {
@@ -128,7 +129,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 					table.setText(rowIndex, cellIndex, sdate);
 					break;
 				case 2: {
-					Image img = new Image(Resources.INSTANCE.delete());
+					Image img = new Image(Resources.INSTANCE.deleteLarger());
 					img.setTitle("Delete document..");
 					img.addClickHandler(new ClickHandler() {
 

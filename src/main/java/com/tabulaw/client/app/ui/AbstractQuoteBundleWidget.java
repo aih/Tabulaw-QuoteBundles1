@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
+import com.tabulaw.client.app.ui.QuoteBundleEditWidget.Styles;
 import com.tabulaw.client.convert.IConverter;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
@@ -27,24 +28,6 @@ import com.tabulaw.common.model.QuoteBundle;
 public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H extends AbstractQuoteBundleWidget.Header> 
 extends AbstractModelChangeAwareWidget {
 
-	static class Styles {
-
-		/**
-		 * Top-most quote bundle widget style.
-		 */
-		public static final String WQBUNDLE = "wqbundle";
-
-		public static final String HEADER = "qbheader";
-
-		public static final String NAME = "name";
-
-		public static final String DESC = "desc";
-
-		public static final String ECHO = "echo";
-
-		public static final String QUOTES = "quotes";
-	} // Styles
-	
 	static final IConverter<String, String> headerDescTextExtractor = new IConverter<String, String>() {
 		
 		@Override
@@ -59,7 +42,7 @@ extends AbstractModelChangeAwareWidget {
 		
 		@Override
 		public String convert(String in) throws IllegalArgumentException {
-			return "<span class=\"" + Styles.ECHO + "\">DESCRIPTION: </span>" + (in == null ? "" : in);
+			return "<span class=\"" + "echo" + "\">DESCRIPTION: </span>" + (in == null ? "" : in);
 		}
 	};
 
@@ -72,7 +55,10 @@ extends AbstractModelChangeAwareWidget {
 		protected final FlowPanel header = new FlowPanel();
 
 		protected final Label lblQb;
-		private final EditableTextWidget pName, pDesc;
+		
+		protected final EditableTextWidget pName, pDesc;
+		
+		protected final FlowPanel buttons = new FlowPanel(); 
 
 		protected QuoteBundle bundle;
 
@@ -81,15 +67,18 @@ extends AbstractModelChangeAwareWidget {
 		 */
 		public Header() {
 			lblQb = new Label("Quote Bundle");
-			lblQb.setStyleName(Styles.ECHO);
+			lblQb.setStyleName("echo");
 
-			header.setStyleName(Styles.HEADER);
+			buttons.setStyleName(Styles.BUTTONS);
+			header.insert(buttons, 0);
+			
+			header.setStyleName("qbheader");
 			header.add(lblQb);
 			
 			initWidget(header);
 
 			pName = new EditableTextWidget();
-			pName.addStyleName(AbstractQuoteBundleWidget.Styles.NAME);
+			pName.addStyleName("name");
 			pName.addValueChangeHandler(new ValueChangeHandler<String>() {
 
 				@Override
@@ -104,7 +93,7 @@ extends AbstractModelChangeAwareWidget {
 			header.add(pName);
 
 			pDesc = new EditableTextWidget(headerDescTextExtractor, headerDescInnerHtmlSetter);
-			pDesc.addStyleName(AbstractQuoteBundleWidget.Styles.DESC);
+			pDesc.addStyleName("desc");
 			pDesc.addValueChangeHandler(new ValueChangeHandler<String>() {
 
 				@Override
@@ -181,7 +170,7 @@ extends AbstractModelChangeAwareWidget {
 
 		public QuotesPanel() {
 			super();
-			setStyleName(AbstractQuoteBundleWidget.Styles.QUOTES);
+			setStyleName("quotes");
 			//setSpacing(4);
 		}
 	} // QuotesPanel
@@ -203,7 +192,7 @@ extends AbstractModelChangeAwareWidget {
 	protected AbstractQuoteBundleWidget(H headerWidget) {
 		super();
 		this.header = headerWidget;
-		panel.setStyleName(Styles.WQBUNDLE);
+		panel.setStyleName("qbundle");
 		panel.add(header);
 		panel.add(quotePanel);
 		initWidget(panel);

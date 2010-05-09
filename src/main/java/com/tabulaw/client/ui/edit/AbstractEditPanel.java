@@ -96,11 +96,11 @@ public abstract class AbstractEditPanel<T> extends Composite implements ClickHan
 	/**
 	 * The panel containing the edit buttons
 	 */
-	private final FlowPanel pnlButtonRow = new FlowPanel();
+	protected final FlowPanel pnlButtonRow = new FlowPanel();
 
-	private final Button btnSave;
+	protected final Button btnSave;
 
-	private final Button btnReset, btnDelete, btnCancel;
+	protected final Button btnReset, btnDelete, btnCancel;
 
 	/**
 	 * Constructor

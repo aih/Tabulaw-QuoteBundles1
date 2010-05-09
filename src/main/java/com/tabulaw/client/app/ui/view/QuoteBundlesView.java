@@ -41,7 +41,7 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 		AddQuoteBundleDialog dialog;
 		
 		public NewQuoteBundleButton() {
-			super("New Quote Bundle", Styles.PLUS);
+			super("New Quote Bundle", "plus");
 			dialog = new AddQuoteBundleDialog();
 			dialog.setGlassEnabled(true);
 			setClickHandler(new ClickHandler() {

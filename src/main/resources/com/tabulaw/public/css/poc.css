@@ -53,6 +53,15 @@ div.ro {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
+/* edit panel */
+.entityEdit {
+}
+.entityEdit .btnRow {
+	text-align: center;
+	overflow: hidden;
+	margin-top: 10px;
+}
+
 .gwt-PopupPanelGlass {
 	background-color: #000;
 	opacity: 0.6;
@@ -77,7 +86,6 @@ div.ro {
 	}
 	.gwt-DialogBox .btnRow {
 		width: 200px;
-		overflow: hidden;
 	}
 	.gwt-DialogBox .btnRow .save {
 		float: left;
@@ -375,41 +383,40 @@ div.ro {
 	margin-bottom: 10px;
 }
 
-/* wqbundle */
-.wqbundle {
+/* qbundle */
+.qbundle {
 }
-	.wqbundle .qbheader {
+	.qbundle .qbheader {
 		margin-bottom: 10px;
 		overflow: hidden;
 	}
-		.wqbundle .qbheader .echo {
+		.qbundle .qbheader .echo {
 			text-transform: uppercase;
 			font-family: Arial, Helvetica, sans-serif;
 			font-weight: lighter;
+			font-size: 11px;
+			letter-spacing: 0.7px;
 		}
-		.wqbundle .qbheader .name {
+		.qbundle .qbheader .name {
 			font-size: 20px;
 			border-bottom: 4px solid #BFBFBF/*#D0E4F6*/;
 			margin-top: 2px; /* hack so qb name text doesn't wrap if it extends at or beyond buttons div just above */
 		}
-		.wqbundle .qbheader .desc {
+		.qbundle .qbheader .desc {
 			font-size: 11px;
 		}
-		.wqbundle .buttons {
+		.qbundle .qbbuttons {
 			float: right;
 		} 
-		.wqbundle .buttons img {
+		.qbundle .qbbuttons img {
 			margin-left: 10px;
 			cursor: pointer;
 		} 
-		.wqbundle .buttons .save {
-			padding-bottom: 4px;
-		} 
-	.wqbundle .quotes {
+	.qbundle .quotes {
 		/*height: 100%;*/
 		width: 100%;
 	}
-	.wqbundle .qbcurrent {
+	.qbundle .qbcurrent {
 		border: 3px solid #DFDFDF;
 		-moz-border-radius: 6px;
 		-webkit-border-radius: 6px;
@@ -423,7 +430,6 @@ div.ro {
 	margin-bottom: 5px;
 }
 .wquote .qheader {
-	overflow: hidden; /*clear floats*/
 	/*background-color: #D0E4F6;*/
 	background-color: #DFDFDF;
 	font-family: Arial, Helvetica, sans-serif;
@@ -431,27 +437,28 @@ div.ro {
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 }
-.wquote .cite {
-	padding: 3px;
+.wquote .qheader .topRow {
+	width: 100%;
 }
-.wquote .hlink {
-	float: right;
-	width: 14px;
-	height: 14px;
+.wquote .qheader .title {
+	float: left;
 	margin: 4px;
-	cursor: pointer;
-}
-.wquote .x {
-	float: right;
-	width: 14px;
-	height: 14px;
-	margin: 4px;
-	cursor: pointer;
-}
-.wquote .title {
 	font-weight: bold;
 }
-.wquote .subtitle {
+.wquote .qheader .buttons {
+	float: right;
+}
+.wquote .qheader .buttons img {
+	width: 14px;
+	height: 14px;
+	margin: 4px;
+	cursor: pointer;
+}
+.wquote .qheader .buttons .x {
+	margin-top: 7px;
+}
+.wquote .citation {
+	padding: 3px;
 }
 .wquote .quoted {
 	padding: 2px 1px 0 2px;
@@ -480,7 +487,7 @@ div.ro {
 
 /* docSuggest widget */
 .docSuggest {
-	margin-bottom: 30px;
+	margin-bottom: 5px;
 }
 	.docSuggest .image {
 	}
@@ -488,32 +495,6 @@ div.ro {
 		font-size: 22px;
 		font-weight: bold;
 	}
-	.docSuggest .gwt-SuggestBoxPopup {
-		
-	} 
-		.docSuggest .gwt-SuggestBoxPopup .item {
-			max-width: 400px;
-		}
-			.docSuggest .gwt-SuggestBoxPopup .item .entry {
-				width: 500px;
-				margin: 1px 0 1px 0;
-			}
-				/* full text search entry */
-				.docSuggest .gwt-SuggestBoxPopup .item .entry .query {
-					font-weight: bold;
-				}
-				.docSuggest .gwt-SuggestBoxPopup .item .entry .fts {
-					color: gray;
-				}
-				.docSuggest .gwt-SuggestBoxPopup .item .entry .title {
-				}
-				.docSuggest .gwt-SuggestBoxPopup .item .entry .summary {
-					color: gray;
-					font-size: smaller;
-					white-space: normal;
-				}
-			.docSuggest .gwt-SuggestBoxPopup .item-selected {
-			} 
 
 /* document viewer widget */
 .docView {
@@ -524,11 +505,18 @@ div.ro {
 .docHeader {
 	width: 100%;
 	height: 22px;
-
+}
+.docHeader .imgEdit {
+	float: right;
+	margin: 2px 8px 0 0;
+	cursor: pointer;
+}
+.edit .imgEdit {
+	display: none; /* hide when in doc edit mode */
 }
 .docHeaderLabel {
 	cursor: default;
-	text-transform: uppercase;
+	/*text-transform: uppercase; - Don't do this */
 	font-weight: bold;
 	padding: 3px;
 	font-family: Arial, Helvetica, sans-serif;
@@ -615,7 +603,38 @@ div.ro {
 	.documents .searchDp .header {
 		font-size: 21px;
 	}
-
+	.documents .searchDp .tableView {
+	}
+	.documents .gwt-DisclosurePanel-open {
+		width: 100%;
+	}
+	.documents .gwt-SuggestBoxPopup {
+		font-family: Georgia, "Times New Roman", Times, serif;
+	}
+	.documents .gwt-SuggestBoxPopup .item {
+		/*max-width: 400px;*/
+	}
+		.documents .gwt-SuggestBoxPopup .item .entry {
+			width: 400px;
+			margin: 1px 0 1px 0;
+		}
+			/* full text search entry */
+			.documents .gwt-SuggestBoxPopup .item .entry .query {
+				font-weight: bold;
+			}
+			.documents .gwt-SuggestBoxPopup .item .entry .fts {
+				color: gray;
+			}
+			.documents .gwt-SuggestBoxPopup .item .entry .title {
+			}
+			.documents .gwt-SuggestBoxPopup .item .entry .summary {
+				color: gray;
+				font-size: smaller;
+				white-space: normal;
+			}
+		.documents .gwt-SuggestBoxPopup .item-selected {
+		} 
+	
 	.documents .docSearch {
 	}
 		.docSearch {
@@ -623,6 +642,7 @@ div.ro {
 		}
 		.docSearch .docSuggest {
 			margin-right: 10px;
+			width: 280px; /* hack to get google scholar logo to right align under the search text box */
 		}
 			.docSearch .docSuggest .poweredBy {
 				overflow: hidden;
@@ -640,8 +660,11 @@ div.ro {
 		.docSearch .docSearchListing .head {
 			display: none;
 		}
+		.docSearch .docSearchListing .tableView {
+			width: 100%;
+		}
 			.docSearch .entry {
-				width: 500px;
+				/*width: 400px;*/
 				margin: 1px 0 1px 0;
 			}
 				.docSearch .entry .title {
@@ -700,7 +723,7 @@ div.ro {
 		width: 100%;
 		height: 100%;
 	}
-	.quoteBundle .columns .wqbundle {
+	.quoteBundle .columns .qbundle {
 		width: 200px;
 		margin-left: 3px;
 		margin-right: 3px;
@@ -734,7 +757,7 @@ div.ro {
 		height: 578px; /* otherwise nothing appears! */
 		margin: 0;
 	}
-	.docview .wqbundle {
+	.docview .qbundle {
 		margin: 5px 0 0 5px;
 	}
 	.docview .quotes {
@@ -802,11 +825,13 @@ div.ro {
 	.manageUsers .entityEdit #spw {
 		margin-left: 20px;
 	}
-	.manageUsers .entityEdit .btnRow {
-		margin-top: 10px;
-		text-align: center;
-	}
-	.manageUsers .entityEdit .btnRow button {
+	.manageUsers .updateUser .btnRow button {
 		margin-right: 10px;
+	}
+	.manageUsers .createUser .btnRow .save {
+		float: left;
+	}
+	.manageUsers .createUser .btnRow .cancel {
+		float: right;
 	}
 	
