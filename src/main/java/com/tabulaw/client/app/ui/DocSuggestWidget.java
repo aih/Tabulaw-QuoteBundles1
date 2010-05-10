@@ -10,6 +10,10 @@ import java.util.Date;
 import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -20,6 +24,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestBox;
@@ -57,6 +62,7 @@ import com.tabulaw.common.msg.Msg;
 public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelectionHandlers<String> {
 
 	public static class Styles {
+
 		public static final String DOC_SUGGEST = "docSuggest";
 		public static final String ENTRY = "entry";
 		public static final String TITLE = "title";
@@ -169,8 +175,10 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 	private final FlowPanel pnl = new FlowPanel();
 
 	private final FlowPanel fpPoweredBy = new FlowPanel();
-	
+
 	private final RpcUiHandler uiHandler;
+
+	private final HTML searchPlaceholder;
 
 	/**
 	 * Constructor
@@ -187,6 +195,30 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 		fpPoweredBy.add(imgGglScholarLogo);
 		fpPoweredBy.add(new Label("Search powered by "));
 		pnl.add(fpPoweredBy);
+
+		searchPlaceholder =
+				new HTML("<img src=\"" + Resources.INSTANCE.magnifyingGlass().getURL()
+						+ "\" /><p>e.g. 'New York Times Co. v. Sullivan</p>");
+		searchPlaceholder.setStyleName("searchPlaceholder");
+		searchPlaceholder.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				searchPlaceholder.setVisible(false);
+				docSuggestBox.getTextBox().setFocus(true);
+			}
+		});
+		docSuggestBox.getTextBox().addBlurHandler(new BlurHandler() {
+			
+			@Override
+			public void onBlur(BlurEvent event) {
+				String text = docSuggestBox.getText();
+				if(text.length() < 1) {
+					searchPlaceholder.setVisible(true);
+				}
+			}
+		});
+		pnl.add(searchPlaceholder);
 
 		initWidget(pnl);
 

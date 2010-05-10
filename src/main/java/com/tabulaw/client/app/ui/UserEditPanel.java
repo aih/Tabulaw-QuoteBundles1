@@ -73,6 +73,7 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 		protected FieldGroup generateFieldGroup() {
 			FieldGroup fg = new UserFieldProvider(UserUseCase.UPDATE).getFieldGroup();
 			fg.setEnabled(false); // initial state
+			fg.validateIncrementally(true);
 			return fg;
 		}
 

@@ -5,8 +5,12 @@
  */
 package com.tabulaw.client.app.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
@@ -15,10 +19,10 @@ import com.tabulaw.common.model.QuoteBundle;
  * Quote bundle widget intended for use side by side with a document in view.
  * @author jpk
  */
-public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteDocWidget, AbstractQuoteBundleWidget.Header> {
+public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteBundleDocWidget, QuoteDocWidget, AbstractQuoteBundleWidget.Header> {
 
 	static class DocHeader extends AbstractQuoteBundleWidget.Header {
-		
+
 		public DocHeader() {
 			super();
 		}
@@ -33,25 +37,52 @@ public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteDocWidg
 
 	private JavaScriptObject domDocBodyRef;
 
+	private final IQuoteHandler quoteEventHandler;
+
+	private Map<QuoteDocWidget, HandlerRegistration> hrQuoteEventBindings;
+
 	/**
 	 * Constructor
+	 * @param aQuoteEventHandler optional quote event handler
 	 */
-	public QuoteBundleDocWidget() {
+	public QuoteBundleDocWidget(IQuoteHandler aQuoteEventHandler) {
 		super(new DocHeader());
+		this.quoteEventHandler = aQuoteEventHandler;
 	}
 
+	/**
+	 * Initializes this widget.
+	 * @param aDocId
+	 * @param aDomDocBodyRef
+	 */
 	public void init(String aDocId, JavaScriptObject aDomDocBodyRef) {
 		this.docId = aDocId;
 		this.domDocBodyRef = aDomDocBodyRef;
 	}
 
+	/**
+	 * Must be called to properly un-bind any quote events that may have been
+	 * registered.
+	 */
+	public void clearQuoteEventBindings() {
+		if(hrQuoteEventBindings != null) {
+			for(HandlerRegistration hr : hrQuoteEventBindings.values()) {
+				hr.removeHandler();
+			}
+			hrQuoteEventBindings.clear();
+		}
+	}
+
 	@Override
 	protected QuoteDocWidget getNewQuoteWidget(Quote mQuote) {
-		return new QuoteDocWidget(this, mQuote);
-	}
-	
-	public void highlightQuote() {
-		// TODO impl
+		QuoteDocWidget w = new QuoteDocWidget(this, mQuote);
+		if(quoteEventHandler != null) {
+			if(hrQuoteEventBindings == null) {
+				hrQuoteEventBindings = new HashMap<QuoteDocWidget, HandlerRegistration>();
+			}
+			hrQuoteEventBindings.put(w, w.addQuoteHandler(quoteEventHandler));
+		}
+		return w;
 	}
 
 	@Override
@@ -87,6 +118,9 @@ public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteDocWidg
 		// un-highlight
 		MarkOverlay mark = (MarkOverlay) w.getModel().getMark();
 		if(mark != null) mark.unhighlight();
+
+		// un-bind quote event registration
+		if(hrQuoteEventBindings != null) hrQuoteEventBindings.remove(w);
 
 		return w;
 	}

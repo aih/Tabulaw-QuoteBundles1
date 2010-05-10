@@ -20,6 +20,7 @@ import com.tabulaw.client.DOMExt;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.client.app.ui.DocViewer.ViewMode;
+import com.tabulaw.client.app.ui.QuoteEvent.QuoteType;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;
@@ -46,7 +47,8 @@ import com.tabulaw.common.model.QuoteBundle;
  * existing quotes in the bundle are re-displayed upon widget load.
  * @author jpk
  */
-public class DocHighlightWidget extends AbstractModelChangeAwareWidget implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode> {
+public class DocHighlightWidget extends AbstractModelChangeAwareWidget 
+implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 
 	class DocQuoteDragHandler extends LoggingDragHandler {
 
@@ -103,7 +105,7 @@ public class DocHighlightWidget extends AbstractModelChangeAwareWidget implement
 		SimpleDropController quoteDropController = new SimpleDropController(wDocViewer);
 		quoteController.registerDropController(quoteDropController);
 
-		wDocQuoteBundle = new QuoteBundleDocWidget();
+		wDocQuoteBundle = new QuoteBundleDocWidget(this);
 
 		hsp.add(wDocViewer);
 		hsp.add(wDocQuoteBundle);
@@ -158,6 +160,7 @@ public class DocHighlightWidget extends AbstractModelChangeAwareWidget implement
 		if(crntQbId == null || !crntQbId.equals(crntQb.getId())) {
 			if(crntQbId != null) {
 				wDocQuoteBundle.clearQuotesFromUi();
+				wDocQuoteBundle.clearQuoteEventBindings();
 			}
 			if(Log.isDebugEnabled()) {
 				String from = wDocQuoteBundle.getModel() == null ? "-empty-" : wDocQuoteBundle.getModel().descriptor();
@@ -173,6 +176,16 @@ public class DocHighlightWidget extends AbstractModelChangeAwareWidget implement
 		}
 
 		return false;
+	}
+
+	@Override
+	public void onQuoteEvent(QuoteEvent event) {
+		if(event.getQtype() == QuoteType.CURRENT_PASTE) {
+			QuoteDocWidget qw = (QuoteDocWidget) event.getSource();
+			String quoteText = qw.getModel().getQuote();
+			DocEditWidget dew = wDocViewer.getDocEditWidget();
+			if(dew != null) dew.getFormatter().insertHTML(quoteText);
+		}
 	}
 
 	@Override

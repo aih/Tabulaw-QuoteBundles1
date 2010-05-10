@@ -19,12 +19,15 @@ import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
+import com.tabulaw.client.data.rpc.IRpcHandler;
 import com.tabulaw.client.data.rpc.RpcCommand;
+import com.tabulaw.client.data.rpc.RpcEvent;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.ui.listing.AbstractListingConfig;
 import com.tabulaw.client.ui.listing.Column;
 import com.tabulaw.client.ui.listing.DataListingOperator;
@@ -67,15 +70,15 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		}
 	} // ListingConfig
 
-	static class DocListing extends ModelListingWidget<DocRef, DocListingWidget.Table> /*implements IRpcHandler*/ {
+	static class DocListing extends ModelListingWidget<DocRef, DocListingWidget.Table> implements IRpcHandler {
 
-		//final RpcUiHandler rpcui;
+		final RpcUiHandler rpcui;
 
 		public DocListing() {
 			super(config.getListingId(), config.getListingElementName(), new Table(config), new ListingNavBar<DocRef>(config,
 					null));
-			//rpcui = new RpcUiHandler(this);
-			//addHandler(this, RpcEvent.TYPE);
+			rpcui = new RpcUiHandler(this);
+			addHandler(this, RpcEvent.TYPE);
 		}
 
 		Table getTable() {
@@ -90,17 +93,16 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		@Override
 		public void onModelChangeEvent(ModelChangeEvent event) {
 			if(event.getModelKey() != null && event.getModelKey().getEntityType().equals(EntityType.DOCUMENT.name())) {
+				// NOTE: we don't call super since we are retrieving the entire listing
 				// super.onModelChangeEvent(event);
 				getOperator().refresh();
 			}
 		}
 
-		/*
 		@Override
 		public void onRpcEvent(RpcEvent event) {
 			rpcui.onRpcEvent(event);
 		}
-		*/
 	}
 
 	static class Table extends ModelListingTable<DocRef> {
@@ -130,14 +132,14 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 					break;
 				case 2: {
 					Image img = new Image(Resources.INSTANCE.deleteLarger());
-					img.setTitle("Delete document..");
+					img.setTitle("Remove document..");
 					img.addClickHandler(new ClickHandler() {
 
 						@Override
 						public void onClick(ClickEvent event) {
 							event.stopPropagation();
 							String docref = rowData.getTitle();
-							if(Window.confirm("Delete document '" + docref + "'?")) {
+							if(Window.confirm("Remove document '" + docref + "'?")) {
 
 								// client
 								ClientModelCache.get().remove(rowData.getModelKey(), table);

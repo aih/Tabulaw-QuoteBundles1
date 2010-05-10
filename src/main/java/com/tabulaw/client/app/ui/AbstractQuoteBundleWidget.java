@@ -21,11 +21,12 @@ import com.tabulaw.common.model.QuoteBundle;
 
 /**
  * Widget that displays a quote bundle.
+ * @param <B> this bundle widget type as a generic arg
  * @param <Q> the {@link AbstractQuoteWidget} type
  * @param <H> the quote bundle {@link Header} widget type.
  * @author jpk
  */
-public abstract class AbstractQuoteBundleWidget<Q extends AbstractQuoteWidget, H extends AbstractQuoteBundleWidget.Header> 
+public abstract class AbstractQuoteBundleWidget<B extends AbstractQuoteBundleWidget<B, Q, H>, Q extends AbstractQuoteWidget<B>, H extends AbstractQuoteBundleWidget.Header> 
 extends AbstractModelChangeAwareWidget {
 
 	static final IConverter<String, String> headerDescTextExtractor = new IConverter<String, String>() {
@@ -245,13 +246,14 @@ extends AbstractModelChangeAwareWidget {
 	 * @return Array of existing {@link AbstractQuoteWidget} currently in this
 	 *         widget.
 	 */
-	public final AbstractQuoteWidget[] getQuoteWidgets() {
+	@SuppressWarnings("unchecked")
+	public final List<Q> getQuoteWidgets() {
 		int siz = quotePanel.getWidgetCount();
-		AbstractQuoteWidget[] arr = new AbstractQuoteWidget[siz];
+		ArrayList<Q> list = new ArrayList<Q>(siz);
 		for(int i = 0; i < siz; i++) {
-			arr[i] = (AbstractQuoteWidget) quotePanel.getWidget(i);
+			list.add((Q) quotePanel.getWidget(i));
 		}
-		return arr;
+		return list;
 	}
 
 	/**
@@ -313,7 +315,7 @@ extends AbstractModelChangeAwareWidget {
 		throw new IllegalStateException();
 	}
 
-	private void makeQuoteDraggable(AbstractQuoteWidget qw, boolean draggable) {
+	private void makeQuoteDraggable(Q qw, boolean draggable) {
 		if(dragController == null) return;
 		if(draggable) {
 			if(!qw.draggable) {
@@ -336,8 +338,8 @@ extends AbstractModelChangeAwareWidget {
 	 */
 	public void makeQuotesDraggable(boolean draggable) {
 		if(dragController == null) throw new IllegalStateException();
-		AbstractQuoteWidget[] arr = getQuoteWidgets();
-		for(AbstractQuoteWidget qw : arr) {
+		List<Q> list = getQuoteWidgets();
+		for(Q qw : list) {
 			makeQuoteDraggable(qw, draggable);
 		}
 	}
@@ -346,8 +348,8 @@ extends AbstractModelChangeAwareWidget {
 	 * Remove all quotes from the UI with no model changes.
 	 */
 	public final void clearQuotesFromUi() {
-		AbstractQuoteWidget[] arr = getQuoteWidgets();
-		for(AbstractQuoteWidget qw : arr) {
+		List<Q> list = getQuoteWidgets();
+		for(Q qw : list) {
 			removeQuote(qw.getModel(), false, false);
 		}
 	}
@@ -358,10 +360,11 @@ extends AbstractModelChangeAwareWidget {
 	 * @param quoteId
 	 * @return the index or <code>-1</code> if not found
 	 */
+	@SuppressWarnings("unchecked")
 	protected final int getQuoteWidgetIndex(String quoteId) {
 		int siz = quotePanel.getWidgetCount();
 		for(int i = 0; i < siz; i++) {
-			AbstractQuoteWidget qw = (AbstractQuoteWidget) quotePanel.getWidget(i);
+			Q qw = (Q) quotePanel.getWidget(i);
 			Quote m = qw.getModel();
 			if(m.getId().equals(quoteId)) return i;
 		}

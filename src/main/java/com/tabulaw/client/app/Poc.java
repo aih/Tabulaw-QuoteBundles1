@@ -26,6 +26,7 @@ import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.Position;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
 import com.tabulaw.client.ui.login.UserSessionEvent;
 import com.tabulaw.client.ui.msg.GlobalMsgPanel;
@@ -299,7 +300,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		ViewManager.get().addViewChangeHandler(navRowPanel);
 
 		// initialize the ui msg notifier
-		Notifier.init(navColPanel);
+		Notifier.init(navColPanel, Position.TOP, -20, 0);
 
 		Log.debug("Building complete.");
 	}

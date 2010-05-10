@@ -12,14 +12,14 @@ import com.tabulaw.common.model.Quote;
  * Widget holding quote data for editing eligible for drag and drop ops.
  * @author jpk
  */
-public class QuoteEditWidget extends AbstractQuoteWidget {
+public class QuoteEditWidget extends AbstractQuoteWidget<QuoteBundleEditWidget> {
 
 	/**
 	 * Constructor
 	 * @param parentQuoteBundleWidget
 	 * @param mQuote
 	 */
-	public QuoteEditWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget, Quote mQuote) {
+	public QuoteEditWidget(QuoteBundleEditWidget parentQuoteBundleWidget, Quote mQuote) {
 		super(parentQuoteBundleWidget, mQuote);
 	}
 
@@ -27,7 +27,7 @@ public class QuoteEditWidget extends AbstractQuoteWidget {
 	 * Constructor
 	 * @param parentQuoteBundleWidget
 	 */
-	public QuoteEditWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget) {
+	public QuoteEditWidget(QuoteBundleEditWidget parentQuoteBundleWidget) {
 		super(parentQuoteBundleWidget);
 	}
 

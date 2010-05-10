@@ -19,6 +19,7 @@ import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
@@ -55,17 +56,22 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 		public static final String DOC_HEADER_LABEL = "docHeaderLabel";
 
 		/**
-		 * The scrollable area containing the document body.
-		 */
-		public static final String DOC_PORTAL = "docPortal";
-
-		/**
-		 * Identifies the html tag containing the actual document data.
+		 * Parent container to the doc content.
 		 */
 		public static final String DOC_CONTAINER = "docContainer";
 
 		/**
-		 * Indicates doc view is in edit mode.
+		 * Identifies the html frame tag containing the doc's static html content.
+		 */
+		public static final String DOC_FRAME = "docFrame";
+
+		/**
+		 * Secondary style name indicating doc view is in non-edit (static) mode.
+		 */
+		public static final String STATIC = "static";
+
+		/**
+		 * Secondary style name indicating doc view is in edit mode.
 		 */
 		public static final String EDIT = "edit";
 	} // Styles
@@ -97,6 +103,15 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 		}
 	}
 
+	static class DocFrame extends Frame {
+
+		public DocFrame() {
+			super();
+			setStyleName(Styles.DOC_FRAME);
+			getElement().setAttribute("frameBorder", "0"); // for IE
+		}
+	}
+
 	/**
 	 * docView
 	 */
@@ -108,14 +123,14 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 	private final DocViewHeader header = new DocViewHeader();
 
 	/**
-	 * portal
+	 * container
 	 */
-	private final FlowPanel portal = new FlowPanel();
+	private final FlowPanel container = new FlowPanel();
 
 	/**
 	 * The iframe tag in which the doc is loaded.
 	 */
-	private final Frame frame;
+	private final DocFrame frame;
 
 	private DocEditWidget dew;
 
@@ -129,19 +144,19 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 	public DocViewer() {
 		super();
 
-		pnl.setStyleName(Styles.DOC_VIEW);
+		pnl.setStylePrimaryName(Styles.DOC_VIEW);
 		pnl.add(header);
 
-		portal.addStyleName(Styles.DOC_PORTAL);
-		pnl.add(portal);
+		container.addStyleName(Styles.DOC_CONTAINER);
+		pnl.add(container);
 
-		frame = new Frame();
-		// frame.getElement().setId(Styles.DOC_CONTAINER_ID);
-		frame.setStyleName(Styles.DOC_CONTAINER);
-		frame.getElement().setAttribute("frameBorder", "0"); // for IE
-		portal.add(frame);
+		frame = new DocFrame();
+		container.add(frame);
 
 		initWidget(pnl);
+
+		// set initial styling..
+		staticMode();
 	}
 
 	public DocRef getModel() {
@@ -155,7 +170,7 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 	public String getFrameId() {
 		return mDocument == null ? null : "docframe_" + mDocument.getId();
 	}
-	
+
 	/**
 	 * @return the DOM iframe body ref of the contained document.
 	 */
@@ -177,10 +192,10 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 		// header
 		String html = mDocument.getTitle();
 		header.html.setHTML("<p>" + html + "</p>");
-		//header.html.setTitle("Double click to edit");
-		
+		// header.html.setTitle("Double click to edit");
+
 		header.imgEdit.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
 				if(dew == null) {
@@ -209,7 +224,7 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 
 					dew = new DocEditWidget();
 					dew.setVisible(false);
-					portal.add(dew);
+					container.add(dew);
 				}
 
 				if(!dew.isVisible()) {
@@ -217,9 +232,9 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 				}
 			}
 		});
-		
+
 		// disallow doc editing for case type docs
-		header.imgEdit.setVisible(mDocument.getCaseRef() == null);	
+		header.imgEdit.setVisible(mDocument.getCaseRef() == null);
 
 		// doc content
 		frame.getElement().setId(getFrameId());
@@ -260,7 +275,13 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 	 * Sets the mode to edit.
 	 */
 	private void editMode() {
-		pnl.addStyleName(Styles.EDIT);
+		pnl.removeStyleDependentName(Styles.STATIC);
+		pnl.addStyleDependentName(Styles.EDIT);
+
+		// so qb doc col can know which doc mode we are in
+		RootPanel.get().removeStyleName("docview-static");
+		RootPanel.get().addStyleName("docview-edit");
+
 		dew.setHTML(getDocHtml());
 		frame.setVisible(false);
 		dew.setVisible(true);
@@ -278,17 +299,21 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 	 * Sets the mode to static.
 	 */
 	private void staticMode() {
+		pnl.addStyleDependentName(Styles.STATIC);
+		pnl.removeStyleDependentName(Styles.EDIT);
+
+		// so qb doc col can know which doc mode we are in
+		RootPanel.get().addStyleName("docview-static");
+		RootPanel.get().removeStyleName("docview-edit");
+
 		frame.setVisible(true);
-		dew.setVisible(false);
-		pnl.removeStyleName(Styles.EDIT);
-
-		dew.getEditBar().removeFromParent();
-		header.html.setTitle("Double click to edit");
-
-		Poc.getNavCol().removeWidget(btnSave);
-		Poc.getNavCol().removeWidget(btnCancel);
-
-		ValueChangeEvent.fire(this, ViewMode.STATIC);
+		if(dew != null) {
+			dew.setVisible(false);
+			dew.getEditBar().removeFromParent();
+			Poc.getNavCol().removeWidget(btnSave);
+			Poc.getNavCol().removeWidget(btnCancel);
+			ValueChangeEvent.fire(this, ViewMode.STATIC);
+		}
 	}
 
 	public Widget[] getNavColWidgets() {

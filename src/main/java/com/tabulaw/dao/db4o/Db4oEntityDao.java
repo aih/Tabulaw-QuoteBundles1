@@ -71,6 +71,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void registerCallbacks(ObjectContainer oc) {
 		final EventRegistry registry = EventRegistryFactory.forObjectContainer(oc);
 
@@ -89,6 +90,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	 * Timestamper
 	 * @author jpk
 	 */
+	@SuppressWarnings("unchecked")
 	static class Timestamper implements EventListener4 {
 
 		static final Log log = LogFactory.getLog(Timestamper.class);
@@ -118,6 +120,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	 * Versioner
 	 * @author jpk
 	 */
+	@SuppressWarnings("unchecked")
 	static class Versioner implements EventListener4 {
 
 		static final Log log = LogFactory.getLog(Versioner.class);

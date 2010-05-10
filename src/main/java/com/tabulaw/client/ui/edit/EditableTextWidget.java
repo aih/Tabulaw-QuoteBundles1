@@ -66,6 +66,7 @@ public class EditableTextWidget extends TextField implements HasHTML {
 	public EditableTextWidget(IConverter<String, String> html2text, IConverter<String, String> text2html) {
 		super("tfield", null, null, null, 30);
 		if(html2text == null || text2html == null) throw new NullPointerException();
+		setTitle("Click to edit..");
 		((TextBox) getEditable()).setTitle("'Enter' to save or 'Esc' to cancel");
 		this.html2text = html2text;
 		this.text2html = text2html;

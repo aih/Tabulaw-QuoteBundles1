@@ -27,7 +27,7 @@ import com.tabulaw.common.model.QuoteBundle;
  * Supports editing capabilty for a quote bundle.
  * @author jpk
  */
-public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWidget, QuoteBundleEditWidget.EditHeader> {
+public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundleEditWidget, QuoteEditWidget, QuoteBundleEditWidget.EditHeader> {
 
 	static class Styles {
 
@@ -57,7 +57,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteEditWi
 			super();
 
 			delete = new Image(Resources.INSTANCE.deleteLarger());
-			delete.setTitle("Delete Quote Bundle..");
+			delete.setTitle("Remove Quote Bundle..");
 			delete.setStyleName(Styles.DELETE);
 			delete.addClickHandler(new ClickHandler() {
 

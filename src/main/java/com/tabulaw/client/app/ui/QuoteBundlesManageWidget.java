@@ -81,7 +81,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 
 			QuoteEditWidget draggedQuoteWidget = (QuoteEditWidget) context.draggable;
 			QuoteBundleEditWidget sourceQuoteBundleWidget =
-					(QuoteBundleEditWidget) draggedQuoteWidget.getParentQuoteBundleWidget();
+					draggedQuoteWidget.getParentQuoteBundleWidget();
 
 			// identify the target quote bundle widget (recipient of draggable)
 			final QuoteBundleEditWidget targetQuoteBundleWidget;
@@ -168,6 +168,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		// initialize quote bundle dragging
 		quoteBundleController = new PickupDragController(boundaryPanel, false);
 		quoteBundleController.setBehaviorMultipleSelection(false);
+		quoteBundleController.setBehaviorDragStartSensitivity(3);
 		quoteBundleHandler = new QuoteBundleDragHandler();
 		quoteBundleController.addDragHandler(quoteBundleHandler);
 		quoteBundleDropController = new HorizontalPanelDropController(columns);
@@ -176,6 +177,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		// initialize quote dragging
 		quoteController = new PickupDragController(boundaryPanel, false);
 		quoteController.setBehaviorMultipleSelection(false);
+		quoteController.setBehaviorDragStartSensitivity(3);
 		quoteHandler = new QuoteDragHandler();
 		quoteController.addDragHandler(quoteHandler);
 
@@ -358,10 +360,9 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		qbDropBindings.put(qbw, quoteDropController);
 
 		// add a quote widget for each contained quote in the bundle
-		AbstractQuoteWidget[] quoteWidgets = qbw.getQuoteWidgets();
-		for(int i = 0; i < quoteWidgets.length; i++) {
+		List<QuoteEditWidget> quoteWidgets = qbw.getQuoteWidgets();
+		for(QuoteEditWidget qw : quoteWidgets) {
 			// make quote widget draggable to other quote bundle widgets
-			AbstractQuoteWidget qw = quoteWidgets[i];
 			quoteController.makeDraggable(qw, qw.getDragHandle());
 		}
 	}

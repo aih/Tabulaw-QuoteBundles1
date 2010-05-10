@@ -7,6 +7,7 @@ package com.tabulaw.client.app.ui;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -20,6 +21,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
+import com.tabulaw.client.data.rpc.IHasQuoteHandlers;
 import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.ui.toolbar.Toolbar;
@@ -29,9 +31,10 @@ import com.tabulaw.common.model.Quote;
 
 /**
  * Base class for widgets displaying quotes.
+ * @param <B> bundle widget type
  * @author jpk
  */
-public abstract class AbstractQuoteWidget extends Composite {
+public abstract class AbstractQuoteWidget<B extends AbstractQuoteBundleWidget<?, ?, ?>> extends Composite implements IHasQuoteHandlers {
 
 	static class Header extends Composite {
 
@@ -71,6 +74,10 @@ public abstract class AbstractQuoteWidget extends Composite {
 			buttonsPanel.add(button);
 		}
 
+		public void insertButton(Widget button, int beforeIndex) {
+			buttonsPanel.insert(button, beforeIndex);
+		}
+
 		public void setQuoteTitle(String title) {
 			this.title.setHTML("<p>" + title + "</p>");
 		}
@@ -101,7 +108,7 @@ public abstract class AbstractQuoteWidget extends Composite {
 
 	protected final QuoteBlock quoteBlock = new QuoteBlock();
 
-	protected final AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget;
+	protected final B parentQuoteBundleWidget;
 
 	protected boolean draggable;
 
@@ -111,7 +118,7 @@ public abstract class AbstractQuoteWidget extends Composite {
 	 * Constructor
 	 * @param parentQuoteBundleWidget required
 	 */
-	public AbstractQuoteWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget) {
+	public AbstractQuoteWidget(B parentQuoteBundleWidget) {
 		super();
 		this.parentQuoteBundleWidget = parentQuoteBundleWidget;
 
@@ -189,12 +196,12 @@ public abstract class AbstractQuoteWidget extends Composite {
 	 * @param parentQuoteBundleWidget
 	 * @param quote
 	 */
-	public AbstractQuoteWidget(AbstractQuoteBundleWidget<?, ?> parentQuoteBundleWidget, Quote quote) {
+	public AbstractQuoteWidget(B parentQuoteBundleWidget, Quote quote) {
 		this(parentQuoteBundleWidget);
 		setModel(quote);
 	}
 
-	public final AbstractQuoteBundleWidget<?, ?> getParentQuoteBundleWidget() {
+	public final B getParentQuoteBundleWidget() {
 		return parentQuoteBundleWidget;
 	}
 
@@ -230,6 +237,11 @@ public abstract class AbstractQuoteWidget extends Composite {
 
 	public void addHeaderButton(Widget button) {
 		header.addButton(button);
+	}
+
+	@Override
+	public final HandlerRegistration addQuoteHandler(IQuoteHandler handler) {
+		return addHandler(handler, QuoteEvent.TYPE);
 	}
 
 	/**

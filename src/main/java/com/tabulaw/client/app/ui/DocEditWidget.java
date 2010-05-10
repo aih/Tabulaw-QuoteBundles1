@@ -10,12 +10,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasHTML;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.RichTextArea.Formatter;
-import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.ui.toolbar.Toolbar;
 
 
@@ -28,15 +26,12 @@ public class DocEditWidget extends Composite implements HasHTML {
 	class EditBar extends Composite implements ClickHandler {
 		private final FlowPanel pnl = new FlowPanel();
 		private final Toolbar toolbar = new Toolbar();
-		private final Image imgPencil = new Image(Resources.INSTANCE.edit());
 		private final PushButton btnBold;
 
 		public EditBar() {
 			super();
-			imgPencil.setStyleName("pencil");
 			btnBold = new PushButton("bold", this);
 			
-			toolbar.add(imgPencil);
 			toolbar.addButton(btnBold, "Toggle Bold");
 			
 			pnl.setStyleName("editBar");

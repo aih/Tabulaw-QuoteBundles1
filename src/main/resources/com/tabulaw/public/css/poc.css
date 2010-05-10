@@ -139,7 +139,6 @@ div.ro {
 	}
 	.navButton-doc {
 		background: url(../images/document-icon.png) left no-repeat transparent;
-		width: 60px;
 		font-size: 11px;
 		font-weight: normal;
 		overflow: hidden;
@@ -153,6 +152,13 @@ div.ro {
 	}
 	.navButton-plus {
 		text-align: center;
+	}
+	.gwt-TabBarItem .navButton-doc {
+		width: 60px;
+	}
+	.gwt-TabBarItem-selected .navButton-doc {
+		width: inherit;
+		font-weight: bold;
 	}
 
 #navCol {
@@ -294,6 +300,7 @@ div.ro {
 	}
 	.navRow .gwt-TabBarItem span {
 		color: #7F7F7F;
+		float: left;
 	}
 	.navRow .gwt-TabBarItem-selected {
 		background-color: #BFBFBF;
@@ -500,7 +507,7 @@ div.ro {
 .docView {
 	width: 100%;
 }
-.docPortal {
+.docContainer {
 }
 .docHeader {
 	width: 100%;
@@ -511,7 +518,7 @@ div.ro {
 	margin: 2px 8px 0 0;
 	cursor: pointer;
 }
-.edit .imgEdit {
+.docView-edit .imgEdit {
 	display: none; /* hide when in doc edit mode */
 }
 .docHeaderLabel {
@@ -528,7 +535,7 @@ div.ro {
 	-moz-border-radius-bottomleft: 2px;
 	-webkit-border-bottom-left-radius: 2px;
 }
-.docContainer { 
+.docFrame { 
 	width: 100%;
 	height: 553px;
 	border: 0;
@@ -640,12 +647,29 @@ div.ro {
 		.docSearch {
 			overflow: hidden;
 		}
+
+		.searchPlaceholder {
+			overflow: hidden;
+			margin: -56px 0 0 5px;
+			position: absolute;
+		}
+		.searchPlaceholder * {
+			color: #BFBFBF;
+		}
+		.searchPlaceholder img, .searchPlaceholder p {
+			float: left;
+		}
+		.searchPlaceholder p {
+			margin: 5px;
+		}
+
 		.docSearch .docSuggest {
 			margin-right: 10px;
 			width: 280px; /* hack to get google scholar logo to right align under the search text box */
 		}
 			.docSearch .docSuggest .poweredBy {
 				overflow: hidden;
+				margin: 4px;
 			}
 			.docSearch .docSuggest .poweredBy .gwt-Label {
 				float: right;
@@ -685,9 +709,6 @@ div.ro {
 			color: #BFBFBF;
 		}
 
-	.documents .tableView .portal {
-		/*height: 200px;*/
-	}
 	.documents .tableView .head {
 		font-family: Arial, Helvetica, sans-serif !important;
 		text-transform: uppercase !important;
@@ -775,6 +796,9 @@ div.ro {
 		max-height: 50px;
 		overflow: hidden;
 	}
+.docview-static .copyQuoteIcon {
+	display: none; /* hide when in doc edit mode */
+}
 
 /* Users view */
 .manageUsers {
@@ -786,6 +810,9 @@ div.ro {
 		float: left;
 		font-family: Arial, Helvetica, sans-serif !important;
 		margin-bottom: 10px; /* when horiz viewing area forces the edit panel below the table */
+	}
+	.manageUsers .tableView table {
+		width: inherit;
 	}
 	.manageUsers .tableView .head {
 		color: #7F7F7F;

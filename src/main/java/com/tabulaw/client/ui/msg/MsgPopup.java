@@ -62,6 +62,32 @@ public class MsgPopup extends PopupPanel implements IMsgOperator {
 	}
 
 	/**
+	 * Constructor
+	 * @param refWidget
+	 * @param offsetTop 
+	 * @param offsetLeft 
+	 */
+	public MsgPopup(Widget refWidget, int offsetTop, int offsetLeft) {
+		this();
+		setRefWidget(refWidget);
+		setRefWidgetOffset(offsetTop, offsetLeft);
+	}
+
+	/**
+	 * Constructor
+	 * @param refWidget
+	 * @param position
+	 * @param offsetTop 
+	 * @param offsetLeft 
+	 */
+	public MsgPopup(Widget refWidget, Position position, int offsetTop, int offsetLeft) {
+		this();
+		setRefWidget(refWidget);
+		setPosition(position);
+		setRefWidgetOffset(offsetTop, offsetLeft);
+	}
+
+	/**
 	 * @return The number of contained messages.
 	 */
 	public int getNumMsgs() {

@@ -126,7 +126,14 @@ public class EntityFactory {
 		e.setCitation(citation);
 		e.setParties(parties);
 		e.setUrl(url);
-		if(year != null) e.setYear(Integer.parseInt(year));
+		if(year != null) {
+			try {
+				e.setYear(Integer.parseInt(year));
+			}
+			catch(NumberFormatException ex) {
+				// ok
+			}
+		}
 		return e;
 	}
 
