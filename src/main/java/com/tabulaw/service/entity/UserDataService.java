@@ -361,6 +361,21 @@ public class UserDataService extends AbstractEntityService {
 		}
 		
 		validate(quote);
+		
+		// get the doc ref from the db to avoid having multiple docs of the same id persisted!
+		// NOTE: this is a db40 specific issue
+		DocRef persistedDoc = null;
+		try {
+			persistedDoc = dao.load(DocRef.class, quote.getDocument().getId());
+			assert persistedDoc != null;
+			quote.setDocument(persistedDoc);
+		}
+		catch(EntityNotFoundException e) {
+			// presume doc exists on filesystem but not in db
+			// persist it
+			persistedDoc = dao.persist(quote.getDocument());
+		}
+		
 		Quote persistedQuote = dao.persist(quote);
 		qb.addQuote(persistedQuote);
 		dao.persist(qb);

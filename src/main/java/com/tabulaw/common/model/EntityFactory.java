@@ -166,14 +166,7 @@ public class EntityFactory {
 	public DocRef buildCaseDoc(String docTitle, String docHash, Date docDate, String parties, String citation, String url,
 			String year) {
 		DocRef doc = buildDoc(docTitle, docHash, docDate);
-		
-		CaseRef caseRef = buildCase(parties, citation, url, year);
-		caseRef.setParties(parties);
-		caseRef.setCitation(citation);
-		caseRef.setUrl(url);
-		if(year != null) caseRef.setYear(Integer.parseInt(year));
-		doc.setCaseRef(caseRef);
-
+		doc.setCaseRef(buildCase(parties, citation, url, year));
 		return doc;
 	}
 

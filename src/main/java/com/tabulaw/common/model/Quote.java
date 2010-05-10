@@ -6,6 +6,7 @@
 package com.tabulaw.common.model;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -96,6 +97,7 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	 * @return The serialized token holding data for client-side text to be
 	 *         highlighted.
 	 */
+	//@NotNull
 	public String getSerializedMark() {
 		return serializedMark;
 	}
@@ -114,6 +116,7 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 
 	@Valid
 	@Reference
+	@NotNull
 	public DocRef getDocument() {
 		return document;
 	}

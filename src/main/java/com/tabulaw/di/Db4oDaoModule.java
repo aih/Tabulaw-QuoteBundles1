@@ -30,6 +30,7 @@ import com.google.inject.Scopes;
 import com.tabulaw.common.model.BundleUserBinding;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.DocUserBinding;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
@@ -117,13 +118,14 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 	 */
 	protected void configureConfiguration(EmbeddedConfiguration c) {
 		CommonConfiguration cc = c.common();
-		cc.objectClass(User.class).updateDepth(2);
-		cc.objectClass(UserState.class).updateDepth(1);
-		cc.objectClass(CaseRef.class).updateDepth(1);
-		cc.objectClass(DocRef.class).updateDepth(2);
+		cc.objectClass(User.class).updateDepth(0);
+		cc.objectClass(UserState.class).updateDepth(0);
+		cc.objectClass(CaseRef.class).updateDepth(0);
+		cc.objectClass(DocRef.class).updateDepth(0);
 		cc.objectClass(Quote.class).updateDepth(1);
 		cc.objectClass(QuoteBundle.class).updateDepth(2);
-		cc.objectClass(BundleUserBinding.class).updateDepth(1);
+		cc.objectClass(BundleUserBinding.class).updateDepth(0);
+		cc.objectClass(DocUserBinding.class).updateDepth(0);
 	}
 
 	/**
