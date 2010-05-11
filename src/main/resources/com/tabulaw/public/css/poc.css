@@ -709,6 +709,14 @@ div.ro {
 			color: #BFBFBF;
 		}
 
+	.documents .btnRow {
+		overflow: hidden;
+	}
+	.documents .btnRow .navButton {
+		float: left;
+		margin-right: 15px;
+	}
+
 	.documents .tableView .head {
 		font-family: Arial, Helvetica, sans-serif !important;
 		text-transform: uppercase !important;

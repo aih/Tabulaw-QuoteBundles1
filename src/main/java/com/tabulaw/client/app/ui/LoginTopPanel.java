@@ -207,27 +207,25 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 			public void onClick(ClickEvent event) {
 				switch(mode) {
 					case FORGOT_PASSWORD: {
+						msgPanel.remove(MsgLevel.INFO); // clear initial view mode help text
 						IFieldWidget<String> femail = loginFieldPanel.getFieldGroup().getFieldWidget("userEmail");
-						if(!femail.isValid()) {
-							msgPanel.add(new Msg("Your email address must be specified for password retrieval.", MsgLevel.ERROR),
-									null);
-							return;
+						if(femail.isValid()) {
+							String emailAddress = femail.getValue();
+							Poc.getUserRegisterService().requestPassword(emailAddress, new AsyncCallback<Payload>() {
+	
+								@Override
+								public void onSuccess(Payload result) {
+									switchMode(Mode.LOGIN);
+									msgPanel.add(result.getStatus().getMsgs(), null);
+								}
+	
+								@Override
+								public void onFailure(Throwable caught) {
+									switchMode(Mode.LOGIN);
+									msgPanel.add(new Msg("An error occurred while sending the reminder email.", MsgLevel.ERROR), null);
+								}
+							});
 						}
-						String emailAddress = femail.getValue();
-						Poc.getUserRegisterService().requestPassword(emailAddress, new AsyncCallback<Payload>() {
-
-							@Override
-							public void onSuccess(Payload result) {
-								switchMode(Mode.LOGIN);
-								msgPanel.add(result.getStatus().getMsgs(), null);
-							}
-
-							@Override
-							public void onFailure(Throwable caught) {
-								switchMode(Mode.LOGIN);
-								msgPanel.add(new Msg("An error occurred while sending the reminder email.", MsgLevel.ERROR), null);
-							}
-						});
 						break;
 					}
 					case LOGIN:

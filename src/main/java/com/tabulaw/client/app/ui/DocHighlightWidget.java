@@ -181,10 +181,19 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode>,
 	@Override
 	public void onQuoteEvent(QuoteEvent event) {
 		if(event.getQtype() == QuoteType.CURRENT_PASTE) {
-			QuoteDocWidget qw = (QuoteDocWidget) event.getSource();
-			String quoteText = qw.getModel().getQuote();
 			DocEditWidget dew = wDocViewer.getDocEditWidget();
-			if(dew != null) dew.getFormatter().insertHTML(quoteText);
+			if(dew != null) {
+				QuoteDocWidget qw = (QuoteDocWidget) event.getSource();
+				Quote q = qw.getModel();
+				DocRef docRef = q.getDocument();
+				String htmlQuote = q.getQuote(); 
+				
+				// append citation in italics if a case doc
+				if(docRef.isCaseDoc()) {
+					htmlQuote += "<i> - " + docRef.getCitation() + "</i>";
+				}
+				dew.getFormatter().insertHTML(htmlQuote);
+			}
 		}
 	}
 

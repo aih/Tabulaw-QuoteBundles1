@@ -14,15 +14,14 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.tabulaw.schema.BusinessKeyDef;
-import com.tabulaw.schema.BusinessObject;
-
 /**
  * NOTE: No surrogate primary key is needed here.
  * @author jpk
  */
-@BusinessObject(businessKeys = @BusinessKeyDef(name = "Doc Hash", properties = { "hash"
-}))
+// NO business keys since this is the primary key!
+// @BusinessObject(businessKeys = @BusinessKeyDef(name = "Doc Hash", properties
+// = { "hash"
+// }))
 public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEntity {
 
 	private static final long serialVersionUID = -8257785916791525146L;
@@ -75,6 +74,23 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	@Override
 	public String getEntityType() {
 		return EntityType.DOCUMENT.name();
+	}
+
+	/**
+	 * Is this a document for a case or a non-case doc?
+	 * @return true/false
+	 */
+	public boolean isCaseDoc() {
+		return caseRef != null;
+	}
+
+	/**
+	 * Provides the citation text if this is a case doc or <code>null</code>
+	 * if not a case doc.
+	 * @return the citation text or <code>null</code>
+	 */
+	public String getCitation() {
+		return caseRef == null ? null : caseRef.getCitation();
 	}
 
 	@NotEmpty
@@ -144,44 +160,21 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 		return title != null && o.title != null ? title.compareTo(o.title) : 0;
 	}
 
-	/*
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((hash == null) ? 0 : hash.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if(this == obj) return true;
-		if(!super.equals(obj)) return false;
-		if(getClass() != obj.getClass()) return false;
-		DocRef other = (DocRef) obj;
-		if(hash == null) {
-			if(other.hash != null) return false;
-		}
-		else if(!hash.equals(other.hash)) return false;
-		return true;
-	}
-	*/
-	
 	@Override
 	public Object getPropertyValue(String propertyPath) {
-		
+
 		if("title".equals(propertyPath) || "name".equals(propertyPath)) {
 			return getTitle();
 		}
-		
+
 		if("hash".equals(propertyPath)) {
 			return getHash();
 		}
-		
+
 		if("date".equals(propertyPath)) {
 			return getHash();
 		}
-		
+
 		return null;
 	}
 

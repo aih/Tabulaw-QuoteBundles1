@@ -21,21 +21,19 @@ public class QuoteDocWidget extends AbstractQuoteWidget<QuoteBundleDocWidget> {
 	public QuoteDocWidget(QuoteBundleDocWidget parentQuoteBundleWidget, Quote mQuote) {
 		super(parentQuoteBundleWidget, mQuote);
 		
-		if(mQuote.getDocument() != null && mQuote.getDocument().getCaseRef() == null) {
-			// add quote copy icon
-			Image img = new Image(Resources.INSTANCE.plus());
-			img.setTitle("Copy to cursor");
-			img.addStyleName("copyQuoteIcon");
-			img.addClickHandler(new ClickHandler() {
-	
-				@Override
-				public void onClick(ClickEvent event) {
-					// fire a quote paste event
-					QuoteEvent.fireQuoteEvent(QuoteDocWidget.this, QuoteType.CURRENT_PASTE);
-				}
-			});
-			header.insertButton(img, 0);
-		}
+		// add quote copy icon
+		Image img = new Image(Resources.INSTANCE.plus());
+		img.setTitle("Copy to cursor");
+		img.addStyleName("copyQuoteIcon");
+		img.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// fire a quote paste event
+				QuoteEvent.fireQuoteEvent(QuoteDocWidget.this, QuoteType.CURRENT_PASTE);
+			}
+		});
+		header.insertButton(img, 0);
 	}
 
 	@Override

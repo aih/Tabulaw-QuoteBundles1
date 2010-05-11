@@ -5,11 +5,6 @@
  */
 package com.tabulaw.client.app.ui.view;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.app.ui.AbstractButton;
-import com.tabulaw.client.app.ui.DocUploadDialog;
 import com.tabulaw.client.app.ui.DocsWidget;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
@@ -47,31 +42,7 @@ public class DocsView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	class DocUploadButton extends AbstractButton {
-
-		private DocUploadButton() {
-			super("Upload", null);
-			setClickHandler(new ClickHandler() {
-				
-				@Override
-				public void onClick(ClickEvent event) {
-					if(docUploadDialog == null) docUploadDialog = new DocUploadDialog();
-					docUploadDialog.center();
-				}
-			});
-		}
-
-		@Override
-		protected String getTitleText(String buttonText) {
-			return "Upload one or more documents...";
-		}
-	}
-	
 	private final DocsWidget docsWidget = new DocsWidget();
-	
-	private DocUploadDialog docUploadDialog;
-	
-	private final DocUploadButton btnDocUpload = new DocUploadButton();
 	
 	/**
 	 * Constructor
@@ -88,11 +59,6 @@ public class DocsView extends AbstractPocView<StaticViewInitializer> {
 	@Override
 	public ViewClass getViewClass() {
 		return klas;
-	}
-
-	@Override
-	public Widget[] getNavColWidgets() {
-		return new Widget[] { btnDocUpload };
 	}
 
 	@Override
