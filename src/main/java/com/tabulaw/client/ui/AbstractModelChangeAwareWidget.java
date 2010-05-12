@@ -41,6 +41,8 @@ public abstract class AbstractModelChangeAwareWidget extends Composite implement
 
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
-		Log.debug("Handling model change: " + event);
+		String cn = getClass().getName();
+		cn = cn.substring(cn.lastIndexOf('.') + 1);
+		Log.debug("MCE on(" + cn + "): " + event);
 	}
 }
