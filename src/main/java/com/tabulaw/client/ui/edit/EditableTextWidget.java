@@ -49,6 +49,7 @@ public class EditableTextWidget extends TextField implements HasHTML {
 
 	private HandlerRegistration hrMouseOver, hrMouseOut, hrClick, hrKeyDown, hrBlur;
 	private String origValue;
+	private boolean rollback;
 
 	/**
 	 * Constructor
@@ -107,14 +108,17 @@ public class EditableTextWidget extends TextField implements HasHTML {
 				@Override
 				public void onKeyDown(KeyDownEvent event) {
 					if(event.getNativeKeyCode() == KeyCodes.KEY_ESCAPE) {
-						if(origValue != null) setHTML(origValue);
+						/*
+						if(origValue != null) {
+							getEditable().setValue(extractText(origValue), false);
+						}
+						setReadOnly(true);
+						*/
+						rollback = true;
 						setReadOnly(true);
 					}
 					else if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-						String changedValue = getEditable().getValue();
-						getReadOnlyWidget().setHTML(text2html.convert(changedValue));
-						setReadOnly(true);
-						ValueChangeEvent.fireIfNotEqual(EditableTextWidget.this, html2text.convert(origValue), changedValue);
+						getEditable().setFocus(false);	// force a blur to trigger onBlur event
 					}
 				}
 			});
@@ -123,7 +127,13 @@ public class EditableTextWidget extends TextField implements HasHTML {
 				
 				@Override
 				public void onBlur(BlurEvent event) {
-					setReadOnly(true);
+					if(!rollback) {
+						String changedValue = getEditable().getValue();
+						setHTML(text2html.convert(changedValue));
+						setReadOnly(true);
+						ValueChangeEvent.fireIfNotEqual(EditableTextWidget.this, extractText(origValue), changedValue);
+					}
+					rollback = false; // reset
 				}
 			});
 			
@@ -173,7 +183,6 @@ public class EditableTextWidget extends TextField implements HasHTML {
 	@Override
 	public void setHTML(String html) {
 		getReadOnlyWidget().setHTML(html);
-		//((TextBox) getEditable()).setText(extractText(html));
 	}
 	
 	public void revert() {

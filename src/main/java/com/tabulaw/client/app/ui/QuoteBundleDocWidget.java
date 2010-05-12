@@ -104,7 +104,7 @@ public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteBundleD
 				if(mark != null) mark.highlight();
 			}
 			catch(Throwable t) {
-				Log.error("Unable to re-highlight quote.");
+				Log.error("Unable to [re-]highlight quote: " + t.getMessage());
 			}
 		}
 

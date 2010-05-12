@@ -134,7 +134,7 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 		docListingHeader.add(lblDocuments);
 		docListingHeader.add(lblSummary);
 		
-		btnDocUpload.setStyleName("btnRow");
+		btnPanel.setStyleName("btnRow");
 		btnPanel.add(btnDocUpload);
 		btnPanel.add(btnNewDoc);
 		docListingHeader.add(btnPanel);

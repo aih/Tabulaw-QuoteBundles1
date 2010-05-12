@@ -186,7 +186,7 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode>,
 				QuoteDocWidget qw = (QuoteDocWidget) event.getSource();
 				Quote q = qw.getModel();
 				DocRef docRef = q.getDocument();
-				String htmlQuote = q.getQuote(); 
+				String htmlQuote = "\"" + q.getQuote() + "\"";
 				
 				// append citation in italics if a case doc
 				if(docRef.isCaseDoc()) {

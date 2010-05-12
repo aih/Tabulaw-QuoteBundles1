@@ -277,7 +277,7 @@ extends AbstractModelChangeAwareWidget {
 		}
 		// add to the ui
 		Q qw = getNewQuoteWidget(mQuote);
-		quotePanel.add(qw);
+		quotePanel.insert(qw, 0); // add to head
 		if(qw != null) makeQuoteDraggable(qw, true);
 		return qw;
 	}
@@ -378,6 +378,8 @@ extends AbstractModelChangeAwareWidget {
 	 * @param bundleToSyncTo
 	 */
 	public final void sync(QuoteBundle bundleToSyncTo) {
+		header.setModel(bundleToSyncTo);
+		
 		// wrap in new lists to avoid concurrent mod exception!
 		List<Quote> existingQuotes = new ArrayList<Quote>(bundle.getQuotes());
 		List<Quote> changedQuotes = new ArrayList<Quote>(bundleToSyncTo.getQuotes());
