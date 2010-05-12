@@ -38,7 +38,7 @@ import com.tabulaw.client.ui.listing.ModelListingTable;
 import com.tabulaw.client.ui.listing.ModelListingWidget;
 import com.tabulaw.common.data.ListingOp;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
-import com.tabulaw.common.data.rpc.DocFetchPayload;
+import com.tabulaw.common.data.rpc.DocHashPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
@@ -190,7 +190,7 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 			final CaseDocSearchResult caseDoc = getRowData(rowIndex);
 			if(caseDoc == null) return;
 			final String docRemoteUrl = caseDoc.getUrl();
-			new RpcCommand<DocFetchPayload>() {
+			new RpcCommand<DocHashPayload>() {
 
 				@Override
 				protected void doExecute() {
@@ -205,7 +205,7 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 				}
 
 				@Override
-				protected void handleSuccess(DocFetchPayload result) {
+				protected void handleSuccess(DocHashPayload result) {
 					super.handleSuccess(result);
 					if(result.hasErrors()) {
 						Notifier.get().showFor(result);

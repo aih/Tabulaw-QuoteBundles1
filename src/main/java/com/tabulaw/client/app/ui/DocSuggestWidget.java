@@ -43,7 +43,7 @@ import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.ui.msg.Msgs;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
-import com.tabulaw.common.data.rpc.DocFetchPayload;
+import com.tabulaw.common.data.rpc.DocHashPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
@@ -242,7 +242,7 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 					if(mDoc == null) {
 						Log.debug("Fetching remote doc: " + docRemoteUrl);
 
-						new RpcCommand<DocFetchPayload>() {
+						new RpcCommand<DocHashPayload>() {
 
 							@Override
 							protected void doExecute() {
@@ -257,7 +257,7 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 							}
 
 							@Override
-							protected void handleSuccess(DocFetchPayload result) {
+							protected void handleSuccess(DocHashPayload result) {
 								super.handleSuccess(result);
 								if(result.hasErrors()) {
 									Msgs.post(result.getStatus().getMsgs(Msg.MsgAttr.EXCEPTION.flag), docSuggestBox);

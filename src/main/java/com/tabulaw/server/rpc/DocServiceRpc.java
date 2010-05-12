@@ -16,11 +16,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.ConstraintViolationException;
+
 import org.apache.commons.io.FileUtils;
 
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
-import com.tabulaw.common.data.rpc.DocFetchPayload;
+import com.tabulaw.common.data.rpc.DocHashPayload;
 import com.tabulaw.common.data.rpc.DocListingPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
@@ -44,7 +46,7 @@ import com.tabulaw.util.StringUtil;
  * Back-end support for rpc document tasks.
  * @author jpk
  */
-public class DocService extends RpcServlet implements IDocService {
+public class DocServiceRpc extends RpcServlet implements IDocService {
 
 	private static final long serialVersionUID = -7006228091616946540L;
 
@@ -67,6 +69,47 @@ public class DocService extends RpcServlet implements IDocService {
 			if(handler.getDocDataType() == dataProviderType) return handler;
 		}
 		return null;
+	}
+
+	@Override
+	public DocHashPayload createDoc(DocRef docRef) {
+		Status status = new Status();
+		DocHashPayload payload = new DocHashPayload(status);
+		
+		final PersistContext pc = getPersistContext();
+		final UserContext uc = getUserContext();
+		
+		try {
+			if(docRef == null || !docRef.isNew()) throw new IllegalArgumentException("Null or non-new document");
+
+			User user = uc.getUser();
+			
+			int userHash = user.hashCode();
+			int cti = Long.valueOf(System.currentTimeMillis()).hashCode();
+			int hash = Math.abs(userHash ^ cti);
+			String filename = DocUtils.createNewDoc(hash);
+			
+			// persist the doc user binding
+			docRef.setHash(filename);
+			UserDataService uds = pc.getUserDataService();
+			/*DocRef persistedDoc = */uds.saveDocForUser(uc.getUser().getId(), docRef);
+			
+			payload.setDocHash(filename);
+			status.addMsg("Document created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final ConstraintViolationException cve) {
+			PersistHelper.handleValidationException(pc, cve, payload);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+		
+		return payload;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -151,9 +194,9 @@ public class DocService extends RpcServlet implements IDocService {
 	}
 
 	@Override
-	public DocFetchPayload fetch(String remoteDocUrl) {
+	public DocHashPayload fetch(String remoteDocUrl) {
 		Status status = new Status();
-		DocFetchPayload payload = new DocFetchPayload(status);
+		DocHashPayload payload = new DocHashPayload(status);
 		payload.setRemoteUrl(remoteDocUrl);
 
 		if(StringUtil.isEmpty(remoteDocUrl)) {

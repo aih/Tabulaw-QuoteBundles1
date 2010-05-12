@@ -224,6 +224,27 @@ public class DocUtils {
 	public static int docHash(String remoteUrl) {
 		return Math.abs(remoteUrl.hashCode());
 	}
+	
+	/**
+	 * Creates a new file on disk given a unique doc hash.
+	 * @param docHash doc hash for which to create a new file
+	 * @return the local doc filename
+	 * @throws IllegalArgumentException When the doc file already exists
+	 * @throws IOException Upon error writing doc to disk 
+	 */
+	public static String createNewDoc(int docHash) throws IllegalArgumentException, IOException {
+		File docDir = getDocDirRef();
+		File fdoc = new File(docDir.getPath() + File.separator + localDocFilename(docHash));
+		if(fdoc.exists()) throw new IllegalArgumentException("Doc already exists for hash: " + docHash);
+		
+		// write to disk
+		StringBuilder sb = new StringBuilder();
+		// TODO set actual doc title
+		localizeDoc(sb, "New Document");
+		FileUtils.writeStringToFile(fdoc, sb.toString());
+		
+		return fdoc.getName();
+	}
 
 	/**
 	 * Creates the local doc filename given the raw hash code.
@@ -238,7 +259,7 @@ public class DocUtils {
 	}
 
 	/**
-	 * "Localizes" the odc by injecting local css and js blocks needed for
+	 * "Localizes" doc html content by injecting local css and js blocks needed for
 	 * client-side doc functionality if not already present.
 	 * <p>
 	 * Also, wraps the given html string with html, head, body tags if not present

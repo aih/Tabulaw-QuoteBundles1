@@ -13,14 +13,21 @@ import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
+import com.tabulaw.client.data.rpc.RpcCommand;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.mvc.ViewManager;
+import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
+import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.common.data.rpc.DocHashPayload;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 
@@ -72,10 +79,42 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 
 				@Override
 				public void onClick(ClickEvent event) {
-					DocRef newDoc = EntityFactory.get().buildDoc("New Doc", "TODO", new Date());
-					ClientModelCache.get().persist(newDoc, null);
-					ViewManager.get().loadView(new DocViewInitializer(newDoc.getModelKey()));
-					// TODO fix and finish
+					// TODO use dialog to get these doc properties
+					String docTitle = "New Document";
+					Date docDate = new Date();
+					final DocRef newDoc = EntityFactory.get().buildDoc(docTitle, null, docDate);
+					
+					// get docs from server
+					new RpcCommand<DocHashPayload>() {
+
+						@Override
+						protected void doExecute() {
+							setSource(NewDocButton.this);
+							Poc.getDocService().createDoc(newDoc, this);
+						}
+
+						@Override
+						protected void handleSuccess(DocHashPayload result) {
+							super.handleSuccess(result);
+							Notifier.get().showFor(result);
+							if(!result.hasErrors()) {
+								// persist the new doc and propagate through app
+								newDoc.setHash(result.getDocHash());
+								ClientModelCache.get().persist(newDoc, NewDocButton.this);
+
+								DeferredCommand.addCommand(new Command() {
+
+									@Override
+									public void execute() {
+										// show the doc (letting the model change event finish
+										// first)
+										final DocViewInitializer dvi = new DocViewInitializer(newDoc.getModelKey());
+										ViewManager.get().dispatch(new ShowViewRequest(dvi));
+									}
+								});
+							}
+						}
+					}.execute();
 				}
 			});
 		}
@@ -133,7 +172,7 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 		lblSummary.setStyleName(Styles.DOC_LISTING_HEADER_SUMMARY);
 		docListingHeader.add(lblDocuments);
 		docListingHeader.add(lblSummary);
-		
+
 		btnPanel.setStyleName("btnRow");
 		btnPanel.add(btnDocUpload);
 		btnPanel.add(btnNewDoc);

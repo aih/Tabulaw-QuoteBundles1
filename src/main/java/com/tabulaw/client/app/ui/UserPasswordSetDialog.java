@@ -118,6 +118,8 @@ public class UserPasswordSetDialog extends Dialog implements IEditHandler<FieldG
 		editPanel.setErrorHandler(ehd, true);
 		
 		final IFieldWidget<?> fpassword = fieldPanel.getFieldGroup().getFieldWidget("userPswd");
-		DeferredCommand.addCommand(new FocusCommand(fpassword, true));
+		
+		// TODO fix this doesn't work for lord knows why
+		DeferredCommand.addCommand(new FocusCommand(fpassword.getEditable(), true));
 	}
 }

@@ -9,10 +9,10 @@ import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
 
 /**
- * Remote doc fetch payload.
+ * Transport for a single doc hash token.
  * @author jpk
  */
-public class DocFetchPayload extends Payload {
+public class DocHashPayload extends Payload {
 
 	/**
 	 * The url pointing to the original remote document.
@@ -29,7 +29,7 @@ public class DocFetchPayload extends Payload {
 	/**
 	 * Constructor
 	 */
-	public DocFetchPayload() {
+	public DocHashPayload() {
 		super();
 	}
 
@@ -37,7 +37,7 @@ public class DocFetchPayload extends Payload {
 	 * Constructor
 	 * @param status
 	 */
-	public DocFetchPayload(Status status) {
+	public DocHashPayload(Status status) {
 		super(status);
 	}
 

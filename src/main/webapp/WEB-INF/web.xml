@@ -136,11 +136,11 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>DocService</servlet-name>
-		<servlet-class>com.tabulaw.server.rpc.DocService</servlet-class>
+		<servlet-name>DocServiceRpc</servlet-name>
+		<servlet-class>com.tabulaw.server.rpc.DocServiceRpc</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>DocService</servlet-name>
+		<servlet-name>DocServiceRpc</servlet-name>
 		<url-pattern>/poc/doc</url-pattern>
 	</servlet-mapping>
 

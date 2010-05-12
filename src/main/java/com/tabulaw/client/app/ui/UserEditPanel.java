@@ -9,10 +9,12 @@ import java.util.Date;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.UIObject;
 import com.tabulaw.client.app.field.UserFieldProvider;
 import com.tabulaw.client.app.field.UserFieldProvider.UserUseCase;
+import com.tabulaw.client.ui.FocusCommand;
 import com.tabulaw.client.ui.SimpleHyperLink;
 import com.tabulaw.client.ui.edit.AbstractEditPanel;
 import com.tabulaw.client.ui.field.AbstractFieldPanel;
@@ -237,6 +239,10 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 			default:
 				throw new IllegalStateException();
 		}
+		
+		// set focus to user name field
+		DeferredCommand.addCommand(new FocusCommand(getFieldPanel().getFieldGroup().getFieldWidget("userName"), true));
+		
 		this.mode = mode;
 	}
 }
