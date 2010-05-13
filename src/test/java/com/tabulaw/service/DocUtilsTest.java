@@ -3,7 +3,7 @@
  * @author jpk
  * @since Mar 26, 2010
  */
-package com.tabulaw.server;
+package com.tabulaw.service;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

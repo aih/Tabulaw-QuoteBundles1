@@ -3,7 +3,7 @@
  * @author jpk
  * @since Mar 26, 2010
  */
-package com.tabulaw.server.scrape;
+package com.tabulaw.service.scrape;
 
 /**
  * Base class for all doc handlers.

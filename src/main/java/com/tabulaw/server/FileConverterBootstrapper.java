@@ -15,10 +15,10 @@ import org.apache.commons.logging.LogFactory;
 
 import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
 import com.google.inject.Injector;
-import com.tabulaw.server.convert.FileConverterDelegate;
-import com.tabulaw.server.convert.HtmlPassThroughFileConverter;
-import com.tabulaw.server.convert.IFileConverter;
-import com.tabulaw.server.convert.OpenOfficeFileConverter;
+import com.tabulaw.service.convert.FileConverterDelegate;
+import com.tabulaw.service.convert.HtmlPassThroughFileConverter;
+import com.tabulaw.service.convert.IFileConverter;
+import com.tabulaw.service.convert.OpenOfficeFileConverter;
 
 /**
  * Boots up needed resources to do uploaded doc to html conversions.

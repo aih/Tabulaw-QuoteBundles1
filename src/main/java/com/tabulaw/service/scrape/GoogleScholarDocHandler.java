@@ -3,7 +3,7 @@
  * @author jpk
  * @since Mar 26, 2010
  */
-package com.tabulaw.server.scrape;
+package com.tabulaw.service.scrape;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -20,7 +20,7 @@ import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
-import com.tabulaw.server.DocUtils;
+import com.tabulaw.service.DocUtils;
 import com.tabulaw.util.StringUtil;
 
 /**

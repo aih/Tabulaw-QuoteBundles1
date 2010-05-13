@@ -3,7 +3,7 @@
  * @author jpk
  * @since Apr 5, 2010
  */
-package com.tabulaw.server.convert;
+package com.tabulaw.service.convert;
 
 import java.io.File;
 import java.net.URL;
@@ -12,9 +12,9 @@ import junit.framework.Assert;
 
 import org.testng.annotations.Test;
 
-import com.tabulaw.server.convert.IFileConverter;
-import com.tabulaw.server.convert.OpenOfficeFileConverter;
-import com.tabulaw.server.convert.IFileConverter.FileType;
+import com.tabulaw.service.convert.IFileConverter;
+import com.tabulaw.service.convert.OpenOfficeFileConverter;
+import com.tabulaw.service.convert.IFileConverter.FileType;
 
 /**
  * @author jpk

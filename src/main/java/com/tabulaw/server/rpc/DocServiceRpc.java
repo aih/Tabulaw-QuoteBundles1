@@ -34,12 +34,12 @@ import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.User.Role;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
-import com.tabulaw.server.DocUtils;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
-import com.tabulaw.server.scrape.GoogleScholarDocHandler;
-import com.tabulaw.server.scrape.IDocHandler;
+import com.tabulaw.service.DocUtils;
 import com.tabulaw.service.entity.UserDataService;
+import com.tabulaw.service.scrape.GoogleScholarDocHandler;
+import com.tabulaw.service.scrape.IDocHandler;
 import com.tabulaw.util.StringUtil;
 
 /**

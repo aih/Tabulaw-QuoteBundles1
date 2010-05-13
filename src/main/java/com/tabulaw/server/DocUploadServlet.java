@@ -26,8 +26,9 @@ import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
-import com.tabulaw.server.convert.IFileConverter;
-import com.tabulaw.server.convert.IFileConverter.FileType;
+import com.tabulaw.service.DocUtils;
+import com.tabulaw.service.convert.IFileConverter;
+import com.tabulaw.service.convert.IFileConverter.FileType;
 import com.tabulaw.util.StringUtil;
 
 /**

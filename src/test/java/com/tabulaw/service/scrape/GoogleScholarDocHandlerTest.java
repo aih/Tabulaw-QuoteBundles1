@@ -3,7 +3,7 @@
  * @author jpk
  * @since Mar 19, 2010
  */
-package com.tabulaw.server.scrape;
+package com.tabulaw.service.scrape;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,9 @@ import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
-import com.tabulaw.server.DocUtils;
+import com.tabulaw.service.DocUtils;
+import com.tabulaw.service.scrape.GoogleScholarDocHandler;
+import com.tabulaw.service.scrape.IDocHandler;
 import com.tabulaw.util.ClassUtil;
 
 /**

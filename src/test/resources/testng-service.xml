@@ -1,14 +1,14 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="client-persist-tests">
   
-  <test name="server-tests" annotations="JDK">
+  <test name="service-tests" annotations="JDK">
     <groups>
       <run>
-        <include name="server" />
+        <include name="service" />
       </run>
     </groups>
     <packages>
-      <package name="com.tabulaw.server.*" />
+      <package name="com.tabulaw.service.*" />
     </packages>
   </test>
 
