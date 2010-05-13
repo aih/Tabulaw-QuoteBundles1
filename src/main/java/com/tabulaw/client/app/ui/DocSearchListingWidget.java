@@ -5,7 +5,6 @@
  */
 package com.tabulaw.client.app.ui;
 
-import java.util.Date;
 import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
@@ -38,12 +37,11 @@ import com.tabulaw.client.ui.listing.ModelListingTable;
 import com.tabulaw.client.ui.listing.ModelListingWidget;
 import com.tabulaw.common.data.ListingOp;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
-import com.tabulaw.common.data.rpc.DocHashPayload;
+import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.dao.Sorting;
 
 /**
@@ -190,7 +188,7 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 			final CaseDocSearchResult caseDoc = getRowData(rowIndex);
 			if(caseDoc == null) return;
 			final String docRemoteUrl = caseDoc.getUrl();
-			new RpcCommand<DocHashPayload>() {
+			new RpcCommand<DocPayload>() {
 
 				@Override
 				protected void doExecute() {
@@ -205,15 +203,13 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 				}
 
 				@Override
-				protected void handleSuccess(DocHashPayload result) {
+				protected void handleSuccess(DocPayload result) {
 					super.handleSuccess(result);
 					if(result.hasErrors()) {
 						Notifier.get().showFor(result);
 						return;
 					}
-					final DocRef mNewDoc =
-							EntityFactory.get().buildCaseDoc(caseDoc.getTitle(), result.getDocHash(), new Date(), null,
-									caseDoc.getCitation(), caseDoc.getUrl(), null);
+					final DocRef mNewDoc = result.getDocRef();
 
 					// persist the new doc and propagate through app
 					ClientModelCache.get().persist(mNewDoc, Table.this);

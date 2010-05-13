@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * FlowPanelFieldComposer - Lays out fields in a flow style having the following
+ * Lays out fields utilizing horizontal and vertical panels with the following
  * attributes:
  * <ol>
  * <li>Field labels are placed on top of the field
@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
  * </ol>
  * @author jpk
  */
-public class FlowPanelFieldComposer extends AbstractFieldComposer implements HasAlignment {
+public class CellFieldComposer extends AbstractFieldComposer implements HasAlignment {
 
 	/**
 	 * Styles - (field.css)
@@ -55,7 +55,7 @@ public class FlowPanelFieldComposer extends AbstractFieldComposer implements Has
 	/**
 	 * Constructor
 	 */
-	public FlowPanelFieldComposer() {
+	public CellFieldComposer() {
 		super();
 	}
 

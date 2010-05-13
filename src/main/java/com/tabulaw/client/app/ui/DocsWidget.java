@@ -5,31 +5,17 @@
  */
 package com.tabulaw.client.app.ui;
 
-import java.util.Date;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.tabulaw.client.app.Poc;
-import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.view.DocViewInitializer;
-import com.tabulaw.client.data.rpc.RpcCommand;
 import com.tabulaw.client.model.ModelChangeEvent;
-import com.tabulaw.client.mvc.ViewManager;
-import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
-import com.tabulaw.client.ui.Notifier;
-import com.tabulaw.common.data.rpc.DocHashPayload;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
 
 /**
  * Single widget containing:
@@ -72,6 +58,8 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 	}
 
 	static class NewDocButton extends AbstractButton {
+		
+		private DocCreateDialog dlg;
 
 		private NewDocButton() {
 			super("New", null);
@@ -79,42 +67,11 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 
 				@Override
 				public void onClick(ClickEvent event) {
-					// TODO use dialog to get these doc properties
-					String docTitle = "New Document";
-					Date docDate = new Date();
-					final DocRef newDoc = EntityFactory.get().buildDoc(docTitle, null, docDate);
-					
-					// get docs from server
-					new RpcCommand<DocHashPayload>() {
-
-						@Override
-						protected void doExecute() {
-							setSource(NewDocButton.this);
-							Poc.getDocService().createDoc(newDoc, this);
-						}
-
-						@Override
-						protected void handleSuccess(DocHashPayload result) {
-							super.handleSuccess(result);
-							Notifier.get().showFor(result);
-							if(!result.hasErrors()) {
-								// persist the new doc and propagate through app
-								newDoc.setHash(result.getDocHash());
-								ClientModelCache.get().persist(newDoc, NewDocButton.this);
-
-								DeferredCommand.addCommand(new Command() {
-
-									@Override
-									public void execute() {
-										// show the doc (letting the model change event finish
-										// first)
-										final DocViewInitializer dvi = new DocViewInitializer(newDoc.getModelKey());
-										ViewManager.get().dispatch(new ShowViewRequest(dvi));
-									}
-								});
-							}
-						}
-					}.execute();
+					if(dlg == null) {
+						dlg = new DocCreateDialog();
+						dlg.setGlassEnabled(true);
+					}
+					dlg.center();
 				}
 			});
 		}

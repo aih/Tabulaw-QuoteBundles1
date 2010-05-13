@@ -14,7 +14,7 @@ import com.tabulaw.client.ui.field.AbstractFieldGroupProvider;
 import com.tabulaw.client.ui.field.AbstractFieldPanel;
 import com.tabulaw.client.ui.field.FieldFactory;
 import com.tabulaw.client.ui.field.FieldGroup;
-import com.tabulaw.client.ui.field.FlowPanelFieldComposer;
+import com.tabulaw.client.ui.field.CellFieldComposer;
 import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.ui.field.IFieldWidget;
 import com.tabulaw.client.validate.IValidator;
@@ -81,7 +81,7 @@ public class AddQuoteBundlePanel extends AbstractFieldPanel {
 	static class Renderer implements IFieldRenderer<FlowPanel> {
 
 		public void render(FlowPanel panel, FieldGroup fg) {
-			final FlowPanelFieldComposer cmpsr = new FlowPanelFieldComposer();
+			final CellFieldComposer cmpsr = new CellFieldComposer();
 			cmpsr.setCanvas(panel);
 			cmpsr.addField(fg.getFieldWidget("qbName"));
 			cmpsr.newRow();

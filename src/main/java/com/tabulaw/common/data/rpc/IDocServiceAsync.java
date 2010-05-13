@@ -13,11 +13,11 @@ import com.tabulaw.common.model.DocRef;
  */
 public interface IDocServiceAsync {
 	
-	void createDoc(DocRef docRef, AsyncCallback<DocHashPayload> callback);
+	void createDoc(DocRef docRef, AsyncCallback<DocPayload> callback);
 	
 	void search(DocSearchRequest request, AsyncCallback<DocSearchPayload> callback);
 	
-	void fetch(String url, AsyncCallback<DocHashPayload> callback);
+	void fetch(String url, AsyncCallback<DocPayload> callback);
 	
 	void getCachedDocs(AsyncCallback<DocListingPayload> callback);
 }

@@ -6,7 +6,6 @@
 package com.tabulaw.client.app.ui;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
@@ -43,12 +42,12 @@ import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.ui.msg.Msgs;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
-import com.tabulaw.common.data.rpc.DocHashPayload;
+import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
+import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.msg.Msg;
 
 /**
@@ -242,7 +241,7 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 					if(mDoc == null) {
 						Log.debug("Fetching remote doc: " + docRemoteUrl);
 
-						new RpcCommand<DocHashPayload>() {
+						new RpcCommand<DocPayload>() {
 
 							@Override
 							protected void doExecute() {
@@ -257,26 +256,25 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 							}
 
 							@Override
-							protected void handleSuccess(DocHashPayload result) {
+							protected void handleSuccess(DocPayload result) {
 								super.handleSuccess(result);
 								if(result.hasErrors()) {
 									Msgs.post(result.getStatus().getMsgs(Msg.MsgAttr.EXCEPTION.flag), docSuggestBox);
 									return;
 								}
-								final DocRef mNewDoc =
-										EntityFactory.get().buildCaseDoc(caseDoc.getTitle(), result.getDocHash(), new Date(), null,
-												caseDoc.getCitation(), caseDoc.getUrl(), null);
+								
+								final DocRef docRef = result.getDocRef();
+								final ModelKey docKey = docRef.getModelKey();
 
 								// persist the new doc and propagate through app
-								ClientModelCache.get().persist(mNewDoc, DocSuggestWidget.this);
-
+								ClientModelCache.get().persist(docRef, DocSuggestWidget.this);
 								DeferredCommand.addCommand(new Command() {
 
 									@Override
 									public void execute() {
 										// show the doc (letting the model change event finish
 										// first)
-										final DocViewInitializer dvi = new DocViewInitializer(mNewDoc.getModelKey());
+										final DocViewInitializer dvi = new DocViewInitializer(docKey);
 										ViewManager.get().dispatch(new ShowViewRequest(dvi));
 									}
 								});

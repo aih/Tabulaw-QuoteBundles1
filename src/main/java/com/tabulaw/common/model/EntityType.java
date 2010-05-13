@@ -17,7 +17,6 @@ import com.tabulaw.ITypeDescriptorProvider;
  */
 public enum EntityType implements IMarshalable, ITypeDescriptorProvider {
 
-	AUTHORITY("Authority"),
 	USER("User"),
 	USER_STATE("User State"),
 

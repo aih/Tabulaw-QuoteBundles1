@@ -22,7 +22,7 @@ public interface IDocService extends RemoteService {
 	 * @param docRef the new doc entity
 	 * @return the doc hash wrapped in a payload
 	 */
-	DocHashPayload createDoc(DocRef docRef);
+	DocPayload createDoc(DocRef docRef);
 
 	/**
 	 * Provides search results for the given doc request.
@@ -35,7 +35,7 @@ public interface IDocService extends RemoteService {
 	 * @param remoteDocUrl http url of the remote doc to fetch
 	 * @return
 	 */
-	DocHashPayload fetch(String remoteDocUrl);
+	DocPayload fetch(String remoteDocUrl);
 
 	/**
 	 * Gets the cached docs from the server.

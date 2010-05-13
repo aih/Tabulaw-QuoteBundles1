@@ -22,8 +22,8 @@ import org.apache.commons.io.FileUtils;
 
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
-import com.tabulaw.common.data.rpc.DocHashPayload;
 import com.tabulaw.common.data.rpc.DocListingPayload;
+import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.IDocService;
@@ -72,9 +72,9 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 	}
 
 	@Override
-	public DocHashPayload createDoc(DocRef docRef) {
+	public DocPayload createDoc(DocRef docRef) {
 		Status status = new Status();
-		DocHashPayload payload = new DocHashPayload(status);
+		DocPayload payload = new DocPayload(status);
 		
 		final PersistContext pc = getPersistContext();
 		final UserContext uc = getUserContext();
@@ -92,9 +92,9 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 			// persist the doc user binding
 			docRef.setHash(filename);
 			UserDataService uds = pc.getUserDataService();
-			/*DocRef persistedDoc = */uds.saveDocForUser(uc.getUser().getId(), docRef);
+			DocRef persistedDoc = uds.saveDocForUser(uc.getUser().getId(), docRef);
 			
-			payload.setDocHash(filename);
+			payload.setDocRef(persistedDoc);
 			status.addMsg("Document created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final ConstraintViolationException cve) {
@@ -194,10 +194,9 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 	}
 
 	@Override
-	public DocHashPayload fetch(String remoteDocUrl) {
+	public DocPayload fetch(String remoteDocUrl) {
 		Status status = new Status();
-		DocHashPayload payload = new DocHashPayload(status);
-		payload.setRemoteUrl(remoteDocUrl);
+		DocPayload payload = new DocPayload(status);
 
 		if(StringUtil.isEmpty(remoteDocUrl)) {
 			status.addMsg("No remote doc url specified.", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag | MsgAttr.STATUS.flag);
@@ -237,7 +236,7 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 			else {
 				mDoc = DocUtils.deserializeDocument(f);
 			}
-			payload.setDocHash(docHash);
+			payload.setDocRef(mDoc);
 
 			// persist the doc user binding
 			PersistContext pc = getPersistContext();
@@ -252,10 +251,6 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 		catch(IOException e) {
 			e.printStackTrace();
 			RpcServlet.exceptionToStatus(e, status);
-		}
-
-		if(!status.hasErrors()) {
-			payload.setRemoteUrl(remoteDocUrl);
 		}
 
 		return payload;

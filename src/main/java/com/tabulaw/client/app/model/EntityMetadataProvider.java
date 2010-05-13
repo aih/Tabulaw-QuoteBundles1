@@ -52,7 +52,7 @@ public final class EntityMetadataProvider {
 		metadata.put(EntityType.CASE, metaCase);
 		metaCase.put("citation", new PropertyMetadata(PropertyType.STRING, false, true, 255));
 		metaCase.put("parties", new PropertyMetadata(PropertyType.STRING, false, true, 255));
-		metaCase.put("year", new PropertyMetadata(PropertyType.STRING, false, true, 255));
+		metaCase.put("year", new PropertyMetadata(PropertyType.STRING, false, true, 4));
 		// metaDocument.put("extractHtml", new PropertyMetadata(PropertyType.STRING,
 		// false, true, -1));
 		metaCase.put("url", new PropertyMetadata(PropertyType.STRING, false, true, -1));

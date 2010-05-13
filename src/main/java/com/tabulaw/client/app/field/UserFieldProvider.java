@@ -13,7 +13,6 @@ import com.tabulaw.client.ui.GridRenderer;
 import com.tabulaw.client.ui.field.AbstractFieldGroupProvider;
 import com.tabulaw.client.ui.field.CheckboxField;
 import com.tabulaw.client.ui.field.DateField;
-import com.tabulaw.client.ui.field.FieldFactory;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.ui.field.PasswordField;
 import com.tabulaw.client.ui.field.RadioGroupField;
@@ -26,7 +25,7 @@ import com.tabulaw.schema.PropertyMetadata;
 import com.tabulaw.util.StringUtil;
 
 /**
- * Generates user related fields according to user case.
+ * Generates user related fields by use case.
  * @author jpk
  */
 public class UserFieldProvider extends AbstractFieldGroupProvider {
@@ -70,7 +69,7 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 
 		if(useCase == UserUseCase.CREATE || useCase == UserUseCase.UPDATE || useCase == UserUseCase.REGISTER) {
 			// name
-			TextField fname = FieldFactory.ftext("userName", "name", "Name", "Name", visibleLen);
+			TextField fname = ftext("userName", "name", "Name", "Name", visibleLen);
 			fname.setPropertyMetadata(metamap.get("name"));
 			fg.addField(fname);
 		}
@@ -107,13 +106,13 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 			}
 			GridRenderer userRolesRenderer = new GridRenderer(roles.length, null);
 			RadioGroupField<Role> fuserRoles =
-					FieldFactory.fradiogroup("userRoles", "roles", "Role", "The user roles", dataMap, userRolesRenderer);
+					fradiogroup("userRoles", "roles", "Role", "The user roles", dataMap, userRolesRenderer);
 			fg.addField(fuserRoles);
 		}
 
 		// password
 		if(useCase == UserUseCase.PASSWORD_SET || useCase == UserUseCase.LOGIN || useCase == UserUseCase.REGISTER || useCase == UserUseCase.CREATE) {
-			PasswordField password = FieldFactory.fpassword("userPswd", "password", "Password", "Specify a password", visibleLen);
+			PasswordField password = fpassword("userPswd", "password", "Password", "Specify a password", visibleLen);
 			password.setPropertyMetadata(metamap.get("password"));
 			fg.addField(password);
 		}
@@ -121,7 +120,7 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 		// confirm password
 		if(useCase == UserUseCase.PASSWORD_SET || useCase == UserUseCase.REGISTER || useCase == UserUseCase.CREATE) {
 			PasswordField passwordConfirm =
-					FieldFactory.fpassword("userPswdConfirm", "passwordConfirm", "Confirm Password", "Confirm your password", visibleLen);
+					fpassword("userPswdConfirm", "passwordConfirm", "Confirm Password", "Confirm your password", visibleLen);
 			passwordConfirm.setPropertyMetadata(metamap.get("password"));
 			fg.addField(passwordConfirm);
 		

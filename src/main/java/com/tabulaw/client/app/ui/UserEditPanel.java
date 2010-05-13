@@ -19,7 +19,7 @@ import com.tabulaw.client.ui.SimpleHyperLink;
 import com.tabulaw.client.ui.edit.AbstractEditPanel;
 import com.tabulaw.client.ui.field.AbstractFieldPanel;
 import com.tabulaw.client.ui.field.FieldGroup;
-import com.tabulaw.client.ui.field.FlowPanelFieldComposer;
+import com.tabulaw.client.ui.field.CellFieldComposer;
 import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.ui.field.IFieldWidget;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
@@ -44,7 +44,7 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 
 				@Override
 				public void render(FlowPanel widget, FieldGroup fg) {
-					final FlowPanelFieldComposer cmpsr = new FlowPanelFieldComposer();
+					final CellFieldComposer cmpsr = new CellFieldComposer();
 					cmpsr.setCanvas(widget);
 					cmpsr.addField(fg.getFieldWidget("userName"));
 					cmpsr.addField(fg.getFieldWidget("userEmail"));
@@ -86,7 +86,7 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 				@Override
 				public void render(FlowPanel widget, FieldGroup fg) {
 
-					final FlowPanelFieldComposer cmpsr = new FlowPanelFieldComposer();
+					final CellFieldComposer cmpsr = new CellFieldComposer();
 					cmpsr.setCanvas(widget);
 					cmpsr.addField(fg.getFieldWidget("userName"));
 					cmpsr.newRow();

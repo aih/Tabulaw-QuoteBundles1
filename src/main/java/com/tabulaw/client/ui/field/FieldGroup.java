@@ -194,17 +194,19 @@ public final class FieldGroup implements IField, Iterable<IField> {
 	private static void verifyAddField(final IField f, FieldGroup group) throws IllegalArgumentException {
 		assert group != null;
 		if(f == null) throw new IllegalArgumentException("No field specified.");
-		final boolean isWidget = (f instanceof IFieldWidget<?>);
+//		final boolean isWidget = (f instanceof IFieldWidget<?>);
 		for(final IField ef : group) {
 			if(f.getName().equals(ef.getName())) {
 				throw new IllegalArgumentException("Field name: '" + f.getName() + "' already exists.");
 			}
+			/* bad logic
 			if(isWidget && (ef instanceof IFieldWidget<?>)) {
 				if(((IFieldWidget<?>) f).getPropertyName().equals(((IFieldWidget<?>) ef).getPropertyName())) {
 					throw new IllegalArgumentException("Field property name: '" + ((IFieldWidget<?>) f).getPropertyName()
 							+ "' already exists.");
 				}
 			}
+			*/
 			if(ef instanceof FieldGroup) {
 				verifyAddField(f, (FieldGroup) ef);
 			}
