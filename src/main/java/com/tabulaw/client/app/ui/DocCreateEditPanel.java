@@ -5,23 +5,18 @@
  */
 package com.tabulaw.client.app.ui;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.tabulaw.client.app.field.DocFieldProvider;
 import com.tabulaw.client.app.field.DocFieldProvider.DocUseCase;
-import com.tabulaw.client.ui.GridRenderer;
 import com.tabulaw.client.ui.edit.FieldGroupEditPanel;
 import com.tabulaw.client.ui.field.AbstractFieldPanel;
+import com.tabulaw.client.ui.field.CellFieldComposer;
 import com.tabulaw.client.ui.field.FieldFactory;
 import com.tabulaw.client.ui.field.FieldGroup;
-import com.tabulaw.client.ui.field.CellFieldComposer;
 import com.tabulaw.client.ui.field.IFieldRenderer;
-import com.tabulaw.client.ui.field.RadioGroupField;
+import com.tabulaw.client.ui.field.RadioField;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
 
 /**
@@ -33,7 +28,7 @@ import com.tabulaw.client.validate.ErrorHandlerBuilder;
  */
 public class DocCreateEditPanel extends FieldGroupEditPanel {
 
-	static class FieldPanel extends AbstractFieldPanel {
+	class FieldPanel extends AbstractFieldPanel {
 
 		@Override
 		protected FieldGroup generateFieldGroup() {
@@ -46,33 +41,35 @@ public class DocCreateEditPanel extends FieldGroupEditPanel {
 			fg.addField(fgNonCaseDoc);
 
 			// add doc type selection radio button
-			Map<String, String> dataMap = new LinkedHashMap<String, String>();
-			dataMap.put("case", "Google Scholar Case");
-			dataMap.put("noncase", "Editable");
-			GridRenderer docTypeRenderer = new GridRenderer(2, null);
-			RadioGroupField<String> fDocType =
-					FieldFactory.fradiogroup("docType", null, "Document Type", "Select the document to create", dataMap,
-							docTypeRenderer);
-			fg.addField(fDocType);
+			RadioField fDocTypeCase = FieldFactory.fradio("docTypeCase", "docType", null, "Google Scholar document", "Select for fetch a remote Google Scholar document");
+			fDocTypeCase.addStyleName("headerCaseDoc");
+			fg.addField(fDocTypeCase);
+			
+			RadioField fDocTypeNonCase = FieldFactory.fradio("docTypeNonCase", "docType", null, "Editable document", "Select to create an empty non-case document.");
+			fDocTypeNonCase.addStyleName("headerNonCaseDoc");
+			fg.addField(fDocTypeNonCase);
 
 			// enable/disable sub-fieldgroup based on doc type radio button selection
-			fDocType.addValueChangeHandler(new ValueChangeHandler<String>() {
+			fDocTypeCase.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
 				@Override
-				public void onValueChange(ValueChangeEvent<String> event) {
-					String fval = event.getValue();
-					boolean isCaseDoc = "case".equals(fval);
+				public void onValueChange(ValueChangeEvent<Boolean> event) {
+					boolean isCaseDoc = event.getValue();
+					setMode(isCaseDoc);
+				}
+			});
+			fDocTypeNonCase.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
-					FieldGroup fgCaseDoc1 = (FieldGroup) getFieldGroup().getFieldByName(DocUseCase.CREATE_CASEDOC.name());
-					fgCaseDoc1.setEnabled(isCaseDoc);
-					fgCaseDoc1.setRequired(isCaseDoc);
-					
-					FieldGroup fgNonCaseDoc1 = (FieldGroup) getFieldGroup().getFieldByName(DocUseCase.CREATE_NONCASE.name());
-					fgNonCaseDoc1.setEnabled(!isCaseDoc);
-					fgNonCaseDoc1.setRequired(!isCaseDoc);
+				@Override
+				public void onValueChange(ValueChangeEvent<Boolean> event) {
+					boolean isCaseDoc = !event.getValue();
+					setMode(isCaseDoc);
 				}
 			});
 
+			// by default
+			//fDocTypeCase.setValue(true, true);
+			
 			return fg;
 		}
 
@@ -85,20 +82,17 @@ public class DocCreateEditPanel extends FieldGroupEditPanel {
 					final CellFieldComposer cmpsr = new CellFieldComposer();
 					cmpsr.setCanvas(widget);
 
-					cmpsr.addField(fg.getFieldWidget("docType"));
+					cmpsr.addField(fg.getFieldWidget("docTypeCase"));
 					cmpsr.newRow();
 
-					HTML htmlNonCaseDoc = new HTML("Create a new editable document");
-					htmlNonCaseDoc.setStyleName("headerNonCaseDoc");
-					cmpsr.addWidget(htmlNonCaseDoc);
+					cmpsr.addField(fg.getFieldWidget("caseUrl"));
+					cmpsr.newRow();
+					
+					cmpsr.addField(fg.getFieldWidget("docTypeNonCase"));
+					cmpsr.newRow();
+
 					cmpsr.addField(fg.getFieldWidget("docTitle"));
 					cmpsr.addField(fg.getFieldWidget("docDate"));
-					cmpsr.newRow();
-
-					HTML htmlCaseDoc = new HTML("Specify the url for a Google Scholar Case Document");
-					htmlCaseDoc.setStyleName("headerCaseDoc");
-					cmpsr.addWidget(htmlCaseDoc);
-					cmpsr.addField(fg.getFieldWidget("caseUrl"));
 					cmpsr.newRow();
 				}
 			};
@@ -109,11 +103,24 @@ public class DocCreateEditPanel extends FieldGroupEditPanel {
 	 * Constructor
 	 */
 	public DocCreateEditPanel() {
-		super("Create Document", null, null, null, new FieldPanel());
+		super("Create Document", null, null, null);
+		setFieldPanel(new FieldPanel());
 		showDeleteButton(false);
 		showResetButton(false);
 		showCancelButton(true);
 		// set field-only error handler (no msg display)
 		setErrorHandler(ErrorHandlerBuilder.build(false, true, null), false);
+	}
+	
+	private void setMode(boolean isCaseDoc) {
+		FieldGroup fg = getFieldPanel().getFieldGroup();
+		
+		FieldGroup fgCaseDoc1 = (FieldGroup) fg.getFieldByName(DocUseCase.CREATE_CASEDOC.name());
+		fgCaseDoc1.setEnabled(isCaseDoc);
+		fgCaseDoc1.setRequired(isCaseDoc);
+		
+		FieldGroup fgNonCaseDoc1 = (FieldGroup) fg.getFieldByName(DocUseCase.CREATE_NONCASE.name());
+		fgNonCaseDoc1.setEnabled(!isCaseDoc);
+		fgNonCaseDoc1.setRequired(!isCaseDoc);
 	}
 }

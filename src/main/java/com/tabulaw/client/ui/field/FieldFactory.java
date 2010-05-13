@@ -82,6 +82,21 @@ public abstract class FieldFactory {
 	}
 
 	/**
+	 * Creates a Radio button field that is designed to be bound to a boolean type
+	 * using String-wise constants "true" and "false" to indicate the boolean
+	 * value respectively.
+	 * @param fieldName the unique field name
+	 * @param radioName the radio form input tag name attribute
+	 * @param propName
+	 * @param labelText
+	 * @param helpText The on hover tool tip text
+	 * @return new field
+	 */
+	public static final RadioField fradio(String fieldName, String radioName, String propName, String labelText, String helpText) {
+		return new RadioField(fieldName, radioName, propName, labelText, helpText);
+	}
+
+	/**
 	 * Creates a Check box field that is designed to be bound to a boolean type
 	 * using String-wise constants "true" and "false" to indicate the boolean
 	 * value respectively. <br>

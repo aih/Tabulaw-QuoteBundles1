@@ -82,11 +82,6 @@ public final class RadioGroupField<V> extends AbstractDataField<V, V> {
 		public static final String GRID = "fradioGrid";
 	}
 
-	/**
-	 * The default radio button renderer.
-	 */
-	private static final GridRenderer DEFAULT_RENDERER = new GridRenderer(1, GridStyles.GRID);
-
 	private final Impl fp = new Impl();
 
 	/**
@@ -112,7 +107,7 @@ public final class RadioGroupField<V> extends AbstractDataField<V, V> {
 	RadioGroupField(String name, String propName, String labelText, String helpText, GridRenderer renderer,
 			Map<V, String> data) {
 		super(name, propName, labelText, helpText);
-		this.renderer = renderer == null ? DEFAULT_RENDERER : renderer;
+		this.renderer = renderer;
 		fp.addValueChangeHandler(this);
 		setData(data);
 	}

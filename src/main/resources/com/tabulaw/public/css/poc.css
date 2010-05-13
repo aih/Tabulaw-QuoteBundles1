@@ -75,18 +75,6 @@ div.ro {
 	.gwt-DialogBox .caption {
 		font-weight: bold;
 	}
-	.gwt-DialogBox .frow {
-		width: 200px;
-	}
-	.gwt-DialogBox .tbox {
-		width: 100%
-	}
-	.gwt-DialogBox textarea {
-		height: 75px;
-	}
-	.gwt-DialogBox .btnRow {
-		width: 200px;
-	}
 	.gwt-DialogBox .btnRow .save {
 		float: left;
 	}
@@ -601,6 +589,24 @@ div.ro {
 /* document listing view styling */
 .documents {
 }
+
+	.documents .gwt-DialogBox .headerNonCaseDoc {
+	}
+	.documents .gwt-DialogBox .headerCaseDoc {
+	}
+	.documents .gwt-DialogBox .frow {
+		width: 300px;
+	}
+	.documents .gwt-DialogBox .tbox {
+		width: 100%
+	}
+	.documents .gwt-DialogBox textarea {
+		height: 75px;
+	}
+	.documents .gwt-DialogBox .btnRow {
+		width: 300px;
+	}
+
 	.documents .viewToolbar {
 		display: none;
 	}
@@ -742,6 +748,19 @@ div.ro {
 /* quote bundle view styling */
 .quoteBundle {
 }
+	.quoteBundle .gwt-DialogBox .frow {
+		width: 200px;
+	}
+	.quoteBundle .gwt-DialogBox .tbox {
+		width: 100%
+	}
+	.quoteBundle .gwt-DialogBox textarea {
+		height: 75px;
+	}
+	.quoteBundle .gwt-DialogBox .btnRow {
+		width: 200px;
+	}
+
 	.quoteBundle .viewContainer {
 		margin-top: 20px;
 	}
