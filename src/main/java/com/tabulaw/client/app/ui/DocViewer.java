@@ -13,6 +13,7 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
@@ -23,6 +24,8 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
+import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.model.DocRef;
 
 /**
@@ -208,8 +211,25 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 						@Override
 						public void onClick(ClickEvent clkEvt) {
 							// save the doc
-							setDocHtml(dew.getHTML());
+							String docHtml = dew.getHTML();
+							setDocHtml(docHtml);
 							staticMode();
+							
+							// persist to server
+							DocRef mDocClone = (DocRef) DocViewer.this.mDocument.clone();
+							mDocClone.setHtmlContent(docHtml);
+							Poc.getDocService().updateDocContent(mDocClone, new AsyncCallback<Payload>() {
+								
+								@Override
+								public void onSuccess(Payload result) {
+									Notifier.get().showFor(result, null);
+								}
+								
+								@Override
+								public void onFailure(Throwable caught) {
+									Notifier.get().showFor(caught);
+								}
+							});
 						}
 					});
 					btnSave.setTitle("Save Document");

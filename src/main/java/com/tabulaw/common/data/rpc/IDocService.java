@@ -7,6 +7,7 @@ package com.tabulaw.common.data.rpc;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.model.DocRef;
 
 /**
@@ -20,9 +21,16 @@ public interface IDocService extends RemoteService {
 	 * Creates a new doc on the server given a new doc entity with all required
 	 * properties set save for the doc hash which is filled in.
 	 * @param docRef the new doc entity
-	 * @return the doc hash wrapped in a payload
+	 * @return the created doc wrapped in a doc payload
 	 */
 	DocPayload createDoc(DocRef docRef);
+	
+	/**
+	 * Updates the contents of an existing (localized) document.
+	 * @param docRef the doc containing the contents to update
+	 * @return the resultant status wrapped in a payload
+	 */
+	Payload updateDocContent(DocRef docRef);
 
 	/**
 	 * Provides search results for the given doc request.

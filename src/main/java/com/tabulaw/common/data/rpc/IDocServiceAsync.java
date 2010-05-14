@@ -6,6 +6,7 @@
 package com.tabulaw.common.data.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.model.DocRef;
 
 /**
@@ -14,6 +15,8 @@ import com.tabulaw.common.model.DocRef;
 public interface IDocServiceAsync {
 	
 	void createDoc(DocRef docRef, AsyncCallback<DocPayload> callback);
+	
+	void updateDocContent(DocRef docRef, AsyncCallback<Payload> callback);
 	
 	void search(DocSearchRequest request, AsyncCallback<DocSearchPayload> callback);
 	

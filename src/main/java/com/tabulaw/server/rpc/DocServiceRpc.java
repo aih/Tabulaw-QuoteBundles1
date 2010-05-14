@@ -20,6 +20,7 @@ import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.io.FileUtils;
 
+import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocListingPayload;
@@ -72,28 +73,60 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 	}
 
 	@Override
+	public Payload updateDocContent(DocRef docRef) {
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		final PersistContext pc = getPersistContext();
+
+		try {
+			if(docRef == null) throw new IllegalArgumentException("Null document");
+			DocUtils.setDocContent(docRef.getHash(), docRef.getHtmlContent());
+			status.addMsg("Document content updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
 	public DocPayload createDoc(DocRef docRef) {
 		Status status = new Status();
 		DocPayload payload = new DocPayload(status);
-		
+
 		final PersistContext pc = getPersistContext();
 		final UserContext uc = getUserContext();
-		
+
 		try {
 			if(docRef == null || !docRef.isNew()) throw new IllegalArgumentException("Null or non-new document");
 
 			User user = uc.getUser();
-			
+
 			int userHash = user.hashCode();
 			int cti = Long.valueOf(System.currentTimeMillis()).hashCode();
 			int hash = Math.abs(userHash ^ cti);
-			String filename = DocUtils.createNewDoc(hash);
 			
+			// stub initial html content if none specified
+			if(docRef.getHtmlContent() == null) {
+				String docHtml = "<p><b>Doc Title: </b>" + docRef.getTitle() + "</p>";
+				docHtml += "<p><b>Doc Creation Date: </b>" + docRef.getDate() + "</p>";
+				docHtml += "<p><b>Doc Author: </b>" + user.getName() + "</p>";
+				docRef.setHtmlContent(docHtml);
+			}
+			
+			DocUtils.createNewDoc(hash, docRef);
+
 			// persist the doc user binding
-			docRef.setHash(filename);
 			UserDataService uds = pc.getUserDataService();
 			DocRef persistedDoc = uds.saveDocForUser(uc.getUser().getId(), docRef);
-			
+
 			payload.setDocRef(persistedDoc);
 			status.addMsg("Document created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
@@ -108,7 +141,7 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 		catch(Exception e) {
 			exceptionToStatus(e, payload.getStatus());
 		}
-		
+
 		return payload;
 	}
 
@@ -116,7 +149,7 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 	@Override
 	public DocListingPayload getCachedDocs() {
 		Status status = new Status();
-		
+
 		final List<DocRef> docList;
 
 		// get user doc bindings

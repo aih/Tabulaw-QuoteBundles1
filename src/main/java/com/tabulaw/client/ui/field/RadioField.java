@@ -78,34 +78,13 @@ public final class RadioField extends AbstractField<Boolean> {
 		super.setEnabled(enabled);
 	}
 
-	/*
-	@Override
-	public void setReadOnly(boolean readOnly) {
-		if(rb != null) rb.setText(readOnly ? "" : cblabelText);
-		super.setReadOnly(readOnly);
-	}
-	*/
-	
 	@Override 
 	public String doGetText() {
 		return ToStringConverter.INSTANCE.convert(getValue());
 	}
 
 	public void setText(String text) {
-		throw new UnsupportedOperationException();
+		rb.setText(text);
 	}
 
-	/*
-	@Override
-	public String getLabelText() {
-		return cblabelText;
-	}
-
-	@Override
-	public void setLabelText(String labelText) {
-		this.cblabelText = labelText == null ? "" : labelText;
-		if(rb != null) rb.setText(cblabelText);
-		super.setLabelText(labelText);
-	}
-	*/
 }

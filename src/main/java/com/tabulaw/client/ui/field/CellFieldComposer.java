@@ -50,8 +50,6 @@ public class CellFieldComposer extends AbstractFieldComposer implements HasAlign
 
 	private Widget last;
 
-	private boolean atCurrent;
-
 	/**
 	 * Constructor
 	 */
@@ -66,7 +64,6 @@ public class CellFieldComposer extends AbstractFieldComposer implements HasAlign
 		vp = new VerticalPanel();
 		currentRow = null;
 		last = null;
-		atCurrent = false;
 		this.canvas = canvas;
 		canvas.add(vp);
 	}
@@ -82,18 +79,17 @@ public class CellFieldComposer extends AbstractFieldComposer implements HasAlign
 
 	@Override
 	public void add(FieldLabel fldLbl, Widget w) {
-		FlowPanel fp;
-		if(!atCurrent) {
-			fp = new FlowPanel();
-			fp.setStyleName(Styles.FIELD_CONTAINER);
-		}
-		else {
-			if(last == null) throw new IllegalStateException("Empty row");
-			fp = (FlowPanel) last.getParent();
+		FlowPanel fcontainer = new FlowPanel();
+		fcontainer.setStyleName(Styles.FIELD_CONTAINER);
+		
+		// add the field's name as a style to the field container
+		// this is the proper way to achieve custom placement of fields
+		if(w instanceof IFieldWidget<?>) {
+			fcontainer.addStyleName(((IFieldWidget<?>) w).getName());
 		}
 
 		if(fldLbl != null) {
-			fp.add(fldLbl);
+			fcontainer.add(fldLbl);
 		}
 		/*
 		else if(!atCurrent) {
@@ -101,8 +97,8 @@ public class CellFieldComposer extends AbstractFieldComposer implements HasAlign
 		}
 		*/
 
-		fp.add(w);
-		getCurrentRow().add(fp);
+		fcontainer.add(w);
+		getCurrentRow().add(fcontainer);
 		last = w;
 	}
 
@@ -134,40 +130,6 @@ public class CellFieldComposer extends AbstractFieldComposer implements HasAlign
 	public void newRow() {
 		// this will cause a new row the next time addField is called
 		currentRow = null;
-		reset();
-	}
-
-	/**
-	 * Forces subsequently added fields/widgets to be added at the same "slot" at
-	 * the last added field/widget.
-	 */
-	public void stopFlow() {
-		atCurrent = true;
-	}
-
-	/**
-	 * Re-establishes the flow so subsequently added fields/widgets will have a
-	 * newly created "slot".
-	 */
-	public void resetFlow() {
-		atCurrent = false;
-	}
-
-	/**
-	 * Resets the alignment for subsequently added Widgets/fields to their initial
-	 * values.
-	 */
-	public void resetAlignment() {
-		setHorizontalAlignment(ALIGN_DEFAULT);
-		setVerticalAlignment(ALIGN_TOP);
-	}
-
-	/**
-	 * Resets both the flow and alignment.
-	 */
-	public void reset() {
-		resetFlow();
-		resetAlignment();
 	}
 
 	/**

@@ -30,7 +30,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	private Date date;
 	private CaseRef caseRef;
 
-	private transient String htmlContent;
+	private String htmlContent;
 
 	/**
 	 * Constructor

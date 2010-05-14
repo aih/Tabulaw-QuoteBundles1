@@ -5,14 +5,19 @@
  */
 package com.tabulaw.client.app.ui;
 
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import java.util.Date;
+
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.tabulaw.client.app.field.DocFieldProvider;
 import com.tabulaw.client.app.field.DocFieldProvider.DocUseCase;
 import com.tabulaw.client.ui.edit.FieldGroupEditPanel;
 import com.tabulaw.client.ui.field.AbstractFieldPanel;
 import com.tabulaw.client.ui.field.CellFieldComposer;
+import com.tabulaw.client.ui.field.DateField;
 import com.tabulaw.client.ui.field.FieldFactory;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.ui.field.IFieldRenderer;
@@ -41,35 +46,37 @@ public class DocCreateEditPanel extends FieldGroupEditPanel {
 			fg.addField(fgNonCaseDoc);
 
 			// add doc type selection radio button
-			RadioField fDocTypeCase = FieldFactory.fradio("docTypeCase", "docType", null, "Google Scholar document", "Select for fetch a remote Google Scholar document");
+			RadioField fDocTypeCase =
+					FieldFactory.fradio("docTypeCase", "docType", null, "Google Scholar document",
+							"Select for fetch a remote Google Scholar document");
 			fDocTypeCase.addStyleName("headerCaseDoc");
 			fg.addField(fDocTypeCase);
-			
-			RadioField fDocTypeNonCase = FieldFactory.fradio("docTypeNonCase", "docType", null, "Editable document", "Select to create an empty non-case document.");
+
+			RadioField fDocTypeNonCase =
+					FieldFactory.fradio("docTypeNonCase", "docType", null, "Editable document",
+							"Select to create an empty non-case document.");
 			fDocTypeNonCase.addStyleName("headerNonCaseDoc");
 			fg.addField(fDocTypeNonCase);
 
 			// enable/disable sub-fieldgroup based on doc type radio button selection
-			fDocTypeCase.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			fDocTypeCase.getEditable().addFocusHandler(new FocusHandler() {
 
 				@Override
-				public void onValueChange(ValueChangeEvent<Boolean> event) {
-					boolean isCaseDoc = event.getValue();
-					setMode(isCaseDoc);
+				public void onFocus(FocusEvent event) {
+					setMode(true);
 				}
 			});
-			fDocTypeNonCase.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			fDocTypeNonCase.getEditable().addFocusHandler(new FocusHandler() {
 
 				@Override
-				public void onValueChange(ValueChangeEvent<Boolean> event) {
-					boolean isCaseDoc = !event.getValue();
-					setMode(isCaseDoc);
+				public void onFocus(FocusEvent event) {
+					setMode(false);
 				}
 			});
 
 			// by default
-			//fDocTypeCase.setValue(true, true);
-			
+			// fDocTypeCase.setValue(true, true);
+
 			return fg;
 		}
 
@@ -82,18 +89,17 @@ public class DocCreateEditPanel extends FieldGroupEditPanel {
 					final CellFieldComposer cmpsr = new CellFieldComposer();
 					cmpsr.setCanvas(widget);
 
-					cmpsr.addField(fg.getFieldWidget("docTypeCase"));
-					cmpsr.newRow();
-
-					cmpsr.addField(fg.getFieldWidget("caseUrl"));
-					cmpsr.newRow();
-					
-					cmpsr.addField(fg.getFieldWidget("docTypeNonCase"));
+					cmpsr.addField(fg.getFieldWidget("docTypeNonCase"), false);
 					cmpsr.newRow();
 
 					cmpsr.addField(fg.getFieldWidget("docTitle"));
 					cmpsr.addField(fg.getFieldWidget("docDate"));
 					cmpsr.newRow();
+
+					cmpsr.addField(fg.getFieldWidget("docTypeCase"), false);
+					cmpsr.newRow();
+
+					cmpsr.addField(fg.getFieldWidget("caseUrl"));
 				}
 			};
 		}
@@ -110,17 +116,39 @@ public class DocCreateEditPanel extends FieldGroupEditPanel {
 		showCancelButton(true);
 		// set field-only error handler (no msg display)
 		setErrorHandler(ErrorHandlerBuilder.build(false, true, null), false);
+		// default check radio button
+		((RadioField) getFieldPanel().getFieldGroup().getFieldWidget("docTypeNonCase")).setChecked(true);
+		setMode(false);
 	}
-	
-	private void setMode(boolean isCaseDoc) {
-		FieldGroup fg = getFieldPanel().getFieldGroup();
-		
-		FieldGroup fgCaseDoc1 = (FieldGroup) fg.getFieldByName(DocUseCase.CREATE_CASEDOC.name());
-		fgCaseDoc1.setEnabled(isCaseDoc);
-		fgCaseDoc1.setRequired(isCaseDoc);
-		
+
+	public void setMode(final boolean isCaseDoc) {
+		final FieldGroup fg = getFieldPanel().getFieldGroup();
+
 		FieldGroup fgNonCaseDoc1 = (FieldGroup) fg.getFieldByName(DocUseCase.CREATE_NONCASE.name());
-		fgNonCaseDoc1.setEnabled(!isCaseDoc);
+		// fgNonCaseDoc1.setEnabled(!isCaseDoc);
+		fgNonCaseDoc1.setVisible(!isCaseDoc);
 		fgNonCaseDoc1.setRequired(!isCaseDoc);
+
+		FieldGroup fgCaseDoc1 = (FieldGroup) fg.getFieldByName(DocUseCase.CREATE_CASEDOC.name());
+		// fgCaseDoc1.setEnabled(isCaseDoc);
+		fgCaseDoc1.setVisible(isCaseDoc);
+		fgCaseDoc1.setRequired(isCaseDoc);
+
+		// default set doc date to now
+		if(!isCaseDoc) {
+			DateField fdocdate = (DateField) fg.getFieldWidget("docDate");
+			if(fdocdate.getValue() == null) fdocdate.setValue(new Date());
+		}
+
+		getErrorHandler().clear();
+
+		// set focus
+		DeferredCommand.addCommand(new Command() {
+
+			@Override
+			public void execute() {
+				fg.getFieldWidget(isCaseDoc ? "caseUrl" : "docTitle").setFocus(true);
+			}
+		});
 	}
 }

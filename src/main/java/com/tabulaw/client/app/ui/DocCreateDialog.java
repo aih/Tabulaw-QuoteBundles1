@@ -48,12 +48,18 @@ public class DocCreateDialog extends Dialog implements IEditHandler<FieldGroup> 
 	}
 
 	@Override
+	public void show() {
+		super.show();
+		editPanel.setMode(false);
+	}
+
+	@Override
 	public void onEdit(EditEvent<FieldGroup> event) {
 		// persist the quote bundle
 		if(event.getOp() == EditOp.SAVE) {
 			FieldGroup fg = event.getContent();
 
-			boolean isCaseDoc = fg.getFieldWidget("docType").getValue().equals("case");
+			boolean isCaseDoc = fg.getFieldWidget("docTypeCase").getValue().equals(Boolean.TRUE);
 
 			if(isCaseDoc) {
 				final String caseUrl = fg.getFieldWidget("caseUrl").getValue().toString();
@@ -118,13 +124,5 @@ public class DocCreateDialog extends Dialog implements IEditHandler<FieldGroup> 
 		else if(event.getOp() == EditOp.CANCEL) {
 			hide();
 		}
-	}
-
-	@Override
-	public void show() {
-		super.show();
-		editPanel.getErrorHandler().clear();
-		// DeferredCommand.addCommand(new
-		// FocusCommand(editPanel.getFieldPanel().getFocusable(), true));
 	}
 }

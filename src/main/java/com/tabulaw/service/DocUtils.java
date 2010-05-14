@@ -7,6 +7,7 @@ package com.tabulaw.service;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -112,7 +113,7 @@ public class DocUtils {
 
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Extracts the serialized doc ref token from a locally cached doc file.
 	 * @param fdoc ref to a locally cached doc file
@@ -123,10 +124,10 @@ public class DocUtils {
 	public static String getSerializedDocToken(File fdoc) throws IOException {
 		// for now just load the entire doc as a string for simplicity's sake
 		String s = FileUtils.readFileToString(fdoc, "UTF-8");
-		
+
 		// ensure we hava a doc serialize token at head
-		if(!s.startsWith("[doc]") && !s.startsWith("[casedoc]")) return null; 
-		
+		if(!s.startsWith("[doc]") && !s.startsWith("[casedoc]")) return null;
+
 		int index = s.indexOf('\n');
 		if(index == -1 || index >= s.length() - 2) return null;
 		return s.substring(0, index + 1); // include the newline char
@@ -224,26 +225,71 @@ public class DocUtils {
 	public static int docHash(String remoteUrl) {
 		return Math.abs(remoteUrl.hashCode());
 	}
-	
+
 	/**
 	 * Creates a new file on disk given a unique doc hash.
 	 * @param docHash doc hash for which to create a new file
-	 * @return the local doc filename
+	 * @param docRef the doc to write to disk
 	 * @throws IllegalArgumentException When the doc file already exists
-	 * @throws IOException Upon error writing doc to disk 
+	 * @throws IOException Upon error writing doc to disk
 	 */
-	public static String createNewDoc(int docHash) throws IllegalArgumentException, IOException {
-		File docDir = getDocDirRef();
-		File fdoc = new File(docDir.getPath() + File.separator + localDocFilename(docHash));
+	public static void createNewDoc(int docHash, DocRef docRef) throws IllegalArgumentException, IOException {
+		if(docRef == null) throw new NullPointerException();
+
+		String filename = localDocFilename(docHash);
+		File fdoc = new File(docDirPath + File.separator + filename);
 		if(fdoc.exists()) throw new IllegalArgumentException("Doc already exists for hash: " + docHash);
-		
+		docRef.setHash(filename);
+
 		// write to disk
-		StringBuilder sb = new StringBuilder();
-		// TODO set actual doc title
-		localizeDoc(sb, "New Document");
-		FileUtils.writeStringToFile(fdoc, sb.toString());
+		String html = docRef.getHtmlContent();
+		if(html == null) html = "";
+		StringBuilder sb = new StringBuilder(html);
+		localizeDoc(sb, docRef.getTitle());
+
+		// pre-pend serialized doc token at start of file
+		String stoken = serializeDocument(docRef);
+		sb.insert(0, stoken);
 		
-		return fdoc.getName();
+		FileUtils.writeStringToFile(fdoc, sb.toString());
+	}
+
+	/**
+	 * [Re-]sets the html document content on disk.
+	 * @param localDocFilename name of the doc file
+	 * @param htmlContent the html content
+	 * @throws IOException
+	 */
+	public static void setDocContent(String localDocFilename, String htmlContent) throws IOException {
+		if(localDocFilename == null || htmlContent == null) throw new NullPointerException();
+
+		File fdoc = new File(docDirPath + File.separator + localDocFilename);
+		if(!fdoc.exists()) throw new IllegalArgumentException("Doc of name: '" + localDocFilename + "' not found.");
+
+		DocRef docRef = deserializeDocument(fdoc);
+
+		// clear out existing doc file contents
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(fdoc);
+			fos.write((new String()).getBytes());
+		}
+		finally {
+			if(fos != null) try {
+				fos.close();
+			}
+			catch(IOException e) {
+				// eat it
+			}
+		}
+
+		// re-write it
+		StringBuilder sb = new StringBuilder(htmlContent);
+		String docTitle = docRef.getTitle();
+		localizeDoc(sb, docTitle);
+		String stoken = serializeDocument(docRef);
+		sb.insert(0, stoken);
+		FileUtils.writeStringToFile(fdoc, sb.toString());
 	}
 
 	/**
@@ -259,8 +305,8 @@ public class DocUtils {
 	}
 
 	/**
-	 * "Localizes" doc html content by injecting local css and js blocks needed for
-	 * client-side doc functionality if not already present.
+	 * "Localizes" doc html content by injecting local css and js blocks needed
+	 * for client-side doc functionality if not already present.
 	 * <p>
 	 * Also, wraps the given html string with html, head, body tags if not present
 	 * @param doc html content string
