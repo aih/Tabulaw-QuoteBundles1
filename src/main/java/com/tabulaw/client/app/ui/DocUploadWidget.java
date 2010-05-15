@@ -189,7 +189,7 @@ public class DocUploadWidget extends Composite implements HasValueChangeHandlers
 						
 						@Override
 						public void execute() {
-							Notifier.get().post(msgs, -1);
+							Notifier.get().post(msgs);
 						}
 					});
 				}

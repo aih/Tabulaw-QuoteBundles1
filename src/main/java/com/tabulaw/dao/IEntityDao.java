@@ -124,9 +124,11 @@ public interface IEntityDao {
 	 * with caution as the entities will be deleted forever!
 	 * @param <E> The entity type
 	 * @param entities Collection of entities to be purged
+	 * @throws EntityNotFoundException fail fast exception thrown when an entity
+	 *         in the given collection is not found
 	 * @throws DataAccessException
 	 */
-	<E extends IEntity> void purgeAll(Collection<E> entities) throws DataAccessException;
+	<E extends IEntity> void purgeAll(Collection<E> entities) throws EntityNotFoundException, DataAccessException;
 
 	/**
 	 * Use when the expected result is a single entity.

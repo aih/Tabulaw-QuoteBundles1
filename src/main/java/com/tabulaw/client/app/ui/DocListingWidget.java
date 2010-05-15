@@ -10,6 +10,7 @@ import java.util.List;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Image;
@@ -38,6 +39,7 @@ import com.tabulaw.client.ui.listing.ModelListingTable;
 import com.tabulaw.client.ui.listing.ModelListingWidget;
 import com.tabulaw.client.util.Fmt;
 import com.tabulaw.client.util.GlobalFormat;
+import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.rpc.DocListingPayload;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityType;
@@ -131,15 +133,19 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 					table.setText(rowIndex, cellIndex, sdate);
 					break;
 				case 2: {
+					final String title = ClientModelCache.get().isAdminUser()? "Permanantly delete document" : "Remove document";
 					Image img = new Image(Resources.INSTANCE.deleteLarger());
-					img.setTitle("Remove document..");
+					img.setTitle(title);
 					img.addClickHandler(new ClickHandler() {
 
 						@Override
 						public void onClick(ClickEvent event) {
 							event.stopPropagation();
 							String docref = rowData.getTitle();
-							if(Window.confirm("Remove document '" + docref + "'?")) {
+							final String confirm =
+									ClientModelCache.get().isAdminUser() ? "Permanantly delete document '" + docref + "'?"
+											: "Remove document '" + docref + "'?";
+							if(Window.confirm(confirm)) {
 
 								// client
 								ClientModelCache.get().remove(rowData.getModelKey(), table);
@@ -147,7 +153,23 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 								operator.refresh();
 
 								// server
-								ClientModelCache.get().removeDocUserBinding(rowData.getId());
+								if(ClientModelCache.get().isAdminUser()) {
+									Poc.getDocService().deleteDoc(rowData.getId(), new AsyncCallback<Payload>() {
+										
+										@Override
+										public void onSuccess(Payload result) {
+											Notifier.get().showFor(result);
+										}
+										
+										@Override
+										public void onFailure(Throwable caught) {
+											Notifier.get().showFor(caught);
+										}
+									});
+								}
+								else {
+									ClientModelCache.get().removeDocUserBinding(rowData.getId());
+								}
 							}
 						}
 					});

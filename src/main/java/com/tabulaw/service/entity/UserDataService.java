@@ -6,6 +6,7 @@
 package com.tabulaw.service.entity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.validation.ConstraintViolationException;
@@ -485,5 +486,26 @@ public class UserDataService extends AbstractEntityService {
 			throw new IllegalStateException(e);
 		}
 		dao.purge(binding);
+	}
+	
+	/**
+	 * Removes all user/doc bindings that exist for a given doc
+	 * @param docId id of the doc
+	 */
+	@Transactional
+	public void removeAllDocUserBindingsForDoc(String docId) {
+		if(docId == null) throw new NullPointerException();
+		Criteria<DocUserBinding> c = new Criteria<DocUserBinding>(DocUserBinding.class);
+		c.getPrimaryGroup().addCriterion("docId", docId, Comparator.EQUALS, true);
+		Collection<DocUserBinding> bindings;
+		try {
+			bindings = dao.findEntities(c, null);
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
+		if(bindings != null && bindings.size() > 0) {
+			dao.purgeAll(bindings);
+		}
 	}
 }

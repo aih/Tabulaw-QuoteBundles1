@@ -10,7 +10,7 @@ import java.io.File;
 /**
  * @author jpk
  */
-abstract class AbstractFileConverter implements IFileConverter {
+abstract class AbstractToHtmlConverter implements IToHtmlConverter {
 	
 	/**
 	 * Is the file named such that is implies it has html content?
@@ -20,6 +20,17 @@ abstract class AbstractFileConverter implements IFileConverter {
 	static boolean isHtmlFileBasedOnFileExtension(File f) {
 		String fname = f.getName();
 		if(fname.endsWith(".htm") || fname.endsWith(".html")) return true;
+		return false;
+	}
+
+	/**
+	 * Is the file named such that is implies it has textual content?
+	 * @param f
+	 * @return true/false
+	 */
+	static boolean isTextFileBasedOnFileExtension(File f) {
+		String fname = f.getName();
+		if(fname.endsWith(".txt") || fname.endsWith(".text")) return true;
 		return false;
 	}
 

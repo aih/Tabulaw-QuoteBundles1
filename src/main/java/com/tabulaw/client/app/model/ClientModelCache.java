@@ -35,6 +35,7 @@ import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
+import com.tabulaw.common.model.User.Role;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.util.ObjectUtil;
 
@@ -323,6 +324,15 @@ public class ClientModelCache {
 		for(List<?> list : entities.values()) {
 			list.clear();
 		}
+	}
+	
+	/**
+	 * Is the logged in user an administrator?
+	 * @return true/false
+	 */
+	public boolean isAdminUser() {
+		User user = getUser();
+		return user == null ? false : user.inRole(Role.ADMINISTRATOR);
 	}
 
 	/**

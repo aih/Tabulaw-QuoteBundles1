@@ -73,6 +73,42 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 	}
 
 	@Override
+	public Payload deleteDoc(String docId) {
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		final PersistContext pc = getPersistContext();
+		
+		try {
+			if(docId == null) throw new IllegalArgumentException("Null doc id");
+
+			// user must be an administrator to permanantly delete docs
+			User user = getUserContext().getUser();
+			if(!user.inRole(Role.ADMINISTRATOR)) {
+				throw new Exception("Permission denied.");
+			}
+
+			// remove from disk
+			DocUtils.deleteDoc(docId);
+
+			// remove all doc/user bindings for the doc
+			pc.getUserDataService().removeAllDocUserBindingsForDoc(docId);
+
+			status.addMsg("Document deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
 	public Payload updateDocContent(DocRef docRef) {
 		Status status = new Status();
 		Payload payload = new Payload(status);
@@ -112,15 +148,15 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 			int userHash = user.hashCode();
 			int cti = Long.valueOf(System.currentTimeMillis()).hashCode();
 			int hash = Math.abs(userHash ^ cti);
-			
+
 			// stub initial html content if none specified
 			if(docRef.getHtmlContent() == null) {
-				String docHtml = "<p><b>Doc Title: </b>" + docRef.getTitle() + "</p>";
-				docHtml += "<p><b>Doc Creation Date: </b>" + docRef.getDate() + "</p>";
-				docHtml += "<p><b>Doc Author: </b>" + user.getName() + "</p>";
+				String docHtml = "<p><b>Title: </b>" + docRef.getTitle() + "</p>";
+				docHtml += "<p><b>Creation Date: </b>" + docRef.getDate() + "</p>";
+				docHtml += "<p><b>Author: </b>" + user.getName() + "</p>";
 				docRef.setHtmlContent(docHtml);
 			}
-			
+
 			DocUtils.createNewDoc(hash, docRef);
 
 			// persist the doc user binding

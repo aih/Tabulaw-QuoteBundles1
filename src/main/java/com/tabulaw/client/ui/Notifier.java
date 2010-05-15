@@ -81,6 +81,10 @@ public class Notifier {
 		post(msgs, duration, false);
 	}
 
+	public void post(Collection<Msg> msgs) {
+		post(msgs, DEFAULT_DURATION, false);
+	}
+
 	/**
 	 * @param caught
 	 */

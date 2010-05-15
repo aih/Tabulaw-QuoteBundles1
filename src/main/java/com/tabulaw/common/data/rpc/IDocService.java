@@ -16,6 +16,13 @@ import com.tabulaw.common.model.DocRef;
  */
 @RemoteServiceRelativePath(value = "doc")
 public interface IDocService extends RemoteService {
+	
+	/**
+	 * Removes a doc from the system.
+	 * @param docId id of the doc to delete
+	 * @return resultant status wrapped in a payload
+	 */
+	Payload deleteDoc(String docId);
 
 	/**
 	 * Creates a new doc on the server given a new doc entity with all required

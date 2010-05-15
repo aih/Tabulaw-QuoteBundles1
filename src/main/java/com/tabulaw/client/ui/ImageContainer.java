@@ -4,6 +4,7 @@
  */
 package com.tabulaw.client.ui;
 
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -34,6 +35,14 @@ public final class ImageContainer extends Composite {
 		setClippedImage(img);
 		initWidget(sp);
 		setStyleName(Styles.IMAGE_CONTAINER);
+	}
+	
+	/**
+	 * Constructor
+	 * @param imageResource
+	 */
+	public ImageContainer(ImageResource imageResource) {
+		this(new Image(imageResource));
 	}
 
 	/**

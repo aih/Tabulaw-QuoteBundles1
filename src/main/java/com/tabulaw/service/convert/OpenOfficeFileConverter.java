@@ -18,7 +18,7 @@ import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConv
  * @see "http://www.artofsolving.com/opensource/jodconverter"
  * @author jpk
  */
-public class OpenOfficeFileConverter extends AbstractFileConverter {
+public class OpenOfficeFileConverter extends AbstractToHtmlConverter {
 	
 	/**
 	 * Factory method for creating instances.
@@ -45,9 +45,15 @@ public class OpenOfficeFileConverter extends AbstractFileConverter {
 	}
 
 	@Override
-	public File convert(File input, FileType outputFileType) {
+	public boolean supportsContentType(String contentType) {
+		// default to all
+		return true;
+	}
+
+	@Override
+	public File convert(File input, String contentType) {
 		DocumentConverter dc = new OpenOfficeDocumentConverter(ooc);
-		File fout = createSiblingFile(input, outputFileType.getSuffix());
+		File fout = createSiblingFile(input, "html");
 		dc.convert(input, fout);
 		return fout;
 	}

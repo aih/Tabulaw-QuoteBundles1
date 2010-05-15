@@ -76,7 +76,19 @@ public class DocCreateDialog extends Dialog implements IEditHandler<FieldGroup> 
 						super.handleSuccess(result);
 						Notifier.get().showFor(result);
 						if(!result.hasErrors()) {
-							
+							// persist the new doc and propagate through app
+							final DocRef persistedDoc = result.getDocRef();
+							ClientModelCache.get().persist(persistedDoc, DocCreateDialog.this);
+
+							DeferredCommand.addCommand(new Command() {
+
+								@Override
+								public void execute() {
+									// show the doc (letting the model change event finish first)
+									final DocViewInitializer dvi = new DocViewInitializer(persistedDoc.getModelKey());
+									ViewManager.get().dispatch(new ShowViewRequest(dvi));
+								}
+							});
 						}
 					}
 
@@ -108,8 +120,7 @@ public class DocCreateDialog extends Dialog implements IEditHandler<FieldGroup> 
 
 								@Override
 								public void execute() {
-									// show the doc (letting the model change event finish
-									// first)
+									// show the doc (letting the model change event finish first)
 									final DocViewInitializer dvi = new DocViewInitializer(persistedDoc.getModelKey());
 									ViewManager.get().dispatch(new ShowViewRequest(dvi));
 								}

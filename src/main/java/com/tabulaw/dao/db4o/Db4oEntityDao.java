@@ -485,7 +485,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	public <E extends IEntity> E persist(E entity) throws EntityExistsException, DataAccessException {
 		logger.debug("Persisting entity: " + entity);
 		Class<E> entityClass = (Class<E>) entityTypeResolver.resolveEntityClass(entity.getEntityType());
-		
+
 		// must check for business key uniqueness first!
 		if(businessKeyFactory.hasBusinessKeys(entityClass)) {
 			try {
@@ -514,13 +514,12 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 				throw new IllegalStateException(e);
 			}
 		}
-		
+
 		// we must purge the existing entity first!
 		if(!entity.isNew() && entity.getId() != null) {
 			try {
 				purge(entity);
-				if(logger.isDebugEnabled()) 
-					logger.debug("Purged existing entity by id before updating: " + entity);
+				if(logger.isDebugEnabled()) logger.debug("Purged existing entity by id before updating: " + entity);
 			}
 			catch(EntityNotFoundException e) {
 				// ok
@@ -569,7 +568,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	}
 
 	@Override
-	public <E extends IEntity> void purgeAll(Collection<E> entities) throws DataAccessException {
+	public <E extends IEntity> void purgeAll(Collection<E> entities) throws EntityNotFoundException, DataAccessException {
 		if(entities != null) {
 			for(final E e : entities) {
 				purge(e);

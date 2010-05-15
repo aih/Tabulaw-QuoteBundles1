@@ -13,6 +13,8 @@ import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -23,6 +25,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -168,6 +171,23 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 			super(new DocSearchSuggestOracle());
 		}
 	}
+	
+	static class SearchPlaceholder extends FocusPanel {
+		private final FlowPanel flowPanel = new FlowPanel();
+		
+		/**
+		 * Constructor
+		 */
+		public SearchPlaceholder() {
+			super();
+			setWidget(flowPanel);
+			flowPanel.setStyleName("searchPlaceholder");
+			flowPanel.add(new Image(Resources.INSTANCE.magnifyingGlass()));
+			HTML html = new HTML("<p>e.g. 'New York Times Co. v. Sullivan'</p>");
+			html.setStyleName("text");
+			flowPanel.add(html);
+		}
+	}
 
 	private final DocSearchSuggestBox docSuggestBox;
 
@@ -177,7 +197,7 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 
 	private final RpcUiHandler uiHandler;
 
-	private final HTML searchPlaceholder;
+	private final SearchPlaceholder searchPlaceholder;
 
 	/**
 	 * Constructor
@@ -195,16 +215,20 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 		fpPoweredBy.add(new Label("Search powered by "));
 		pnl.add(fpPoweredBy);
 
-		searchPlaceholder =
-				new HTML("<img src=\"" + Resources.INSTANCE.magnifyingGlass().getURL()
-						+ "\" /><p>e.g. 'New York Times Co. v. Sullivan</p>");
-		searchPlaceholder.setStyleName("searchPlaceholder");
+		searchPlaceholder = new SearchPlaceholder();
 		searchPlaceholder.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				searchPlaceholder.setVisible(false);
+				//searchPlaceholder.setVisible(false);
 				docSuggestBox.getTextBox().setFocus(true);
+			}
+		});
+		docSuggestBox.getTextBox().addFocusHandler(new FocusHandler() {
+			
+			@Override
+			public void onFocus(FocusEvent event) {
+				searchPlaceholder.setVisible(false);
 			}
 		});
 		docSuggestBox.getTextBox().addBlurHandler(new BlurHandler() {

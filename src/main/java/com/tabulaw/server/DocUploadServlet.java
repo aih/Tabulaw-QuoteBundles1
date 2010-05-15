@@ -26,9 +26,10 @@ import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
+import com.tabulaw.common.model.User;
 import com.tabulaw.service.DocUtils;
-import com.tabulaw.service.convert.IFileConverter;
-import com.tabulaw.service.convert.IFileConverter.FileType;
+import com.tabulaw.service.convert.IToHtmlConverter;
+import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -47,6 +48,12 @@ public class DocUploadServlet extends HttpServlet {
 
 		if(ServletFileUpload.isMultipartContent(req)) {
 
+			final PersistContext pc =
+					(PersistContext) req.getSession(false).getServletContext().getAttribute(PersistContext.KEY);
+			final UserContext uc = (UserContext) req.getSession(false).getAttribute(UserContext.KEY);
+			UserDataService uds = pc.getUserDataService();
+			User user = uc.getUser();
+
 			// Create a factory for disk-based file items
 			FileItemFactory factory = new DiskFileItemFactory();
 
@@ -55,8 +62,8 @@ public class DocUploadServlet extends HttpServlet {
 
 			// Parse the request
 			try {
-				IFileConverter fconverter =
-						(IFileConverter) req.getSession().getServletContext().getAttribute(
+				IToHtmlConverter fconverter =
+						(IToHtmlConverter) req.getSession().getServletContext().getAttribute(
 								FileConverterBootstrapper.FILE_CONVERTER_KEY);
 				if(fconverter == null) {
 					throw new Exception("No file converters found.");
@@ -83,10 +90,11 @@ public class DocUploadServlet extends HttpServlet {
 						numSuccessful++;
 
 						// convert to html
-						File fconverted = fconverter.convert(f, FileType.HTML);
-						
+						File fconverted = fconverter.convert(f, item.getContentType());
+
 						// serialize the just created html doc file
-						// NOTE: the doc hash for uploaded docs is just hash of the non-path filename given
+						// NOTE: the doc hash for uploaded docs is just hash of the non-path
+						// filename given
 						String docHash = fconverted.getName();
 						String docTitle = docHash; // for now
 						Date docDate = new Date();
@@ -99,7 +107,7 @@ public class DocUploadServlet extends HttpServlet {
 							StringBuilder docsb = new StringBuilder(htmlContent);
 							DocUtils.localizeDoc(docsb, docTitle);
 							htmlContent = docsb.toString();
-							
+
 							// write to disk
 							if(!fconverted.delete()) {
 								throw new Exception("Unable to delete converted html file");
@@ -107,7 +115,10 @@ public class DocUploadServlet extends HttpServlet {
 							FileUtils.writeStringToFile(fconverted, sdoc + htmlContent);
 							fconverted = null;
 						}
-						
+
+						// persist the doc user binding
+						uds.saveDocForUser(user.getId(), mDoc);
+
 						if(sb.length() == 0) {
 							sb.append("[START]");
 						}
@@ -138,5 +149,4 @@ public class DocUploadServlet extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, "Unsupported content type");
 		}
 	}
-
 }

@@ -14,6 +14,8 @@ import com.tabulaw.common.model.DocRef;
  */
 public interface IDocServiceAsync {
 	
+	void deleteDoc(String docId, AsyncCallback<Payload> callback);
+	
 	void createDoc(DocRef docRef, AsyncCallback<DocPayload> callback);
 	
 	void updateDocContent(DocRef docRef, AsyncCallback<Payload> callback);

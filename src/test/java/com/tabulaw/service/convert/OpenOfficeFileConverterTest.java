@@ -12,10 +12,6 @@ import junit.framework.Assert;
 
 import org.testng.annotations.Test;
 
-import com.tabulaw.service.convert.IFileConverter;
-import com.tabulaw.service.convert.OpenOfficeFileConverter;
-import com.tabulaw.service.convert.IFileConverter.FileType;
-
 /**
  * @author jpk
  */
@@ -26,8 +22,8 @@ public class OpenOfficeFileConverterTest {
 		URL url = getClass().getResource("");
 		String canonicalname = url.getPath() + "test.doc";
 		File fin = new File(canonicalname);
-		IFileConverter fc = OpenOfficeFileConverter.create();
-		File fout = fc.convert(fin, FileType.HTML);
+		IToHtmlConverter fc = OpenOfficeFileConverter.create();
+		File fout = fc.convert(fin, null);
 		Assert.assertNotNull(fout);
 	}
 	

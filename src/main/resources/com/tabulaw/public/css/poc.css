@@ -144,6 +144,15 @@ div.ro {
 	.navButton .text {
 		vertical-align: middle;
 	}
+	.gwt-TabBarItem .navButton-doc {
+		width: 60px;
+		font-weight: normal;
+		overflow: hidden;
+	}
+	.gwt-TabBarItem-selected .navButton-doc {
+		width: inherit;
+		font-weight: bold;
+	}
 
 #navCol {
 	float: left;
@@ -669,12 +678,15 @@ div.ro {
 			opacity: 0.4;
 			filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40);
 		}
-		.searchPlaceholder img, .searchPlaceholder p {
+		.searchPlaceholder img, .searchPlaceholder .text {
 			float: left;
 		}
-		.searchPlaceholder p {
+		.searchPlaceholder .text {
 			margin: 5px;
 		}
+    * html .searchPlaceholder { /* hide for IE - too buggy */
+       display: none;
+     }
 
 		.docSearch .docSuggest {
 			margin-right: 10px;

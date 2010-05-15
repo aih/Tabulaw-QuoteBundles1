@@ -225,6 +225,17 @@ public class DocUtils {
 	public static int docHash(String remoteUrl) {
 		return Math.abs(remoteUrl.hashCode());
 	}
+	
+	/**
+	 * Removes a doc file from disk
+	 * @param filename i.e. the doc hash
+	 */
+	public static void deleteDoc(String filename) {
+		if(filename == null) throw new NullPointerException();
+		if(!getDocRef(filename).delete()) {
+			throw new IllegalArgumentException("Doc of filename: '" + filename + "' was not deleted.");
+		}
+	}
 
 	/**
 	 * Creates a new file on disk given a unique doc hash.
