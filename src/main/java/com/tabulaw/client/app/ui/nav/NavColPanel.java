@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 12, 2010
  */
-package com.tabulaw.client.app.ui;
+package com.tabulaw.client.app.ui.nav;
 
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;

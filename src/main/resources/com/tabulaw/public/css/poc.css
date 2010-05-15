@@ -32,6 +32,25 @@ a:active {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
+/* .imgBtn */
+.imgBtn {
+	padding: 2px;
+	cursor: pointer;
+}
+	.imgBtn .icon {
+		vertical-align: middle;
+	}
+	.imgBtn .text {
+		padding-left: 4px; 
+		font-weight: bold;
+		white-space: nowrap;
+		vertical-align: middle;
+	}
+
+.imgBtn-quoteBundle .text {
+	font-size: 12px;
+}
+
 /* global message panel */
 .gmsg {
 	margin-bottom: 15px;
@@ -119,34 +138,11 @@ div.ro {
 	text-align: center;
 	padding: 0 3px 0 3px;
 }
+	.navButton img {
+		vertical-align: middle;
+	}
 	.navButton .text {
-	}
-	.navButton-bundles {
-	}
-	.navButton-docs {
-	}
-	.navButton-doc {
-		background: url(../images/document-icon.png) left no-repeat transparent;
-		font-size: 11px;
-		font-weight: normal;
-		overflow: hidden;
-	}
-	.navButton-doc .text {
-		margin-left: 18px;
-		margin-top: 2px;
-	}
-	* html .navButton-doc .text {
-		float: right;
-	}
-	.navButton-plus {
-		text-align: center;
-	}
-	.gwt-TabBarItem .navButton-doc {
-		width: 60px;
-	}
-	.gwt-TabBarItem-selected .navButton-doc {
-		width: inherit;
-		font-weight: bold;
+		vertical-align: middle;
 	}
 
 #navCol {
@@ -172,8 +168,8 @@ div.ro {
 	#navCol .widget {
 		margin-bottom: 10px;
 		width: 145px;
-		-moz-border-radius: 5px;
-		-webkit-border-radius: 5px;
+		/*-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;*/
 	}
 	#navCol .gwt-PushButton {
 		width: 100%;
@@ -266,6 +262,16 @@ div.ro {
 		border-bottom: 3px solid #BFBFBF;
 	}
 	
+	.navRow .navButton {
+	}
+	.navRow .navButton img {
+		margin-right: 3px;
+	}
+	.navRow .navButton .text {
+	}
+	.navRow .navButton-docs .text {
+	}
+
 	/* nav row tab bar */
 	/*
 	.gwt-TabBar { the tab bar itself }</li>
@@ -288,18 +294,15 @@ div.ro {
 	}
 	.navRow .gwt-TabBarItem span {
 		color: #7F7F7F;
-		float: left;
 	}
 	.navRow .gwt-TabBarItem-selected {
 		background-color: #BFBFBF;
 	}
-	.navRow .gwt-TabBarItem-selected span {
+	.navRow .gwt-TabBarItem-selected .text {
+		background-color: #BFBFBF;
 		color: #2F2F2F;
 	}
-	.navRow .openDocs .gwt-TabBarItem-selected {
-		/*display:none;*/
-	}
-	
+
 	.navRow .mainViews {
 		float: left;
 		margin-right: 30px;
@@ -351,10 +354,10 @@ div.ro {
 
 .viewToolbar {
 	background-color: #fff;
-	font-size: 21px;
 	margin: 10px 0;
 }
 	.viewToolbar .viewTitle {
+		font-size: 21px;
 		font-weight: normal; 
 	}
 	.viewToolbar .button {
@@ -662,6 +665,10 @@ div.ro {
 		.searchPlaceholder * {
 			color: #BFBFBF;
 		}
+		.searchPlaceholder img {
+			opacity: 0.4;
+			filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40);
+		}
 		.searchPlaceholder img, .searchPlaceholder p {
 			float: left;
 		}
@@ -716,10 +723,11 @@ div.ro {
 		}
 
 	.documents .btnRow {
-		overflow: hidden;
+		/*overflow: hidden;*/
+		margin: 10px;
 	}
-	.documents .btnRow .navButton {
-		float: left;
+	.documents .btnRow button {
+		/*float: left;*/
 		margin-right: 15px;
 	}
 

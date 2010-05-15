@@ -62,7 +62,7 @@ public class UsersWidget extends Composite {
 		editContainer.add(lblTitle);
 
 		userFloatPanel = new FlowPanel();
-
+		
 		listing = new UsersListingWidget();
 		panel.add(listing);
 		panel.add(userFloatPanel);

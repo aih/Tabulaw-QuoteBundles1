@@ -8,7 +8,7 @@
 	width: 100%;
 	margin: 2px 0 2px 2px;
 	white-space: nowrap;
-	font-size: 110%;
+	font-size: 21px;
 	font-weight: bold;
 }
 
@@ -24,33 +24,13 @@
 */
 
 .viewContainer {
-}
-
-.viewContainer-pinned {
 	width: 100%;
 	overflow: auto;
 }
 
-.viewContainer-pinned .view {
+.viewContainer .view {
 	margin-top: 10px;
 	width: 100%;
-}
-
-.viewContainer-popped {
-	border:2px solid #DFDFDF;
-	overflow: hidden;
-	background-color: #fff;
-}
-
-.viewContainer-popped .viewTitle {
-	cursor: move;
-	/*-moz-user-select:none;*/ 
-}
-
-.viewContainer-popped .view {
-	overflow: visible;
-	height: auto;
-	margin: 2px;
 }
 
 .viewContainer-popped .portal {

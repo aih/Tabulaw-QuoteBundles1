@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 12, 2010
  */
-package com.tabulaw.client.app.ui;
+package com.tabulaw.client.app.ui.nav;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -413,7 +413,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			boolean found = false;
 			int i = 0;
 			for(DocViewNavButton b : openDocNavButtons) {
-				if(b.getDocKey().equals(event.getModelKey())) {
+				if(b.getModelKey().equals(event.getModelKey())) {
 					found = true;
 					break;
 				}

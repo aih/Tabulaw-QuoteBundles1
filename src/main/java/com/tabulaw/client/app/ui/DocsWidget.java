@@ -14,8 +14,10 @@ import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
+import com.tabulaw.client.ui.ImageButton;
 
 /**
  * Single widget containing:
@@ -35,13 +37,14 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 		public static final String DP_SEARCH = "searchDp";
 	}
 
-	static class DocUploadButton extends AbstractButton {
+	static class DocUploadButton extends ImageButton {
 
 		private DocUploadDialog docUploadDialog;
 
 		private DocUploadButton() {
-			super("Upload", null);
-			setClickHandler(new ClickHandler() {
+			super(Resources.INSTANCE.documentIcon(), "Upload");
+			setTitle("Upload one or more documents...");
+			addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
@@ -50,20 +53,16 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 				}
 			});
 		}
-
-		@Override
-		protected String getTitleText(String buttonText) {
-			return "Upload one or more documents...";
-		}
 	}
 
-	static class NewDocButton extends AbstractButton {
+	static class NewDocButton extends ImageButton {
 		
 		private DocCreateDialog dlg;
 
 		private NewDocButton() {
-			super("New", null);
-			setClickHandler(new ClickHandler() {
+			super(Resources.INSTANCE.plus(), "New Document");
+			setTitle("Create a document...");
+			addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
@@ -74,11 +73,6 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 					dlg.center();
 				}
 			});
-		}
-
-		@Override
-		protected String getTitleText(String buttonText) {
-			return "Create new document";
 		}
 	}
 

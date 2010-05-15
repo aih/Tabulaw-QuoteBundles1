@@ -9,11 +9,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.app.ui.AbstractButton;
+import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.AddQuoteBundleDialog;
 import com.tabulaw.client.app.ui.QuoteBundlesManageWidget;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
+import com.tabulaw.client.ui.ImageButton;
 
 /**
  * A view for managing existing doc bundles.
@@ -36,26 +37,25 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	static class NewQuoteBundleButton extends AbstractButton {
+	static class NewQuoteBundleButton extends ImageButton {
 		
-		AddQuoteBundleDialog dialog;
+		private AddQuoteBundleDialog dialog;
 		
 		public NewQuoteBundleButton() {
-			super("New Quote Bundle", "plus");
-			dialog = new AddQuoteBundleDialog();
-			dialog.setGlassEnabled(true);
-			setClickHandler(new ClickHandler() {
+			super(Resources.INSTANCE.plus(), "New Quote Bundle");
+			addStyleDependentName("quoteBundle");
+			setTitle("Create a Quote Bundle...");
+			addClickHandler(new ClickHandler() {
 				
 				@Override
 				public void onClick(ClickEvent event) {
+					if(dialog == null) {
+						dialog = new AddQuoteBundleDialog();
+						dialog.setGlassEnabled(true);
+					}
 					dialog.showRelativeTo(NewQuoteBundleButton.this);
 				}
 			});
-		}
-
-		@Override
-		protected String getTitleText(String buttonText) {
-			return "Create a Quote Bundle...";
 		}
 	}
 	

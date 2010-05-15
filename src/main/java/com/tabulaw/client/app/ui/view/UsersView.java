@@ -7,11 +7,12 @@ package com.tabulaw.client.app.ui.view;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.app.ui.AbstractButton;
+import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.UsersWidget;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
+import com.tabulaw.client.ui.ImageButton;
+import com.tabulaw.client.ui.view.ViewToolbar;
 
 /**
  * @author jpk
@@ -33,27 +34,16 @@ public class UsersView extends AbstractPocView<StaticViewInitializer> {
 		}
 	}
 	
-	class NewUserButton extends AbstractButton {
-		
-		public NewUserButton() {
-			super("New User", "plus");
-			setClickHandler(new ClickHandler() {
-				
-				@Override
-				public void onClick(ClickEvent event) {
-					widget.newUserMode();
-				}
-			});
-		}
+	static class NewUserButton extends ImageButton {
 
-		@Override
-		protected String getTitleText(String buttonText) {
-			return "Create a new User...";
+		public NewUserButton() {
+			super(Resources.INSTANCE.plus(), "New User");
+			setTitle("Create a user...");
 		}
 	}
-	
-	private final Widget[] navColWidgets;
-	
+
+	private final NewUserButton newUserButton;
+
 	private final UsersWidget widget;
 	
 	/**
@@ -63,9 +53,21 @@ public class UsersView extends AbstractPocView<StaticViewInitializer> {
 		super();
 		widget = new UsersWidget();
 		
-		navColWidgets = new Widget[] {
-			new NewUserButton(),
-		};
+		newUserButton = new NewUserButton();
+		newUserButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				widget.newUserMode();
+			}
+		});
+
+	}
+
+	@Override
+	protected void decorateToolbar(ViewToolbar toolbar) {
+		super.decorateToolbar(toolbar);
+		toolbar.add(newUserButton);
 	}
 
 	@Override
@@ -76,11 +78,6 @@ public class UsersView extends AbstractPocView<StaticViewInitializer> {
 	@Override
 	public ViewClass getViewClass() {
 		return klas;
-	}
-
-	@Override
-	public Widget[] getNavColWidgets() {
-		return navColWidgets; 
 	}
 
 	@Override

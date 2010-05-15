@@ -3,26 +3,19 @@
  * @author jpk
  * @since Feb 26, 2010
  */
-package com.tabulaw.client.app.ui;
+package com.tabulaw.client.app.ui.nav;
 
+import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.mvc.view.IViewInitializer;
-import com.tabulaw.client.mvc.view.IViewInitializerProvider;
+import com.tabulaw.common.model.IModelKeyProvider;
 import com.tabulaw.common.model.ModelKey;
 
 /**
  * Routes to an open document when clicked.
  * @author jpk
  */
-public class DocViewNavButton extends AbstractButton implements IViewInitializerProvider {
-
-	static class Styles {
-
-		/**
-		 * The secondary style used for document nav buttons.
-		 */
-		public static final String DOC = "doc";
-	} // Styles
+public class DocViewNavButton extends AbstractNavButton implements IModelKeyProvider {
 
 	private final ModelKey documentKey;
 
@@ -31,8 +24,10 @@ public class DocViewNavButton extends AbstractButton implements IViewInitializer
 	 * @param docKey The document model key
 	 */
 	public DocViewNavButton(ModelKey docKey) {
-		super(docKey.getName(), Styles.DOC);
+		super();
 		this.documentKey = docKey;
+		setTitle("View " + documentKey.descriptor());
+		setDisplay(docKey.getName(), "doc", Resources.INSTANCE.documentIcon());
 	}
 
 	@Override
@@ -40,7 +35,8 @@ public class DocViewNavButton extends AbstractButton implements IViewInitializer
 		return new DocViewInitializer(documentKey);
 	}
 
-	public ModelKey getDocKey() {
+	@Override
+	public ModelKey getModelKey() {
 		return documentKey;
 	}
 }
