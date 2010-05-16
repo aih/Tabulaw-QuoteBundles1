@@ -7,8 +7,8 @@ package com.tabulaw.client.app.ui;
 
 import java.util.Date;
 
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -59,6 +59,26 @@ public class DocCreateEditPanel extends FieldGroupEditPanel {
 			fg.addField(fDocTypeNonCase);
 
 			// enable/disable sub-fieldgroup based on doc type radio button selection
+			fDocTypeCase.getEditable().addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<Boolean> event) {
+					setMode(event.getValue());
+				}
+				
+			});
+			fDocTypeNonCase.getEditable().addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<Boolean> event) {
+					setMode(!event.getValue());
+				}
+				
+			});
+			
+			// doesn't work on webkit browsers
+			// see: http://code.google.com/p/google-web-toolkit/issues/detail?id=4515&q=focus%20event&sort=-id
+			/*
 			fDocTypeCase.getEditable().addFocusHandler(new FocusHandler() {
 
 				@Override
@@ -73,6 +93,7 @@ public class DocCreateEditPanel extends FieldGroupEditPanel {
 					setMode(false);
 				}
 			});
+			*/
 
 			// by default
 			// fDocTypeCase.setValue(true, true);

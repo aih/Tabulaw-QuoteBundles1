@@ -6,24 +6,18 @@
 package com.tabulaw.client.app.ui.nav;
 
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
-import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.IViewInitializerProvider;
-import com.tabulaw.client.mvc.view.ShowViewRequest;
 
 /**
  * Button like widget intended for use in a nav panel.
  * @author jpk
  */
-abstract class AbstractNavButton extends FocusWidget implements IViewInitializerProvider, ClickHandler {
-
-	// private HandlerRegistration clickRegiseration;
+abstract class AbstractNavButton extends FocusWidget implements IViewInitializerProvider {
 
 	private Image img;
 	private Element span;
@@ -34,7 +28,6 @@ abstract class AbstractNavButton extends FocusWidget implements IViewInitializer
 	public AbstractNavButton() {
 		super(Document.get().createDivElement());
 		setStylePrimaryName("navButton");
-		/*clickRegiseration = */addClickHandler(this);
 	}
 
 	/**
@@ -78,11 +71,5 @@ abstract class AbstractNavButton extends FocusWidget implements IViewInitializer
 		if(buttonSecondaryStyle != null) {
 			addStyleDependentName(buttonSecondaryStyle);
 		}
-	}
-
-	@Override
-	public void onClick(ClickEvent event) {
-		// default behavior
-		ViewManager.get().dispatch(new ShowViewRequest(getViewInitializer()));
 	}
 }

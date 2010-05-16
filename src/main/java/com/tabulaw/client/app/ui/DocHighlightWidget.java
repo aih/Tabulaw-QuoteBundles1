@@ -16,16 +16,12 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.DOMExt;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.client.app.ui.DocViewer.ViewMode;
 import com.tabulaw.client.app.ui.QuoteEvent.QuoteType;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
-import com.tabulaw.client.mvc.ViewManager;
-import com.tabulaw.client.mvc.view.IViewChangeHandler;
-import com.tabulaw.client.mvc.view.ViewChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.ITextSelectHandler;
 import com.tabulaw.client.ui.LoggingDragHandler;
@@ -48,7 +44,7 @@ import com.tabulaw.common.model.QuoteBundle;
  * @author jpk
  */
 public class DocHighlightWidget extends AbstractModelChangeAwareWidget 
-implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
+implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 
 	class DocQuoteDragHandler extends LoggingDragHandler {
 
@@ -76,6 +72,9 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode>,
 	private final QuoteBundleDocWidget wDocQuoteBundle;
 
 	private final HorizontalSplitPanel hsp = new HorizontalSplitPanel();
+	
+	//@SuppressWarnings("unused")
+	private final TextSelectApi tsapi;
 
 	/**
 	 * Facilitate drag/drop ops.
@@ -113,6 +112,8 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode>,
 
 		initWidget(boundaryPanel);
 		// initWidget(hsp);
+		
+		tsapi = new TextSelectApi(this);
 	}
 
 	public Widget[] getNavColWidgets() {
@@ -213,13 +214,13 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode>,
 	public void setDocument(DocRef mDoc) {
 		String frameId = wDocViewer.getFrameId();
 		if(frameId != null) {
-			TextSelectApi.shutdown(frameId);
+			tsapi.shutdown(frameId);
 		}
 
 		// update doc viewer with doc
 		wDocViewer.setModel(mDoc);
 
-		TextSelectApi.init(wDocViewer.getFrameId());
+		tsapi.init(wDocViewer.getFrameId());
 
 		// grab the current quote bundle
 		maybeSetCurrentQuoteBundle();
@@ -230,7 +231,7 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode>,
 		wDocQuoteBundle.setDragController(quoteController);
 		wDocQuoteBundle.makeQuotesDraggable(event.getValue() == ViewMode.EDIT);
 	}
-
+	
 	@Override
 	protected void onLoad() {
 		super.onLoad();
@@ -239,34 +240,16 @@ implements ITextSelectHandler, IViewChangeHandler, ValueChangeHandler<ViewMode>,
 		// we want to see as much of the doc as possible
 		hsp.setSplitPosition("80%");
 
+		assert hrViewMode == null;
 		hrViewMode = wDocViewer.addValueChangeHandler(this);
-
-		ViewManager.get().addViewChangeHandler(this);
 	}
 
 	@Override
 	protected void onUnload() {
-		String frameId = wDocViewer.getFrameId();
-		if(frameId != null) {
-			TextSelectApi.shutdown(frameId);
-		}
-
-		ViewManager.get().removeViewChangeHandler(this);
-
+		assert hrViewMode != null;
 		hrViewMode.removeHandler();
+		hrViewMode = null;
 
 		super.onUnload();
-	}
-
-	@Override
-	public void onViewChange(ViewChangeEvent event) {
-		if(DOMExt.isCloaked(getElement())) {
-			// register to receive text select events
-			TextSelectApi.get().removeTextSelectHandler(this);
-		}
-		else {
-			// register to receive text select events
-			TextSelectApi.get().addTextSelectHandler(this);
-		}
 	}
 }

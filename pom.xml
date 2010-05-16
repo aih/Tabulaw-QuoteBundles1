@@ -5,7 +5,7 @@
 	<groupId>com.tabulaw</groupId>
 	<artifactId>tabulaw</artifactId>
 	<name>tabulaw</name>
-	<version>0.1.13</version>
+	<version>0.2.0</version>
 	<description>The GWT Tabulaw app by the Logic Lab</description>
 	<packaging>war</packaging>
 
