@@ -82,25 +82,28 @@ public class DocUtils {
 		StringBuilder sb = new StringBuilder(1024);
 
 		// doc: "title", "hash",
-		sb.append("title:");
+		sb.append("title::");
 		sb.append(doc.getTitle());
-		sb.append("|date:");
+		sb.append("|date::");
 		sb.append(dateFormat.format(doc.getDate()));
-		sb.append("|hash:");
+		sb.append("|hash::");
 		sb.append(doc.getHash());
 
 		CaseRef caseRef = doc.getCaseRef();
 		if(caseRef != null) {
 			sb.insert(0, "[casedoc]");
 
-			// case: "parties", "citation", "url", "year", "date"
-			sb.append("|parties:");
+			sb.append("|parties::");
 			sb.append(caseRef.getParties());
-			sb.append("|citation:");
-			sb.append(caseRef.getCitation());
-			sb.append("|url:");
+			sb.append("|reftoken::");
+			sb.append(caseRef.getReftoken());
+			sb.append("|docLoc::");
+			sb.append(caseRef.getDocLoc());
+			sb.append("|court::");
+			sb.append(caseRef.getCourt());
+			sb.append("|url::");
 			sb.append(caseRef.getUrl());
-			sb.append("|year:");
+			sb.append("|year::");
 			sb.append(caseRef.getYear());
 		}
 		else {
@@ -157,7 +160,7 @@ public class DocUtils {
 		String title = null, hash = null;
 
 		// case related
-		String parties = null, citation = null, url = null, year = null;
+		String parties = null, reftoken = null, docLoc = null, court = null, url = null, year = null;
 		Date date = null;
 
 		int nli = stoken.indexOf('\n');
@@ -169,7 +172,7 @@ public class DocUtils {
 
 		String[] sarr1 = firstline.split("\\|");
 		for(String sub : sarr1) {
-			String[] sarr2 = sub.split(":");
+			String[] sarr2 = sub.split("::");
 			String name = sarr2[0];
 			String value = (sarr2.length == 2) ? sarr2[1] : "";
 
@@ -194,8 +197,14 @@ public class DocUtils {
 				if("parties".equals(name)) {
 					parties = value;
 				}
-				else if("citation".equals(name)) {
-					citation = value;
+				else if("reftoken".equals(name)) {
+					reftoken = value;
+				}
+				else if("docLoc".equals(name)) {
+					docLoc = value;
+				}
+				else if("court".equals(name)) {
+					court = value;
 				}
 				else if("url".equals(name)) {
 					url = value;
@@ -207,7 +216,7 @@ public class DocUtils {
 		}
 
 		if("casedoc".equals(type))
-			return EntityFactory.get().buildCaseDoc(title, hash, date, parties, citation, url, year);
+			return EntityFactory.get().buildCaseDoc(title, hash, date, parties, reftoken, docLoc, court, url, year);
 		else if("doc".equals(type))
 			return EntityFactory.get().buildDoc(title, hash, date);
 		else

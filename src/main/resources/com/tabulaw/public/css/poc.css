@@ -452,6 +452,8 @@ div.ro {
 	margin: 4px;
 	font-weight: bold;
 }
+.wquote .qheader .subtitle {
+}
 .wquote .qheader .buttons {
 	float: right;
 }
@@ -464,7 +466,7 @@ div.ro {
 .wquote .qheader .buttons .x {
 	margin-top: 7px;
 }
-.wquote .citation {
+.wquote .subTitle {
 	padding: 3px;
 }
 .wquote .quoted {
@@ -642,6 +644,7 @@ div.ro {
 		.documents .gwt-SuggestBoxPopup .item .entry {
 			width: 400px;
 			margin: 1px 0 1px 0;
+			overflow: hidden;
 		}
 			/* full text search entry */
 			.documents .gwt-SuggestBoxPopup .item .entry .query {

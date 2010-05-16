@@ -54,15 +54,15 @@ public class Notifier {
 	}
 
 	public void info(String msg) {
-		post(msg, MsgLevel.INFO, -1, false);
+		post(msg, MsgLevel.INFO, DEFAULT_DURATION, false);
 	}
 
 	public void warn(String msg) {
-		post(msg, MsgLevel.WARN, -1, false);
+		post(msg, MsgLevel.WARN, DEFAULT_DURATION, false);
 	}
 
 	public void error(String msg) {
-		post(msg, MsgLevel.ERROR, -1, false);
+		post(msg, MsgLevel.ERROR, DEFAULT_DURATION, false);
 	}
 
 	public void info(String msg, int duration) {

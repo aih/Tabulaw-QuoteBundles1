@@ -116,7 +116,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		@Override
 		protected void onCellClick(int colIndex, int rowIndex) {
 			if(rowIndex > 0 && colIndex < 2)
-				ViewManager.get().dispatch(new ShowViewRequest(new DocViewInitializer(getRowKey(rowIndex))));
+				ViewManager.get().dispatch(new ShowViewRequest(new DocViewInitializer(getRowData(rowIndex).getModelKey())));
 		}
 	}
 

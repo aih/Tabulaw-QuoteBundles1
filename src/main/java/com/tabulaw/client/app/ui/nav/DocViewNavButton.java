@@ -8,6 +8,7 @@ package com.tabulaw.client.app.ui.nav;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.mvc.view.IViewInitializer;
+import com.tabulaw.common.model.DocKey;
 import com.tabulaw.common.model.IModelKeyProvider;
 import com.tabulaw.common.model.ModelKey;
 
@@ -17,16 +18,16 @@ import com.tabulaw.common.model.ModelKey;
  */
 public class DocViewNavButton extends AbstractNavButton implements IModelKeyProvider {
 
-	private final ModelKey documentKey;
+	private final DocKey documentKey;
 
 	/**
 	 * Constructor
 	 * @param docKey The document model key
 	 */
-	public DocViewNavButton(ModelKey docKey) {
+	public DocViewNavButton(DocKey docKey) {
 		super();
 		this.documentKey = docKey;
-		setTitle("View " + documentKey.descriptor());
+		setTitle(documentKey.descriptor());
 		setDisplay(docKey.getName(), "doc", Resources.INSTANCE.documentIcon());
 	}
 

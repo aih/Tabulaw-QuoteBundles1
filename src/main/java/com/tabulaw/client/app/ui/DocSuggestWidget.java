@@ -49,8 +49,8 @@ import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
+import com.tabulaw.common.model.DocKey;
 import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.msg.Msg;
 
 /**
@@ -183,7 +183,7 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 			setWidget(flowPanel);
 			flowPanel.setStyleName("searchPlaceholder");
 			flowPanel.add(new Image(Resources.INSTANCE.magnifyingGlass()));
-			HTML html = new HTML("<p>e.g. 'New York Times Co. v. Sullivan'</p>");
+			HTML html = new HTML("<p>e.g. New York Times Co. v. Sullivan</p>");
 			html.setStyleName("text");
 			flowPanel.add(html);
 		}
@@ -288,7 +288,7 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 								}
 								
 								final DocRef docRef = result.getDocRef();
-								final ModelKey docKey = docRef.getModelKey();
+								final DocKey docKey = docRef.getModelKey();
 
 								// persist the new doc and propagate through app
 								ClientModelCache.get().persist(docRef, DocSuggestWidget.this);

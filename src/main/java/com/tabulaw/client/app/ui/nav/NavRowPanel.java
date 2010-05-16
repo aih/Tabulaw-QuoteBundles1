@@ -39,9 +39,9 @@ import com.tabulaw.client.mvc.view.ViewKey;
 import com.tabulaw.client.ui.SimpleHyperLink;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
 import com.tabulaw.client.ui.login.UserSessionEvent;
+import com.tabulaw.common.model.DocKey;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 
@@ -330,7 +330,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			if(index == -1) {
 				// create a doc nav button and tab
 				DocView dview = (DocView) ViewManager.get().resolveView(crntViewKey);
-				ModelKey docKey = dview.getDocKey();
+				DocKey docKey = dview.getDocKey();
 				DocViewNavButton dnb = new DocViewNavButton(docKey);
 				openDocNavButtons.add(0, dnb);
 				openDocTabs.insertTab(dnb, 0);

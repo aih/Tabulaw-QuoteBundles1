@@ -5,7 +5,6 @@
  */
 package com.tabulaw.common.model;
 
-
 import java.util.Date;
 
 /**
@@ -82,7 +81,8 @@ public class EntityFactory {
 	/**
 	 * Constructor
 	 */
-	private EntityFactory() {}
+	private EntityFactory() {
+	}
 
 	/**
 	 * Creates a new entity instance of the given an entity type. <br>
@@ -112,19 +112,23 @@ public class EntityFactory {
 		}
 		return e;
 	}
-	
+
 	/**
 	 * Builds a Case ref entity.
 	 * @param parties
-	 * @param citation
+	 * @param reftoken
+	 * @param docLoc
+	 * @param court
 	 * @param url
 	 * @param year
 	 * @return
 	 */
-	public CaseRef buildCase(String parties, String citation, String url, String year) {
+	public CaseRef buildCase(String parties, String reftoken, String docLoc, String court, String url, String year) {
 		CaseRef e = (CaseRef) create(EntityType.CASE);
-		e.setCitation(citation);
+		e.setReftoken(reftoken);
 		e.setParties(parties);
+		e.setDocLoc(docLoc);
+		e.setCourt(court);
 		e.setUrl(url);
 		if(year != null) {
 			try {
@@ -158,15 +162,17 @@ public class EntityFactory {
 	 * @param docHash the server-side filename
 	 * @param docDate
 	 * @param parties
-	 * @param citation
+	 * @param reftoken
+	 * @param docLoc
+	 * @param court
 	 * @param url
 	 * @param year
 	 * @return newly created model
 	 */
-	public DocRef buildCaseDoc(String docTitle, String docHash, Date docDate, String parties, String citation, String url,
-			String year) {
+	public DocRef buildCaseDoc(String docTitle, String docHash, Date docDate, String parties, String reftoken,
+			String docLoc, String court, String url, String year) {
 		DocRef doc = buildDoc(docTitle, docHash, docDate);
-		doc.setCaseRef(buildCase(parties, citation, url, year));
+		doc.setCaseRef(buildCase(parties, reftoken, docLoc, court, url, year));
 		return doc;
 	}
 

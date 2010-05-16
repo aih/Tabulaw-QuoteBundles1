@@ -28,6 +28,8 @@ import com.tabulaw.client.ui.toolbar.Toolbar;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
+import com.tabulaw.common.model.CaseRef.CitationFormatFlag;
+import com.tabulaw.util.StringUtil;
 
 /**
  * Base class for widgets displaying quotes.
@@ -40,7 +42,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractQuoteBundleWidget<?,
 
 		private final FlowPanel panel = new FlowPanel();
 
-		protected final HTML title, citation;
+		protected final HTML title, subTitle;
 
 		private final HorizontalPanel topRow = new HorizontalPanel();
 		private final Toolbar buttonsPanel = new Toolbar();
@@ -63,11 +65,11 @@ public abstract class AbstractQuoteWidget<B extends AbstractQuoteBundleWidget<?,
 			topRow.add(dragHandle);
 			topRow.add(buttonsPanel);
 
-			citation = new HTML();
-			citation.setStyleName("citation");
+			subTitle = new HTML();
+			subTitle.setStyleName("subtitle");
 
 			panel.add(topRow);
-			panel.add(citation);
+			panel.add(subTitle);
 		}
 		
 		public void addButton(Widget button) {
@@ -82,8 +84,8 @@ public abstract class AbstractQuoteWidget<B extends AbstractQuoteBundleWidget<?,
 			this.title.setHTML("<p>" + title + "</p>");
 		}
 
-		public void setQuoteCitation(String citation) {
-			this.citation.setHTML("<p>" + citation + "</p>");
+		public void setSubTitle(String subTitle) {
+			this.subTitle.setHTML("<p>" + subTitle + "</p>");
 		}
 	}
 
@@ -216,22 +218,20 @@ public abstract class AbstractQuoteWidget<B extends AbstractQuoteBundleWidget<?,
 	public void setModel(Quote quote) {
 		this.quote = quote;
 
-		String title, citation = "", quoteText = quote.getQuote();
+		String title, subTitle = "", quoteText = quote.getQuote();
 		DocRef doc = quote.getDocument();
 		title = doc.getTitle();
-		header.setQuoteTitle(title);
 
 		// case doc?
 		CaseRef caseRef = doc.getCaseRef();
 		if(caseRef != null) {
 			String parties = caseRef.getParties();
-			if(parties != null && parties.length() > 0 && !"null".equals(parties)) {
-				title = parties;
-			}
-			citation = caseRef.getCitation();
+			if(!StringUtil.isEmpty(parties)) title = parties;
+			subTitle = caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag());
 		}
-		header.setQuoteCitation(citation);
-
+		
+		header.setQuoteTitle(title);
+		header.setSubTitle(subTitle);
 		quoteBlock.setQuotedText(quoteText);
 	}
 

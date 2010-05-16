@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
@@ -73,17 +74,17 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 		catch(UnsupportedEncodingException e1) {
 			throw new IllegalStateException();
 		}
-		
+
 		// page size
 		sb.append("&num=");
 		sb.append(request.getNumResults());
-		
+
 		// offset
 		if(request.getOffset() > 0) {
 			sb.append("&start=");
 			sb.append(request.getOffset());
 		}
-		
+
 		sb.append("&as_epq=");
 		sb.append("&as_oq=");
 
@@ -116,37 +117,37 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 	 * GOOGLE_SCHOLAR format: <br>
 	 * 
 	 * <pre>
-		<div class="gs_r">
-		  <h3>
-		    <a class="yC7" href="/scholar_case?case=9143673394692693115&amp;q=term&amp;hl=en&amp;as_sdt=2002">
-		      Connally v. General Constr. Co.
-		    </a>
-		  </h3>
-		  - 
-		  <a href="/scholar_case?about=9143673394692693115&amp;q=term&amp;hl=en&amp;as_sdt=2002" class="gs_fl">
-		    How cited
-		  </a>
-		  <font size="-1">
-		    <br>
-		    <span class="gs_a">269 US 385, 46 S. Ct. 126, 70 L. Ed. 322 - Supreme Court, 1926 - Google Scholar</span>
-		    <br>
-		    <b>...</b> 
-		    process of law, in violation of the Fourteenth Amendment to the federal Constitution; that they<br>
-		    contain no ascertainable standard of guilt; that it cannot be determined with any degree of certainty<br>
-		    what sum constitutes a current wage in any locality; and that the <b>term</b> "locality" itself <b>...</b> <br>
-		    <span class="gs_fl">
-		      <a href="/scholar?cites=9143673394692693115&amp;hl=en&amp;as_sdt=2002">Cited by 4084</a>
-		      - 
-		      <a href="/scholar?q=related:exzZ2IHa5H4J:scholar.google.com/&amp;hl=en&amp;as_sdt=2002">
-		        Related articles
-		      </a>
-		      - 
-		      <a href="/scholar?cluster=9143673394692693115&amp;hl=en&amp;as_sdt=2002">
-		        All 4 versions
-		      </a>
-		    </span>
-		  </font>
-		</div>
+	 * <div class="gs_r">
+	 * 		  <h3>
+	 * 		    <a class="yC7" href="/scholar_case?case=9143673394692693115&amp;q=term&amp;hl=en&amp;as_sdt=2002">
+	 * 		      Connally v. General Constr. Co.
+	 * 		    </a>
+	 * 		  </h3>
+	 * 		  - 
+	 * 		  <a href="/scholar_case?about=9143673394692693115&amp;q=term&amp;hl=en&amp;as_sdt=2002" class="gs_fl">
+	 * 		    How cited
+	 * 		  </a>
+	 * 		  <font size="-1">
+	 * 		    <br>
+	 * 		    <span class="gs_a">269 US 385, 46 S. Ct. 126, 70 L. Ed. 322 - Supreme Court, 1926 - Google Scholar</span>
+	 * 		    <br>
+	 * 		    <b>...</b> 
+	 * 		    process of law, in violation of the Fourteenth Amendment to the federal Constitution; that they<br>
+	 * 		    contain no ascertainable standard of guilt; that it cannot be determined with any degree of certainty<br>
+	 * 		    what sum constitutes a current wage in any locality; and that the <b>term</b> "locality" itself <b>...</b> <br>
+	 * 		    <span class="gs_fl">
+	 * 		      <a href="/scholar?cites=9143673394692693115&amp;hl=en&amp;as_sdt=2002">Cited by 4084</a>
+	 * 		      - 
+	 * 		      <a href="/scholar?q=related:exzZ2IHa5H4J:scholar.google.com/&amp;hl=en&amp;as_sdt=2002">
+	 * 		        Related articles
+	 * 		      </a>
+	 * 		      - 
+	 * 		      <a href="/scholar?cluster=9143673394692693115&amp;hl=en&amp;as_sdt=2002">
+	 * 		        All 4 versions
+	 * 		      </a>
+	 * 		    </span>
+	 * 		  </font>
+	 * 		</div>
 	 * </pre>
 	 * @param rawHtml
 	 * @return array of html strings
@@ -155,9 +156,9 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 	@Override
 	public List<CaseDocSearchResult> parseSearchResults(String rawHtml) {
 		ArrayList<CaseDocSearchResult> results = new ArrayList<CaseDocSearchResult>();
-		
+
 		HtmlCleaner cleaner = new HtmlCleaner();
-		
+
 		TagNode root;
 		try {
 			root = cleaner.clean(rawHtml);
@@ -177,7 +178,8 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 		TagNode[] tnarr;
 		TagNode tn;
 		String cname, docTitle, docTitleHtml, docUrl, citation, docSummary;
-		
+		String href;
+
 		for(TagNode rawElm : rawResults) {
 			cname = docTitle = docTitleHtml = docUrl = citation = docSummary = "";
 
@@ -185,9 +187,14 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 			tnarr = rawElm.getElementsByName("h3", true);
 			if(tnarr != null && tnarr.length > 0) {
 				tn = (TagNode) tnarr[0].getChildTagList().get(0);
-				docUrl = "http://scholar.google.com" + tn.getAttributes().get("href");
+				href = (String) tn.getAttributes().get("href");
+				if(href == null) href = "";
+				if(href.indexOf("http") < 0) href = "http://scholar.google.com" + href;
+				docUrl = href;
 				docTitleHtml = cleaner.getInnerHtml(tn);
-				docTitle = docTitleHtml.replace("<b>", "").replace("</b>", "");
+				// strip out html tags
+				docTitle = docTitleHtml.replaceAll("\\<.*?\\>", "");
+				docTitle = StringEscapeUtils.unescapeHtml(docTitle);
 			}
 			else {
 				System.out.println("WARN: No h3 tag found in search result entry");
@@ -208,69 +215,106 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 				}
 				else {
 					String txt = child.toString();
-					//String txt = tn.getText().toString().trim();
+					// String txt = tn.getText().toString().trim();
 					if(txt.length() > 0 && !"null".equals(txt)) {
 						docSummary += txt;
 					}
 				}
 			}
-			
+
 			docSummary = docSummary.trim().replaceAll("\n", "") + "...";
-			
+
 			// TODO fix and not use current date rather extract it
 			Date docDate = new Date();
 
 			results.add(new CaseDocSearchResult(docTitle, docDate, docUrl, citation, docTitleHtml, docSummary));
 		}
-		
+
 		return results;
 	}
-	
+
 	@Override
 	public DocRef parseSingleDocument(String rawHtml) {
-		String parties = "", citation = "", syear = "", docTitle = "", htmlContent = "";
+		String reftoken = "", dlcy = "", parties = "", docLoc = "", court = "", syear = "", docTitle = "", htmlContent = "";
 		Date date = new Date();
-		
+
 		try {
 			HtmlCleaner cleaner = new HtmlCleaner();
 			TagNode root = cleaner.clean(rawHtml);
 			TagNode[] tnarr;
-			
+
 			// extract citation/doc title
-			tnarr = root.getElementsByName("title", true);
-			if(tnarr == null || tnarr.length < 1)
-				throw new IllegalArgumentException("No title tag found");
-			citation = tnarr[0].getText().toString().replace(" - Google Scholar", "");
-			if(citation.length() < 1) {
+			tnarr = root.getElementsByAttValue("id", "gsl_reference", true, false);
+			if(tnarr == null || tnarr.length < 1) {
+				// fall back on gsl_title
 				tnarr = root.getElementsByAttValue("class", "gsl_title", true, false);
-				if(tnarr != null && tnarr.length > 0) {
-					citation = tnarr[0].getText().toString().replace(" - Google Scholar", "");
+				if(tnarr == null || tnarr.length < 1) throw new IllegalArgumentException("No gsl_reference nor gsl_title tags found");
+				if(tnarr.length > 0) {
+					reftoken = tnarr[0].getText().toString().replace(" - Google Scholar", "");
 				}
 			}
-			
-			String[] sarr = citation.split(",");
-			if(sarr.length >= 2) {
+			reftoken = tnarr[0].getText().toString().trim();
+			reftoken = reftoken.replace("\r", "").replace("\n", "");
+			while(reftoken.indexOf("  ") >= 0) reftoken = reftoken.replace("  ", " ");
+
+			String[] sarr = reftoken.split(",");
+			if(sarr.length > 2) {
+				// re-join the split parts after the first element
+				String[] nsarr = new String[2];
+				nsarr[0] = sarr[0];
+				String two = "";
+				for(int i = 1; i < sarr.length; i++) {
+					two += ',' + sarr[i];
+				}
+				nsarr[1] = two.substring(1);
+				sarr = nsarr;
+			}
+			if(sarr.length == 2) {
 				parties = sarr[0].trim();
+				dlcy = sarr[1].trim();
+				
+				// parse citation into constituent parts
+				sarr = dlcy.split("-");
+				if(sarr.length == 2) {
+					docLoc = sarr[0].trim(); // i.e. "216 SE 2d 199"
+					court = sarr[1].trim(); // i.e. "Va: Supreme Court 1975"
+					//int colonIndex = court.indexOf(':');
+					//if(colonIndex >= 0) {
+						//court = court.substring(colonIndex + 1).trim();
+						
+						int courtlen = court.length();
+						if(courtlen > 4) {
+							String sub = court.substring(courtlen - 4);
+							if(sub.startsWith("19") || sub.startsWith("20")) {
+								syear = sub;
+								court = court.substring(0, courtlen - 4).trim();
+							}
+						}
+
+					//}
+				}
+
 				docTitle = parties;
 			}
 			else {
-				docTitle = citation;
+				docTitle = reftoken;
 			}
-			
-			int dtlen = citation.length();
-			if(dtlen > 4) {
-				String sub = citation.substring(dtlen - 4);
-				if(sub.startsWith("19") || sub.startsWith("20")) {
-					syear = sub;
+
+			if(syear.length() == 0) {
+				int dtlen = reftoken.length();
+				if(dtlen > 4) {
+					String sub = reftoken.substring(dtlen - 4);
+					if(sub.startsWith("19") || sub.startsWith("20")) {
+						syear = sub;
+					}
 				}
 			}
-			
+
 			// extract #gsl_opinion div (docContent)
 			TagNode[] tags = root.getElementsByAttValue("id", "gsl_opinion", true, false);
-			if(tags == null || tags.length < 1)
-				throw new IllegalArgumentException("No gsl_opinion tag found");
+			if(tags == null || tags.length < 1) throw new IllegalArgumentException("No gsl_opinion tag found");
 			TagNode tagOpinion = tags[0];
-			
+
 			// remove any nested script tags
 			TagNode[] stags = tagOpinion.getElementsByName("script", true);
 			if(stags != null) {
@@ -279,10 +323,10 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 				}
 			}
 			htmlContent = cleaner.getInnerHtml(tags[0]);
-			
+
 			// absolutize local hrefs
 			htmlContent = htmlContent.replace("/scholar_case", "http://scholar.google.com/scholar_case");
-			
+
 			StringBuilder sb = new StringBuilder(htmlContent.length() + 1024);
 			sb.append(htmlContent);
 			DocUtils.localizeDoc(sb, docTitle);
@@ -291,10 +335,10 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 		catch(IOException e) {
 			throw new IllegalArgumentException(e);
 		}
-		
-		DocRef doc = EntityFactory.get().buildCaseDoc(docTitle, null, date, parties, citation, null, syear);
+
+		DocRef doc = EntityFactory.get().buildCaseDoc(docTitle, null, date, parties, reftoken, docLoc, court, null, syear);
 		doc.setHtmlContent(htmlContent);
-		
+
 		return doc;
 	}
 }

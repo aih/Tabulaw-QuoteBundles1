@@ -15,8 +15,8 @@ import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.UnloadViewRequest;
 import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.mvc.view.ViewOptions;
+import com.tabulaw.common.model.DocKey;
 import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.ModelKey;
 
 /**
  * Displays a single document allowing quote/bundle editing.
@@ -53,7 +53,7 @@ public class DocView extends AbstractPocView<DocViewInitializer> {
 
 	private final DocHighlightWidget docWidget = new DocHighlightWidget();
 
-	private ModelKey docKey;
+	private DocKey docKey;
 
 	/**
 	 * Constructor
@@ -81,7 +81,7 @@ public class DocView extends AbstractPocView<DocViewInitializer> {
 	/**
 	 * @return The key of the document being viewed for this view instance.
 	 */
-	public ModelKey getDocKey() {
+	public DocKey getDocKey() {
 		return docKey;
 	}
 

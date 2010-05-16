@@ -50,10 +50,8 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	}
 
 	@Override
-	public final ModelKey getModelKey() {
-		ModelKey mk = super.getModelKey();
-		mk.setName(getName());
-		return mk;
+	public final DocKey getModelKey() {
+		return new DocKey(getEntityType(), getId(), getName(), getCitation());
 	}
 
 	@Override
@@ -85,12 +83,12 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	}
 
 	/**
-	 * Provides the citation text if this is a case doc or <code>null</code>
-	 * if not a case doc.
+	 * Provides the citation text if this is a case doc or <code>null</code> if
+	 * not a case doc.
 	 * @return the citation text or <code>null</code>
 	 */
 	public String getCitation() {
-		return caseRef == null ? null : caseRef.getCitation();
+		return caseRef == null ? null : caseRef.descriptor();
 	}
 
 	@NotEmpty

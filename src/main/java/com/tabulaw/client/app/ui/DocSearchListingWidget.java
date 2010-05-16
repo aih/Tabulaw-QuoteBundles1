@@ -7,7 +7,6 @@ package com.tabulaw.client.app.ui;
 
 import java.util.List;
 
-import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Command;
@@ -199,7 +198,8 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 				@Override
 				protected void handleFailure(Throwable caught) {
 					super.handleFailure(caught);
-					Log.error("Unable to fetch remote document", caught);
+					//Log.error("Unable to fetch remote document", caught);
+					Notifier.get().showFor(caught);
 				}
 
 				@Override

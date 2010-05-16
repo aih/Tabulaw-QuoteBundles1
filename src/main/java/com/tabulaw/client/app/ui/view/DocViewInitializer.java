@@ -6,7 +6,7 @@
 package com.tabulaw.client.app.ui.view;
 
 import com.tabulaw.client.mvc.view.AbstractDynamicViewInitializer;
-import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.common.model.DocKey;
 
 /**
  * DocViewInitializer
@@ -14,13 +14,13 @@ import com.tabulaw.common.model.ModelKey;
  */
 public class DocViewInitializer extends AbstractDynamicViewInitializer {
 
-	private final ModelKey documentKey;
+	private final DocKey documentKey;
 
 	/**
 	 * Constructor
 	 * @param documentKey
 	 */
-	public DocViewInitializer(ModelKey documentKey) {
+	public DocViewInitializer(DocKey documentKey) {
 		super(DocView.klas);
 		this.documentKey = documentKey;
 	}
@@ -30,7 +30,7 @@ public class DocViewInitializer extends AbstractDynamicViewInitializer {
 		return documentKey.hashCode();
 	}
 
-	public ModelKey getDocumentKey() {
+	public DocKey getDocumentKey() {
 		return documentKey;
 	}
 }
