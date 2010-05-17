@@ -20,6 +20,7 @@ import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.DocUserBinding;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.common.model.QuoteUserBinding;
 import com.tabulaw.common.model.UserState;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
@@ -46,6 +47,18 @@ public class UserDataService extends AbstractEntityService {
 		super(dao, validationFactory);
 	}
 	
+	@Transactional(readOnly = true)
+	public List<Quote> getOrphanedQuotesForUser(String userId) {
+		if(userId == null) throw new NullPointerException();
+		List<QuoteUserBinding> bindings = dao.loadAll(QuoteUserBinding.class);
+		ArrayList<String> ids = new ArrayList<String>(bindings.size());
+		for(QuoteUserBinding binding : bindings) {
+			ids.add(binding.getQuoteId());
+		}
+		List<Quote> list = dao.findByIds(Quote.class, ids, null);
+		return list;
+	}
+
 	@Transactional(readOnly = true)
 	public List<DocRef> getDocsForUser(String userId) {
 		if(userId == null) throw new NullPointerException();
@@ -105,7 +118,7 @@ public class UserDataService extends AbstractEntityService {
 	/**
 	 * Saves user state.
 	 * @param userState
-	 * @throws EntityExistsException 
+	 * @throws EntityExistsException
 	 */
 	@Transactional
 	public void saveUserState(UserState userState) throws EntityExistsException {
@@ -158,7 +171,7 @@ public class UserDataService extends AbstractEntityService {
 		existingQb.setDescription(bundle.getDescription());
 		dao.persist(existingQb);
 	}
-	
+
 	/**
 	 * Saves the doc for the given user.
 	 * @param userId
@@ -169,7 +182,7 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional
 	public DocRef saveDocForUser(String userId, DocRef doc) throws ConstraintViolationException {
 		if(userId == null || doc == null) throw new NullPointerException();
-		
+
 		validate(doc);
 
 		DocRef existing;
@@ -188,7 +201,7 @@ public class UserDataService extends AbstractEntityService {
 		else {
 			doc = existing;
 		}
-		
+
 		// create binding
 		try {
 			addDocUserBinding(userId, doc.getId());
@@ -293,7 +306,7 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional
 	public QuoteBundle addBundleForUser(String userId, QuoteBundle bundle) throws ConstraintViolationException {
 		if(userId == null || bundle == null) throw new NullPointerException();
-		
+
 		try {
 			dao.load(QuoteBundle.class, bundle.getId());
 			throw new IllegalArgumentException("Bundle already exists.");
@@ -337,6 +350,7 @@ public class UserDataService extends AbstractEntityService {
 
 	/**
 	 * Adds the given quote to the quote bundle identified by the given bundle id.
+	 * @param userId needed for creating quote/user binding
 	 * @param bundleId
 	 * @param quote
 	 * @return the persisted quote
@@ -345,13 +359,13 @@ public class UserDataService extends AbstractEntityService {
 	 *         given id
 	 */
 	@Transactional
-	public Quote addQuoteToBundle(String bundleId, Quote quote) throws ConstraintViolationException,
+	public Quote addQuoteToBundle(String userId, String bundleId, Quote quote) throws ConstraintViolationException,
 			EntityNotFoundException {
-		if(bundleId == null || quote == null) throw new NullPointerException();
-		
+		if(userId == null || bundleId == null || quote == null) throw new NullPointerException();
+
 		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);
 		assert qb != null;
-		
+
 		// ensure quote is new
 		try {
 			dao.load(Quote.class, quote.getId());
@@ -360,10 +374,11 @@ public class UserDataService extends AbstractEntityService {
 		catch(EntityNotFoundException e) {
 			// expected
 		}
-		
+
 		validate(quote);
-		
-		// get the doc ref from the db to avoid having multiple docs of the same id persisted!
+
+		// get the doc ref from the db to avoid having multiple docs of the same id
+		// persisted!
 		// NOTE: this is a db40 specific issue
 		DocRef persistedDoc = null;
 		try {
@@ -376,10 +391,14 @@ public class UserDataService extends AbstractEntityService {
 			// persist it
 			persistedDoc = dao.persist(quote.getDocument());
 		}
-		
+
 		Quote persistedQuote = dao.persist(quote);
 		qb.addQuote(persistedQuote);
 		dao.persist(qb);
+
+		// add quote/user binding
+		addQuoteUserBinding(userId, persistedQuote.getId());
+
 		return persistedQuote;
 	}
 
@@ -389,17 +408,17 @@ public class UserDataService extends AbstractEntityService {
 	 * The quote is <em>not</em> deleted rather it is put into a potentially
 	 * "orphaned" state meaning no bundles may reference the removed quote.
 	 * <p>
-	 * TODO handle orphaned quotes case
+	 * @param userId needed for removing the quote/user binding
 	 * @param bundleId
 	 * @param quoteId
-	 * @param deleteQuote delete the quote as well?
+	 * @param deleteQuote delete the quote as well? If <code>false</code>, the quote will be orphaned.
 	 * @throws EntityNotFoundException when the quote isn't found to exist in the
 	 *         bundle
 	 */
 	@Transactional
-	public void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote)
+	public void removeQuoteFromBundle(String userId, String bundleId, String quoteId, boolean deleteQuote)
 			throws EntityNotFoundException {
-		if(bundleId == null || quoteId == null) throw new NullPointerException();
+		if(userId == null || bundleId == null || quoteId == null) throw new NullPointerException();
 		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);
 		Quote tormv = null;
 		if(qb.getQuotes() != null) {
@@ -413,8 +432,14 @@ public class UserDataService extends AbstractEntityService {
 		if(tormv == null) throw new EntityNotFoundException("Quote: " + quoteId + " not found in bundle: " + bundleId);
 		qb.removeQuote(tormv);
 		dao.persist(qb);
+
 		if(deleteQuote) {
 			dao.purge(tormv);
+			removeQuoteUserBinding(userId, quoteId, false);
+		}
+		else {
+			// mark quote as orphaned
+			removeQuoteUserBinding(userId, quoteId, true);
 		}
 	}
 
@@ -487,7 +512,7 @@ public class UserDataService extends AbstractEntityService {
 		}
 		dao.purge(binding);
 	}
-	
+
 	/**
 	 * Removes all user/doc bindings that exist for a given doc
 	 * @param docId id of the doc
@@ -508,4 +533,43 @@ public class UserDataService extends AbstractEntityService {
 			dao.purgeAll(bindings);
 		}
 	}
+
+	/**
+	 * Adds an association of an existing quote to an existing user.
+	 * @param userId
+	 * @param quoteId
+	 * @throws EntityExistsException if the association already exists
+	 */
+	@Transactional
+	public void addQuoteUserBinding(String userId, String quoteId) throws EntityExistsException {
+		if(quoteId == null || userId == null) throw new NullPointerException();
+		QuoteUserBinding binding = new QuoteUserBinding(quoteId, userId, false);
+		dao.persist(binding);
+	}
+
+	/**
+	 * Removes a user quote association.
+	 * @param userId
+	 * @param quoteId
+	 * @param orphan Keep the binding and mark it as orphaned or delete it?
+	 * @throws EntityNotFoundException when the association doesn't exist
+	 */
+	@Transactional
+	public void removeQuoteUserBinding(String userId, String quoteId, boolean orphan) throws EntityNotFoundException {
+		if(quoteId == null || userId == null) throw new NullPointerException();
+		Criteria<QuoteUserBinding> c = new Criteria<QuoteUserBinding>(QuoteUserBinding.class);
+		c.getPrimaryGroup().addCriterion("quoteId", quoteId, Comparator.EQUALS, true);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		QuoteUserBinding binding;
+		try {
+			binding = dao.findEntity(c);
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
+
+		binding.setOrphaned(true);
+		dao.persist(binding);
+	}
+
 }

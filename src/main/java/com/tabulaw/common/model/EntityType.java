@@ -21,7 +21,7 @@ public enum EntityType implements IMarshalable, ITypeDescriptorProvider {
 	USER_STATE("User State"),
 
 	BUNDLE_USER_BINDING("Bundle User Binding"),
-
+	QUOTE_USER_BINDING("Quote User Binding"),
 	DOC_USER_BINDING("Document User Binding"),
 
 	CASE("Case"),

@@ -35,20 +35,4 @@ public class QuoteDocWidget extends AbstractQuoteWidget<QuoteBundleDocWidget> {
 		});
 		header.insertButton(img, 0);
 	}
-
-	@Override
-	protected String getXTitle() {
-		return "Permanantly delete quote";
-	}
-
-	@Override
-	protected boolean allowXClick() {
-		return true;
-	}
-
-	@Override
-	protected void handleXClick() {
-		// remove from bundle and permanantly delete the quote
-		parentQuoteBundleWidget.removeQuote(quote, true, true);
-	}
 }

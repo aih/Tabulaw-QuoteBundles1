@@ -294,9 +294,15 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 			// get the user's quote bundles
 			List<QuoteBundle> bundles = pc.getUserDataService().getBundlesForUser(user.getId());
-			if(bundles != null) {
-				payload.setBundles(bundles);
-			}
+			assert bundles != null;
+			ArrayList<QuoteBundle> allBundles = new ArrayList<QuoteBundle>(bundles.size() + 1); 
+			payload.setBundles(allBundles);
+			
+			// get the user's orphaned quotes adding it to the list of all user bundles
+			List<Quote> oqs = pc.getUserDataService().getOrphanedQuotesForUser(user.getId());
+			QuoteBundle oqb = QuoteBundle.newOrphanedQuoteBundle();
+			oqb.setQuotes(oqs);
+			allBundles.add(oqb);
 
 			// get the next ids for client-side use
 			Map<String, Integer[]> nextIds = getNextIdMap();
@@ -527,7 +533,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	}
 
 	@Override
-	public ModelPayload<Quote> addQuoteToBundle(String bundleId, Quote quote) {
+	public ModelPayload<Quote> addQuoteToBundle(String userId, String bundleId, Quote quote) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
@@ -535,7 +541,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		ModelPayload<Quote> payload = new ModelPayload<Quote>(status);
 
 		try {
-			quote = userDataService.addQuoteToBundle(bundleId, quote);
+			quote = userDataService.addQuoteToBundle(userId, bundleId, quote);
 			payload.setModel(quote);
 			status.addMsg("Quote added.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
@@ -585,7 +591,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	}
 
 	@Override
-	public Payload removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote) {
+	public Payload removeQuoteFromBundle(String userId, String bundleId, String quoteId, boolean deleteQuote) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
@@ -593,8 +599,8 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		Payload payload = new Payload(status);
 
 		try {
-			userDataService.removeQuoteFromBundle(bundleId, quoteId, deleteQuote);
-			status.addMsg("Quote removed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+			userDataService.removeQuoteFromBundle(userId, bundleId, quoteId, deleteQuote);
+			status.addMsg("Quote " + (deleteQuote ? "removed." : "orphaned."), MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
 			exceptionToStatus(e, payload.getStatus());

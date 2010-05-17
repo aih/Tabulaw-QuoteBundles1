@@ -13,6 +13,7 @@ import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.common.model.QuoteUserBinding;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
 
@@ -25,6 +26,8 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 	public Class<? extends IEntity> resolveEntityClass(String entityType) throws IllegalArgumentException {
 		EntityType et = EntityType.fromString(entityType);
 		switch(et) {
+			case QUOTE_USER_BINDING:
+				return QuoteUserBinding.class;
 			case BUNDLE_USER_BINDING:
 				return BundleUserBinding.class;
 			case DOC_USER_BINDING:
@@ -47,7 +50,10 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 
 	@Override
 	public String resolveEntityType(Class<? extends IEntity> clz) throws IllegalArgumentException {
-		if(clz == BundleUserBinding.class) {
+		if(clz == QuoteUserBinding.class) {
+			return EntityType.QUOTE_USER_BINDING.name();
+		}
+		else if(clz == BundleUserBinding.class) {
 			return EntityType.BUNDLE_USER_BINDING.name();
 		}
 		else if(clz == DocUserBinding.class) {

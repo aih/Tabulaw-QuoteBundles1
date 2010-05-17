@@ -102,6 +102,8 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 				targetQuoteBundleWidget =
 						(QuoteBundleEditWidget) context.finalDropController.getDropTarget().getParent().getParent();
 			}
+			// CRITICAL: we must catch a Throwable as opposed to a NullPointerException in order 
+			// for this to work in webmode!!!
 			catch(Throwable t) {
 				// presume the drop target is the same as the source!
 				//return;

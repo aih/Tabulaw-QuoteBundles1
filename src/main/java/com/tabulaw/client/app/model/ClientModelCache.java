@@ -120,6 +120,15 @@ public class ClientModelCache {
 		doServerPersist = true;
 
 	} // constructor
+	
+	public QuoteBundle getOrphanQuoteBundle() {
+		List<? extends IEntity> list = entities.get(EntityType.QUOTE_BUNDLE.name());
+		for(IEntity elm : list) {
+			QuoteBundle qb = (QuoteBundle) elm;
+			if(qb.isOrphanedQuoteContainer()) return qb;
+		}
+		throw new IllegalStateException("No orphan quote container cached.");
+	}
 
 	public void saveBundle(QuoteBundle bundle) {
 		if(!doServerPersist) return;
@@ -191,7 +200,8 @@ public class ClientModelCache {
 
 	public void addQuoteToBundle(String bundleId, Quote quote) {
 		if(!doServerPersist) return;
-		userDataService.addQuoteToBundle(bundleId, quote, new AsyncCallback<ModelPayload<Quote>>() {
+		String userId = getUser().getId();
+		userDataService.addQuoteToBundle(userId, bundleId, quote, new AsyncCallback<ModelPayload<Quote>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -207,7 +217,8 @@ public class ClientModelCache {
 
 	public void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote) {
 		if(!doServerPersist) return;
-		userDataService.removeQuoteFromBundle(bundleId, quoteId, deleteQuote, new AsyncCallback<Payload>() {
+		String userId = getUser().getId();
+		userDataService.removeQuoteFromBundle(userId, bundleId, quoteId, deleteQuote, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

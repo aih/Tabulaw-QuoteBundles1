@@ -102,17 +102,20 @@ public interface IUserDataService extends RemoteService {
 
 	/**
 	 * Adds a quote to the bundle
+	 * @param userId the user for which the added quote is bound
 	 * @param bundleId id of the bundle to which the quote will be added
 	 * @param quote quote to add
 	 * @return the persisted quote
 	 */
-	ModelPayload<Quote> addQuoteToBundle(String bundleId, Quote quote);
+	ModelPayload<Quote> addQuoteToBundle(String userId, String bundleId, Quote quote);
 
 	/**
+	 * @param userId the user for which the quote/user binding is removed
 	 * @param bundleId id of the bundle containing the quote to remove.
 	 * @param quoteId id of the quote to remove
-	 * @param deleteQuote Permanantly delete the quote as well?
+	 * @param deleteQuote Permanantly delete the quote as well? If
+	 *        <code>false</code>, the quote will be orphaned.
 	 * @return the status of the removal
 	 */
-	Payload removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote);
+	Payload removeQuoteFromBundle(String userId, String bundleId, String quoteId, boolean deleteQuote);
 }

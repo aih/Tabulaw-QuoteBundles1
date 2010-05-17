@@ -244,18 +244,16 @@ public abstract class AbstractQuoteWidget<B extends AbstractQuoteBundleWidget<?,
 		return addHandler(handler, QuoteEvent.TYPE);
 	}
 
-	/**
-	 * @return The title text to show when mouse hovers the x icon.
-	 */
-	protected abstract String getXTitle();
+	protected String getXTitle() {
+		return "Orphan quote?";
+	}
 
-	/**
-	 * @return <code>true</code> if X click action should occur.
-	 */
-	protected abstract boolean allowXClick();
+	protected boolean allowXClick() {
+		return true;
+	}
 
-	/**
-	 * Handles the X click action.
-	 */
-	protected abstract void handleXClick();
+	protected void handleXClick() {
+		// orphan the quote
+		parentQuoteBundleWidget.removeQuote(quote, true, false);
+	}
 }

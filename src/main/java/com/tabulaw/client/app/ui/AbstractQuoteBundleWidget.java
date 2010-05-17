@@ -10,10 +10,12 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.QuoteBundleEditWidget.Styles;
 import com.tabulaw.client.convert.IConverter;
 import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.edit.EditableTextWidget;
 import com.tabulaw.common.model.Quote;
@@ -239,6 +241,14 @@ extends AbstractModelChangeAwareWidget {
 				}
 			}
 		}
+		
+		if(bundle != null && bundle.isOrphanedQuoteContainer()) {
+			panel.addStyleName("orphaned");
+		}
+		else {
+			panel.removeStyleName("orphaned");
+		}
+		
 		this.bundle = bundle;
 	}
 
@@ -298,10 +308,18 @@ extends AbstractModelChangeAwareWidget {
 			if(bundle.removeQuote(mQuote)) {
 				if(persist) {
 					// delete the quote updating the bundle quote refs too
-					if(deleteQuote) {
+					//if(deleteQuote) {
 						ClientModelCache.get().remove(mQuote.getModelKey(), AbstractQuoteBundleWidget.this);
-					}
+					//}
 					ClientModelCache.get().persist(bundle, AbstractQuoteBundleWidget.this);
+					
+					// TODO this probably needs robustification
+					if(!deleteQuote) {
+						// orphaned
+						QuoteBundle qbOrphaned = ClientModelCache.get().getOrphanQuoteBundle();
+						qbOrphaned.addQuote(mQuote);
+						Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractQuoteBundleWidget.this, ModelChangeOp.UPDATED, null, qbOrphaned.getModelKey()));
+					}
 
 					// server side persist
 					ClientModelCache.get().removeQuoteFromBundle(bundle.getId(), mQuote.getId(), deleteQuote);

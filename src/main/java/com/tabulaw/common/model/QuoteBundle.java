@@ -18,6 +18,19 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class QuoteBundle extends TimeStampEntity implements INamedEntity, Comparable<QuoteBundle> {
 
 	private static final long serialVersionUID = -6606826756860275551L;
+	
+	private static final String ORPHANED_QUOTES_BUNDLE_NAME = "Orphaned Quotes";
+
+	/**
+	 * @return Newly created instance with hard-coded properties signifying a
+	 *         container for orphaned qoutes.
+	 */
+	public static QuoteBundle newOrphanedQuoteBundle() {
+		QuoteBundle oqb = new QuoteBundle();
+		oqb.setName(ORPHANED_QUOTES_BUNDLE_NAME);
+		oqb.setDescription("All orphaned quotes");
+		return oqb;
+	}
 
 	private String id;
 
@@ -30,6 +43,14 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 	 */
 	public QuoteBundle() {
 		super();
+	}
+	
+	/**
+	 * Is this a container for orphaned quotes?
+	 * @return true/false
+	 */
+	public boolean isOrphanedQuoteContainer() {
+		return ORPHANED_QUOTES_BUNDLE_NAME.equals(getName());
 	}
 
 	@Override
@@ -59,15 +80,15 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 	public void doClone(IEntity cln) {
 		super.doClone(cln);
 		QuoteBundle qb = (QuoteBundle) cln;
-		
+
 		ArrayList<Quote> cquotes = null;
 		if(quotes != null) {
 			cquotes = new ArrayList<Quote>(quotes.size());
 			for(Quote q : quotes) {
-				cquotes.add((Quote)q.clone());
+				cquotes.add((Quote) q.clone());
 			}
 		}
-		
+
 		qb.id = id;
 		qb.name = name;
 		qb.description = description;
@@ -78,7 +99,7 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 	public String descriptor() {
 		return typeDesc() + " (" + getName() + ")";
 	}
-	
+
 	@Override
 	public String getEntityType() {
 		return EntityType.QUOTE_BUNDLE.name();

@@ -33,6 +33,7 @@ import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.DocUserBinding;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.common.model.QuoteUserBinding;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
 import com.tabulaw.config.Config;
@@ -126,6 +127,7 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 		cc.objectClass(QuoteBundle.class).updateDepth(2);
 		cc.objectClass(BundleUserBinding.class).updateDepth(0);
 		cc.objectClass(DocUserBinding.class).updateDepth(0);
+		cc.objectClass(QuoteUserBinding.class).updateDepth(0);
 	}
 
 	/**
