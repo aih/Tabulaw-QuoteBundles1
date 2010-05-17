@@ -86,6 +86,7 @@ public class TextSelectApi {
 		//alert('shutdown - frameId: ' + frameId);
 		try {
 			var frame = $wnd.goog.dom.$(frameId);
+			if(frame == null) return;
 			//alert('shutdown - frame: ' + frame);
 			var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 			//alert('shutdown - fbody: ' + fbody);

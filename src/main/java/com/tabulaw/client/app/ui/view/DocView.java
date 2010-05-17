@@ -8,7 +8,7 @@ package com.tabulaw.client.app.ui.view;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.DocHighlightWidget;
+import com.tabulaw.client.app.ui.DocAndBundleWidget;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;
@@ -51,7 +51,7 @@ public class DocView extends AbstractPocView<DocViewInitializer> {
 		}
 	}
 
-	private final DocHighlightWidget docWidget = new DocHighlightWidget();
+	private final DocAndBundleWidget docWidget = new DocAndBundleWidget();
 
 	private DocKey docKey;
 

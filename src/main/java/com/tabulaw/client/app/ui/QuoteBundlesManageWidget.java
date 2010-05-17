@@ -54,6 +54,19 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	} // Styles
 
 	static final int NUM_COLUMNS = 3;
+	
+	static enum QbColStyle {
+		one, two, three;
+		
+		public static QbColStyle resolveFromNumBundles(int numBundles) {
+			switch(numBundles) {
+				case 1: return one;
+				case 2: return two;
+				default:
+				case 3: return three;
+			}
+		}
+	}
 
 	class QuoteBundleDragHandler extends LoggingDragHandler {
 
@@ -89,12 +102,14 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 				targetQuoteBundleWidget =
 						(QuoteBundleEditWidget) context.finalDropController.getDropTarget().getParent().getParent();
 			}
-			catch(NullPointerException e) {
+			catch(Throwable t) {
 				// presume the drop target is the same as the source!
-				return;
+				//return;
+				throw new VetoDragException();
 			}
 			if(targetQuoteBundleWidget == sourceQuoteBundleWidget) {
-				return;
+				//return;
+				throw new VetoDragException();
 			}
 
 			Quote draggedQuoteModel = draggedQuoteWidget.getModel();
@@ -225,18 +240,12 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 * @param quoteBundleWidget The quote bundle widget to close
 	 */
 	void unpinQuoteBundle(QuoteBundleEditWidget quoteBundleWidget) {
-		// unregister quote drop controller for this quote bundle widget
-		FlowPanelDropController quoteDropController = qbDropBindings.remove(quoteBundleWidget);
-		quoteController.unregisterDropController(quoteDropController);
-
-		// remove just added quote bundle widget and replace with bundle option to
-		// options panel
-		quoteBundleWidget.removeFromParent();
+		// remove from main viewing area
+		removeQuoteBundleColumn(quoteBundleWidget.getModel());
+		
+		// add to nav col
 		QuoteBundle bundle = quoteBundleWidget.getModel();
 		addQuoteBundleOption(bundle);
-
-		// String msg = quoteBundleWidget.getModel().descriptor() + " closed.";
-		// Notifier.get().info(msg);
 	}
 
 	/**
@@ -322,19 +331,20 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 * @param bundle
 	 */
 	private void insertQuoteBundleColumn(final QuoteBundle bundle, int index) {
-
-		// "demote" the last quote bundle in the main viewing area to the bundle
-		// listing
-		int numBundles = columns.getWidgetCount();
-		if(numBundles >= NUM_COLUMNS) {
-			// need to iterate since drag and drop adds place holder widgets
-			int ilast = -1;
-			for(int i = 0; i < columns.getWidgetCount(); i++) {
-				Widget w = columns.getWidget(i);
-				if(w instanceof QuoteBundleEditWidget) {
-					ilast = i;
-				}
+		
+		// determine number of existing qb widgets
+		int numBundlesBeforeInsert = 0;
+		int ilast = -1;
+		for(int i = 0; i < columns.getWidgetCount(); i++) {
+			Widget w = columns.getWidget(i);
+			if(w instanceof QuoteBundleEditWidget) {
+				numBundlesBeforeInsert++;
+				ilast = i;
 			}
+		}
+		
+		// "demote" the last quote bundle in the main viewing area
+		if(numBundlesBeforeInsert >= NUM_COLUMNS) {
 			QuoteBundleEditWidget last = (QuoteBundleEditWidget) columns.getWidget(ilast);
 			unpinQuoteBundle(last);
 		}
@@ -350,37 +360,97 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			}
 		});
 		columns.insert(qbw, index);
-
-		// make quote bundle widget draggable to bundle options
-		quoteBundleController.makeDraggable(qbw, qbw.header.getDraggable());
+		
+		int numBundles = numBundlesBeforeInsert + 1;
+		QbColStyle colStyleToApply = QbColStyle.resolveFromNumBundles(numBundles);
+		for(int i = 0; i < columns.getWidgetCount(); i++) {
+			Widget w = columns.getWidget(i);
+			
+			if(w instanceof QuoteBundleEditWidget) {
+				QuoteBundleEditWidget iqbw = (QuoteBundleEditWidget) w;
+				
+				// [re-]apply num cols based style to each bundle widget
+				for(QbColStyle colStyle : QbColStyle.values()) {
+					iqbw.removeStyleName(colStyle.name());
+				}
+				iqbw.addStyleName(colStyleToApply.name());
+				
+				// make quote bundle widget draggable
+				if(numBundles == 2) {
+					quoteBundleController.makeDraggable(iqbw, iqbw.header.getDraggable());
+				}
+			}
+		}
+		
+		if(numBundles > 2) {
+			// only make added qb widget draggable and assume existing one are already
+			quoteBundleController.makeDraggable(qbw, qbw.header.getDraggable());
+		}
 
 		// initialize a quote drop controller for this quote bundle widget
 		FlowPanelDropController quoteDropController = new FlowPanelDropController(qbw.quotePanel);
 		quoteController.registerDropController(quoteDropController);
 		qbDropBindings.put(qbw, quoteDropController);
 
-		// add a quote widget for each contained quote in the bundle
+		// make quote widgets draggable
 		List<QuoteEditWidget> quoteWidgets = qbw.getQuoteWidgets();
 		for(QuoteEditWidget qw : quoteWidgets) {
-			// make quote widget draggable to other quote bundle widgets
 			quoteController.makeDraggable(qw, qw.getDragHandle());
 		}
 	}
 
 	private boolean removeQuoteBundleColumn(QuoteBundle bundle) {
+		QuoteBundleEditWidget removedQbw = null;
+		int numBundles = 0;
+		
 		// identify the quote bundle widget
 		String rmId = bundle.getId();
+		
 		for(int i = 0; i < columns.getWidgetCount(); i++) {
-			QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) columns.getWidget(i);
-			if(qbw.getModel().getId().equals(rmId)) {
-				FlowPanelDropController quoteDropController = qbDropBindings.remove(qbw);
-				quoteController.unregisterDropController(quoteDropController);
-				// TODO makeNotDraggable the child quotes too ???
-				columns.remove(qbw);
-				return true;
+			Widget w = columns.getWidget(i);
+			if(w instanceof QuoteBundleEditWidget) {
+				QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) w;
+				if(qbw.getModel().getId().equals(rmId)) {
+	
+					// un-make quote widgets draggable
+					List<QuoteEditWidget> quoteWidgets = qbw.getQuoteWidgets();
+					for(QuoteEditWidget qw : quoteWidgets) {
+						quoteController.makeNotDraggable(qw);
+					}
+	
+					removedQbw = qbw;
+				}
+				else {
+					numBundles++;
+				}
 			}
 		}
-		return false;
+		
+		if(removedQbw != null) {
+			if(numBundles >= 1) quoteBundleController.makeNotDraggable(removedQbw);
+			FlowPanelDropController quoteDropController = qbDropBindings.remove(removedQbw);
+			quoteController.unregisterDropController(quoteDropController);
+			columns.remove(removedQbw);
+
+			QbColStyle colStyleToApply = QbColStyle.resolveFromNumBundles(numBundles);
+			for(int i = 0; i < columns.getWidgetCount(); i++) {
+				Widget w = columns.getWidget(i);
+				if(w instanceof QuoteBundleEditWidget) {
+					QuoteBundleEditWidget iqbw = (QuoteBundleEditWidget) w;
+					
+					// [re-]apply num cols based style to each bundle widget
+					for(QbColStyle colStyle : QbColStyle.values()) {
+						iqbw.removeStyleName(colStyle.name());
+					}
+					iqbw.addStyleName(colStyleToApply.name());
+					
+					// remove dragging if necessary
+					if(numBundles < 2) quoteBundleController.makeNotDraggable(iqbw);
+				}
+			}
+		}
+
+		return removedQbw != null;
 	}
 
 	@Override

@@ -36,15 +36,16 @@ import com.tabulaw.common.model.QuoteBundle;
 
 /**
  * Displays a document on the left and quote bundle on the right separated by a
- * split panel. This widget auto-creates quotes under the displayed quote bundle
- * from user made text selections.
+ * split panel.
+ * <p>
+ * This widget auto-creates quotes under the displayed quote bundle from user
+ * made text selections for supported doc types.
  * <p>
  * Text selections/quotes are serialized and persisted and therefore any
  * existing quotes in the bundle are re-displayed upon widget load.
  * @author jpk
  */
-public class DocHighlightWidget extends AbstractModelChangeAwareWidget 
-implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
+public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 
 	class DocQuoteDragHandler extends LoggingDragHandler {
 
@@ -72,9 +73,8 @@ implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 	private final QuoteBundleDocWidget wDocQuoteBundle;
 
 	private final HorizontalSplitPanel hsp = new HorizontalSplitPanel();
-	
-	//@SuppressWarnings("unused")
-	private final TextSelectApi tsapi;
+
+	private TextSelectApi tsapi;
 
 	/**
 	 * Facilitate drag/drop ops.
@@ -90,7 +90,7 @@ implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 	/**
 	 * Constructor
 	 */
-	public DocHighlightWidget() {
+	public DocAndBundleWidget() {
 		super();
 
 		boundaryPanel = new AbsolutePanel();
@@ -111,9 +111,8 @@ implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 		boundaryPanel.add(hsp);
 
 		initWidget(boundaryPanel);
-		// initWidget(hsp);
-		
-		tsapi = new TextSelectApi(this);
+
+		//tsapi = new TextSelectApi(this);
 	}
 
 	public Widget[] getNavColWidgets() {
@@ -140,7 +139,7 @@ implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 	private boolean maybeSetCurrentQuoteBundle() {
 		QuoteBundle crntQb = ClientModelCache.get().getCurrentQuoteBundle();
 		if(crntQb == null) {
-			
+
 			// auto-create a new quote bundle
 			DocRef mDoc = wDocViewer.getModel();
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
@@ -150,10 +149,10 @@ implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 			crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
 
 			ClientModelCache.get().getUserState().setCurrentQuoteBundleId(crntQb.getId());
-			
+
 			// client-side persist
 			ClientModelCache.get().persist(crntQb, this);
-			
+
 			// server-side persist
 			ClientModelCache.get().addBundle(crntQb);
 		}
@@ -188,7 +187,7 @@ implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 				Quote q = qw.getModel();
 				DocRef docRef = q.getDocument();
 				String htmlQuote = "\"" + q.getQuote() + "\"";
-				
+
 				// append citation in italics if a case doc
 				if(docRef.isCaseDoc()) {
 					htmlQuote += "<i> - " + docRef.getCitation() + "</i>";
@@ -213,14 +212,18 @@ implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 
 	public void setDocument(DocRef mDoc) {
 		String frameId = wDocViewer.getFrameId();
-		if(frameId != null) {
+		if(frameId != null && tsapi != null) {
 			tsapi.shutdown(frameId);
 		}
 
 		// update doc viewer with doc
 		wDocViewer.setModel(mDoc);
 
-		tsapi.init(wDocViewer.getFrameId());
+		// we allow all doc type to be highlightable
+		//if(mDoc.isCaseDoc()) {
+			if(tsapi == null) tsapi = new TextSelectApi(this);
+			tsapi.init(wDocViewer.getFrameId());
+		//}
 
 		// grab the current quote bundle
 		maybeSetCurrentQuoteBundle();
@@ -231,7 +234,7 @@ implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 		wDocQuoteBundle.setDragController(quoteController);
 		wDocQuoteBundle.makeQuotesDraggable(event.getValue() == ViewMode.EDIT);
 	}
-	
+
 	@Override
 	protected void onLoad() {
 		super.onLoad();

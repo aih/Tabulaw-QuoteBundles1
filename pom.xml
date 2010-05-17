@@ -61,7 +61,7 @@
 			<properties>
 				<gwt.compile.style>PRETTY</gwt.compile.style>
 				<gwt.log.level>INFO</gwt.log.level>
-				<gwt.compile.module>com.tabulaw.PocDev</gwt.compile.module>		
+				<gwt.compile.module>com.tabulaw.PocProd</gwt.compile.module>		
 			</properties>
 		</profile>
 		<profile>

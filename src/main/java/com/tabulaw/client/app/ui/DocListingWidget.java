@@ -20,15 +20,12 @@ import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
-import com.tabulaw.client.data.rpc.IRpcHandler;
 import com.tabulaw.client.data.rpc.RpcCommand;
-import com.tabulaw.client.data.rpc.RpcEvent;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.Notifier;
-import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.ui.listing.AbstractListingConfig;
 import com.tabulaw.client.ui.listing.Column;
 import com.tabulaw.client.ui.listing.DataListingOperator;
@@ -72,15 +69,16 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		}
 	} // ListingConfig
 
-	static class DocListing extends ModelListingWidget<DocRef, DocListingWidget.Table> implements IRpcHandler {
+	static class DocListing extends ModelListingWidget<DocRef, DocListingWidget.Table> /*implements IRpcHandler*/ {
 
-		final RpcUiHandler rpcui;
+		// don't show as it gets offset from table due to disclosure panel animation above in ui
+		//final RpcUiHandler rpcui;
 
 		public DocListing() {
 			super(config.getListingId(), config.getListingElementName(), new Table(config), new ListingNavBar<DocRef>(config,
 					null));
-			rpcui = new RpcUiHandler(this);
-			addHandler(this, RpcEvent.TYPE);
+			//rpcui = new RpcUiHandler(this);
+			//addHandler(this, RpcEvent.TYPE);
 		}
 
 		Table getTable() {
@@ -101,10 +99,12 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 			}
 		}
 
+		/*
 		@Override
 		public void onRpcEvent(RpcEvent event) {
 			rpcui.onRpcEvent(event);
 		}
+		*/
 	}
 
 	static class Table extends ModelListingTable<DocRef> {

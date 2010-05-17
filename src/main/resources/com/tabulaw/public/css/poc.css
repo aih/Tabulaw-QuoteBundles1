@@ -795,10 +795,25 @@ div.ro {
 		height: 100%;
 	}
 	.quoteBundle .columns .qbundle {
-		width: 200px;
+	}
+	
+	/* qb widget styling based on num-cols */
+	.quoteBundle .columns .one {
+		width: 100%;
+		margin: 0;
+	}
+	.quoteBundle .columns .two {
 		margin-left: 3px;
 		margin-right: 3px;
+		width: 350px;
 	}
+	.quoteBundle .columns .three {
+		margin-left: 3px;
+		margin-right: 3px;
+		width: 200px;
+	}
+
+	
 	/* drag and drop specific allowing drops to empty qb columns!! */
 	.quoteBundle .columns .spacer {
 		height: 50px;
