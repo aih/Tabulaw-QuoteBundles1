@@ -294,15 +294,11 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 			// get the user's quote bundles
 			List<QuoteBundle> bundles = pc.getUserDataService().getBundlesForUser(user.getId());
-			assert bundles != null;
-			ArrayList<QuoteBundle> allBundles = new ArrayList<QuoteBundle>(bundles.size() + 1); 
-			payload.setBundles(allBundles);
+			payload.setBundles(bundles);
 			
 			// get the user's orphaned quotes adding it to the list of all user bundles
 			List<Quote> oqs = pc.getUserDataService().getOrphanedQuotesForUser(user.getId());
-			QuoteBundle oqb = QuoteBundle.newOrphanedQuoteBundle();
-			oqb.setQuotes(oqs);
-			allBundles.add(oqb);
+			payload.setOrphanedQuotes(oqs);
 
 			// get the next ids for client-side use
 			Map<String, Integer[]> nextIds = getNextIdMap();
@@ -659,6 +655,36 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		try {
 			userDataService.updateBundlePropsForUser(userId, bundle);
 			status.addMsg("Quote Bundle properties saved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityExistsException e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final ConstraintViolationException ise) {
+			PersistHelper.handleValidationException(context, ise, payload);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			context.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload unorphanQuote(String userId, String quoteId, String bundleId) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		try {
+			userDataService.unorphanQuote(userId, quoteId, bundleId);
+			status.addMsg("Quote moved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityExistsException e) {
 			exceptionToStatus(e, payload.getStatus());

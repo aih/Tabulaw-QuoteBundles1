@@ -430,9 +430,15 @@ div.ro {
 		padding: 4px;
 	}
 	
-.orphaned .qbheader * {
-	opacity: 0.6;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+.orphaned .qbheader, .orphaned .qheader {
+	opacity: 0.8;
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+}
+.orphaned .qbheader .echo {
+	display: none;
+}
+.orphaned .qheader .buttons {
+	display: none;
 }
 
 /* wquote */

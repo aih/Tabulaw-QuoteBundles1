@@ -113,33 +113,38 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 				//return;
 				throw new VetoDragException();
 			}
+			
+			Quote sourceQuote = draggedQuoteWidget.getModel();
 
-			Quote draggedQuoteModel = draggedQuoteWidget.getModel();
-			// ModelKey draggedQuoteModelKey = draggedQuoteModel.getKey();
-
-			String dscQuote = draggedQuoteModel.getDocument().getTitle();
+			String dscQuote = sourceQuote.getDocument().getTitle();
 			String dscBundle = targetQuoteBundleWidget.getModel().getName();
 
 			// does the quote already exist in the target bundle?
-			if(targetQuoteBundleWidget.hasQuote(draggedQuoteModel)) {
+			if(targetQuoteBundleWidget.hasQuote(sourceQuote)) {
 				String msg = "'" + dscQuote + "' is already in Quote Bundle: " + dscBundle;
 				Notifier.get().warn(msg);
 				throw new VetoDragException();
 			}
 
-			// clone the dragged quote widget setting its id to a new one
-			Quote mQuoteClone = (Quote) draggedQuoteModel.clone();
-			mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
-			mQuoteClone.setVersion(-1); // CRITICAL
-
-			// add and persist
-			targetQuoteBundleWidget.addQuote(mQuoteClone, true, true);
-
-			// String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
-			// Notifier.get().info(msg);
-
-			// deny since we are copying
-			throw new VetoDragException();
+			// are we dragging from orphaned quotes container?
+			if(!sourceQuoteBundleWidget.getModel().isOrphanedQuoteContainer()) {
+				// clone the dragged quote widget setting its id to a new one
+				Quote mQuoteClone = (Quote) sourceQuote.clone();
+				mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
+				mQuoteClone.setVersion(-1); // CRITICAL
+				// add and persist
+				targetQuoteBundleWidget.addQuote(mQuoteClone, true, true);
+				// deny since we are copying
+				throw new VetoDragException();
+				// String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
+				// Notifier.get().info(msg);
+			}
+			
+			// move the quote (un-orphan it)
+			QuoteBundle orphanedQuoteContainer = ClientModelCache.get().getOrphanQuoteContainer();
+			if(!orphanedQuoteContainer.removeQuote(sourceQuote)) throw new IllegalStateException();
+			targetQuoteBundleWidget.addQuote(sourceQuote, false, true);
+			
 		}
 	}
 
@@ -476,7 +481,13 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 					break;
 				}
 				case ADDED:
-					insertQuoteBundleColumn(qb, 0);
+					if(qb.isOrphanedQuoteContainer()) {
+						// don't put orphaned qb container in main viewing area by default
+						addQuoteBundleOption(qb);
+					}
+					else {
+						insertQuoteBundleColumn(qb, 0);
+					}
 					break;
 				case DELETED:
 					if(removeQuoteBundleOption(qb) == null) removeQuoteBundleColumn(qb);

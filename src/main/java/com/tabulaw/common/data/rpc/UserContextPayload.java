@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
+import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
@@ -28,6 +29,8 @@ public class UserContextPayload extends Payload {
 	private UserState userState;
 
 	private List<QuoteBundle> bundles;
+
+	private List<Quote> orphanedQuotes;
 
 	/**
 	 * Map of id ranges keyed by entity type.
@@ -92,5 +95,13 @@ public class UserContextPayload extends Payload {
 
 	public void setNextIds(Map<String, Integer[]> nextIds) {
 		this.nextIds = nextIds;
+	}
+
+	public List<Quote> getOrphanedQuotes() {
+		return orphanedQuotes;
+	}
+
+	public void setOrphanedQuotes(List<Quote> orphanedQuotes) {
+		this.orphanedQuotes = orphanedQuotes;
 	}
 }

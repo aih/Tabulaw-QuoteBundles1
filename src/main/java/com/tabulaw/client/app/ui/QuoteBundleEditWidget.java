@@ -17,11 +17,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.ClientModelCache;
+import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.util.ObjectUtil;
 
 /**
  * Supports editing capabilty for a quote bundle.
@@ -38,7 +41,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundle
 		public static final String CURRENT = "current";
 
 		public static final String X = "x";
-		
+
 		public static final String QB_CURRENT = "qbcurrent";
 	} // Styles
 
@@ -75,7 +78,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundle
 						ClientModelCache.get().remove(bundle.getModelKey(), Poc.getPortal());
 
 						// server side
-						ClientModelCache.get().removeBundleUserBinding(bundle.getId());
+						ServerPersistApi.get().removeBundleUserBinding(bundle.getId());
 					}
 				}
 			});
@@ -93,30 +96,32 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundle
 				public void onClick(ClickEvent event) {
 					if(ClientModelCache.get().getUserState().setCurrentQuoteBundleId(bundle.getId())) {
 						Notifier.get().info("Current Quote Bundle set.");
-						// we need to globally notify all views of the current quote bundle change
+						// we need to globally notify all views of the current quote bundle
+						// change
 						// and we do it by firing a model change event
 						Poc.getPortal().fireEvent(new ModelChangeEvent(current, ModelChangeOp.UPDATED, bundle, null));
 					}
 				}
 			});
 
-			//buttons.add(save);
-			//buttons.add(undo);
+			// buttons.add(save);
+			// buttons.add(undo);
 			buttons.add(delete);
 			buttons.add(current);
 			buttons.add(close);
 		}
-		
+
 		@Override
-		public void setModel(QuoteBundle mQuoteBundle) {
-			super.setModel(mQuoteBundle);
-			currentQuoteBundleCheck();
+		public void setModel(QuoteBundle bundle) {
+			super.setModel(bundle);
+			modelStateCheck();
 		}
 
 		/**
-		 * Sets relevant state based on the current quote bundle.
+		 * Sets relevant state based on the current quote bundle and the current
+		 * bundle model.
 		 */
-		void currentQuoteBundleCheck() {
+		void modelStateCheck() {
 			QuoteBundle cqb = ClientModelCache.get().getCurrentQuoteBundle();
 			boolean isCurrent = cqb != null && cqb.equals(bundle);
 			current.setVisible(!isCurrent);
@@ -140,10 +145,10 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundle
 	 */
 	public QuoteBundleEditWidget(PickupDragController dragController) {
 		super(new EditHeader());
-		
+
 		// TODO do we need to handle clean up?
 		makeModelChangeAware();
-		
+
 		setDragController(dragController);
 		dropAreaCheck();
 	}
@@ -171,14 +176,20 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundle
 		for(int i = 0; i < quotePanel.getWidgetCount(); i++) {
 			Widget w = quotePanel.getWidget(i);
 			if(w instanceof QuoteEditWidget) {
-				if(ClientModelCache.get().compareQuotes(mQuote, ((QuoteEditWidget) w).getModel())) {
+				
+				// compare quotes
+				Quote q1 = mQuote;
+				Quote q2 = ((QuoteEditWidget) w).getModel();
+				DocRef doc1 = q1.getDocument();
+				DocRef doc2 = q2.getDocument();
+				if(doc1.equals(doc2) && ObjectUtil.equals(q1.getQuote(), q2.getQuote())) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-	
+
 	@Override
 	protected QuoteEditWidget getNewQuoteWidget(Quote mQuote) {
 		return new QuoteEditWidget(this, mQuote);
@@ -190,7 +201,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundle
 		dropAreaCheck();
 		return w;
 	}
-	
+
 	private void dropAreaCheck() {
 		// maintain a drop area
 		if(quotePanel.getWidgetCount() == 0) {
@@ -204,6 +215,6 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundle
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
-		header.currentQuoteBundleCheck();
+		header.modelStateCheck();
 	}
 }

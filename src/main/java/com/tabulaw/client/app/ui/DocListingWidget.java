@@ -19,6 +19,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.ClientModelCache;
+import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.data.rpc.RpcCommand;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -40,6 +41,7 @@ import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.rpc.DocListingPayload;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityType;
+import com.tabulaw.common.model.User;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.listhandler.InMemoryListHandler;
 
@@ -133,7 +135,9 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 					table.setText(rowIndex, cellIndex, sdate);
 					break;
 				case 2: {
-					final String title = ClientModelCache.get().isAdminUser()? "Permanantly delete document" : "Remove document";
+					final User liu = ClientModelCache.get().getUser();
+					final boolean isAdmin = liu.isAdministrator();
+					final String title = isAdmin ? "Permanantly delete document" : "Remove document";
 					Image img = new Image(Resources.INSTANCE.deleteLarger());
 					img.setTitle(title);
 					img.addClickHandler(new ClickHandler() {
@@ -143,7 +147,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 							event.stopPropagation();
 							String docref = rowData.getTitle();
 							final String confirm =
-									ClientModelCache.get().isAdminUser() ? "Permanantly delete document '" + docref + "'?"
+									isAdmin ? "Permanantly delete document '" + docref + "'?"
 											: "Remove document '" + docref + "'?";
 							if(Window.confirm(confirm)) {
 
@@ -153,7 +157,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 								operator.refresh();
 
 								// server
-								if(ClientModelCache.get().isAdminUser()) {
+								if(isAdmin) {
 									Poc.getDocService().deleteDoc(rowData.getId(), new AsyncCallback<Payload>() {
 										
 										@Override
@@ -168,7 +172,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 									});
 								}
 								else {
-									ClientModelCache.get().removeDocUserBinding(rowData.getId());
+									ServerPersistApi.get().removeDocUserBinding(rowData.getId());
 								}
 							}
 						}

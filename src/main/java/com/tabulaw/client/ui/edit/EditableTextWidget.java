@@ -47,6 +47,8 @@ public class EditableTextWidget extends TextField implements HasHTML {
 
 	private final IConverter<String, String> html2text, text2html;
 
+	private boolean editable;
+
 	private HandlerRegistration hrMouseOver, hrMouseOut, hrClick, hrKeyDown, hrBlur;
 	private String origValue;
 	private boolean rollback;
@@ -62,7 +64,8 @@ public class EditableTextWidget extends TextField implements HasHTML {
 	 * Constructor
 	 * @param html2text responsible for extracting desired edit text from the
 	 *        innerHTML of static text
-	 * @param text2html responsible for re-setting the static html from the edited text content
+	 * @param text2html responsible for re-setting the static html from the edited
+	 *        text content
 	 */
 	public EditableTextWidget(IConverter<String, String> html2text, IConverter<String, String> text2html) {
 		super("tfield", null, null, null, 30);
@@ -71,6 +74,24 @@ public class EditableTextWidget extends TextField implements HasHTML {
 		((TextBox) getEditable()).setTitle("'Enter' to save or 'Esc' to cancel");
 		this.html2text = html2text;
 		this.text2html = text2html;
+	}
+
+	/**
+	 * Are we editable?
+	 * @return true/false
+	 */
+	public boolean isEditable() {
+		return editable;
+	}
+
+	/**
+	 * Set editability
+	 * @param editable
+	 */
+	public void setEditable(boolean editable) {
+		this.editable = editable;
+		setReadOnly(true);
+		this.rollback = false;
 	}
 
 	protected void init() {
@@ -93,6 +114,7 @@ public class EditableTextWidget extends TextField implements HasHTML {
 
 				@Override
 				public void onClick(ClickEvent event) {
+					if(!editable) return;
 					removeStyleName("hover");
 					int width = getReadOnlyWidget().getOffsetWidth();
 					((Widget) getEditable()).getElement().getStyle().setWidth(width, Style.Unit.PX);
@@ -118,13 +140,14 @@ public class EditableTextWidget extends TextField implements HasHTML {
 						setReadOnly(true);
 					}
 					else if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-						getEditable().setFocus(false);	// force a blur to trigger onBlur event
+						getEditable().setFocus(false); // force a blur to trigger onBlur
+																						// event
 					}
 				}
 			});
-			
+
 			hrBlur = getEditable().addBlurHandler(new BlurHandler() {
-				
+
 				@Override
 				public void onBlur(BlurEvent event) {
 					if(!rollback) {
@@ -136,7 +159,7 @@ public class EditableTextWidget extends TextField implements HasHTML {
 					rollback = false; // reset
 				}
 			});
-			
+
 			setReadOnly(true);
 		}
 	}
@@ -172,7 +195,7 @@ public class EditableTextWidget extends TextField implements HasHTML {
 	@Override
 	public void setText(String text) {
 		getReadOnlyWidget().setText(text);
-		//((TextBox) getEditable()).setText(text);
+		// ((TextBox) getEditable()).setText(text);
 	}
 
 	@Override
@@ -184,7 +207,7 @@ public class EditableTextWidget extends TextField implements HasHTML {
 	public void setHTML(String html) {
 		getReadOnlyWidget().setHTML(html);
 	}
-	
+
 	public void revert() {
 		if(origValue != null) {
 			setHTML(origValue);

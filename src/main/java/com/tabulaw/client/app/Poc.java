@@ -164,7 +164,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// cache initial batch of next ids
 					ClientModelCache.get().setNextIdBatch(result.getNextIds());
 
-					// ensure quote bundles view so it recieves model change events
+					// ensure quote bundles view is loaded so it recieves model change events
 					// staying in sync!
 					ViewManager.get().loadView(new StaticViewInitializer(QuoteBundlesView.klas));
 
@@ -186,6 +186,9 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 					// cache bundles and notify
 					ClientModelCache.get().persistAll(userBundles, getPortal());
+					
+					// store orphaned quotes
+					List<Quote> orphanedQuotes = result.getOrphanedQuotes();
 
 					// cache user state
 					UserState userState = result.getUserState();

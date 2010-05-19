@@ -118,4 +118,13 @@ public interface IUserDataService extends RemoteService {
 	 * @return the status of the removal
 	 */
 	Payload removeQuoteFromBundle(String userId, String bundleId, String quoteId, boolean deleteQuote);
+	
+	/**
+	 * Un-orphans a quote for a user adding it a specified bundle.
+	 * @param userId
+	 * @param quoteId
+	 * @param bundleId
+	 * @return the status of the op
+	 */
+	Payload unorphanQuote(String userId, String quoteId, String bundleId);
 }

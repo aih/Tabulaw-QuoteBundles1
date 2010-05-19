@@ -40,4 +40,6 @@ public interface IUserDataServiceAsync {
 	void addQuoteToBundle(String userId, String bundleId, Quote quote, AsyncCallback<ModelPayload<Quote>> callback);
 
 	void removeQuoteFromBundle(String userId, String bundleId, String quoteId, boolean deleteQuote, AsyncCallback<Payload> callback);
+
+	void unorphanQuote(String userId, String quoteId, String bundleId, AsyncCallback<Payload> callback);
 }

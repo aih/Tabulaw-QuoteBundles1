@@ -19,19 +19,18 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 
 	private static final long serialVersionUID = -6606826756860275551L;
 	
-	private static final String ORPHANED_QUOTES_BUNDLE_NAME = "Orphaned Quotes";
+	//private static final String ORPHANED_QUOTES_BUNDLE_ID = "0";
 
-	/**
-	 * @return Newly created instance with hard-coded properties signifying a
-	 *         container for orphaned qoutes.
-	 */
+	/*
 	public static QuoteBundle newOrphanedQuoteBundle() {
 		QuoteBundle oqb = new QuoteBundle();
-		oqb.setName(ORPHANED_QUOTES_BUNDLE_NAME);
-		oqb.setDescription("All orphaned quotes");
+		oqb.setId(ORPHANED_QUOTES_BUNDLE_ID);
+		oqb.setName("Orphaned Quotes");
+		oqb.setDescription("Quotes currently not belonging to any Quote Bundles");
 		return oqb;
 	}
-
+	*/
+	
 	private String id;
 
 	private String name, description;
@@ -49,10 +48,12 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 	 * Is this a container for orphaned quotes?
 	 * @return true/false
 	 */
+	/*
 	public boolean isOrphanedQuoteContainer() {
-		return ORPHANED_QUOTES_BUNDLE_NAME.equals(getName());
+		return ORPHANED_QUOTES_BUNDLE_ID.equals(getId());
 	}
-
+	*/
+	
 	@Override
 	public String getId() {
 		return id;

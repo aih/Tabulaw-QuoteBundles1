@@ -18,6 +18,7 @@ import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
+import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.DocViewer.ViewMode;
 import com.tabulaw.client.app.ui.QuoteEvent.QuoteType;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -154,7 +155,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 			ClientModelCache.get().persist(crntQb, this);
 
 			// server-side persist
-			ClientModelCache.get().addBundle(crntQb);
+			ServerPersistApi.get().addBundle(crntQb);
 		}
 
 		if(crntQbId == null || !crntQbId.equals(crntQb.getId())) {

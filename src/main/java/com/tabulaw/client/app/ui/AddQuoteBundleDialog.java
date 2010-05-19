@@ -8,6 +8,7 @@ package com.tabulaw.client.app.ui;
 import com.google.gwt.user.client.DeferredCommand;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
+import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.ui.Dialog;
 import com.tabulaw.client.ui.FocusCommand;
 import com.tabulaw.client.ui.edit.EditEvent;
@@ -68,7 +69,7 @@ public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGr
 			ClientModelCache.get().persist(qb, Poc.getPortal());
 
 			// server side persist
-			ClientModelCache.get().addBundle(qb);
+			ServerPersistApi.get().addBundle(qb);
 
 			hide();
 		}

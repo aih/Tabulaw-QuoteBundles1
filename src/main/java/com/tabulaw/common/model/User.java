@@ -71,6 +71,10 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		return SUPERUSER.equals(name);
 	}
 
+	public boolean isAdministrator() {
+		return inRole(Role.ADMINISTRATOR);
+	}
+
 	@Override
 	public final ModelKey getModelKey() {
 		ModelKey mk = super.getModelKey();

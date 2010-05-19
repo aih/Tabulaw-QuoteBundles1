@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
+import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.QuoteBundleEditWidget.Styles;
 import com.tabulaw.client.convert.IConverter;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -90,7 +91,7 @@ extends AbstractModelChangeAwareWidget {
 					// save the quote bundle
 					ClientModelCache.get().persist(bundle, Header.this);
 					// server side
-					ClientModelCache.get().updateBundleProps(bundle);
+					ServerPersistApi.get().updateBundleProps(bundle);
 				}
 			});
 			header.add(pName);
@@ -105,7 +106,7 @@ extends AbstractModelChangeAwareWidget {
 					// save the quote bundle
 					ClientModelCache.get().persist(bundle, Header.this);
 					// server side
-					ClientModelCache.get().updateBundleProps(bundle);
+					ServerPersistApi.get().updateBundleProps(bundle);
 				}
 			});
 			header.add(pDesc);
@@ -184,7 +185,7 @@ extends AbstractModelChangeAwareWidget {
 
 	protected QuoteBundle bundle;
 	
-	private final FlowPanel panel = new FlowPanel();
+	protected final FlowPanel panel = new FlowPanel();
 
 	private PickupDragController dragController;
 
@@ -241,14 +242,6 @@ extends AbstractModelChangeAwareWidget {
 				}
 			}
 		}
-		
-		if(bundle != null && bundle.isOrphanedQuoteContainer()) {
-			panel.addStyleName("orphaned");
-		}
-		else {
-			panel.removeStyleName("orphaned");
-		}
-		
 		this.bundle = bundle;
 	}
 
@@ -282,8 +275,9 @@ extends AbstractModelChangeAwareWidget {
 			// add the quote updating the bundle quote refs too
 			ClientModelCache.get().persist(mQuote, this);
 			ClientModelCache.get().persist(bundle, this);
+			
 			// server side persist
-			ClientModelCache.get().addQuoteToBundle(bundle.getId(), mQuote);
+			ServerPersistApi.get().addQuoteToBundle(bundle.getId(), mQuote);
 		}
 		// add to the ui
 		Q qw = getNewQuoteWidget(mQuote);
@@ -313,16 +307,15 @@ extends AbstractModelChangeAwareWidget {
 					//}
 					ClientModelCache.get().persist(bundle, AbstractQuoteBundleWidget.this);
 					
-					// TODO this probably needs robustification
 					if(!deleteQuote) {
 						// orphaned
-						QuoteBundle qbOrphaned = ClientModelCache.get().getOrphanQuoteBundle();
-						qbOrphaned.addQuote(mQuote);
-						Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractQuoteBundleWidget.this, ModelChangeOp.UPDATED, null, qbOrphaned.getModelKey()));
+						QuoteBundle orphanedQuoteContainer = ClientModelCache.get().getOrphanQuoteContainer();
+						orphanedQuoteContainer.addQuote(mQuote);
+						Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractQuoteBundleWidget.this, ModelChangeOp.UPDATED, orphanedQuoteContainer, null));
 					}
 
 					// server side persist
-					ClientModelCache.get().removeQuoteFromBundle(bundle.getId(), mQuote.getId(), deleteQuote);
+					ServerPersistApi.get().removeQuoteFromBundle(bundle.getId(), mQuote.getId(), deleteQuote);
 				}
 				Q qw = (Q) quotePanel.getWidget(index);
 				quotePanel.remove(index);

@@ -46,7 +46,7 @@ public class UserDataService extends AbstractEntityService {
 	public UserDataService(IEntityDao dao, ValidatorFactory validationFactory) {
 		super(dao, validationFactory);
 	}
-	
+
 	@Transactional(readOnly = true)
 	public List<Quote> getOrphanedQuotesForUser(String userId) {
 		if(userId == null) throw new NullPointerException();
@@ -411,7 +411,8 @@ public class UserDataService extends AbstractEntityService {
 	 * @param userId needed for removing the quote/user binding
 	 * @param bundleId
 	 * @param quoteId
-	 * @param deleteQuote delete the quote as well? If <code>false</code>, the quote will be orphaned.
+	 * @param deleteQuote delete the quote as well? If <code>false</code>, the
+	 *        quote will be orphaned.
 	 * @throws EntityNotFoundException when the quote isn't found to exist in the
 	 *         bundle
 	 */
@@ -435,11 +436,11 @@ public class UserDataService extends AbstractEntityService {
 
 		if(deleteQuote) {
 			dao.purge(tormv);
-			removeQuoteUserBinding(userId, quoteId, false);
+			removeQuoteUserBinding(userId, quoteId);
 		}
 		else {
 			// mark quote as orphaned
-			removeQuoteUserBinding(userId, quoteId, true);
+			updateQuoteUserBinding(userId, quoteId, true);
 		}
 	}
 
@@ -551,25 +552,58 @@ public class UserDataService extends AbstractEntityService {
 	 * Removes a user quote association.
 	 * @param userId
 	 * @param quoteId
-	 * @param orphan Keep the binding and mark it as orphaned or delete it?
 	 * @throws EntityNotFoundException when the association doesn't exist
 	 */
 	@Transactional
-	public void removeQuoteUserBinding(String userId, String quoteId, boolean orphan) throws EntityNotFoundException {
+	public void removeQuoteUserBinding(String userId, String quoteId) throws EntityNotFoundException {
+		QuoteUserBinding binding = findQuoteUserBinding(userId, quoteId);
+		dao.purge(binding);
+	}
+
+	/**
+	 * Updates an existing quote/user binding's orphan property.
+	 * <p>
+	 * Use for orphaning and un-orphaning a quote.
+	 * @param userId
+	 * @param quoteId
+	 * @param orphan
+	 * @throws EntityNotFoundException
+	 */
+	@Transactional
+	public void updateQuoteUserBinding(String userId, String quoteId, boolean orphan) throws EntityNotFoundException {
+		QuoteUserBinding binding = findQuoteUserBinding(userId, quoteId);
+		binding.setOrphaned(orphan);
+		dao.persist(binding);
+	}
+
+	/**
+	 * Updates an existing quote/user binding's setting the orphan property to
+	 * <code>false</code>, then add the quote to the given bundle.
+	 * @param userId resolves the quote/user binding
+	 * @param quoteId id of quote to un-orphan
+	 * @param bundleId id of bundle to which the quote is added
+	 * @throws EntityNotFoundException When the quote/user binding or quote or
+	 *         bundle doesn't exist
+	 */
+	public void unorphanQuote(String userId, String quoteId, String bundleId) throws EntityNotFoundException {
+		if(bundleId == null) throw new NullPointerException();
+		QuoteUserBinding binding = findQuoteUserBinding(userId, quoteId);
+		Quote q = dao.load(Quote.class, quoteId);
+		addQuoteToBundle(userId, bundleId, q);
+		binding.setOrphaned(false);
+		dao.persist(binding);
+	}
+
+	private QuoteUserBinding findQuoteUserBinding(String userId, String quoteId) throws EntityNotFoundException {
 		if(quoteId == null || userId == null) throw new NullPointerException();
 		Criteria<QuoteUserBinding> c = new Criteria<QuoteUserBinding>(QuoteUserBinding.class);
 		c.getPrimaryGroup().addCriterion("quoteId", quoteId, Comparator.EQUALS, true);
 		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
-		QuoteUserBinding binding;
 		try {
-			binding = dao.findEntity(c);
+			return dao.findEntity(c);
 		}
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
 		}
-
-		binding.setOrphaned(true);
-		dao.persist(binding);
 	}
-
 }

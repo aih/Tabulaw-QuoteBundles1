@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.TabBar;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.app.model.ClientModelCache;
+import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.view.DocView;
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -160,7 +161,7 @@ public class NavRowPanel extends AbstractNavPanel {
 				public void onClick(ClickEvent event) {
 
 					// save the user state to the server
-					ClientModelCache.get().saveUserState(new Command() {
+					ServerPersistApi.get().saveUserState(new Command() {
 
 						@Override
 						public void execute() {

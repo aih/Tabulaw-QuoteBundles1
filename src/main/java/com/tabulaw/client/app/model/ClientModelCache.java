@@ -14,18 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
-import com.tabulaw.client.ui.Notifier;
-import com.tabulaw.common.data.ModelPayload;
-import com.tabulaw.common.data.Payload;
-import com.tabulaw.common.data.rpc.IUserDataService;
-import com.tabulaw.common.data.rpc.IUserDataServiceAsync;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityType;
@@ -35,24 +27,12 @@ import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
-import com.tabulaw.common.model.User.Role;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.util.ObjectUtil;
 
 /**
  * @author jpk
  */
 public class ClientModelCache {
-
-	private static final IUserDataServiceAsync userDataService;
-
-	static {
-		userDataService = (IUserDataServiceAsync) GWT.create(IUserDataService.class);
-	}
-	
-	public static IUserDataServiceAsync getUserDataService() {
-		return userDataService;
-	}
 
 	private static ClientModelCache instance;
 
@@ -60,7 +40,7 @@ public class ClientModelCache {
 		if(instance == null) throw new IllegalStateException("Init must be called.");
 		return instance;
 	}
-	
+
 	public static void init(IHasModelChangeHandlers modelChangeDispatcher) {
 		instance = new ClientModelCache(modelChangeDispatcher);
 	}
@@ -89,24 +69,17 @@ public class ClientModelCache {
 		}
 	}
 
-	private static void handlePersistResponse(Payload payload) {
-		Notifier.get().showFor(payload, "Persist op successful.");
-
-		// TODO what do we do with the persisted entity in the payload ???
-		// we don't want a collision in accessing the sole entity map which
-		// as i see it is possible
-	}
-	
 	private final IHasModelChangeHandlers modelChangeDispatcher;
 
 	private final HashMap<String, IdCache> nextIdCache = new HashMap<String, IdCache>();
 
 	private final HashMap<String, List<IEntity>> entities = new HashMap<String, List<IEntity>>();
 
-	private final boolean doServerPersist;
+	private final ArrayList<Quote> orphanedQuotes = new ArrayList<Quote>();
 
 	/**
 	 * Constructor
+	 * @param modelChangeDispatcher
 	 */
 	private ClientModelCache(IHasModelChangeHandlers modelChangeDispatcher) {
 		if(modelChangeDispatcher == null) throw new NullPointerException();
@@ -116,188 +89,50 @@ public class ClientModelCache {
 		for(EntityType et : EntityType.values()) {
 			entities.put(et.name(), new ArrayList<IEntity>());
 		}
-
-		doServerPersist = true;
-
 	} // constructor
-	
-	public QuoteBundle getOrphanQuoteBundle() {
-		List<? extends IEntity> list = entities.get(EntityType.QUOTE_BUNDLE.name());
-		for(IEntity elm : list) {
-			QuoteBundle qb = (QuoteBundle) elm;
-			if(qb.isOrphanedQuoteContainer()) return qb;
+
+	public void setOrphanedQuotes(List<Quote> orphanedQuotes) {
+		this.orphanedQuotes.clear();
+		this.orphanedQuotes.addAll(orphanedQuotes);
+	}
+
+	public List<Quote> getOrphanedQuotes() {
+		return orphanedQuotes;
+	}
+
+	/**
+	 * Client-side coralary to the server-side user data service method.
+	 * <p>
+	 * Fires a quote added model change event for the un-orphaned quote
+	 * <p>
+	 * Fires a quote bundle updated model change event for the bundle receiving
+	 * the orphaned quote
+	 * @param quoteId id of the quote to un-orphan that is expected to be held in
+	 *        the orphan quote container
+	 * @param bundleId id of the bundle to which to add the un-orphaned quote
+	 * @param source if specified, model change events are fired with this widget as their source
+	 * @throws EntityNotFoundException When either the orphaned quote or target
+	 *         bundle can't be found
+	 */
+	public void unorphanQuoteClient(String quoteId, String bundleId, Widget source) throws EntityNotFoundException {
+		// find the orphaned quote
+		Quote quote = null;
+		for(Quote q : orphanedQuotes) {
+			if(q.getId().equals(quoteId)) {
+				quote = q;
+				break;
+			}
 		}
-		throw new IllegalStateException("No orphan quote container cached.");
-	}
+		if(quote == null) throw new EntityNotFoundException("Orphaned quote of id: " + quoteId + " not found.");
+		
+		// move orphaned quote to entity cache but don't fire model change event
+		orphanedQuotes.remove(quote);
+		persist(quote, null);
 
-	public void saveBundle(QuoteBundle bundle) {
-		if(!doServerPersist) return;
-		String userId = getUser().getId();
-		userDataService.saveBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(ModelPayload<QuoteBundle> result) {
-				handlePersistResponse(result);
-			}
-		});
-	}
-
-	public void updateBundleProps(QuoteBundle bundle) {
-		if(!doServerPersist) return;
-		String userId = getUser().getId();
-		userDataService.updateBundlePropsForUser(userId, bundle, new AsyncCallback<Payload>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(Payload result) {
-				handlePersistResponse(result);
-			}
-		});
-	}
-
-	public void addBundle(QuoteBundle bundle) {
-		if(!doServerPersist) return;
-		String userId = getUser().getId();
-		userDataService.addBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(ModelPayload<QuoteBundle> result) {
-				handlePersistResponse(result);
-			}
-		});
-	}
-
-	public void deleteBundle(String bundleId, boolean deleteQuotes) {
-		if(!doServerPersist) return;
-		String userId = getUser().getId();
-		userDataService.deleteBundleForUser(userId, bundleId, deleteQuotes, new AsyncCallback<Payload>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(Payload result) {
-				handlePersistResponse(result);
-			}
-		});
-	}
-
-	public void addQuoteToBundle(String bundleId, Quote quote) {
-		if(!doServerPersist) return;
-		String userId = getUser().getId();
-		userDataService.addQuoteToBundle(userId, bundleId, quote, new AsyncCallback<ModelPayload<Quote>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(ModelPayload<Quote> result) {
-				handlePersistResponse(result);
-			}
-		});
-	}
-
-	public void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote) {
-		if(!doServerPersist) return;
-		String userId = getUser().getId();
-		userDataService.removeQuoteFromBundle(userId, bundleId, quoteId, deleteQuote, new AsyncCallback<Payload>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(Payload result) {
-				handlePersistResponse(result);
-			}
-		});
-	}
-
-	public void addBundleUserBinding(String bundleId) {
-		if(!doServerPersist) return;
-		String userId = getUser().getId();
-		userDataService.addBundleUserBinding(userId, bundleId, new AsyncCallback<Payload>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(Payload result) {
-				handlePersistResponse(result);
-			}
-		});
-	}
-
-	public void addDocUserBinding(String docId) {
-		if(!doServerPersist) return;
-		String userId = getUser().getId();
-		userDataService.addDocUserBinding(userId, docId, new AsyncCallback<Payload>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(Payload result) {
-				handlePersistResponse(result);
-			}
-		});
-	}
-
-	public void removeBundleUserBinding(String bundleId) {
-		if(!doServerPersist) return;
-		String userId = getUser().getId();
-		userDataService.removeBundleUserBinding(userId, bundleId, new AsyncCallback<Payload>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(Payload result) {
-				handlePersistResponse(result);
-			}
-		});
-	}
-
-	public void removeDocUserBinding(String docId) {
-		if(!doServerPersist) return;
-		String userId = getUser().getId();
-		userDataService.removeDocUserBinding(userId, docId, new AsyncCallback<Payload>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(Payload result) {
-				handlePersistResponse(result);
-			}
-		});
+		// add quote to target bundle and fire model change event
+		QuoteBundle targetBundle = (QuoteBundle) get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), bundleId));
+		targetBundle.addQuote(quote);
+		persist(targetBundle, source);
 	}
 
 	/**
@@ -336,15 +171,6 @@ public class ClientModelCache {
 			list.clear();
 		}
 	}
-	
-	/**
-	 * Is the logged in user an administrator?
-	 * @return true/false
-	 */
-	public boolean isAdminUser() {
-		User user = getUser();
-		return user == null ? false : user.inRole(Role.ADMINISTRATOR);
-	}
 
 	/**
 	 * @return The currently logged in user.
@@ -361,28 +187,6 @@ public class ClientModelCache {
 		List<?> list = entities.get(EntityType.USER_STATE.name());
 		UserState userState = list.size() < 1 ? null : (UserState) list.get(0);
 		return userState;
-	}
-
-	/**
-	 * Persists the user state to the server.
-	 * @param cmd optional command to execute upon return irregardless of error.
-	 */
-	public void saveUserState(final Command cmd) {
-		UserState userState = getUserState();
-		if(userState != null) {
-			userDataService.saveUserState(userState, new AsyncCallback<Void>() {
-
-				@Override
-				public void onSuccess(Void result) {
-					if(cmd != null) cmd.execute();
-				}
-
-				@Override
-				public void onFailure(Throwable caught) {
-					if(cmd != null) cmd.execute();
-				}
-			});
-		}
 	}
 
 	/**
@@ -573,25 +377,6 @@ public class ClientModelCache {
 				modelChangeDispatcher.fireEvent(new ModelChangeEvent(source, ModelChangeOp.DELETED, e, null));
 			}
 		}
-	}
-
-	/**
-	 * Compares two quotes for equality by an implicit business key:
-	 * <ul>
-	 * <li>same doc ref
-	 * <li>same quote text
-	 * </ul>
-	 * @param q1
-	 * @param q2
-	 * @return <code>true</code> if they are business key equal
-	 */
-	public boolean compareQuotes(Quote q1, Quote q2) {
-		DocRef doc1 = q1.getDocument();
-		DocRef doc2 = q2.getDocument();
-		if(doc1.equals(doc2)) {
-			return ObjectUtil.equals(q1.getQuote(), q2.getQuote());
-		}
-		return false;
 	}
 
 	public DocRef getCaseDocByRemoteUrl(String remoteCaseUrl) {
