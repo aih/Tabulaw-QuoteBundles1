@@ -6,7 +6,7 @@
 package com.tabulaw.client.app.ui.nav;
 
 import com.tabulaw.client.app.Resources;
-import com.tabulaw.client.app.ui.view.QuoteBundlesView;
+import com.tabulaw.client.app.ui.view.BundlesView;
 import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 
@@ -17,7 +17,7 @@ import com.tabulaw.client.mvc.view.StaticViewInitializer;
  */
 public class QuoteBundlesNavButton extends AbstractNavButton {
 
-	static final IViewInitializer vi = new StaticViewInitializer(QuoteBundlesView.klas);
+	static final IViewInitializer vi = new StaticViewInitializer(BundlesView.klas);
 	
 	public QuoteBundlesNavButton() {
 		super("Quote Bundles", "bundles", Resources.INSTANCE.quoteBundleIcon());

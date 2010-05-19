@@ -19,9 +19,9 @@ import com.tabulaw.common.model.QuoteBundle;
  * Quote bundle widget intended for use side by side with a document in view.
  * @author jpk
  */
-public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteBundleDocWidget, QuoteDocWidget, AbstractQuoteBundleWidget.Header> {
+public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, QuoteDocWidget, AbstractBundleWidget.Header> {
 
-	static class DocHeader extends AbstractQuoteBundleWidget.Header {
+	static class DocHeader extends AbstractBundleWidget.Header {
 
 		public DocHeader() {
 			super();
@@ -45,7 +45,7 @@ public class QuoteBundleDocWidget extends AbstractQuoteBundleWidget<QuoteBundleD
 	 * Constructor
 	 * @param aQuoteEventHandler optional quote event handler
 	 */
-	public QuoteBundleDocWidget(IQuoteHandler aQuoteEventHandler) {
+	public BundleDocWidget(IQuoteHandler aQuoteEventHandler) {
 		super(new DocHeader());
 		this.quoteEventHandler = aQuoteEventHandler;
 	}

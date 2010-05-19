@@ -11,14 +11,14 @@ import com.tabulaw.common.model.Quote;
  * Quote widgtet that is <code>Mark</code> aware.
  * @author jpk
  */
-public class QuoteDocWidget extends AbstractQuoteWidget<QuoteBundleDocWidget> {
+public class QuoteDocWidget extends AbstractQuoteWidget<BundleDocWidget> {
 	
 	/**
 	 * Constructor
 	 * @param parentQuoteBundleWidget
 	 * @param mQuote
 	 */
-	public QuoteDocWidget(QuoteBundleDocWidget parentQuoteBundleWidget, Quote mQuote) {
+	public QuoteDocWidget(BundleDocWidget parentQuoteBundleWidget, Quote mQuote) {
 		super(parentQuoteBundleWidget, mQuote);
 		
 		// add quote copy icon

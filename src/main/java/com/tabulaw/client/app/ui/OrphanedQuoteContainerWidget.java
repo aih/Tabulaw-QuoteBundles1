@@ -7,21 +7,21 @@ package com.tabulaw.client.app.ui;
 
 import com.google.gwt.user.client.ui.Image;
 import com.tabulaw.client.app.Resources;
-import com.tabulaw.client.app.ui.QuoteBundleEditWidget.Styles;
+import com.tabulaw.client.app.ui.BundleEditWidget.Styles;
 import com.tabulaw.common.model.Quote;
 
 /**
- * Dedicated {@link QuoteBundleEditWidget} exclusively housing orphaned quotes
+ * Dedicated {@link BundleEditWidget} exclusively housing orphaned quotes
  * in an ad-hoc bundle.
  * @author jpk
  */
-public class OrphanedQuoteContainerWidget extends AbstractQuoteBundleWidget<OrphanedQuoteContainerWidget, OrphanedQuoteWidget, OrphanedQuoteContainerWidget.Header> {
+public class OrphanedQuoteContainerWidget extends AbstractBundleWidget<OrphanedQuoteContainerWidget, OrphanedQuoteWidget, OrphanedQuoteContainerWidget.Header> {
 
 	/**
 	 * Quote bundle header widget with edit butons.
 	 * @author jpk
 	 */
-	static class Header extends AbstractQuoteBundleWidget.Header {
+	static class Header extends AbstractBundleWidget.Header {
 
 		private final Image close;
 

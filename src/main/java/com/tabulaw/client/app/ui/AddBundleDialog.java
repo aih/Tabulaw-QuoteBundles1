@@ -25,16 +25,16 @@ import com.tabulaw.common.model.QuoteBundle;
  * Dialog for handling quote bundles to the app.
  * @author jpk
  */
-public class AddQuoteBundleDialog extends Dialog implements IEditHandler<FieldGroup> {
+public class AddBundleDialog extends Dialog implements IEditHandler<FieldGroup> {
 
-	private final AddQuoteBundlePanel fieldPanel = new AddQuoteBundlePanel();
+	private final AddBundlePanel fieldPanel = new AddBundlePanel();
 
 	private final FieldGroupEditPanel editPanel = new FieldGroupEditPanel("Add", null, "Cancel", null, fieldPanel);
 
 	/**
 	 * Constructor
 	 */
-	public AddQuoteBundleDialog() {
+	public AddBundleDialog() {
 		super(null, false);
 
 		setText("Add Quote Bundle");

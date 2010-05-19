@@ -30,7 +30,7 @@ import com.tabulaw.util.ObjectUtil;
  * Supports editing capabilty for a quote bundle.
  * @author jpk
  */
-public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundleEditWidget, QuoteEditWidget, QuoteBundleEditWidget.EditHeader> {
+public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, QuoteEditWidget, BundleEditWidget.EditHeader> {
 
 	static class Styles {
 
@@ -49,7 +49,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundle
 	 * Quote bundle header widget with edit butons.
 	 * @author jpk
 	 */
-	static class EditHeader extends AbstractQuoteBundleWidget.Header {
+	static class EditHeader extends AbstractBundleWidget.Header {
 
 		private final Image /*save, undo, */delete, current, close;
 
@@ -143,7 +143,7 @@ public class QuoteBundleEditWidget extends AbstractQuoteBundleWidget<QuoteBundle
 	 * Constructor
 	 * @param dragController optional
 	 */
-	public QuoteBundleEditWidget(PickupDragController dragController) {
+	public BundleEditWidget(PickupDragController dragController) {
 		super(new EditHeader());
 
 		// TODO do we need to handle clean up?

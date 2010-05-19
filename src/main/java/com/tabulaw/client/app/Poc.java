@@ -17,7 +17,7 @@ import com.tabulaw.client.app.ui.nav.NavColPanel;
 import com.tabulaw.client.app.ui.nav.NavRowPanel;
 import com.tabulaw.client.app.ui.view.DocView;
 import com.tabulaw.client.app.ui.view.DocsView;
-import com.tabulaw.client.app.ui.view.QuoteBundlesView;
+import com.tabulaw.client.app.ui.view.BundlesView;
 import com.tabulaw.client.app.ui.view.UsersView;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -166,7 +166,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 					// ensure quote bundles view is loaded so it recieves model change events
 					// staying in sync!
-					ViewManager.get().loadView(new StaticViewInitializer(QuoteBundlesView.klas));
+					ViewManager.get().loadView(new StaticViewInitializer(BundlesView.klas));
 
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
@@ -311,7 +311,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	private void populateViewClasses() {
 		ViewClass.addClass(DocsView.klas);
 		ViewClass.addClass(DocView.klas);
-		ViewClass.addClass(QuoteBundlesView.klas);
+		ViewClass.addClass(BundlesView.klas);
 		ViewClass.addClass(UsersView.klas);
 	}
 }

@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.QuoteBundleListingWidget.BOption;
+import com.tabulaw.client.app.ui.BundleListingWidget.BOption;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.LoggingDragHandler;
@@ -37,7 +37,7 @@ import com.tabulaw.common.model.QuoteBundle;
  * Manages the editing of quote bundles via drag and drop.
  * @author jpk
  */
-public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
+public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 
 	static class Styles {
 
@@ -93,14 +93,14 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			DragContext context = event.getContext();
 
 			QuoteEditWidget draggedQuoteWidget = (QuoteEditWidget) context.draggable;
-			QuoteBundleEditWidget sourceQuoteBundleWidget =
+			BundleEditWidget sourceQuoteBundleWidget =
 					draggedQuoteWidget.getParentQuoteBundleWidget();
 
 			// identify the target quote bundle widget (recipient of draggable)
-			final QuoteBundleEditWidget targetQuoteBundleWidget;
+			final BundleEditWidget targetQuoteBundleWidget;
 			try {
 				targetQuoteBundleWidget =
-						(QuoteBundleEditWidget) context.finalDropController.getDropTarget().getParent().getParent();
+						(BundleEditWidget) context.finalDropController.getDropTarget().getParent().getParent();
 			}
 			// CRITICAL: we must catch a Throwable as opposed to a NullPointerException in order 
 			// for this to work in webmode!!!
@@ -151,7 +151,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	/**
 	 * The life-cycle of this widget is managed by this class!
 	 */
-	private final QuoteBundleListingWidget qbListingWidget;
+	private final BundleListingWidget qbListingWidget;
 
 	/**
 	 * Contains the quote bundle columns.
@@ -173,19 +173,19 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	private final PickupDragController quoteController;
 	private final QuoteDragHandler quoteHandler;
 
-	private final HashMap<QuoteBundleEditWidget, FlowPanelDropController> qbDropBindings =
-			new HashMap<QuoteBundleEditWidget, FlowPanelDropController>();
+	private final HashMap<BundleEditWidget, FlowPanelDropController> qbDropBindings =
+			new HashMap<BundleEditWidget, FlowPanelDropController>();
 
 	/**
 	 * Constructor
 	 */
-	public QuoteBundlesManageWidget() {
+	public BundlesManageWidget() {
 		super();
 
 		boundaryPanel.addStyleName(Styles.BOUNDARY_AREA);
 		initWidget(boundaryPanel);
 
-		qbListingWidget = new QuoteBundleListingWidget();
+		qbListingWidget = new BundleListingWidget();
 
 		// initialize quote bundle dragging
 		quoteBundleController = new PickupDragController(boundaryPanel, false);
@@ -246,7 +246,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 * corres. entry back in the quote bundle listing widget.
 	 * @param quoteBundleWidget The quote bundle widget to close
 	 */
-	void unpinQuoteBundle(QuoteBundleEditWidget quoteBundleWidget) {
+	void unpinQuoteBundle(BundleEditWidget quoteBundleWidget) {
 		// remove from main viewing area
 		removeQuoteBundleColumn(quoteBundleWidget.getModel());
 		
@@ -258,7 +258,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	/**
 	 * @return The <em>managed</em> quote bundle listing widget.
 	 */
-	public QuoteBundleListingWidget getQuoteBundleListingWidget() {
+	public BundleListingWidget getQuoteBundleListingWidget() {
 		return qbListingWidget;
 	}
 
@@ -292,12 +292,12 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	}
 
 	private void clearQuoteBundleColumns() {
-		ArrayList<QuoteBundleEditWidget> qbwlist = new ArrayList<QuoteBundleEditWidget>();
+		ArrayList<BundleEditWidget> qbwlist = new ArrayList<BundleEditWidget>();
 		for(int i = 0; i < columns.getWidgetCount(); i++) {
-			QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) columns.getWidget(i);
+			BundleEditWidget qbw = (BundleEditWidget) columns.getWidget(i);
 			qbwlist.add(qbw);
 		}
-		for(QuoteBundleEditWidget qbw : qbwlist) {
+		for(BundleEditWidget qbw : qbwlist) {
 			removeQuoteBundleColumn(qbw.getModel());
 		}
 	}
@@ -344,7 +344,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		int ilast = -1;
 		for(int i = 0; i < columns.getWidgetCount(); i++) {
 			Widget w = columns.getWidget(i);
-			if(w instanceof QuoteBundleEditWidget) {
+			if(w instanceof BundleEditWidget) {
 				numBundlesBeforeInsert++;
 				ilast = i;
 			}
@@ -352,12 +352,12 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		
 		// "demote" the last quote bundle in the main viewing area
 		if(numBundlesBeforeInsert >= NUM_COLUMNS) {
-			QuoteBundleEditWidget last = (QuoteBundleEditWidget) columns.getWidget(ilast);
+			BundleEditWidget last = (BundleEditWidget) columns.getWidget(ilast);
 			unpinQuoteBundle(last);
 		}
 
 		Log.debug("Inserting quote bundle col widget for: " + bundle);
-		final QuoteBundleEditWidget qbw = new QuoteBundleEditWidget(quoteController);
+		final BundleEditWidget qbw = new BundleEditWidget(quoteController);
 		qbw.setModel(bundle);
 		qbw.setCloseHandler(new ClickHandler() {
 
@@ -373,8 +373,8 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		for(int i = 0; i < columns.getWidgetCount(); i++) {
 			Widget w = columns.getWidget(i);
 			
-			if(w instanceof QuoteBundleEditWidget) {
-				QuoteBundleEditWidget iqbw = (QuoteBundleEditWidget) w;
+			if(w instanceof BundleEditWidget) {
+				BundleEditWidget iqbw = (BundleEditWidget) w;
 				
 				// [re-]apply num cols based style to each bundle widget
 				for(QbColStyle colStyle : QbColStyle.values()) {
@@ -407,7 +407,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 	}
 
 	private boolean removeQuoteBundleColumn(QuoteBundle bundle) {
-		QuoteBundleEditWidget removedQbw = null;
+		BundleEditWidget removedQbw = null;
 		int numBundles = 0;
 		
 		// identify the quote bundle widget
@@ -415,8 +415,8 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 		
 		for(int i = 0; i < columns.getWidgetCount(); i++) {
 			Widget w = columns.getWidget(i);
-			if(w instanceof QuoteBundleEditWidget) {
-				QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) w;
+			if(w instanceof BundleEditWidget) {
+				BundleEditWidget qbw = (BundleEditWidget) w;
 				if(qbw.getModel().getId().equals(rmId)) {
 	
 					// un-make quote widgets draggable
@@ -442,8 +442,8 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 			QbColStyle colStyleToApply = QbColStyle.resolveFromNumBundles(numBundles);
 			for(int i = 0; i < columns.getWidgetCount(); i++) {
 				Widget w = columns.getWidget(i);
-				if(w instanceof QuoteBundleEditWidget) {
-					QuoteBundleEditWidget iqbw = (QuoteBundleEditWidget) w;
+				if(w instanceof BundleEditWidget) {
+					BundleEditWidget iqbw = (BundleEditWidget) w;
 					
 					// [re-]apply num cols based style to each bundle widget
 					for(QbColStyle colStyle : QbColStyle.values()) {
@@ -472,7 +472,7 @@ public class QuoteBundlesManageWidget extends AbstractModelChangeAwareWidget {
 					String id = m.getId();
 					// look for the quote bundle in the pinned quote bundle widgets
 					for(int i = 0; i < columns.getWidgetCount(); i++) {
-						QuoteBundleEditWidget qbw = (QuoteBundleEditWidget) columns.getWidget(i);
+						BundleEditWidget qbw = (BundleEditWidget) columns.getWidget(i);
 						QuoteBundle qbm = qbw.getModel();
 						if(qbm.getId().equals(id)) {
 							qbw.sync(qb);

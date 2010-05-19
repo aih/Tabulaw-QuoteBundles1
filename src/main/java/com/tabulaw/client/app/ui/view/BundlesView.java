@@ -10,8 +10,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Resources;
-import com.tabulaw.client.app.ui.AddQuoteBundleDialog;
-import com.tabulaw.client.app.ui.QuoteBundlesManageWidget;
+import com.tabulaw.client.app.ui.AddBundleDialog;
+import com.tabulaw.client.app.ui.BundlesManageWidget;
 import com.tabulaw.client.mvc.view.StaticViewInitializer;
 import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.ui.ImageButton;
@@ -20,7 +20,7 @@ import com.tabulaw.client.ui.ImageButton;
  * A view for managing existing doc bundles.
  * @author jpk
  */
-public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
+public class BundlesView extends AbstractPocView<StaticViewInitializer> {
 	
 	public static final Class klas = new Class();
 
@@ -32,14 +32,14 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 		}
 
 		@Override
-		public QuoteBundlesView newView() {
-			return new QuoteBundlesView();
+		public BundlesView newView() {
+			return new BundlesView();
 		}
 	}
 	
 	static class NewQuoteBundleButton extends ImageButton {
 		
-		private AddQuoteBundleDialog dialog;
+		private AddBundleDialog dialog;
 		
 		public NewQuoteBundleButton() {
 			super(Resources.INSTANCE.plus(), "New Quote Bundle");
@@ -50,7 +50,7 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 				@Override
 				public void onClick(ClickEvent event) {
 					if(dialog == null) {
-						dialog = new AddQuoteBundleDialog();
+						dialog = new AddBundleDialog();
 						dialog.setGlassEnabled(true);
 					}
 					dialog.showRelativeTo(NewQuoteBundleButton.this);
@@ -61,14 +61,14 @@ public class QuoteBundlesView extends AbstractPocView<StaticViewInitializer> {
 	
 	private final Widget[] navColWidgets;
 	
-	private final QuoteBundlesManageWidget qbPanel;
+	private final BundlesManageWidget qbPanel;
 	
 	/**
 	 * Constructor
 	 */
-	public QuoteBundlesView() {
+	public BundlesView() {
 		super();
-		qbPanel = new QuoteBundlesManageWidget();
+		qbPanel = new BundlesManageWidget();
 		
 		HTML viewName = new HTML(getLongViewName());
 		viewName.setStyleName("viewTitle");

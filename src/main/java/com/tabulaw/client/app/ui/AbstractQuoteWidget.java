@@ -36,7 +36,7 @@ import com.tabulaw.util.StringUtil;
  * @param <B> bundle widget type
  * @author jpk
  */
-public abstract class AbstractQuoteWidget<B extends AbstractQuoteBundleWidget<?, ?, ?>> extends Composite implements IHasQuoteHandlers {
+public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?>> extends Composite implements IHasQuoteHandlers {
 
 	static class Header extends Composite {
 

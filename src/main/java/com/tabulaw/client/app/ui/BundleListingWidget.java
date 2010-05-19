@@ -13,12 +13,12 @@ import com.tabulaw.client.ui.option.Option;
  * Displays quote bundles vertically by title.
  * @author jpk
  */
-public final class QuoteBundleListingWidget extends Composite {
+public final class BundleListingWidget extends Composite {
 
 	public static class Styles {
 
 		/**
-		 * The id of the {@link QuoteBundleListingWidget} widget in the dom.
+		 * The id of the {@link BundleListingWidget} widget in the dom.
 		 */
 		public static final String ID = "qbListing";
 	}
@@ -70,10 +70,10 @@ public final class QuoteBundleListingWidget extends Composite {
 	/**
 	 * Constructor
 	 */
-	public QuoteBundleListingWidget() {
+	public BundleListingWidget() {
 		super();
 		bundleOptionsPanel = new BundleOptionsPanel();
-		bundleOptionsPanel.getElement().setId(QuoteBundleListingWidget.Styles.ID);
+		bundleOptionsPanel.getElement().setId(BundleListingWidget.Styles.ID);
 		initWidget(bundleOptionsPanel);
 	}
 	

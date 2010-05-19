@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
-import com.tabulaw.client.app.ui.QuoteBundleEditWidget.Styles;
+import com.tabulaw.client.app.ui.BundleEditWidget.Styles;
 import com.tabulaw.client.convert.IConverter;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -29,7 +29,7 @@ import com.tabulaw.common.model.QuoteBundle;
  * @param <H> the quote bundle {@link Header} widget type.
  * @author jpk
  */
-public abstract class AbstractQuoteBundleWidget<B extends AbstractQuoteBundleWidget<B, Q, H>, Q extends AbstractQuoteWidget<B>, H extends AbstractQuoteBundleWidget.Header> 
+public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, H>, Q extends AbstractQuoteWidget<B>, H extends AbstractBundleWidget.Header> 
 extends AbstractModelChangeAwareWidget {
 
 	static final IConverter<String, String> headerDescTextExtractor = new IConverter<String, String>() {
@@ -193,7 +193,7 @@ extends AbstractModelChangeAwareWidget {
 	 * Constructor
 	 * @param headerWidget The header widget
 	 */
-	protected AbstractQuoteBundleWidget(H headerWidget) {
+	protected AbstractBundleWidget(H headerWidget) {
 		super();
 		this.header = headerWidget;
 		panel.setStyleName("qbundle");
@@ -303,15 +303,15 @@ extends AbstractModelChangeAwareWidget {
 				if(persist) {
 					// delete the quote updating the bundle quote refs too
 					//if(deleteQuote) {
-						ClientModelCache.get().remove(mQuote.getModelKey(), AbstractQuoteBundleWidget.this);
+						ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
 					//}
-					ClientModelCache.get().persist(bundle, AbstractQuoteBundleWidget.this);
+					ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
 					
 					if(!deleteQuote) {
 						// orphaned
 						QuoteBundle orphanedQuoteContainer = ClientModelCache.get().getOrphanQuoteContainer();
 						orphanedQuoteContainer.addQuote(mQuote);
-						Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractQuoteBundleWidget.this, ModelChangeOp.UPDATED, orphanedQuoteContainer, null));
+						Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractBundleWidget.this, ModelChangeOp.UPDATED, orphanedQuoteContainer, null));
 					}
 
 					// server side persist

@@ -71,7 +71,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 	private HandlerRegistration hrViewMode;
 
-	private final QuoteBundleDocWidget wDocQuoteBundle;
+	private final BundleDocWidget wDocQuoteBundle;
 
 	private final HorizontalSplitPanel hsp = new HorizontalSplitPanel();
 
@@ -105,7 +105,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		SimpleDropController quoteDropController = new SimpleDropController(wDocViewer);
 		quoteController.registerDropController(quoteDropController);
 
-		wDocQuoteBundle = new QuoteBundleDocWidget(this);
+		wDocQuoteBundle = new BundleDocWidget(this);
 
 		hsp.add(wDocViewer);
 		hsp.add(wDocQuoteBundle);
