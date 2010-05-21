@@ -50,9 +50,21 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional(readOnly = true)
 	public List<Quote> getOrphanedQuotesForUser(String userId) {
 		if(userId == null) throw new NullPointerException();
-		List<QuoteUserBinding> bindings = dao.loadAll(QuoteUserBinding.class);
+
+		Criteria<QuoteUserBinding> c = new Criteria<QuoteUserBinding>(QuoteUserBinding.class);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		c.getPrimaryGroup().addCriterion("orphaned", Boolean.TRUE, Comparator.EQUALS, true);
+
+		List<QuoteUserBinding> bindings;
+		try {
+			bindings = dao.findEntities(c, null);
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
 		ArrayList<String> ids = new ArrayList<String>(bindings.size());
 		for(QuoteUserBinding binding : bindings) {
+			assert binding.isOrphaned(); 
 			ids.add(binding.getQuoteId());
 		}
 		List<Quote> list = dao.findByIds(Quote.class, ids, null);
@@ -589,7 +601,9 @@ public class UserDataService extends AbstractEntityService {
 		if(bundleId == null) throw new NullPointerException();
 		QuoteUserBinding binding = findQuoteUserBinding(userId, quoteId);
 		Quote q = dao.load(Quote.class, quoteId);
-		addQuoteToBundle(userId, bundleId, q);
+		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);
+		qb.addQuote(q);
+		dao.persist(qb);
 		binding.setOrphaned(false);
 		dao.persist(binding);
 	}

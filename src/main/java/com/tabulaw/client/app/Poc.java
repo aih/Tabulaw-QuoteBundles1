@@ -180,14 +180,16 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 						ClientModelCache.get().persistAll(qb.getQuotes());
 					}
 
+					// cache bundles (w/ no notification)
+					ClientModelCache.get().persistAll(userBundles);
+
 					// store orphaned quotes (w/ no notification)
 					List<Quote> orphanedQuotes = result.getOrphanedQuotes();
 					ClientModelCache.get().persistAll(orphanedQuotes);
-					ClientModelCache.get().getOrphanedQuoteContainer().addQuotes(orphanedQuotes);
+					QuoteBundle oqc = ClientModelCache.get().getOrphanedQuoteContainer();
+					oqc.addQuotes(orphanedQuotes);
+					ClientModelCache.get().persist(oqc, null);
 
-					// cache bundles w/ no notification
-					ClientModelCache.get().persistAll(userBundles);
-					
 					// load bundles view (this will pull all just stored bundles from cache)
 					ViewManager.get().loadView(new StaticViewInitializer(BundlesView.klas));
 

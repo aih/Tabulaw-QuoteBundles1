@@ -100,12 +100,12 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 
 			QuoteEditWidget sourceQuoteWidget = (QuoteEditWidget) context.draggable;
 			BundleEditWidget sourceBundleWidget = sourceQuoteWidget.getParentBundleWidget();
+			Quote sourceQuote = sourceQuoteWidget.getModel();
 
 			// identify the target quote bundle widget (recipient of draggable)
 			final BundleEditWidget targetBundleWidget;
 			try {
-				targetBundleWidget =
-						(BundleEditWidget) context.finalDropController.getDropTarget().getParent().getParent();
+				targetBundleWidget = (BundleEditWidget) context.finalDropController.getDropTarget().getParent().getParent();
 			}
 			// CRITICAL: we must catch a Throwable as opposed to a
 			// NullPointerException in order
@@ -120,7 +120,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 				throw new VetoDragException();
 			}
 
-			Quote sourceQuote = sourceQuoteWidget.getModel();
+			QuoteBundle targetBundle = targetBundleWidget.getModel();
 
 			String dscQuote = sourceQuote.getDocument().getTitle();
 			String dscBundle = targetBundleWidget.getModel().getName();
@@ -134,23 +134,34 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 
 			// are we dragging from orphaned quotes container?
 			if(sourceBundleWidget.isOrphanedQuoteContainer()) {
-				
-				QuoteBundle targetBundle = targetBundleWidget.getModel();
-				
+
 				// move the source quote to target bundle
-				if(!sourceBundleWidget.getModel().removeQuote(sourceQuote))
-					throw new IllegalStateException();
+				if(!sourceBundleWidget.getModel().removeQuote(sourceQuote)) throw new IllegalStateException();
 				targetBundle.addQuote(sourceQuote);
-				
-				//if(!ClientModelCache.get().getOrphanedQuoteContainer().removeQuote(sourceQuote))
-					//throw new IllegalStateException();
-				
+				sourceQuoteWidget.setParentQuoteBundleWidget(targetBundleWidget);
+
 				// client persist target bundle w/ notification
 				ClientModelCache.get().persist(targetBundle, targetBundleWidget);
-				
+
 				// server-side persist
 				ServerPersistApi.get().unorphanQuote(sourceQuote.getId(), targetBundle.getId());
-				
+
+				return;
+			}
+
+			// are we dragging TO orphaned quotes container?
+			if(targetBundleWidget.isOrphanedQuoteContainer()) {
+				QuoteBundle sourceBundle = sourceBundleWidget.getModel();
+				if(!sourceBundle.removeQuote(sourceQuote)) throw new IllegalStateException();
+				targetBundle.addQuote(sourceQuote);
+				sourceQuoteWidget.setParentQuoteBundleWidget(targetBundleWidget);
+
+				// client persist source bundle quote removal w/ notification
+				ClientModelCache.get().persist(sourceBundle, sourceBundleWidget);
+
+				// server-side persist
+				ServerPersistApi.get().removeQuoteFromBundle(sourceBundle.getId(), sourceQuote.getId(), false);
+
 				return;
 			}
 

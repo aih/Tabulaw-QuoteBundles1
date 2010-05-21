@@ -37,7 +37,7 @@ import com.tabulaw.util.StringUtil;
  * @param <B> bundle widget type
  * @author jpk
  */
-public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?>> extends Composite implements IHasModel<Quote>, IHasQuoteHandlers  {
+public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?>> extends Composite implements IHasModel<Quote>, IHasQuoteHandlers {
 
 	static class Header extends Composite {
 
@@ -72,7 +72,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 			panel.add(topRow);
 			panel.add(subTitle);
 		}
-		
+
 		public void addButton(Widget button) {
 			buttonsPanel.add(button);
 		}
@@ -111,7 +111,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 	protected final QuoteBlock quoteBlock = new QuoteBlock();
 
-	protected final B parentQuoteBundleWidget;
+	protected B parentQuoteBundleWidget;
 
 	protected boolean draggable;
 
@@ -123,7 +123,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 	 */
 	public AbstractQuoteWidget(B parentQuoteBundleWidget) {
 		super();
-		this.parentQuoteBundleWidget = parentQuoteBundleWidget;
+		setParentQuoteBundleWidget(parentQuoteBundleWidget);
 
 		panel.setStyleName("wquote");
 		panel.add(header);
@@ -194,6 +194,15 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		header.addButton(img);
 	}
 
+	public B getParentQuoteBundleWidget() {
+		return parentQuoteBundleWidget;
+	}
+
+	public void setParentQuoteBundleWidget(B parentQuoteBundleWidget) {
+		if(parentQuoteBundleWidget == null) throw new NullPointerException();
+		this.parentQuoteBundleWidget = parentQuoteBundleWidget;
+	}
+
 	/**
 	 * Constructor
 	 * @param parentQuoteBundleWidget
@@ -232,7 +241,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 			if(!StringUtil.isEmpty(parties)) title = parties;
 			subTitle = caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag());
 		}
-		
+
 		header.setQuoteTitle(title);
 		header.setSubTitle(subTitle);
 		quoteBlock.setQuotedText(quoteText);
