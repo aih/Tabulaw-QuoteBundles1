@@ -13,25 +13,12 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
 
 /**
  * Quote bundle widget intended for use side by side with a document in view.
  * @author jpk
  */
-public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, QuoteDocWidget, AbstractBundleWidget.Header> {
-
-	static class DocHeader extends AbstractBundleWidget.Header {
-
-		public DocHeader() {
-			super();
-		}
-
-		@Override
-		public void setModel(QuoteBundle mQuoteBundle) {
-			super.setModel(mQuoteBundle);
-		}
-	}
+public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, QuoteDocWidget, EditableBundleHeader> {
 
 	private String docId;
 
@@ -46,7 +33,7 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 	 * @param aQuoteEventHandler optional quote event handler
 	 */
 	public BundleDocWidget(IQuoteHandler aQuoteEventHandler) {
-		super(new DocHeader());
+		super(new EditableBundleHeader());
 		this.quoteEventHandler = aQuoteEventHandler;
 	}
 

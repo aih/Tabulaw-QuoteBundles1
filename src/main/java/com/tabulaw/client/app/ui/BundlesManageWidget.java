@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
+import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.BundleListingWidget.BOption;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
@@ -54,16 +55,21 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	} // Styles
 
 	static final int NUM_COLUMNS = 3;
-	
+
 	static enum QbColStyle {
-		one, two, three;
-		
+		one,
+		two,
+		three;
+
 		public static QbColStyle resolveFromNumBundles(int numBundles) {
 			switch(numBundles) {
-				case 1: return one;
-				case 2: return two;
+				case 1:
+					return one;
+				case 2:
+					return two;
 				default:
-				case 3: return three;
+				case 3:
+					return three;
 			}
 		}
 	}
@@ -92,59 +98,72 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 			// move the underying model now
 			DragContext context = event.getContext();
 
-			QuoteEditWidget draggedQuoteWidget = (QuoteEditWidget) context.draggable;
-			BundleEditWidget sourceQuoteBundleWidget =
-					draggedQuoteWidget.getParentQuoteBundleWidget();
+			QuoteEditWidget sourceQuoteWidget = (QuoteEditWidget) context.draggable;
+			BundleEditWidget sourceBundleWidget = sourceQuoteWidget.getParentQuoteBundleWidget();
 
 			// identify the target quote bundle widget (recipient of draggable)
-			final BundleEditWidget targetQuoteBundleWidget;
+			final BundleEditWidget targetBundleWidget;
 			try {
-				targetQuoteBundleWidget =
+				targetBundleWidget =
 						(BundleEditWidget) context.finalDropController.getDropTarget().getParent().getParent();
 			}
-			// CRITICAL: we must catch a Throwable as opposed to a NullPointerException in order 
+			// CRITICAL: we must catch a Throwable as opposed to a
+			// NullPointerException in order
 			// for this to work in webmode!!!
 			catch(Throwable t) {
 				// presume the drop target is the same as the source!
-				//return;
+				// return;
 				throw new VetoDragException();
 			}
-			if(targetQuoteBundleWidget == sourceQuoteBundleWidget) {
-				//return;
+			if(targetBundleWidget == sourceBundleWidget) {
+				// return;
 				throw new VetoDragException();
 			}
-			
-			Quote sourceQuote = draggedQuoteWidget.getModel();
+
+			Quote sourceQuote = sourceQuoteWidget.getModel();
 
 			String dscQuote = sourceQuote.getDocument().getTitle();
-			String dscBundle = targetQuoteBundleWidget.getModel().getName();
+			String dscBundle = targetBundleWidget.getModel().getName();
 
 			// does the quote already exist in the target bundle?
-			if(targetQuoteBundleWidget.hasQuote(sourceQuote)) {
+			if(targetBundleWidget.hasQuote(sourceQuote)) {
 				String msg = "'" + dscQuote + "' is already in Quote Bundle: " + dscBundle;
 				Notifier.get().warn(msg);
 				throw new VetoDragException();
 			}
 
 			// are we dragging from orphaned quotes container?
-			if(!sourceQuoteBundleWidget.getModel().isOrphanedQuoteContainer()) {
-				// clone the dragged quote widget setting its id to a new one
-				Quote mQuoteClone = (Quote) sourceQuote.clone();
-				mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
-				mQuoteClone.setVersion(-1); // CRITICAL
-				// add and persist
-				targetQuoteBundleWidget.addQuote(mQuoteClone, true, true);
-				// deny since we are copying
-				throw new VetoDragException();
-				// String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
-				// Notifier.get().info(msg);
+			if(sourceBundleWidget.isOrphanedQuoteContainer()) {
+				
+				QuoteBundle targetBundle = targetBundleWidget.getModel();
+				
+				// move the source quote to target bundle
+				if(!sourceBundleWidget.getModel().removeQuote(sourceQuote))
+					throw new IllegalStateException();
+				targetBundle.addQuote(sourceQuote);
+				
+				if(!ClientModelCache.get().getOrphanedQuoteContainer().removeQuote(sourceQuote))
+					throw new IllegalStateException();
+				
+				// client persist target bundle w/ notification
+				ClientModelCache.get().persist(targetBundle, targetBundleWidget);
+				
+				// server-side persist
+				ServerPersistApi.get().unorphanQuote(sourceQuote.getId(), targetBundle.getId());
+				
+				return;
 			}
-			
-			// move the quote (un-orphan it)
-			QuoteBundle orphanedQuoteContainer = ClientModelCache.get().getOrphanQuoteContainer();
-			if(!orphanedQuoteContainer.removeQuote(sourceQuote)) throw new IllegalStateException();
-			targetQuoteBundleWidget.addQuote(sourceQuote, false, true);
-			
+
+			// clone the dragged quote widget setting its id to a new one
+			Quote mQuoteClone = (Quote) sourceQuote.clone();
+			mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
+			mQuoteClone.setVersion(-1); // CRITICAL
+			// add and persist
+			targetBundleWidget.addQuote(mQuoteClone, true, true);
+			// deny since we are copying
+			throw new VetoDragException();
+			// String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
+			// Notifier.get().info(msg);
 		}
 	}
 
@@ -164,9 +183,9 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	private final HorizontalPanel columns = new HorizontalPanel();
 
 	// quote bundle widget dragging (main viewing area to nav col)
-	private final PickupDragController quoteBundleController;
-	private final QuoteBundleDragHandler quoteBundleHandler;
-	private final HorizontalPanelDropController quoteBundleDropController;
+	private final PickupDragController bundleController;
+	private final QuoteBundleDragHandler bundleHandler;
+	private final HorizontalPanelDropController bundleDropController;
 
 	// quote widget dragging (from one bundle widget to another bundle widget in
 	// main viewing area only)
@@ -188,13 +207,13 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 		qbListingWidget = new BundleListingWidget();
 
 		// initialize quote bundle dragging
-		quoteBundleController = new PickupDragController(boundaryPanel, false);
-		quoteBundleController.setBehaviorMultipleSelection(false);
-		quoteBundleController.setBehaviorDragStartSensitivity(3);
-		quoteBundleHandler = new QuoteBundleDragHandler();
-		quoteBundleController.addDragHandler(quoteBundleHandler);
-		quoteBundleDropController = new HorizontalPanelDropController(columns);
-		quoteBundleController.registerDropController(quoteBundleDropController);
+		bundleController = new PickupDragController(boundaryPanel, false);
+		bundleController.setBehaviorMultipleSelection(false);
+		bundleController.setBehaviorDragStartSensitivity(3);
+		bundleHandler = new QuoteBundleDragHandler();
+		bundleController.addDragHandler(bundleHandler);
+		bundleDropController = new HorizontalPanelDropController(columns);
+		bundleController.registerDropController(bundleDropController);
 
 		// initialize quote dragging
 		quoteController = new PickupDragController(boundaryPanel, false);
@@ -249,10 +268,10 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	void unpinQuoteBundle(BundleEditWidget quoteBundleWidget) {
 		// remove from main viewing area
 		removeQuoteBundleColumn(quoteBundleWidget.getModel());
-		
+
 		// add to nav col
 		QuoteBundle bundle = quoteBundleWidget.getModel();
-		addQuoteBundleOption(bundle);
+		addBundleOption(bundle);
 	}
 
 	/**
@@ -275,7 +294,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 					insertQuoteBundleColumn(mbundles.get(i), columns.getWidgetCount());
 				}
 				else {
-					addQuoteBundleOption(mbundles.get(i));
+					addBundleOption(mbundles.get(i));
 				}
 			}
 		}
@@ -308,7 +327,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 * @param bundle
 	 * @return new added option
 	 */
-	private BOption addQuoteBundleOption(QuoteBundle bundle) {
+	private BOption addBundleOption(QuoteBundle bundle) {
 		BOption option = new BOption(bundle.getId(), bundle.getName());
 		option.addClickHandler(new ClickHandler() {
 
@@ -322,7 +341,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 		return option;
 	}
 
-	private BOption removeQuoteBundleOption(QuoteBundle qb) {
+	private BOption removeBundleOption(QuoteBundle qb) {
 		for(BOption option : qbListingWidget.getOptionsPanel().getOptions()) {
 			if(option.bundleId.equals(qb.getId())) {
 				qbListingWidget.getOptionsPanel().removeOption(option);
@@ -338,7 +357,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 * @param bundle
 	 */
 	private void insertQuoteBundleColumn(final QuoteBundle bundle, int index) {
-		
+
 		// determine number of existing qb widgets
 		int numBundlesBeforeInsert = 0;
 		int ilast = -1;
@@ -349,7 +368,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 				ilast = i;
 			}
 		}
-		
+
 		// "demote" the last quote bundle in the main viewing area
 		if(numBundlesBeforeInsert >= NUM_COLUMNS) {
 			BundleEditWidget last = (BundleEditWidget) columns.getWidget(ilast);
@@ -367,31 +386,31 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 			}
 		});
 		columns.insert(qbw, index);
-		
+
 		int numBundles = numBundlesBeforeInsert + 1;
 		QbColStyle colStyleToApply = QbColStyle.resolveFromNumBundles(numBundles);
 		for(int i = 0; i < columns.getWidgetCount(); i++) {
 			Widget w = columns.getWidget(i);
-			
+
 			if(w instanceof BundleEditWidget) {
 				BundleEditWidget iqbw = (BundleEditWidget) w;
-				
+
 				// [re-]apply num cols based style to each bundle widget
 				for(QbColStyle colStyle : QbColStyle.values()) {
 					iqbw.removeStyleName(colStyle.name());
 				}
 				iqbw.addStyleName(colStyleToApply.name());
-				
+
 				// make quote bundle widget draggable
 				if(numBundles == 2) {
-					quoteBundleController.makeDraggable(iqbw, iqbw.header.getDraggable());
+					bundleController.makeDraggable(iqbw, iqbw.header.getDraggable());
 				}
 			}
 		}
-		
+
 		if(numBundles > 2) {
 			// only make added qb widget draggable and assume existing one are already
-			quoteBundleController.makeDraggable(qbw, qbw.header.getDraggable());
+			bundleController.makeDraggable(qbw, qbw.header.getDraggable());
 		}
 
 		// initialize a quote drop controller for this quote bundle widget
@@ -409,22 +428,22 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	private boolean removeQuoteBundleColumn(QuoteBundle bundle) {
 		BundleEditWidget removedQbw = null;
 		int numBundles = 0;
-		
+
 		// identify the quote bundle widget
 		String rmId = bundle.getId();
-		
+
 		for(int i = 0; i < columns.getWidgetCount(); i++) {
 			Widget w = columns.getWidget(i);
 			if(w instanceof BundleEditWidget) {
 				BundleEditWidget qbw = (BundleEditWidget) w;
 				if(qbw.getModel().getId().equals(rmId)) {
-	
+
 					// un-make quote widgets draggable
 					List<QuoteEditWidget> quoteWidgets = qbw.getQuoteWidgets();
 					for(QuoteEditWidget qw : quoteWidgets) {
 						quoteController.makeNotDraggable(qw);
 					}
-	
+
 					removedQbw = qbw;
 				}
 				else {
@@ -432,9 +451,9 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 				}
 			}
 		}
-		
+
 		if(removedQbw != null) {
-			if(numBundles >= 1) quoteBundleController.makeNotDraggable(removedQbw);
+			if(numBundles >= 1) bundleController.makeNotDraggable(removedQbw);
 			FlowPanelDropController quoteDropController = qbDropBindings.remove(removedQbw);
 			quoteController.unregisterDropController(quoteDropController);
 			columns.remove(removedQbw);
@@ -444,15 +463,15 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 				Widget w = columns.getWidget(i);
 				if(w instanceof BundleEditWidget) {
 					BundleEditWidget iqbw = (BundleEditWidget) w;
-					
+
 					// [re-]apply num cols based style to each bundle widget
 					for(QbColStyle colStyle : QbColStyle.values()) {
 						iqbw.removeStyleName(colStyle.name());
 					}
 					iqbw.addStyleName(colStyleToApply.name());
-					
+
 					// remove dragging if necessary
-					if(numBundles < 2) quoteBundleController.makeNotDraggable(iqbw);
+					if(numBundles < 2) bundleController.makeNotDraggable(iqbw);
 				}
 			}
 		}
@@ -481,16 +500,16 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 					break;
 				}
 				case ADDED:
-					if(qb.isOrphanedQuoteContainer()) {
-						// don't put orphaned qb container in main viewing area by default
-						addQuoteBundleOption(qb);
+					// if orphaned quote conatainer, don't add it to main viewing area
+					if(qb == ClientModelCache.get().getOrphanedQuoteContainer()) {
+						addBundleOption(qb);
 					}
 					else {
 						insertQuoteBundleColumn(qb, 0);
 					}
 					break;
 				case DELETED:
-					if(removeQuoteBundleOption(qb) == null) removeQuoteBundleColumn(qb);
+					if(removeBundleOption(qb) == null) removeQuoteBundleColumn(qb);
 					break;
 			}
 		}

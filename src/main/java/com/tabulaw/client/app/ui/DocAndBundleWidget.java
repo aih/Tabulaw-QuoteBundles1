@@ -146,7 +146,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
 			String qbName = mDoc.getTitle();
 			String qbDesc = "Quote Bundle for " + qbName;
-			crntQb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
+			crntQb = EntityFactory.get().buildBundle(qbName, qbDesc);
 			crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
 
 			ClientModelCache.get().getUserState().setCurrentQuoteBundleId(crntQb.getId());

@@ -4,21 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
-import com.tabulaw.client.app.ui.BundleEditWidget.Styles;
-import com.tabulaw.client.convert.IConverter;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
-import com.tabulaw.client.ui.edit.EditableTextWidget;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 
@@ -26,165 +18,30 @@ import com.tabulaw.common.model.QuoteBundle;
  * Widget that displays a quote bundle.
  * @param <B> this bundle widget type as a generic arg
  * @param <Q> the {@link AbstractQuoteWidget} type
- * @param <H> the quote bundle {@link Header} widget type.
+ * @param <H> the quote bundle {@link EditableBundleHeader} widget type.
  * @author jpk
  */
-public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, H>, Q extends AbstractQuoteWidget<B>, H extends AbstractBundleWidget.Header> 
-extends AbstractModelChangeAwareWidget {
-
-	static final IConverter<String, String> headerDescTextExtractor = new IConverter<String, String>() {
-		
-		@Override
-		public String convert(String in) throws IllegalArgumentException {
-			int index = in.indexOf("</span>");
-			if(index == -1) index = in.indexOf("</SPAN>");
-			return in.substring(index + 7);
-		}
-	};
-
-	static final IConverter<String, String> headerDescInnerHtmlSetter = new IConverter<String, String>() {
-		
-		@Override
-		public String convert(String in) throws IllegalArgumentException {
-			return "<span class=\"" + "echo" + "\">DESCRIPTION: </span>" + (in == null ? "" : in);
-		}
-	};
-
-	/**
-	 * Extensible quote bundle header widget.
-	 * @author jpk
-	 */
-	protected static class Header extends Composite {
-
-		protected final FlowPanel header = new FlowPanel();
-
-		protected final Label lblQb;
-		
-		protected final EditableTextWidget pName, pDesc;
-		
-		protected final FlowPanel buttons = new FlowPanel(); 
-
-		protected QuoteBundle bundle;
-
-		/**
-		 * Constructor
-		 */
-		public Header() {
-			lblQb = new Label("Quote Bundle");
-			lblQb.setStyleName("echo");
-
-			buttons.setStyleName(Styles.BUTTONS);
-			header.insert(buttons, 0);
-			
-			header.setStyleName("qbheader");
-			header.add(lblQb);
-			
-			initWidget(header);
-
-			pName = new EditableTextWidget();
-			pName.addStyleName("name");
-			pName.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-				@Override
-				public void onValueChange(ValueChangeEvent<String> event) {
-					bundle.setName(event.getValue());
-					// save the quote bundle
-					ClientModelCache.get().persist(bundle, Header.this);
-					// server side
-					ServerPersistApi.get().updateBundleProps(bundle);
-				}
-			});
-			header.add(pName);
-
-			pDesc = new EditableTextWidget(headerDescTextExtractor, headerDescInnerHtmlSetter);
-			pDesc.addStyleName("desc");
-			pDesc.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-				@Override
-				public void onValueChange(ValueChangeEvent<String> event) {
-					bundle.setDescription(event.getValue());
-					// save the quote bundle
-					ClientModelCache.get().persist(bundle, Header.this);
-					// server side
-					ServerPersistApi.get().updateBundleProps(bundle);
-				}
-			});
-			header.add(pDesc);
-			
-			/*
-			save = new Image(Resources.INSTANCE.save());
-			save.setStyleName(Styles.SAVE);
-			save.setTitle("Save Name and Description");
-			save.setVisible(false);
-			save.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					// save the quote bundle
-					ClientModelCache.get().persist(bundle, EditHeader.this);
-					// server side
-					ClientModelCache.get().updateBundleProps(bundle);
-
-					save.setVisible(false);
-					undo.setVisible(false);
-				}
-			});
-
-			undo = new Image(Resources.INSTANCE.undo());
-			undo.setStyleName(Styles.UNDO);
-			undo.setTitle("Revert Name and Description");
-			undo.setVisible(false);
-			undo.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					// revert
-					pName.revert();
-					pDesc.revert(); 
-					save.setVisible(false);
-					undo.setVisible(false);
-				}
-			});
-			*/
-		}
-
-		/**
-		 * Sets the quote bundle model updating the UI.
-		 * @param bundle the quote bundle model data
-		 */
-		public void setModel(QuoteBundle bundle) {
-			String name = bundle.getName();
-			String desc = bundle.getDescription();
-			pName.setText(name == null ? "" : name);
-			pDesc.setHTML(headerDescInnerHtmlSetter.convert(desc));
-			this.bundle = bundle;
-		}
-
-		public final Widget getDraggable() {
-			return lblQb;
-		}
-
-	} // Header
+public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, H>, Q extends AbstractQuoteWidget<B>, H extends EditableBundleHeader> extends AbstractModelChangeAwareWidget {
 
 	/**
 	 * Supports drag drop targeting.
 	 * @author jpk
 	 */
-	protected static class QuotesPanel extends FlowPanel {
+	static class QuotesPanel extends FlowPanel {
 
 		public QuotesPanel() {
 			super();
 			setStyleName("quotes");
-			//setSpacing(4);
+			// setSpacing(4);
 		}
-	} // QuotesPanel
+	}
 
 	protected H header;
 
 	protected QuotesPanel quotePanel = new QuotesPanel();
 
 	protected QuoteBundle bundle;
-	
+
 	protected final FlowPanel panel = new FlowPanel();
 
 	private PickupDragController dragController;
@@ -231,7 +88,7 @@ extends AbstractModelChangeAwareWidget {
 	 * provided model data.
 	 * @param bundle
 	 */
-	public final void setModel(QuoteBundle bundle) {
+	public void setModel(QuoteBundle bundle) {
 		header.setModel(bundle);
 		clearQuotesFromUi();
 		if(bundle != null) {
@@ -269,20 +126,21 @@ extends AbstractModelChangeAwareWidget {
 	 * @return the added quote widget
 	 */
 	public Q addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
-		// add the quote ref to the quote bundle
-		if(addToThisBundleModel && bundle != null) bundle.insertQuote(mQuote, 0);
+		if(mQuote == null) throw new NullPointerException();
+
+		// add to the ui
+		Q qw = getNewQuoteWidget(mQuote);
+		addQuoteWidget(qw, true);
+
 		if(persist) {
 			// add the quote updating the bundle quote refs too
 			ClientModelCache.get().persist(mQuote, this);
 			ClientModelCache.get().persist(bundle, this);
-			
+
 			// server side persist
 			ServerPersistApi.get().addQuoteToBundle(bundle.getId(), mQuote);
 		}
-		// add to the ui
-		Q qw = getNewQuoteWidget(mQuote);
-		quotePanel.insert(qw, 0); // add to head
-		if(qw != null) makeQuoteDraggable(qw, true);
+
 		return qw;
 	}
 
@@ -292,38 +150,91 @@ extends AbstractModelChangeAwareWidget {
 	 * @param mQuote the quote to remove
 	 * @param persist update the datastore (which will trigger a model change
 	 *        event)?
-	 * @param deleteQuote Delete the quote in the datastore?
+	 * @param deleteQuote Delete (<code>true</code>) or orphan the quote (
+	 *        <code>false</code>)?
 	 * @return the widget of the removed quote
 	 */
-	@SuppressWarnings("unchecked")
 	public Q removeQuote(final Quote mQuote, boolean persist, final boolean deleteQuote) {
-		int index = getQuoteWidgetIndex(mQuote.getId());
-		if(index != -1) {
-			if(bundle.removeQuote(mQuote)) {
-				if(persist) {
-					// delete the quote updating the bundle quote refs too
-					//if(deleteQuote) {
-						ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
-					//}
-					ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
-					
-					if(!deleteQuote) {
-						// orphaned
-						QuoteBundle orphanedQuoteContainer = ClientModelCache.get().getOrphanQuoteContainer();
-						orphanedQuoteContainer.addQuote(mQuote);
-						Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractBundleWidget.this, ModelChangeOp.UPDATED, orphanedQuoteContainer, null));
-					}
+		if(mQuote == null) throw new NullPointerException();
 
-					// server side persist
-					ServerPersistApi.get().removeQuoteFromBundle(bundle.getId(), mQuote.getId(), deleteQuote);
-				}
-				Q qw = (Q) quotePanel.getWidget(index);
-				quotePanel.remove(index);
-				makeQuoteDraggable(qw, false);
-				return qw;
+		Q qw = getQuoteWidget(mQuote.getId());
+		if(qw == null)
+			throw new IllegalArgumentException("No quote widget contained having quote with id: " + mQuote.getId());
+
+		removeQuoteWidget(qw, true);
+
+		if(persist) {
+			// delete the quote updating the bundle quote refs too
+			if(deleteQuote) {
+				ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
 			}
+			else {
+				QuoteBundle ocq = ClientModelCache.get().getOrphanedQuoteContainer();
+				ocq.addQuote(mQuote);
+				Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractBundleWidget.this, ModelChangeOp.UPDATED, ocq, null));
+			}
+			ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
+
+			// server side persist
+			ServerPersistApi.get().removeQuoteFromBundle(bundle.getId(), mQuote.getId(), deleteQuote);
 		}
-		throw new IllegalStateException();
+
+		return qw;
+
+		/*
+		if(bundle.removeQuote(mQuote)) {
+			if(persist) {
+				// delete the quote updating the bundle quote refs too
+				if(deleteQuote) {
+					ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
+				}
+				else {
+					QuoteBundle ocq = ClientModelCache.get().getOrphanedQuoteContainer();
+					ocq.addQuote(mQuote);
+					Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractBundleWidget.this, ModelChangeOp.UPDATED, ocq, null));
+				}
+				ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
+
+				// server side persist
+				ServerPersistApi.get().removeQuoteFromBundle(bundle.getId(), mQuote.getId(), deleteQuote);
+			}
+			Q qw = (Q) quotePanel.getWidget(index);
+			quotePanel.remove(index);
+			makeQuoteDraggable(qw, false);
+			return qw;
+		}
+		*/
+	}
+
+	/**
+	 * Adds a quote widget to this panel adding its model quote to this widget's
+	 * model bundle.
+	 * @param quoteWidget
+	 * @param addToUi add the quote widget to the UI?
+	 */
+	public void addQuoteWidget(Q quoteWidget, boolean addToUi) {
+		if(quoteWidget == null) throw new NullPointerException();
+		if(bundle.hasQuote(quoteWidget.getModel())) throw new IllegalArgumentException("Quote already contained.");
+		bundle.insertQuote(quoteWidget.getModel(), 0);
+		if(addToUi) {
+			quotePanel.insert(quoteWidget, 0); // add to head
+			makeQuoteDraggable(quoteWidget, true);
+		}
+	}
+
+	/**
+	 * Removes a quote widget from this panel removing its model quote from this
+	 * widget's model bundle.
+	 * @param quoteWidget
+	 * @param removeFromUi remove the quote from the UI?
+	 */
+	public void removeQuoteWidget(Q quoteWidget, boolean removeFromUi) {
+		if(quoteWidget == null) throw new NullPointerException();
+		if(!bundle.removeQuote(quoteWidget.getModel())) throw new IllegalArgumentException("Quote not contained.");
+		if(removeFromUi) {
+			if(!quotePanel.remove(quoteWidget)) throw new IllegalArgumentException("Quote widget not found.");
+			makeQuoteDraggable(quoteWidget, false);
+		}
 	}
 
 	private void makeQuoteDraggable(Q qw, boolean draggable) {
@@ -366,22 +277,22 @@ extends AbstractModelChangeAwareWidget {
 	}
 
 	/**
-	 * Resolves the index at which the quote widget referencing the model having
-	 * the given key resides.
+	 * Finds the quote widget containing the quote identified by the given quote
+	 * id.
 	 * @param quoteId
 	 * @return the index or <code>-1</code> if not found
 	 */
 	@SuppressWarnings("unchecked")
-	protected final int getQuoteWidgetIndex(String quoteId) {
+	public final Q getQuoteWidget(String quoteId) {
 		int siz = quotePanel.getWidgetCount();
 		for(int i = 0; i < siz; i++) {
 			Q qw = (Q) quotePanel.getWidget(i);
 			Quote m = qw.getModel();
-			if(m.getId().equals(quoteId)) return i;
+			if(m.getId().equals(quoteId)) return qw;
 		}
-		return -1;
+		return null;
 	}
-	
+
 	/**
 	 * Compares the given quote bundle model against the one held currently adding
 	 * quotes that don't exist and removing those that do but not in the one
@@ -390,7 +301,7 @@ extends AbstractModelChangeAwareWidget {
 	 */
 	public final void sync(QuoteBundle bundleToSyncTo) {
 		header.setModel(bundleToSyncTo);
-		
+
 		// wrap in new lists to avoid concurrent mod exception!
 		List<Quote> existingQuotes = new ArrayList<Quote>(bundle.getQuotes());
 		List<Quote> changedQuotes = new ArrayList<Quote>(bundleToSyncTo.getQuotes());

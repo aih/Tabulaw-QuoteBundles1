@@ -6,6 +6,7 @@
 package com.tabulaw.common.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
@@ -18,19 +19,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class QuoteBundle extends TimeStampEntity implements INamedEntity, Comparable<QuoteBundle> {
 
 	private static final long serialVersionUID = -6606826756860275551L;
-	
-	//private static final String ORPHANED_QUOTES_BUNDLE_ID = "0";
 
-	/*
-	public static QuoteBundle newOrphanedQuoteBundle() {
-		QuoteBundle oqb = new QuoteBundle();
-		oqb.setId(ORPHANED_QUOTES_BUNDLE_ID);
-		oqb.setName("Orphaned Quotes");
-		oqb.setDescription("Quotes currently not belonging to any Quote Bundles");
-		return oqb;
-	}
-	*/
-	
 	private String id;
 
 	private String name, description;
@@ -43,17 +32,7 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 	public QuoteBundle() {
 		super();
 	}
-	
-	/**
-	 * Is this a container for orphaned quotes?
-	 * @return true/false
-	 */
-	/*
-	public boolean isOrphanedQuoteContainer() {
-		return ORPHANED_QUOTES_BUNDLE_ID.equals(getId());
-	}
-	*/
-	
+
 	@Override
 	public String getId() {
 		return id;
@@ -115,6 +94,19 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	/**
+	 * Does the given quote exist in this bundle?
+	 * @param q quote to check
+	 * @return true/false
+	 */
+	public boolean hasQuote(Quote q) {
+		if(quotes == null) return false;
+		for(Quote eq : quotes) {
+			if(eq.equals(q)) return true;
+		}
+		return false;
+	}
 
 	/**
 	 * @return A newly created list containing the referenced quotes in this
@@ -136,6 +128,15 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 	public void addQuote(Quote quote) {
 		if(quote == null) throw new NullPointerException();
 		getQuotes().add(quote);
+	}
+
+	/**
+	 * Adds all quotes in the given collection to the internally managed list of
+	 * quotes.
+	 * @param clc collection of quotes to add
+	 */
+	public void addQuotes(Collection<Quote> clc) {
+		if(clc != null) getQuotes().addAll(clc);
 	}
 
 	/**
@@ -166,6 +167,13 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 	public Quote removeQuote(int index) {
 		if(quotes == null) return null;
 		return quotes.remove(index);
+	}
+
+	/**
+	 * Removes any and all contained quotes.
+	 */
+	public void clearQuotes() {
+		if(quotes != null) quotes.clear();
 	}
 
 	@Length(max = 4000)

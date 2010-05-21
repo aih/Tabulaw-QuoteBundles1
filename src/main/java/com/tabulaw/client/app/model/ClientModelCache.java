@@ -20,10 +20,10 @@ import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.ModelKey;
-import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
@@ -75,7 +75,11 @@ public class ClientModelCache {
 
 	private final HashMap<String, List<IEntity>> entities = new HashMap<String, List<IEntity>>();
 
-	private final ArrayList<Quote> orphanedQuotes = new ArrayList<Quote>();
+	/**
+	 * Identifies the sole client-side bundle in this cache dedicated to housing
+	 * orphaned quotes for the currently logged in user.
+	 */
+	private final ModelKey orphanedQuoteBundleKey = new ModelKey(EntityType.QUOTE_BUNDLE.name(), "0");
 
 	/**
 	 * Constructor
@@ -91,48 +95,47 @@ public class ClientModelCache {
 		}
 	} // constructor
 
-	public void setOrphanedQuotes(List<Quote> orphanedQuotes) {
-		this.orphanedQuotes.clear();
-		this.orphanedQuotes.addAll(orphanedQuotes);
-	}
-
-	public List<Quote> getOrphanedQuotes() {
-		return orphanedQuotes;
+	/**
+	 * @return the total number of cached entities.
+	 */
+	public int totalSize() {
+		int total = 0;
+		for(String et : entities.keySet()) {
+			total += entities.get(et).size();
+		}
+		return total;
 	}
 
 	/**
-	 * Client-side coralary to the server-side user data service method.
-	 * <p>
-	 * Fires a quote added model change event for the un-orphaned quote
-	 * <p>
-	 * Fires a quote bundle updated model change event for the bundle receiving
-	 * the orphaned quote
-	 * @param quoteId id of the quote to un-orphan that is expected to be held in
-	 *        the orphan quote container
-	 * @param bundleId id of the bundle to which to add the un-orphaned quote
-	 * @param source if specified, model change events are fired with this widget as their source
-	 * @throws EntityNotFoundException When either the orphaned quote or target
-	 *         bundle can't be found
+	 * The number of entities of the given type currently cached.
+	 * @param entityType
+	 * @return number of cached entities
 	 */
-	public void unorphanQuoteClient(String quoteId, String bundleId, Widget source) throws EntityNotFoundException {
-		// find the orphaned quote
-		Quote quote = null;
-		for(Quote q : orphanedQuotes) {
-			if(q.getId().equals(quoteId)) {
-				quote = q;
-				break;
-			}
-		}
-		if(quote == null) throw new EntityNotFoundException("Orphaned quote of id: " + quoteId + " not found.");
-		
-		// move orphaned quote to entity cache but don't fire model change event
-		orphanedQuotes.remove(quote);
-		persist(quote, null);
+	public int size(EntityType entityType) {
+		return entities.get(entityType.name()).size();
+	}
 
-		// add quote to target bundle and fire model change event
-		QuoteBundle targetBundle = (QuoteBundle) get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), bundleId));
-		targetBundle.addQuote(quote);
-		persist(targetBundle, source);
+	/**
+	 * Provides a {@link QuoteBundle} serving as the sole orphaned quote container
+	 * client-side.
+	 * <p>
+	 * If not present, it is auto-generated with an id specific only to the
+	 * special orphaned qoute container (QuoteBundle).
+	 * @return the client-side only bundle dedicated to housing orphaned quotes.
+	 */
+	public QuoteBundle getOrphanedQuoteContainer() {
+		// obtain the client-only orphaned quote container
+		QuoteBundle oqc;
+		try {
+			oqc = (QuoteBundle) get(orphanedQuoteBundleKey);
+			assert oqc != null;
+		}
+		catch(EntityNotFoundException e) {
+			oqc = EntityFactory.get().buildBundle(null, null);
+			oqc.setId(orphanedQuoteBundleKey.getId());
+			persist(oqc, null);
+		}
+		return oqc;
 	}
 
 	/**

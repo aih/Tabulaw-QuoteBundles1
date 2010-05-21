@@ -49,9 +49,9 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	 * Quote bundle header widget with edit butons.
 	 * @author jpk
 	 */
-	static class EditHeader extends AbstractBundleWidget.Header {
+	static class EditHeader extends EditableBundleHeader {
 
-		private final Image /*save, undo, */delete, current, close;
+		final Image /*save, undo, */delete, current, close;
 
 		/**
 		 * Constructor
@@ -139,6 +139,8 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 
 	} // EditHeader
 
+	private boolean orphanedQuoteContainer;
+
 	/**
 	 * Constructor
 	 * @param dragController optional
@@ -151,6 +153,10 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 
 		setDragController(dragController);
 		dropAreaCheck();
+	}
+
+	public boolean isOrphanedQuoteContainer() {
+		return orphanedQuoteContainer;
 	}
 
 	public void setCloseHandler(ClickHandler closeHandler) {
@@ -172,11 +178,12 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	 * @param mQuote the quote model to check
 	 * @return true/false
 	 */
+	// TODO consider moving to super
 	public boolean hasQuote(Quote mQuote) {
 		for(int i = 0; i < quotePanel.getWidgetCount(); i++) {
 			Widget w = quotePanel.getWidget(i);
 			if(w instanceof QuoteEditWidget) {
-				
+
 				// compare quotes
 				Quote q1 = mQuote;
 				Quote q2 = ((QuoteEditWidget) w).getModel();
@@ -210,6 +217,12 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		else {
 			quotePanel.getElement().getStyle().clearHeight();
 		}
+	}
+
+	@Override
+	public void setModel(QuoteBundle bundle) {
+		super.setModel(bundle);
+		this.orphanedQuoteContainer = false; // TODO!!!
 	}
 
 	@Override

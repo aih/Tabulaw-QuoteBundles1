@@ -15,9 +15,9 @@ import com.tabulaw.client.app.ui.LoginTopPanel;
 import com.tabulaw.client.app.ui.Portal;
 import com.tabulaw.client.app.ui.nav.NavColPanel;
 import com.tabulaw.client.app.ui.nav.NavRowPanel;
+import com.tabulaw.client.app.ui.view.BundlesView;
 import com.tabulaw.client.app.ui.view.DocView;
 import com.tabulaw.client.app.ui.view.DocsView;
-import com.tabulaw.client.app.ui.view.BundlesView;
 import com.tabulaw.client.app.ui.view.UsersView;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -146,6 +146,9 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	private LoginTopPanel loginPanel;
 
 	private void getUserContext() {
+		// we need to make sure we have a clean slate
+		assert ClientModelCache.get().totalSize() == 0;
+
 		userContextService.getClientUserContext(new AsyncCallback<UserContextPayload>() {
 
 			@Override
@@ -178,18 +181,17 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// we need to individually add the contained qoutes as well but don't
 					// throw model changes events for quotes
 					for(QuoteBundle qb : userBundles) {
-						List<Quote> quotes = qb.getQuotes();
-						for(Quote q : quotes) {
-							ClientModelCache.get().persist(q, null);
-						}
+						ClientModelCache.get().persistAll(qb.getQuotes());
 					}
+
+					// store orphaned quotes (w/ no notification)
+					List<Quote> orphanedQuotes = result.getOrphanedQuotes();
+					ClientModelCache.get().persistAll(orphanedQuotes);
+					ClientModelCache.get().getOrphanedQuoteContainer().addQuotes(orphanedQuotes);
 
 					// cache bundles and notify
 					ClientModelCache.get().persistAll(userBundles, getPortal());
 					
-					// store orphaned quotes
-					List<Quote> orphanedQuotes = result.getOrphanedQuotes();
-
 					// cache user state
 					UserState userState = result.getUserState();
 					if(userState == null) {

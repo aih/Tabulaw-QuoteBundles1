@@ -57,7 +57,7 @@ public class AddBundleDialog extends Dialog implements IEditHandler<FieldGroup> 
 			String qbName = (String) fieldGroup.getFieldWidget("qbName").getValue();
 			String qbDesc = (String) fieldGroup.getFieldWidget("qbDesc").getValue();
 
-			QuoteBundle qb = EntityFactory.get().buildQuoteBundle(qbName, qbDesc);
+			QuoteBundle qb = EntityFactory.get().buildBundle(qbName, qbDesc);
 			qb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
 
 			// default set the current quote bundle if not set yet

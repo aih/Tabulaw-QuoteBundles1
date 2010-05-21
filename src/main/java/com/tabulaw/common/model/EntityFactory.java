@@ -182,7 +182,7 @@ public class EntityFactory {
 	 * @param description
 	 * @return newly created model
 	 */
-	public QuoteBundle buildQuoteBundle(String name, String description) {
+	public QuoteBundle buildBundle(String name, String description) {
 		QuoteBundle m = (QuoteBundle) create(EntityType.QUOTE_BUNDLE);
 		m.setName(name);
 		m.setDescription(description);

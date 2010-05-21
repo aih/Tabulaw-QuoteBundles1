@@ -5,13 +5,13 @@
 	<groupId>com.tabulaw</groupId>
 	<artifactId>tabulaw</artifactId>
 	<name>tabulaw</name>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
 	<description>The GWT Tabulaw app by the Logic Lab</description>
 	<packaging>war</packaging>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gwt.version>2.0.3</gwt.version>
+		<gwt.version>2.1.0.M1</gwt.version>
 		<gwt.compile.style>OBF</gwt.compile.style>
 		<gwt.log.level>INFO</gwt.log.level>
 		<gwt.compile.module>com.tabulaw.PocDev</gwt.compile.module>
