@@ -378,7 +378,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 		}
 
 		Log.debug("Inserting quote bundle col widget for: " + bundle);
-		final BundleEditWidget qbw = new BundleEditWidget(quoteController);
+		boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteContainer().equals(bundle);
+		final BundleEditWidget qbw = new BundleEditWidget(quoteController, isOrphanedBundle);
 		qbw.setModel(bundle);
 		qbw.setCloseHandler(new ClickHandler() {
 

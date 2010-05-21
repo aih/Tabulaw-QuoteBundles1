@@ -51,61 +51,71 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	 */
 	static class EditHeader extends EditableBundleHeader {
 
-		final Image /*save, undo, */delete, current, close;
+		private final Image delete, current, close;
 
 		/**
 		 * Constructor
+		 * @param orphan is this header for an orphaned quote container instance?
 		 */
-		public EditHeader() {
+		public EditHeader(boolean orphan) {
 			super();
 
-			delete = new Image(Resources.INSTANCE.deleteLarger());
-			delete.setTitle("Remove Quote Bundle..");
-			delete.setStyleName(Styles.DELETE);
-			delete.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					if(Window.confirm("Remove '" + bundle.descriptor() + "'?")) {
-
-						// client side
-						List<Quote> quotes = bundle.getQuotes();
-						if(quotes != null) {
-							for(Quote q : bundle.getQuotes()) {
-								ClientModelCache.get().remove(q.getModelKey(), Poc.getPortal());
+			if(!orphan) {
+				delete = new Image(Resources.INSTANCE.deleteLarger());
+				delete.setTitle("Remove Quote Bundle..");
+				delete.setStyleName(Styles.DELETE);
+				delete.addClickHandler(new ClickHandler() {
+	
+					@Override
+					public void onClick(ClickEvent event) {
+						if(Window.confirm("Remove '" + bundle.descriptor() + "'?")) {
+	
+							// client side
+							List<Quote> quotes = bundle.getQuotes();
+							if(quotes != null) {
+								for(Quote q : bundle.getQuotes()) {
+									ClientModelCache.get().remove(q.getModelKey(), Poc.getPortal());
+								}
 							}
+							ClientModelCache.get().remove(bundle.getModelKey(), Poc.getPortal());
+	
+							// server side
+							ServerPersistApi.get().removeBundleUserBinding(bundle.getId());
 						}
-						ClientModelCache.get().remove(bundle.getModelKey(), Poc.getPortal());
-
-						// server side
-						ServerPersistApi.get().removeBundleUserBinding(bundle.getId());
 					}
-				}
-			});
+				});
+				buttons.add(delete);
+			}
+			else {
+				delete = null;
+			}
+
+			if(!orphan) {
+				current = new Image(Resources.INSTANCE.documentIcon());
+				current.setTitle("Set as current");
+				current.setStyleName(Styles.CURRENT);
+				current.addClickHandler(new ClickHandler() {
+	
+					@Override
+					public void onClick(ClickEvent event) {
+						if(ClientModelCache.get().getUserState().setCurrentQuoteBundleId(bundle.getId())) {
+							Notifier.get().info("Current Quote Bundle set.");
+							// we need to globally notify all views of the current quote bundle
+							// change
+							// and we do it by firing a model change event
+							Poc.getPortal().fireEvent(new ModelChangeEvent(current, ModelChangeOp.UPDATED, bundle, null));
+						}
+					}
+				});
+				buttons.add(current);
+			}
+			else {
+				current = null;
+			}
 
 			close = new Image(Resources.INSTANCE.XButton());
 			close.setTitle("Close");
 			close.setStyleName(Styles.X);
-
-			current = new Image(Resources.INSTANCE.documentIcon());
-			current.setTitle("Set as current");
-			current.setStyleName(Styles.CURRENT);
-			current.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					if(ClientModelCache.get().getUserState().setCurrentQuoteBundleId(bundle.getId())) {
-						Notifier.get().info("Current Quote Bundle set.");
-						// we need to globally notify all views of the current quote bundle
-						// change
-						// and we do it by firing a model change event
-						Poc.getPortal().fireEvent(new ModelChangeEvent(current, ModelChangeOp.UPDATED, bundle, null));
-					}
-				}
-			});
-
-			buttons.add(delete);
-			buttons.add(current);
 			buttons.add(close);
 		}
 
@@ -122,8 +132,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		void modelStateCheck() {
 			QuoteBundle cqb = ClientModelCache.get().getCurrentQuoteBundle();
 			boolean isCurrent = cqb != null && cqb.equals(bundle);
-			current.setVisible(!isCurrent);
-			delete.setVisible(!isCurrent);
 			close.setVisible(!isCurrent);
 			if(isCurrent) {
 				lblQb.setText("Current Quote Bundle");
@@ -133,18 +141,28 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 				lblQb.setText("Quote Bundle");
 				removeStyleName(Styles.QB_CURRENT);
 			}
+			if(current != null) current.setVisible(!isCurrent);
+			if(delete != null) delete.setVisible(!isCurrent);
 		}
 
 	} // EditHeader
 
-	private boolean orphanedQuoteContainer;
+	private final boolean orphanedQuoteContainer;
 
 	/**
 	 * Constructor
 	 * @param dragController optional
+	 * @param orphanedQuoteContainer
 	 */
-	public BundleEditWidget(PickupDragController dragController) {
-		super(new EditHeader());
+	public BundleEditWidget(PickupDragController dragController, boolean orphanedQuoteContainer) {
+		super(new EditHeader(orphanedQuoteContainer));
+		
+		this.orphanedQuoteContainer = orphanedQuoteContainer;
+		header.pName.setEditable(!orphanedQuoteContainer);
+		header.pDesc.setEditable(!orphanedQuoteContainer);
+		if(orphanedQuoteContainer) {
+			addStyleName("orphaned");
+		}
 
 		// TODO do we need to handle clean up?
 		makeModelChangeAware();
@@ -214,24 +232,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		}
 		else {
 			quotePanel.getElement().getStyle().clearHeight();
-		}
-	}
-
-	@Override
-	public void setModel(QuoteBundle bundle) {
-		super.setModel(bundle);
-		orphanedQuoteContainer = ClientModelCache.get().getOrphanedQuoteContainer().equals(bundle);
-		header.pName.setEditable(!orphanedQuoteContainer);
-		header.pDesc.setEditable(!orphanedQuoteContainer);
-		if(orphanedQuoteContainer) {
-			addStyleName("orphaned");
-			header.delete.removeFromParent();
-			header.current.removeFromParent();
-		}
-		else {
-			removeStyleName("orphaned");
-			header.buttons.insert(header.current, 0);
-			header.buttons.insert(header.delete, 0);
 		}
 	}
 
