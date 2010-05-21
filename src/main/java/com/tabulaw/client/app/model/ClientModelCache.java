@@ -131,7 +131,7 @@ public class ClientModelCache {
 			assert oqc != null;
 		}
 		catch(EntityNotFoundException e) {
-			oqc = EntityFactory.get().buildBundle(null, null);
+			oqc = EntityFactory.get().buildBundle("Unassigned Quotes", "Quotes currently not assigned to a bundle");
 			oqc.setId(orphanedQuoteBundleKey.getId());
 			persist(oqc, null);
 		}

@@ -27,6 +27,7 @@ import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.ui.toolbar.Toolbar;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.IHasModel;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.CaseRef.CitationFormatFlag;
 import com.tabulaw.util.StringUtil;
@@ -36,7 +37,7 @@ import com.tabulaw.util.StringUtil;
  * @param <B> bundle widget type
  * @author jpk
  */
-public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?>> extends Composite implements IHasQuoteHandlers {
+public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?>> extends Composite implements IHasModel<Quote>, IHasQuoteHandlers  {
 
 	static class Header extends Composite {
 
@@ -203,7 +204,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		setModel(quote);
 	}
 
-	public final B getParentQuoteBundleWidget() {
+	public final B getParentBundleWidget() {
 		return parentQuoteBundleWidget;
 	}
 
@@ -211,10 +212,12 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		return header.dragHandle;
 	}
 
+	@Override
 	public final Quote getModel() {
 		return quote;
 	}
 
+	@Override
 	public void setModel(Quote quote) {
 		this.quote = quote;
 
@@ -235,11 +238,6 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		quoteBlock.setQuotedText(quoteText);
 	}
 
-	public void addHeaderButton(Widget button) {
-		header.addButton(button);
-	}
-
-	@Override
 	public final HandlerRegistration addQuoteHandler(IQuoteHandler handler) {
 		return addHandler(handler, QuoteEvent.TYPE);
 	}
@@ -254,6 +252,6 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 	protected void handleXClick() {
 		// orphan the quote
-		parentQuoteBundleWidget.removeQuote(quote, true, false);
+		parentQuoteBundleWidget.removeQuote(quote, true, true, false);
 	}
 }

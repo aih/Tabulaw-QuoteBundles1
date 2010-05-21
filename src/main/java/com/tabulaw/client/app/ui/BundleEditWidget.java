@@ -104,8 +104,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 				}
 			});
 
-			// buttons.add(save);
-			// buttons.add(undo);
 			buttons.add(delete);
 			buttons.add(current);
 			buttons.add(close);
@@ -164,8 +162,8 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	}
 
 	@Override
-	public QuoteEditWidget removeQuote(Quote mQuote, boolean persist, boolean deleteQuote) {
-		QuoteEditWidget w = super.removeQuote(mQuote, persist, deleteQuote);
+	public QuoteEditWidget removeQuote(Quote mQuote, boolean removeFromModel, boolean persist, boolean deleteQuote) {
+		QuoteEditWidget w = super.removeQuote(mQuote, removeFromModel, persist, deleteQuote);
 		dropAreaCheck();
 		return w;
 	}
@@ -222,7 +220,19 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	@Override
 	public void setModel(QuoteBundle bundle) {
 		super.setModel(bundle);
-		this.orphanedQuoteContainer = false; // TODO!!!
+		orphanedQuoteContainer = ClientModelCache.get().getOrphanedQuoteContainer().equals(bundle);
+		header.pName.setEditable(!orphanedQuoteContainer);
+		header.pDesc.setEditable(!orphanedQuoteContainer);
+		if(orphanedQuoteContainer) {
+			addStyleName("orphaned");
+			header.delete.removeFromParent();
+			header.current.removeFromParent();
+		}
+		else {
+			removeStyleName("orphaned");
+			header.buttons.insert(header.current, 0);
+			header.buttons.insert(header.delete, 0);
+		}
 	}
 
 	@Override

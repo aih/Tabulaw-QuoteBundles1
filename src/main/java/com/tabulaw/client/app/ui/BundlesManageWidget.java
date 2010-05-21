@@ -99,7 +99,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 			DragContext context = event.getContext();
 
 			QuoteEditWidget sourceQuoteWidget = (QuoteEditWidget) context.draggable;
-			BundleEditWidget sourceBundleWidget = sourceQuoteWidget.getParentQuoteBundleWidget();
+			BundleEditWidget sourceBundleWidget = sourceQuoteWidget.getParentBundleWidget();
 
 			// identify the target quote bundle widget (recipient of draggable)
 			final BundleEditWidget targetBundleWidget;
@@ -142,8 +142,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 					throw new IllegalStateException();
 				targetBundle.addQuote(sourceQuote);
 				
-				if(!ClientModelCache.get().getOrphanedQuoteContainer().removeQuote(sourceQuote))
-					throw new IllegalStateException();
+				//if(!ClientModelCache.get().getOrphanedQuoteContainer().removeQuote(sourceQuote))
+					//throw new IllegalStateException();
 				
 				// client persist target bundle w/ notification
 				ClientModelCache.get().persist(targetBundle, targetBundleWidget);
@@ -290,11 +290,13 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 		List<QuoteBundle> mbundles = (List<QuoteBundle>) ClientModelCache.get().getAll(EntityType.QUOTE_BUNDLE);
 		if(mbundles != null) {
 			for(int i = 0; i < mbundles.size(); i++) {
-				if(i < NUM_COLUMNS) {
-					insertQuoteBundleColumn(mbundles.get(i), columns.getWidgetCount());
+				QuoteBundle qb = mbundles.get(i);
+				boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteContainer().equals(qb);
+				if(!isOrphanedBundle && i < NUM_COLUMNS) {
+					insertQuoteBundleColumn(qb, columns.getWidgetCount());
 				}
 				else {
-					addBundleOption(mbundles.get(i));
+					addBundleOption(qb);
 				}
 			}
 		}
@@ -500,13 +502,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 					break;
 				}
 				case ADDED:
-					// if orphaned quote conatainer, don't add it to main viewing area
-					if(qb == ClientModelCache.get().getOrphanedQuoteContainer()) {
-						addBundleOption(qb);
-					}
-					else {
-						insertQuoteBundleColumn(qb, 0);
-					}
+					insertQuoteBundleColumn(qb, 0);
 					break;
 				case DELETED:
 					if(removeBundleOption(qb) == null) removeQuoteBundleColumn(qb);

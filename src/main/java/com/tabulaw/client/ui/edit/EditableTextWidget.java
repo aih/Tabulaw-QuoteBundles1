@@ -47,7 +47,7 @@ public class EditableTextWidget extends TextField implements HasHTML {
 
 	private final IConverter<String, String> html2text, text2html;
 
-	private boolean editable;
+	private boolean editable = true; // editable by default
 
 	private HandlerRegistration hrMouseOver, hrMouseOut, hrClick, hrKeyDown, hrBlur;
 	private String origValue;

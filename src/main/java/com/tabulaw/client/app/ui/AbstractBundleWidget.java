@@ -11,6 +11,7 @@ import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
+import com.tabulaw.common.model.IHasModel;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 
@@ -21,7 +22,7 @@ import com.tabulaw.common.model.QuoteBundle;
  * @param <H> the quote bundle {@link EditableBundleHeader} widget type.
  * @author jpk
  */
-public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, H>, Q extends AbstractQuoteWidget<B>, H extends EditableBundleHeader> extends AbstractModelChangeAwareWidget {
+public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, H>, Q extends AbstractQuoteWidget<B>, H extends EditableBundleHeader> extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle> {
 
 	/**
 	 * Supports drag drop targeting.
@@ -91,6 +92,7 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 	public void setModel(QuoteBundle bundle) {
 		header.setModel(bundle);
 		clearQuotesFromUi();
+		this.bundle = bundle;
 		if(bundle != null) {
 			List<Quote> mQuotes = bundle.getQuotes();
 			if(mQuotes != null) {
@@ -99,7 +101,6 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 				}
 			}
 		}
-		this.bundle = bundle;
 	}
 
 	/**
@@ -121,16 +122,16 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 	 * @param mQuote quote model to add
 	 * @param persist save both the bundle and quote model data (firing model
 	 *        change events)?
-	 * @param addToThisBundleModel Add the given quote model to our internal model
+	 * @param addToModel Add the given quote model to our internal model
 	 *        instance?
 	 * @return the added quote widget
 	 */
-	public Q addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
+	public Q addQuote(Quote mQuote, boolean persist, boolean addToModel) {
 		if(mQuote == null) throw new NullPointerException();
 
 		// add to the ui
 		Q qw = getNewQuoteWidget(mQuote);
-		addQuoteWidget(qw, true);
+		addQuoteWidget(qw, true, addToModel);
 
 		if(persist) {
 			// add the quote updating the bundle quote refs too
@@ -148,20 +149,21 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 	 * Removes the given quote ref from the underlying quote bundle model removing
 	 * the corres. quote widget from the ui as well.
 	 * @param mQuote the quote to remove
+	 * @param removeFromModel 
 	 * @param persist update the datastore (which will trigger a model change
 	 *        event)?
 	 * @param deleteQuote Delete (<code>true</code>) or orphan the quote (
 	 *        <code>false</code>)?
 	 * @return the widget of the removed quote
 	 */
-	public Q removeQuote(final Quote mQuote, boolean persist, final boolean deleteQuote) {
+	public Q removeQuote(final Quote mQuote, boolean removeFromModel, boolean persist, final boolean deleteQuote) {
 		if(mQuote == null) throw new NullPointerException();
 
 		Q qw = getQuoteWidget(mQuote.getId());
 		if(qw == null)
 			throw new IllegalArgumentException("No quote widget contained having quote with id: " + mQuote.getId());
 
-		removeQuoteWidget(qw, true);
+		removeQuoteWidget(qw, true, removeFromModel);
 
 		if(persist) {
 			// delete the quote updating the bundle quote refs too
@@ -211,11 +213,14 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 	 * model bundle.
 	 * @param quoteWidget
 	 * @param addToUi add the quote widget to the UI?
+	 * @param addToModel add the quote widget's model quote to this bundle widgets model?
 	 */
-	public void addQuoteWidget(Q quoteWidget, boolean addToUi) {
+	private void addQuoteWidget(Q quoteWidget, boolean addToUi, boolean addToModel) {
 		if(quoteWidget == null) throw new NullPointerException();
-		if(bundle.hasQuote(quoteWidget.getModel())) throw new IllegalArgumentException("Quote already contained.");
-		bundle.insertQuote(quoteWidget.getModel(), 0);
+		if(addToModel) {
+			if(bundle.hasQuote(quoteWidget.getModel())) throw new IllegalArgumentException("Quote already contained.");
+			bundle.insertQuote(quoteWidget.getModel(), 0);
+		}
 		if(addToUi) {
 			quotePanel.insert(quoteWidget, 0); // add to head
 			makeQuoteDraggable(quoteWidget, true);
@@ -227,10 +232,13 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 	 * widget's model bundle.
 	 * @param quoteWidget
 	 * @param removeFromUi remove the quote from the UI?
+	 * @param removeFromModel remove the model quote from this widgets bundle model?
 	 */
-	public void removeQuoteWidget(Q quoteWidget, boolean removeFromUi) {
+	private void removeQuoteWidget(Q quoteWidget, boolean removeFromUi, boolean removeFromModel) {
 		if(quoteWidget == null) throw new NullPointerException();
-		if(!bundle.removeQuote(quoteWidget.getModel())) throw new IllegalArgumentException("Quote not contained.");
+		if(removeFromModel) {
+			if(!bundle.removeQuote(quoteWidget.getModel())) throw new IllegalArgumentException("Quote not contained.");
+		}
 		if(removeFromUi) {
 			if(!quotePanel.remove(quoteWidget)) throw new IllegalArgumentException("Quote widget not found.");
 			makeQuoteDraggable(quoteWidget, false);
@@ -272,7 +280,7 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 	public final void clearQuotesFromUi() {
 		List<Q> list = getQuoteWidgets();
 		for(Q qw : list) {
-			removeQuote(qw.getModel(), false, false);
+			removeQuote(qw.getModel(), false, false, false);
 		}
 	}
 
@@ -310,7 +318,7 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 		for(Quote mexisting : existingQuotes) {
 			if(!changedQuotes.contains(mexisting)) {
 				// quote to remove
-				removeQuote(mexisting, false, false);
+				removeQuote(mexisting, true, false, false);
 			}
 		}
 

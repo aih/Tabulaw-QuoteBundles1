@@ -167,10 +167,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// cache initial batch of next ids
 					ClientModelCache.get().setNextIdBatch(result.getNextIds());
 
-					// ensure quote bundles view is loaded so it recieves model change events
-					// staying in sync!
-					ViewManager.get().loadView(new StaticViewInitializer(BundlesView.klas));
-
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
 					getPortal().fireEvent(new ModelChangeEvent(null, ModelChangeOp.LOADED, liu, null));
@@ -178,7 +174,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// load up user bundles
 					List<QuoteBundle> userBundles = result.getBundles();
 
-					// we need to individually add the contained qoutes as well but don't
+					// we need to individually add the contained quotes as well but don't
 					// throw model changes events for quotes
 					for(QuoteBundle qb : userBundles) {
 						ClientModelCache.get().persistAll(qb.getQuotes());
@@ -189,9 +185,12 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					ClientModelCache.get().persistAll(orphanedQuotes);
 					ClientModelCache.get().getOrphanedQuoteContainer().addQuotes(orphanedQuotes);
 
-					// cache bundles and notify
-					ClientModelCache.get().persistAll(userBundles, getPortal());
+					// cache bundles w/ no notification
+					ClientModelCache.get().persistAll(userBundles);
 					
+					// load bundles view (this will pull all just stored bundles from cache)
+					ViewManager.get().loadView(new StaticViewInitializer(BundlesView.klas));
+
 					// cache user state
 					UserState userState = result.getUserState();
 					if(userState == null) {
