@@ -5,17 +5,18 @@ import java.util.List;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
-import com.tabulaw.common.model.EntityType;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.IHasModel;
-import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.util.ObjectUtil;
 
 /**
  * Widget that displays a quote bundle.
@@ -24,7 +25,8 @@ import com.tabulaw.common.model.QuoteBundle;
  * @param <H> the quote bundle {@link EditableBundleHeader} widget type.
  * @author jpk
  */
-public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, H>, Q extends AbstractQuoteWidget<B>, H extends EditableBundleHeader> extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle> {
+public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, H>, Q extends AbstractQuoteWidget<B>, H extends EditableBundleHeader> 
+extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle> {
 
 	/**
 	 * Supports drag drop targeting.
@@ -114,7 +116,10 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 		int siz = quotePanel.getWidgetCount();
 		ArrayList<Q> list = new ArrayList<Q>(siz);
 		for(int i = 0; i < siz; i++) {
-			list.add((Q) quotePanel.getWidget(i));
+			Widget w = quotePanel.getWidget(i);
+			if(w instanceof AbstractQuoteWidget) {
+				list.add((Q) quotePanel.getWidget(i));
+			}
 		}
 		return list;
 	}
@@ -166,16 +171,16 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 		removeQuoteWidget(qw, true, removeFromModel);
 
 		if(persist) {
-			// delete the quote updating the bundle quote refs too
-			String oqbId = ClientModelCache.get().getOrphanedQuoteBundleId();
-			QuoteBundle ocq = (QuoteBundle) ClientModelCache.get().get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), oqbId));
+			// propagate removal
+			ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
+
+			// add removed quote to un-assigned quotes bundle and propagate
+			QuoteBundle ocq = ClientModelCache.get().getOrphanedQuoteBundle();
 			ocq.addQuote(mQuote);
 			Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractBundleWidget.this, ModelChangeOp.UPDATED, ocq, null));
 
-			ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
-
-			// server side persist
-			ServerPersistApi.get().moveQuote(mQuote.getId(), bundle.getId(), /*TODO targetBundle*/null);
+			// server side persist (move to un-assigned bundle)
+			ServerPersistApi.get().moveQuote(mQuote.getId(), bundle.getId(), ocq.getId());
 		}
 
 		return qw;
@@ -277,7 +282,8 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 	public final void clearQuotesFromUi() {
 		List<Q> list = getQuoteWidgets();
 		for(Q qw : list) {
-			removeQuote(qw.getModel(), false, false);
+			quotePanel.remove(qw);
+			makeQuoteDraggable(qw, false);
 		}
 	}
 
@@ -296,6 +302,32 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 			if(m.getId().equals(quoteId)) return qw;
 		}
 		return null;
+	}
+	
+	/**
+	 * Tests to see whether this quote is already referenced in the underlying
+	 * bundle.
+	 * <p>
+	 * NOTE: This may safely be called when dragging to/from.
+	 * @param mQuote the quote model to check
+	 * @return true/false
+	 */
+	public boolean hasQuote(Quote mQuote) {
+		for(int i = 0; i < quotePanel.getWidgetCount(); i++) {
+			Widget w = quotePanel.getWidget(i);
+			if(w instanceof QuoteEditWidget) {
+
+				// compare quotes
+				Quote q1 = mQuote;
+				Quote q2 = ((QuoteEditWidget) w).getModel();
+				DocRef doc1 = q1.getDocument();
+				DocRef doc2 = q2.getDocument();
+				if(doc1.equals(doc2) && ObjectUtil.equals(q1.getQuote(), q2.getQuote())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -325,10 +357,5 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 				addQuote(mchanged, false, true);
 			}
 		}
-	}
-
-	@Override
-	public void onModelChangeEvent(ModelChangeEvent event) {
-		// no-op
 	}
 }

@@ -75,10 +75,10 @@ public class ClientModelCache {
 	private final HashMap<String, List<IEntity>> entities = new HashMap<String, List<IEntity>>();
 
 	/**
-	 * Id of the bundle dedicated to housing the un-assigned quotes for the logged
-	 * in user.
+	 * Points to the bundle that holds un-assigned quotes.
+	 * <br>Quotes that are removed from other bundles end up here bro.
 	 */
-	private String orphanedQuoteBundleId;
+	private ModelKey orphanedQuoteContainerKey;
 
 	/**
 	 * Constructor
@@ -187,12 +187,16 @@ public class ClientModelCache {
 		return null;
 	}
 
-	public String getOrphanedQuoteBundleId() {
-		return orphanedQuoteBundleId;
+	public ModelKey getOrphanedQuoteBundleKey() {
+		return orphanedQuoteContainerKey;
+	}
+
+	public QuoteBundle getOrphanedQuoteBundle() {
+		return (QuoteBundle) get(orphanedQuoteContainerKey);
 	}
 
 	public void setOrphanedQuoteBundleId(String orphanedQuoteBundleId) {
-		this.orphanedQuoteBundleId = orphanedQuoteBundleId;
+		this.orphanedQuoteContainerKey = new ModelKey(EntityType.QUOTE_BUNDLE.name(), orphanedQuoteBundleId);
 	}
 
 	/**

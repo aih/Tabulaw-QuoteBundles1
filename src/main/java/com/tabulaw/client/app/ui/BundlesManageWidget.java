@@ -134,15 +134,16 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 
 			QuoteBundle sourceBundle = sourceBundleWidget.getModel();
 			
-			// are we dragging from orphaned quotes container?
-			if(sourceBundleWidget.isOrphanedQuoteContainer()) {
+			// move the quote if moving to/from orphaned quote container
+			if(sourceBundleWidget.isOrphanedQuoteContainer() || targetBundleWidget.isOrphanedQuoteContainer()) {
 
 				// move the source quote to target bundle
-				if(!sourceBundleWidget.getModel().removeQuote(sourceQuote)) throw new IllegalStateException();
+				if(!sourceBundle.removeQuote(sourceQuote)) throw new IllegalStateException();
 				targetBundle.addQuote(sourceQuote);
 				sourceQuoteWidget.setParentQuoteBundleWidget(targetBundleWidget);
 
-				// client persist target bundle w/ notification
+				// client persist w/ notification
+				ClientModelCache.get().persist(sourceBundle, sourceBundleWidget);
 				ClientModelCache.get().persist(targetBundle, targetBundleWidget);
 
 				// server-side persist
@@ -151,22 +152,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 				return;
 			}
 
-			// are we dragging TO orphaned quotes container?
-			if(targetBundleWidget.isOrphanedQuoteContainer()) {
-				if(!sourceBundle.removeQuote(sourceQuote)) throw new IllegalStateException();
-				targetBundle.addQuote(sourceQuote);
-				sourceQuoteWidget.setParentQuoteBundleWidget(targetBundleWidget);
-
-				// client persist source bundle quote removal w/ notification
-				ClientModelCache.get().persist(sourceBundle, sourceBundleWidget);
-
-				// server-side persist
-				ServerPersistApi.get().moveQuote(sourceQuote.getId(), sourceBundle.getId(), targetBundle.getId());
-
-				return;
-			}
-
-			// clone the dragged quote widget setting its id to a new one
+			// copy the quote
 			Quote mQuoteClone = (Quote) sourceQuote.clone();
 			mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
 			mQuoteClone.setVersion(-1); // CRITICAL
@@ -303,7 +289,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 		if(mbundles != null) {
 			for(int i = 0; i < mbundles.size(); i++) {
 				QuoteBundle qb = mbundles.get(i);
-				boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteBundleId().equals(qb.getId());
+				boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteBundleKey().equals(qb.getModelKey());
 				if(!isOrphanedBundle && i < NUM_COLUMNS) {
 					insertQuoteBundleColumn(qb, columns.getWidgetCount());
 				}
@@ -390,7 +376,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 		}
 
 		Log.debug("Inserting quote bundle col widget for: " + bundle);
-		boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteBundleId().equals(bundle.getId());
+		boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteBundleKey().equals(bundle.getModelKey());
 		final BundleEditWidget qbw = new BundleEditWidget(quoteController, isOrphanedBundle);
 		qbw.setModel(bundle);
 		qbw.setCloseHandler(new ClickHandler() {

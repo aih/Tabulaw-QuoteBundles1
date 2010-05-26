@@ -13,7 +13,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.ClientModelCache;
@@ -21,10 +20,8 @@ import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
-import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.util.ObjectUtil;
 
 /**
  * Supports editing capabilty for a quote bundle.
@@ -184,33 +181,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		QuoteEditWidget w = super.removeQuote(mQuote, removeFromModel, persist);
 		dropAreaCheck();
 		return w;
-	}
-
-	/**
-	 * Tests to see whether this quote is already referenced in the underlying
-	 * bundle.
-	 * <p>
-	 * NOTE: This may safely be called when dragging to/from.
-	 * @param mQuote the quote model to check
-	 * @return true/false
-	 */
-	// TODO consider moving to super
-	public boolean hasQuote(Quote mQuote) {
-		for(int i = 0; i < quotePanel.getWidgetCount(); i++) {
-			Widget w = quotePanel.getWidget(i);
-			if(w instanceof QuoteEditWidget) {
-
-				// compare quotes
-				Quote q1 = mQuote;
-				Quote q2 = ((QuoteEditWidget) w).getModel();
-				DocRef doc1 = q1.getDocument();
-				DocRef doc2 = q2.getDocument();
-				if(doc1.equals(doc2) && ObjectUtil.equals(q1.getQuote(), q2.getQuote())) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	@Override
