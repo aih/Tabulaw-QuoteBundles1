@@ -20,7 +20,6 @@ import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.ModelKey;
@@ -76,10 +75,10 @@ public class ClientModelCache {
 	private final HashMap<String, List<IEntity>> entities = new HashMap<String, List<IEntity>>();
 
 	/**
-	 * Identifies the sole client-side bundle in this cache dedicated to housing
-	 * orphaned quotes for the currently logged in user.
+	 * Id of the bundle dedicated to housing the un-assigned quotes for the logged
+	 * in user.
 	 */
-	private final ModelKey orphanedQuoteBundleKey = new ModelKey(EntityType.QUOTE_BUNDLE.name(), "0");
+	private String orphanedQuoteBundleId;
 
 	/**
 	 * Constructor
@@ -113,29 +112,6 @@ public class ClientModelCache {
 	 */
 	public int size(EntityType entityType) {
 		return entities.get(entityType.name()).size();
-	}
-
-	/**
-	 * Provides a {@link QuoteBundle} serving as the sole orphaned quote container
-	 * client-side.
-	 * <p>
-	 * If not present, it is auto-generated with an id specific only to the
-	 * special orphaned qoute container (QuoteBundle).
-	 * @return the client-side only bundle dedicated to housing orphaned quotes.
-	 */
-	public QuoteBundle getOrphanedQuoteContainer() {
-		// obtain the client-only orphaned quote container
-		QuoteBundle oqc;
-		try {
-			oqc = (QuoteBundle) get(orphanedQuoteBundleKey);
-			assert oqc != null;
-		}
-		catch(EntityNotFoundException e) {
-			oqc = EntityFactory.get().buildBundle("Unassigned Quotes", "Quotes currently not assigned to a bundle");
-			oqc.setId(orphanedQuoteBundleKey.getId());
-			persist(oqc, null);
-		}
-		return oqc;
 	}
 
 	/**
@@ -209,6 +185,14 @@ public class ClientModelCache {
 			}
 		}
 		return null;
+	}
+
+	public String getOrphanedQuoteBundleId() {
+		return orphanedQuoteBundleId;
+	}
+
+	public void setOrphanedQuoteBundleId(String orphanedQuoteBundleId) {
+		this.orphanedQuoteBundleId = orphanedQuoteBundleId;
 	}
 
 	/**

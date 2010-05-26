@@ -180,8 +180,8 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	}
 
 	@Override
-	public QuoteEditWidget removeQuote(Quote mQuote, boolean removeFromModel, boolean persist, boolean deleteQuote) {
-		QuoteEditWidget w = super.removeQuote(mQuote, removeFromModel, persist, deleteQuote);
+	public QuoteEditWidget removeQuote(Quote mQuote, boolean removeFromModel, boolean persist) {
+		QuoteEditWidget w = super.removeQuote(mQuote, removeFromModel, persist);
 		dropAreaCheck();
 		return w;
 	}

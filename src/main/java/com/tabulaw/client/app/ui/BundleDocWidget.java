@@ -99,8 +99,8 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 	}
 
 	@Override
-	public QuoteDocWidget removeQuote(Quote mQuote, boolean removeFromModel, boolean persist, boolean deleteQuote) {
-		QuoteDocWidget w = super.removeQuote(mQuote, removeFromModel, persist, deleteQuote);
+	public QuoteDocWidget removeQuote(Quote mQuote, boolean removeFromModel, boolean persist) {
+		QuoteDocWidget w = super.removeQuote(mQuote, removeFromModel, persist);
 
 		// un-highlight
 		MarkOverlay mark = (MarkOverlay) w.getModel().getMark();

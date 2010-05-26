@@ -85,7 +85,6 @@
 				<directory>src/main/java</directory>
 				<includes>
 					<include>**/key/IKey.java</include>
-					<include>**/IProvider.java</include>
 					<include>**/IPropertyValueProvider.java</include>
 					<include>**/INameValueProvider.java</include>
 					<include>**/IDescriptorProvider.java</include>

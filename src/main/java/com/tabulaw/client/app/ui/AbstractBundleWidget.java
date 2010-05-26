@@ -11,7 +11,9 @@ import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
+import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IHasModel;
+import com.tabulaw.common.model.ModelKey;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 
@@ -152,11 +154,9 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 	 * @param removeFromModel 
 	 * @param persist update the datastore (which will trigger a model change
 	 *        event)?
-	 * @param deleteQuote Delete (<code>true</code>) or orphan the quote (
-	 *        <code>false</code>)?
 	 * @return the widget of the removed quote
 	 */
-	public Q removeQuote(final Quote mQuote, boolean removeFromModel, boolean persist, final boolean deleteQuote) {
+	public Q removeQuote(final Quote mQuote, boolean removeFromModel, boolean persist) {
 		if(mQuote == null) throw new NullPointerException();
 
 		Q qw = getQuoteWidget(mQuote.getId());
@@ -167,18 +167,15 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 
 		if(persist) {
 			// delete the quote updating the bundle quote refs too
-			if(deleteQuote) {
-				ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
-			}
-			else {
-				QuoteBundle ocq = ClientModelCache.get().getOrphanedQuoteContainer();
-				ocq.addQuote(mQuote);
-				Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractBundleWidget.this, ModelChangeOp.UPDATED, ocq, null));
-			}
+			String oqbId = ClientModelCache.get().getOrphanedQuoteBundleId();
+			QuoteBundle ocq = (QuoteBundle) ClientModelCache.get().get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), oqbId));
+			ocq.addQuote(mQuote);
+			Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractBundleWidget.this, ModelChangeOp.UPDATED, ocq, null));
+
 			ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
 
 			// server side persist
-			ServerPersistApi.get().removeQuoteFromBundle(bundle.getId(), mQuote.getId(), deleteQuote);
+			ServerPersistApi.get().moveQuote(mQuote.getId(), bundle.getId(), /*TODO targetBundle*/null);
 		}
 
 		return qw;
@@ -280,7 +277,7 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 	public final void clearQuotesFromUi() {
 		List<Q> list = getQuoteWidgets();
 		for(Q qw : list) {
-			removeQuote(qw.getModel(), false, false, false);
+			removeQuote(qw.getModel(), false, false);
 		}
 	}
 
@@ -318,7 +315,7 @@ public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, 
 		for(Quote mexisting : existingQuotes) {
 			if(!changedQuotes.contains(mexisting)) {
 				// quote to remove
-				removeQuote(mexisting, true, false, false);
+				removeQuote(mexisting, true, false);
 			}
 		}
 

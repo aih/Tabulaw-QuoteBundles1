@@ -261,6 +261,6 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 	protected void handleXClick() {
 		// orphan the quote
-		parentQuoteBundleWidget.removeQuote(quote, true, true, false);
+		parentQuoteBundleWidget.removeQuote(quote, true, true);
 	}
 }

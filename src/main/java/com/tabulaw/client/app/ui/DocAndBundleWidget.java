@@ -126,6 +126,8 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		String serializedMark = mark.serialize();
 		// create the quote
 		Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
+		// eagerly set id since EntityBase.equals() depends on it
+		quote.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
 		// cache, show and highlight
 		quote.setMark(mark);
 		wDocQuoteBundle.addQuote(quote, true, true);

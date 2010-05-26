@@ -4,19 +4,24 @@
  */
 package com.tabulaw.server.rpc;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.mail.MailSendException;
 
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
+import com.tabulaw.common.data.rpc.DocListingPayload;
+import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.IUserAdminService;
 import com.tabulaw.common.data.rpc.IUserContextService;
 import com.tabulaw.common.data.rpc.IUserCredentialsService;
@@ -25,12 +30,14 @@ import com.tabulaw.common.data.rpc.IdsPayload;
 import com.tabulaw.common.data.rpc.UserContextPayload;
 import com.tabulaw.common.data.rpc.UserListPayload;
 import com.tabulaw.common.data.rpc.UserRegistrationRequest;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IUserRef;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
+import com.tabulaw.common.model.User.Role;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.dao.EntityExistsException;
@@ -41,8 +48,10 @@ import com.tabulaw.mail.MailRouting;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
+import com.tabulaw.service.DocUtils;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
+import com.tabulaw.service.entity.UserDataService.BundleContainer;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -293,12 +302,9 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			}
 
 			// get the user's quote bundles
-			List<QuoteBundle> bundles = pc.getUserDataService().getBundlesForUser(user.getId());
-			payload.setBundles(bundles);
-			
-			// get the user's orphaned quotes adding it to the list of all user bundles
-			List<Quote> oqs = pc.getUserDataService().getOrphanedQuotesForUser(user.getId());
-			payload.setOrphanedQuotes(oqs);
+			BundleContainer bc = pc.getUserDataService().getBundlesForUser(user.getId());
+			payload.setBundles(bc.getBundles());
+			payload.setOrphanQuoteContainerId(bc.getOrphanBundleId());
 
 			// get the next ids for client-side use
 			Map<String, Integer[]> nextIds = getNextIdMap();
@@ -587,7 +593,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	}
 
 	@Override
-	public Payload removeQuoteFromBundle(String userId, String bundleId, String quoteId, boolean deleteQuote) {
+	public Payload moveQuote(String userId, String quoteId, String sourceBundleId, String targetBundleId) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
@@ -595,8 +601,8 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		Payload payload = new Payload(status);
 
 		try {
-			userDataService.removeQuoteFromBundle(userId, bundleId, quoteId, deleteQuote);
-			status.addMsg("Quote " + (deleteQuote ? "removed." : "orphaned."), MsgLevel.INFO, MsgAttr.STATUS.flag);
+			userDataService.moveQuote(userId, quoteId, sourceBundleId, targetBundleId);
+			status.addMsg("Quote moved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityNotFoundException e) {
 			exceptionToStatus(e, payload.getStatus());
@@ -674,27 +680,171 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		return payload;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Payload unorphanQuote(String userId, String quoteId, String bundleId) {
-		PersistContext context = getPersistContext();
-		UserDataService userDataService = context.getUserDataService();
-
+	public DocListingPayload getAllDocs() {
 		Status status = new Status();
-		Payload payload = new Payload(status);
+		DocListingPayload payload = new DocListingPayload(status);
 
+		// get user doc bindings
+		//PersistContext pc = getPersistContext();
+		//UserDataService uds = pc.getUserDataService();
+		UserContext uc = getUserContext();
+		User user = uc.getUser();
+		if(!user.inRole(Role.ADMINISTRATOR)) {
+			status.addMsg("Permission denied.", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag);
+		}
+		
 		try {
-			userDataService.unorphanQuote(userId, quoteId, bundleId);
-			status.addMsg("Quote moved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+			ArrayList<DocRef> docList = new ArrayList<DocRef>();
+			File docDir = DocUtils.getDocDirRef();
+			Iterator<File> itr = FileUtils.iterateFiles(docDir, new String[] {
+				"htm", "html"
+			}, false);
+			while(itr.hasNext()) {
+				File f = itr.next();
+				DocRef mDoc = DocUtils.deserializeDocument(f);
+				if(mDoc != null) docList.add(mDoc);
+			}
+			payload.setDocList(docList);
 		}
-		catch(final EntityExistsException e) {
-			exceptionToStatus(e, payload.getStatus());
+		catch(Exception e) {
+			RpcServlet.exceptionToStatus(e, status);
 		}
-		catch(final ConstraintViolationException ise) {
-			PersistHelper.handleValidationException(context, ise, payload);
+
+		return payload;
+	}
+
+	@Override
+	public DocListingPayload getDocsForUser(String userId) {
+		Status status = new Status();
+		DocListingPayload payload = new DocListingPayload(status);
+
+		PersistContext pc = getPersistContext();
+		UserDataService uds = pc.getUserDataService();
+		
+		try {
+			final List<DocRef> docList;
+	
+			// get user doc bindings
+	
+			// non-admin users only see docs they have previously seen
+			docList = uds.getDocsForUser(userId);
+			payload.setDocList(docList);
+	
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload deleteDoc(String docId) {
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		final PersistContext pc = getPersistContext();
+		
+		try {
+			if(docId == null) throw new IllegalArgumentException("Null doc id");
+
+			// user must be an administrator to permanantly delete docs
+			User user = getUserContext().getUser();
+			if(!user.inRole(Role.ADMINISTRATOR)) {
+				throw new Exception("Permission denied.");
+			}
+
+			// remove from disk
+			DocUtils.deleteDoc(docId);
+
+			// remove all doc/user bindings for the doc
+			pc.getUserDataService().removeAllDocUserBindingsForDoc(docId);
+
+			status.addMsg("Document deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload updateDocContent(DocRef docRef) {
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		final PersistContext pc = getPersistContext();
+
+		try {
+			if(docRef == null) throw new IllegalArgumentException("Null document");
+			DocUtils.setDocContent(docRef.getHash(), docRef.getHtmlContent());
+			status.addMsg("Document content updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public DocPayload createDoc(DocRef docRef) {
+		Status status = new Status();
+		DocPayload payload = new DocPayload(status);
+
+		final PersistContext pc = getPersistContext();
+		final UserContext uc = getUserContext();
+
+		try {
+			if(docRef == null || !docRef.isNew()) throw new IllegalArgumentException("Null or non-new document");
+
+			User user = uc.getUser();
+
+			int userHash = user.hashCode();
+			int cti = Long.valueOf(System.currentTimeMillis()).hashCode();
+			int hash = Math.abs(userHash ^ cti);
+
+			// stub initial html content if none specified
+			if(docRef.getHtmlContent() == null) {
+				String docHtml = "<p><b>Title: </b>" + docRef.getTitle() + "</p>";
+				docHtml += "<p><b>Creation Date: </b>" + docRef.getDate() + "</p>";
+				docHtml += "<p><b>Author: </b>" + user.getName() + "</p>";
+				docRef.setHtmlContent(docHtml);
+			}
+
+			DocUtils.createNewDoc(hash, docRef);
+
+			// persist the doc user binding
+			UserDataService uds = pc.getUserDataService();
+			DocRef persistedDoc = uds.saveDocForUser(uc.getUser().getId(), docRef);
+
+			payload.setDocRef(persistedDoc);
+			status.addMsg("Document created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final ConstraintViolationException cve) {
+			PersistHelper.handleValidationException(pc, cve, payload);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
 			throw e;
 		}
 		catch(Exception e) {

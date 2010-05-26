@@ -25,8 +25,6 @@ public class QuoteUserBinding extends EntityBase {
 
 	private String quoteId, userId;
 
-	private boolean orphaned;
-
 	/**
 	 * Constructor
 	 */
@@ -38,25 +36,11 @@ public class QuoteUserBinding extends EntityBase {
 	 * Constructor
 	 * @param quoteId
 	 * @param userId
-	 * @param orphaned Is the quote orphaned?
 	 */
-	public QuoteUserBinding(String quoteId, String userId, boolean orphaned) {
+	public QuoteUserBinding(String quoteId, String userId) {
 		super();
 		this.quoteId = quoteId;
 		this.userId = userId;
-		this.orphaned = orphaned;
-	}
-
-	/**
-	 * Is this a binding to an orphaned quote?
-	 * @return true/false
-	 */
-	public boolean isOrphaned() {
-		return orphaned;
-	}
-
-	public void setOrphaned(boolean orphaned) {
-		this.orphaned = orphaned;
 	}
 
 	@Override

@@ -218,7 +218,7 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 							// persist to server
 							DocRef mDocClone = (DocRef) DocViewer.this.mDocument.clone();
 							mDocClone.setHtmlContent(docHtml);
-							Poc.getDocService().updateDocContent(mDocClone, new AsyncCallback<Payload>() {
+							Poc.getUserDataService().updateDocContent(mDocClone, new AsyncCallback<Payload>() {
 								
 								@Override
 								public void onSuccess(Payload result) {

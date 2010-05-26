@@ -132,6 +132,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 				throw new VetoDragException();
 			}
 
+			QuoteBundle sourceBundle = sourceBundleWidget.getModel();
+			
 			// are we dragging from orphaned quotes container?
 			if(sourceBundleWidget.isOrphanedQuoteContainer()) {
 
@@ -144,14 +146,13 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 				ClientModelCache.get().persist(targetBundle, targetBundleWidget);
 
 				// server-side persist
-				ServerPersistApi.get().unorphanQuote(sourceQuote.getId(), targetBundle.getId());
+				ServerPersistApi.get().moveQuote(sourceQuote.getId(), sourceBundle.getId(), targetBundle.getId());
 
 				return;
 			}
 
 			// are we dragging TO orphaned quotes container?
 			if(targetBundleWidget.isOrphanedQuoteContainer()) {
-				QuoteBundle sourceBundle = sourceBundleWidget.getModel();
 				if(!sourceBundle.removeQuote(sourceQuote)) throw new IllegalStateException();
 				targetBundle.addQuote(sourceQuote);
 				sourceQuoteWidget.setParentQuoteBundleWidget(targetBundleWidget);
@@ -160,7 +161,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 				ClientModelCache.get().persist(sourceBundle, sourceBundleWidget);
 
 				// server-side persist
-				ServerPersistApi.get().removeQuoteFromBundle(sourceBundle.getId(), sourceQuote.getId(), false);
+				ServerPersistApi.get().moveQuote(sourceQuote.getId(), sourceBundle.getId(), targetBundle.getId());
 
 				return;
 			}
@@ -302,7 +303,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 		if(mbundles != null) {
 			for(int i = 0; i < mbundles.size(); i++) {
 				QuoteBundle qb = mbundles.get(i);
-				boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteContainer().equals(qb);
+				boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteBundleId().equals(qb.getId());
 				if(!isOrphanedBundle && i < NUM_COLUMNS) {
 					insertQuoteBundleColumn(qb, columns.getWidgetCount());
 				}
@@ -389,7 +390,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 		}
 
 		Log.debug("Inserting quote bundle col widget for: " + bundle);
-		boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteContainer().equals(bundle);
+		boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteBundleId().equals(bundle.getId());
 		final BundleEditWidget qbw = new BundleEditWidget(quoteController, isOrphanedBundle);
 		qbw.setModel(bundle);
 		qbw.setCloseHandler(new ClickHandler() {

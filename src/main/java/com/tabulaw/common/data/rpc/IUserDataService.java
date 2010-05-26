@@ -9,6 +9,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.UserState;
@@ -110,21 +111,47 @@ public interface IUserDataService extends RemoteService {
 	ModelPayload<Quote> addQuoteToBundle(String userId, String bundleId, Quote quote);
 
 	/**
-	 * @param userId the user for which the quote/user binding is removed
-	 * @param bundleId id of the bundle containing the quote to remove.
-	 * @param quoteId id of the quote to remove
-	 * @param deleteQuote Permanantly delete the quote as well? If
-	 *        <code>false</code>, the quote will be orphaned.
+	 * Moves an existing quote from an existing source bundle to an existing target bundle.
+	 * @param userId
+	 * @param quoteId id of the quote to move
+	 * @param sourceBundleId id of the bundle currently containing the quote
+	 * @param targetBundleId id of the bundle to which to move the quote
 	 * @return the status of the removal
 	 */
-	Payload removeQuoteFromBundle(String userId, String bundleId, String quoteId, boolean deleteQuote);
+	Payload moveQuote(String userId, String quoteId, String sourceBundleId, String targetBundleId);
+
+	/**
+	 * Gets the docs associated with a particular user.
+	 * @param userId id of the user for which to get docs
+	 * @return doc listing payload
+	 */
+	DocListingPayload getDocsForUser(String userId);
 	
 	/**
-	 * Un-orphans a quote for a user adding it a specified bundle.
-	 * @param userId
-	 * @param quoteId
-	 * @param bundleId
-	 * @return the status of the op
+	 * Requires user administrator priviliges.
+	 * @return All docs in the system w/out html content.
 	 */
-	Payload unorphanQuote(String userId, String quoteId, String bundleId);
+	DocListingPayload getAllDocs();
+
+	/**
+	 * Removes a doc from the system.
+	 * @param docId id of the doc to delete
+	 * @return resultant status wrapped in a payload
+	 */
+	Payload deleteDoc(String docId);
+
+	/**
+	 * Creates a new doc on the server given a new doc entity with all required
+	 * properties set save for the doc hash which is filled in.
+	 * @param docRef the new doc entity
+	 * @return the created doc wrapped in a doc payload
+	 */
+	DocPayload createDoc(DocRef docRef);
+	
+	/**
+	 * Updates the contents of an existing (localized) document.
+	 * @param docRef the doc containing the contents to update
+	 * @return the resultant status wrapped in a payload
+	 */
+	Payload updateDocContent(DocRef docRef);
 }

@@ -10,7 +10,6 @@ import java.util.Map;
 
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
-import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
@@ -30,7 +29,7 @@ public class UserContextPayload extends Payload {
 
 	private List<QuoteBundle> bundles;
 
-	private List<Quote> orphanedQuotes;
+	private String orphanQuoteContainerId;
 
 	/**
 	 * Map of id ranges keyed by entity type.
@@ -97,11 +96,15 @@ public class UserContextPayload extends Payload {
 		this.nextIds = nextIds;
 	}
 
-	public List<Quote> getOrphanedQuotes() {
-		return orphanedQuotes;
+	/**
+	 * @return id of the bundle contained in {@link #getBundles()} holding the
+	 *         orphaned (un-assigned) quotes.
+	 */
+	public String getOrphanQuoteContainerId() {
+		return orphanQuoteContainerId;
 	}
 
-	public void setOrphanedQuotes(List<Quote> orphanedQuotes) {
-		this.orphanedQuotes = orphanedQuotes;
+	public void setOrphanQuoteContainerId(String orphanQuoteContainerId) {
+		this.orphanQuoteContainerId = orphanQuoteContainerId;
 	}
 }

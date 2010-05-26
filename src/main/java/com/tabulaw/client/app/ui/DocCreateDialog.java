@@ -104,7 +104,7 @@ public class DocCreateDialog extends Dialog implements IEditHandler<FieldGroup> 
 					@Override
 					protected void doExecute() {
 						setSource(DocCreateDialog.this);
-						Poc.getDocService().createDoc(newDoc, this);
+						Poc.getUserDataService().createDoc(newDoc, this);
 					}
 
 					@Override

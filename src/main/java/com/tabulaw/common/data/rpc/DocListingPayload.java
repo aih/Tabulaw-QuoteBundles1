@@ -16,7 +16,7 @@ import com.tabulaw.common.model.DocRef;
  */
 public class DocListingPayload extends Payload {
 
-	private List<DocRef> cachedDocs;
+	private List<DocRef> docList;
 
 	public DocListingPayload() {
 		super();
@@ -25,14 +25,16 @@ public class DocListingPayload extends Payload {
 	/**
 	 * Constructor
 	 * @param status
-	 * @param cachedDocs
 	 */
-	public DocListingPayload(Status status, List<DocRef> cachedDocs) {
+	public DocListingPayload(Status status) {
 		super(status);
-		this.cachedDocs = cachedDocs;
 	}
 
-	public List<DocRef> getCachedDocs() {
-		return cachedDocs;
+	public void setDocList(List<DocRef> docList) {
+		this.docList = docList;
+	}
+
+	public List<DocRef> getDocList() {
+		return docList;
 	}
 }

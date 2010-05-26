@@ -30,16 +30,17 @@ import com.tabulaw.client.ui.Position;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
 import com.tabulaw.client.ui.login.UserSessionEvent;
 import com.tabulaw.client.ui.msg.GlobalMsgPanel;
-import com.tabulaw.common.data.rpc.IDocService;
-import com.tabulaw.common.data.rpc.IDocServiceAsync;
+import com.tabulaw.common.data.rpc.IRemoteDocService;
+import com.tabulaw.common.data.rpc.IRemoteDocServiceAsync;
 import com.tabulaw.common.data.rpc.IUserAdminService;
 import com.tabulaw.common.data.rpc.IUserAdminServiceAsync;
 import com.tabulaw.common.data.rpc.IUserContextService;
 import com.tabulaw.common.data.rpc.IUserContextServiceAsync;
 import com.tabulaw.common.data.rpc.IUserCredentialsService;
 import com.tabulaw.common.data.rpc.IUserCredentialsServiceAsync;
+import com.tabulaw.common.data.rpc.IUserDataService;
+import com.tabulaw.common.data.rpc.IUserDataServiceAsync;
 import com.tabulaw.common.data.rpc.UserContextPayload;
-import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
@@ -56,7 +57,9 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 	private static IUserCredentialsServiceAsync userCredentialsService;
 
-	private static final IDocServiceAsync docService;
+	private static final IUserDataServiceAsync userDataService;
+	
+	private static final IRemoteDocServiceAsync docService;
 
 	/**
 	 * Use this token to initialize GWT history tracking.
@@ -67,7 +70,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 	static {
 		userContextService = (IUserContextServiceAsync) GWT.create(IUserContextService.class);
-		docService = (IDocServiceAsync) GWT.create(IDocService.class);
+		userDataService = (IUserDataServiceAsync) GWT.create(IUserDataService.class);
+		docService = (IRemoteDocServiceAsync) GWT.create(IRemoteDocService.class);
 
 		msgPanel = new GlobalMsgPanel();
 	}
@@ -100,9 +104,16 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	}
 
 	/**
+	 * @return The user data service.
+	 */
+	public static IUserDataServiceAsync getUserDataService() {
+		return userDataService;
+	}
+	
+	/**
 	 * @return The doc service.
 	 */
-	public static IDocServiceAsync getDocService() {
+	public static IRemoteDocServiceAsync getDocService() {
 		return docService;
 	}
 
@@ -170,6 +181,9 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
 					getPortal().fireEvent(new ModelChangeEvent(null, ModelChangeOp.LOADED, liu, null));
+					
+					// set the orphan bundle id
+					ClientModelCache.get().setOrphanedQuoteBundleId(result.getOrphanQuoteContainerId());
 
 					// load up user bundles
 					List<QuoteBundle> userBundles = result.getBundles();
@@ -182,13 +196,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 					// cache bundles (w/ no notification)
 					ClientModelCache.get().persistAll(userBundles);
-
-					// store orphaned quotes (w/ no notification)
-					List<Quote> orphanedQuotes = result.getOrphanedQuotes();
-					ClientModelCache.get().persistAll(orphanedQuotes);
-					QuoteBundle oqc = ClientModelCache.get().getOrphanedQuoteContainer();
-					oqc.addQuotes(orphanedQuotes);
-					ClientModelCache.get().persist(oqc, null);
 
 					// load bundles view (this will pull all just stored bundles from cache)
 					ViewManager.get().loadView(new StaticViewInitializer(BundlesView.klas));

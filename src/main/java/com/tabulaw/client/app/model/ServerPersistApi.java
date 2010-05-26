@@ -5,14 +5,12 @@
  */
 package com.tabulaw.client.app.model;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
-import com.tabulaw.common.data.rpc.IUserDataService;
-import com.tabulaw.common.data.rpc.IUserDataServiceAsync;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.UserState;
@@ -21,16 +19,6 @@ import com.tabulaw.common.model.UserState;
  * @author jpk
  */
 public class ServerPersistApi {
-
-	private static final IUserDataServiceAsync userDataService;
-
-	static {
-		userDataService = (IUserDataServiceAsync) GWT.create(IUserDataService.class);
-	}
-
-	public static IUserDataServiceAsync getUserDataService() {
-		return userDataService;
-	}
 
 	private static void handlePersistResponse(Payload payload) {
 		Notifier.get().showFor(payload, "Persist op successful.");
@@ -63,7 +51,7 @@ public class ServerPersistApi {
 	public void saveUserState(final Command cmd) {
 		UserState userState = ClientModelCache.get().getUserState();
 		if(userState != null) {
-			userDataService.saveUserState(userState, new AsyncCallback<Void>() {
+			Poc.getUserDataService().saveUserState(userState, new AsyncCallback<Void>() {
 
 				@Override
 				public void onSuccess(Void result) {
@@ -78,27 +66,10 @@ public class ServerPersistApi {
 		}
 	}
 
-	public void unorphanQuote(String quoteId, String bundleId) {
-		if(!doServerPersist) return;
-		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.unorphanQuote(userId, quoteId, bundleId, new AsyncCallback<Payload>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Notifier.get().showFor(caught);
-			}
-
-			@Override
-			public void onSuccess(Payload result) {
-				handlePersistResponse(result);
-			}
-		});
-	}
-
 	public void saveBundle(QuoteBundle bundle) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.saveBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
+		Poc.getUserDataService().saveBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -115,7 +86,7 @@ public class ServerPersistApi {
 	public void updateBundleProps(QuoteBundle bundle) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.updateBundlePropsForUser(userId, bundle, new AsyncCallback<Payload>() {
+		Poc.getUserDataService().updateBundlePropsForUser(userId, bundle, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -132,7 +103,7 @@ public class ServerPersistApi {
 	public void addBundle(QuoteBundle bundle) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.addBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
+		Poc.getUserDataService().addBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -149,7 +120,7 @@ public class ServerPersistApi {
 	public void deleteBundle(String bundleId, boolean deleteQuotes) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.deleteBundleForUser(userId, bundleId, deleteQuotes, new AsyncCallback<Payload>() {
+		Poc.getUserDataService().deleteBundleForUser(userId, bundleId, deleteQuotes, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -166,7 +137,7 @@ public class ServerPersistApi {
 	public void addQuoteToBundle(String bundleId, Quote quote) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.addQuoteToBundle(userId, bundleId, quote, new AsyncCallback<ModelPayload<Quote>>() {
+		Poc.getUserDataService().addQuoteToBundle(userId, bundleId, quote, new AsyncCallback<ModelPayload<Quote>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -180,10 +151,10 @@ public class ServerPersistApi {
 		});
 	}
 
-	public void removeQuoteFromBundle(String bundleId, String quoteId, boolean deleteQuote) {
+	public void moveQuote(String quoteId, String sourceBundleId, String targetBundleId) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.removeQuoteFromBundle(userId, bundleId, quoteId, deleteQuote, new AsyncCallback<Payload>() {
+		Poc.getUserDataService().moveQuote(userId, quoteId, sourceBundleId, targetBundleId, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -200,7 +171,7 @@ public class ServerPersistApi {
 	public void addBundleUserBinding(String bundleId) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.addBundleUserBinding(userId, bundleId, new AsyncCallback<Payload>() {
+		Poc.getUserDataService().addBundleUserBinding(userId, bundleId, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -217,7 +188,7 @@ public class ServerPersistApi {
 	public void addDocUserBinding(String docId) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.addDocUserBinding(userId, docId, new AsyncCallback<Payload>() {
+		Poc.getUserDataService().addDocUserBinding(userId, docId, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -234,7 +205,7 @@ public class ServerPersistApi {
 	public void removeBundleUserBinding(String bundleId) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.removeBundleUserBinding(userId, bundleId, new AsyncCallback<Payload>() {
+		Poc.getUserDataService().removeBundleUserBinding(userId, bundleId, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -251,7 +222,7 @@ public class ServerPersistApi {
 	public void removeDocUserBinding(String docId) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		userDataService.removeDocUserBinding(userId, docId, new AsyncCallback<Payload>() {
+		Poc.getUserDataService().removeDocUserBinding(userId, docId, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

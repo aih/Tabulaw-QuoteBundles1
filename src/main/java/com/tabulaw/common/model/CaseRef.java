@@ -12,10 +12,11 @@ import com.tabulaw.util.StringUtil;
 /**
  * Ref to a remote case.
  * <p>
- * 
  * <pre>
+ * reftoken  {original full citation text}
+ * url:      {the url pointing to the original doc of which this entity is based
  * parties:  "New York Times Co. v. Sullivan"
- * citation: "376 U.S. 254"
+ * docLoc:   "376 U.S. 254"
  * court:    "Supreme Court" or "5th Circuit"
  * year:     1975
  * </pre>
@@ -70,10 +71,8 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 	 */
 	private String id;
 
-	/**
-	 * The reftoken is the original citation token.
-	 */
 	private String reftoken, parties, docLoc, court, url;
+	
 	private int year;
 
 	/**

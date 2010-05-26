@@ -10,29 +10,21 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolationException;
-
 import org.apache.commons.io.FileUtils;
 
-import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
-import com.tabulaw.common.data.rpc.DocListingPayload;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.common.data.rpc.IDocService;
+import com.tabulaw.common.data.rpc.IRemoteDocService;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.User.Role;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.server.PersistContext;
@@ -47,7 +39,7 @@ import com.tabulaw.util.StringUtil;
  * Back-end support for rpc document tasks.
  * @author jpk
  */
-public class DocServiceRpc extends RpcServlet implements IDocService {
+public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 
 	private static final long serialVersionUID = -7006228091616946540L;
 
@@ -70,155 +62,6 @@ public class DocServiceRpc extends RpcServlet implements IDocService {
 			if(handler.getDocDataType() == dataProviderType) return handler;
 		}
 		return null;
-	}
-
-	@Override
-	public Payload deleteDoc(String docId) {
-		Status status = new Status();
-		Payload payload = new Payload(status);
-
-		final PersistContext pc = getPersistContext();
-		
-		try {
-			if(docId == null) throw new IllegalArgumentException("Null doc id");
-
-			// user must be an administrator to permanantly delete docs
-			User user = getUserContext().getUser();
-			if(!user.inRole(Role.ADMINISTRATOR)) {
-				throw new Exception("Permission denied.");
-			}
-
-			// remove from disk
-			DocUtils.deleteDoc(docId);
-
-			// remove all doc/user bindings for the doc
-			pc.getUserDataService().removeAllDocUserBindingsForDoc(docId);
-
-			status.addMsg("Document deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
-		}
-		catch(final RuntimeException e) {
-			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
-			throw e;
-		}
-		catch(Exception e) {
-			exceptionToStatus(e, payload.getStatus());
-		}
-
-		return payload;
-	}
-
-	@Override
-	public Payload updateDocContent(DocRef docRef) {
-		Status status = new Status();
-		Payload payload = new Payload(status);
-
-		final PersistContext pc = getPersistContext();
-
-		try {
-			if(docRef == null) throw new IllegalArgumentException("Null document");
-			DocUtils.setDocContent(docRef.getHash(), docRef.getHtmlContent());
-			status.addMsg("Document content updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
-		}
-		catch(final RuntimeException e) {
-			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
-			throw e;
-		}
-		catch(Exception e) {
-			exceptionToStatus(e, payload.getStatus());
-		}
-
-		return payload;
-	}
-
-	@Override
-	public DocPayload createDoc(DocRef docRef) {
-		Status status = new Status();
-		DocPayload payload = new DocPayload(status);
-
-		final PersistContext pc = getPersistContext();
-		final UserContext uc = getUserContext();
-
-		try {
-			if(docRef == null || !docRef.isNew()) throw new IllegalArgumentException("Null or non-new document");
-
-			User user = uc.getUser();
-
-			int userHash = user.hashCode();
-			int cti = Long.valueOf(System.currentTimeMillis()).hashCode();
-			int hash = Math.abs(userHash ^ cti);
-
-			// stub initial html content if none specified
-			if(docRef.getHtmlContent() == null) {
-				String docHtml = "<p><b>Title: </b>" + docRef.getTitle() + "</p>";
-				docHtml += "<p><b>Creation Date: </b>" + docRef.getDate() + "</p>";
-				docHtml += "<p><b>Author: </b>" + user.getName() + "</p>";
-				docRef.setHtmlContent(docHtml);
-			}
-
-			DocUtils.createNewDoc(hash, docRef);
-
-			// persist the doc user binding
-			UserDataService uds = pc.getUserDataService();
-			DocRef persistedDoc = uds.saveDocForUser(uc.getUser().getId(), docRef);
-
-			payload.setDocRef(persistedDoc);
-			status.addMsg("Document created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
-		}
-		catch(final ConstraintViolationException cve) {
-			PersistHelper.handleValidationException(pc, cve, payload);
-		}
-		catch(final RuntimeException e) {
-			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
-			throw e;
-		}
-		catch(Exception e) {
-			exceptionToStatus(e, payload.getStatus());
-		}
-
-		return payload;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public DocListingPayload getCachedDocs() {
-		Status status = new Status();
-
-		final List<DocRef> docList;
-
-		// get user doc bindings
-		PersistContext pc = getPersistContext();
-		UserDataService uds = pc.getUserDataService();
-		UserContext uc = getUserContext();
-		User user = uc.getUser();
-		if(user.inRole(Role.ADMINISTRATOR)) {
-			// admins can see all docs
-			docList = new ArrayList<DocRef>();
-			try {
-				File docDir = DocUtils.getDocDirRef();
-				Iterator<File> itr = FileUtils.iterateFiles(docDir, new String[] {
-					"htm", "html"
-				}, false);
-				while(itr.hasNext()) {
-					File f = itr.next();
-					DocRef mDoc = DocUtils.deserializeDocument(f);
-					if(mDoc != null) docList.add(mDoc);
-				}
-			}
-			catch(Exception e) {
-				RpcServlet.exceptionToStatus(e, status);
-			}
-		}
-		else {
-			// non-admin users only see docs they have previously seen
-			docList = uds.getDocsForUser(user.getId());
-		}
-
-		DocListingPayload payload = new DocListingPayload(status, docList);
-
-		return payload;
 	}
 
 	@Override

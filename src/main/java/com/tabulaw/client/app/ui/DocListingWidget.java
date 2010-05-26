@@ -158,7 +158,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 
 								// server
 								if(isAdmin) {
-									Poc.getDocService().deleteDoc(rowData.getId(), new AsyncCallback<Payload>() {
+									Poc.getUserDataService().deleteDoc(rowData.getId(), new AsyncCallback<Payload>() {
 										
 										@Override
 										public void onSuccess(Payload result) {
@@ -239,7 +239,13 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 			@Override
 			protected void doExecute() {
 				setSource(listingWidget);
-				Poc.getDocService().getCachedDocs(this);
+				User user = ClientModelCache.get().getUser();
+				if(user.isAdministrator()) {
+					Poc.getUserDataService().getAllDocs(this);	
+				}
+				else {
+					Poc.getUserDataService().getDocsForUser(user.getId(), this);
+				}
 			}
 
 			@Override
@@ -247,7 +253,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 				super.handleSuccess(result);
 				Notifier.get().showFor(result);
 				if(!result.hasErrors()) {
-					ClientModelCache.get().persistAll(result.getCachedDocs());
+					ClientModelCache.get().persistAll(result.getDocList());
 					operator.refresh();
 				}
 			}

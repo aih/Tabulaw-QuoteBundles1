@@ -8,6 +8,7 @@ package com.tabulaw.common.data.rpc;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.UserState;
@@ -39,7 +40,15 @@ public interface IUserDataServiceAsync {
 
 	void addQuoteToBundle(String userId, String bundleId, Quote quote, AsyncCallback<ModelPayload<Quote>> callback);
 
-	void removeQuoteFromBundle(String userId, String bundleId, String quoteId, boolean deleteQuote, AsyncCallback<Payload> callback);
+	void moveQuote(String userId, String quoteId, String sourceBundleId, String targetBundleId, AsyncCallback<Payload> callback);
 
-	void unorphanQuote(String userId, String quoteId, String bundleId, AsyncCallback<Payload> callback);
+	void getDocsForUser(String userId, AsyncCallback<DocListingPayload> callback);
+	
+	void getAllDocs(AsyncCallback<DocListingPayload> callback);
+
+	void deleteDoc(String docId, AsyncCallback<Payload> callback);
+	
+	void createDoc(DocRef docRef, AsyncCallback<DocPayload> callback);
+	
+	void updateDocContent(DocRef docRef, AsyncCallback<Payload> callback);	
 }
