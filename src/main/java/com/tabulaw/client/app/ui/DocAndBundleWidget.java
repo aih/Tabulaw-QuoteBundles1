@@ -123,13 +123,22 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	@Override
 	public void onTextSelect(TextSelectEvent event) {
 		final MarkOverlay mark = event.getMark();
-		String serializedMark = mark.serialize();
+		
+		// only add quote if a valid hightlight is possible
+		try {
+			mark.highlight();
+		}
+		catch(Throwable t) {
+			Log.error("Unable to highlight quote: " + t.getMessage());
+			return;
+		}
+		
 		// create the quote
+		String serializedMark = mark.serialize();
 		Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
+		quote.setMark(mark);
 		// eagerly set id since EntityBase.equals() depends on it
 		quote.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
-		// cache, show and highlight
-		quote.setMark(mark);
 		wDocQuoteBundle.addQuote(quote, true, true);
 	}
 

@@ -89,6 +89,7 @@ public class UserDataService extends AbstractEntityService {
 				docIds.add(b.getDocId());
 			}
 			List<DocRef> list = dao.findByIds(DocRef.class, docIds, new Sorting("name"));
+			if(list.size() != docIds.size()) throw new IllegalStateException("Doc id list and doc entity list size mis-match.");
 			return list;
 		}
 		catch(InvalidCriteriaException e) {
@@ -179,6 +180,7 @@ public class UserDataService extends AbstractEntityService {
 			}
 
 			List<QuoteBundle> list = dao.findByIds(QuoteBundle.class, bundleIds, new Sorting("name"));
+			if(list.size() != bundleIds.size()) throw new IllegalStateException("Bundle id list and bundle entity list size mis-match.");
 			return new BundleContainer(list, orphanQuoteContainerId);
 		}
 		catch(InvalidCriteriaException e) {
