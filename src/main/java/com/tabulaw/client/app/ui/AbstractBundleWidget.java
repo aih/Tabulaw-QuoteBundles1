@@ -6,11 +6,8 @@ import java.util.List;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
-import com.tabulaw.client.model.ModelChangeEvent;
-import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.IHasModel;
@@ -176,38 +173,16 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle> {
 
 			// add removed quote to un-assigned quotes bundle and propagate
 			QuoteBundle ocq = ClientModelCache.get().getOrphanedQuoteBundle();
-			ocq.addQuote(mQuote);
-			Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractBundleWidget.this, ModelChangeOp.UPDATED, ocq, null));
+			if(!bundle.equals(ocq)) {
+				ocq.addQuote(mQuote);
+				ClientModelCache.get().persist(ocq, AbstractBundleWidget.this);
+			}
 
 			// server side persist (move to un-assigned bundle)
 			ServerPersistApi.get().moveQuote(mQuote.getId(), bundle.getId(), ocq.getId());
 		}
 
 		return qw;
-
-		/*
-		if(bundle.removeQuote(mQuote)) {
-			if(persist) {
-				// delete the quote updating the bundle quote refs too
-				if(deleteQuote) {
-					ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
-				}
-				else {
-					QuoteBundle ocq = ClientModelCache.get().getOrphanedQuoteContainer();
-					ocq.addQuote(mQuote);
-					Poc.fireModelChangeEvent(new ModelChangeEvent(AbstractBundleWidget.this, ModelChangeOp.UPDATED, ocq, null));
-				}
-				ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
-
-				// server side persist
-				ServerPersistApi.get().removeQuoteFromBundle(bundle.getId(), mQuote.getId(), deleteQuote);
-			}
-			Q qw = (Q) quotePanel.getWidget(index);
-			quotePanel.remove(index);
-			makeQuoteDraggable(qw, false);
-			return qw;
-		}
-		*/
 	}
 
 	/**

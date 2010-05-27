@@ -161,11 +161,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			addStyleName("orphaned");
 		}
 
-		// TODO do we need to handle clean up?
-		makeModelChangeAware();
-
 		setDragController(dragController);
-		dropAreaCheck();
 	}
 
 	public boolean isOrphanedQuoteContainer() {
@@ -203,6 +199,19 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		else {
 			quotePanel.getElement().getStyle().clearHeight();
 		}
+	}
+
+	@Override
+	protected void onLoad() {
+		super.onLoad();
+		makeModelChangeAware();
+		dropAreaCheck();
+	}
+
+	@Override
+	protected void onUnload() {
+		super.onUnload();
+		unmakeModelChangeAware();
 	}
 
 	@Override
