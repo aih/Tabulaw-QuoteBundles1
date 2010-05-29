@@ -77,21 +77,25 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 		QuoteDocWidget w = super.addQuote(mQuote, persist, addToThisBundleModel);
 		assert mQuote == w.getModel();
 		String wDocId = w.getModel().getDocument().getId();
+		
 		if(docId != null && docId.equals(wDocId)) {
 			// highlight
 			MarkOverlay mark = (MarkOverlay) w.getModel().getMark();
 			if(mark == null) {
 				String stoken = w.getModel().getSerializedMark();
-				mark = MarkOverlay.deserialize(domDocBodyRef, stoken);
-				w.getModel().setMark(mark); // cache
+				if(stoken != null) {
+					mark = MarkOverlay.deserialize(domDocBodyRef, stoken);
+					w.getModel().setMark(mark); // cache
+				}
 			}
 
-			// TODO temp HACK wrap w/ try/catch
-			try {
-				if(mark != null) mark.highlight();
-			}
-			catch(Throwable t) {
-				Log.error("Unable to [re-]highlight quote: " + t.getMessage());
+			if(mark != null) {
+				try {
+					mark.highlight();
+				}
+				catch(Throwable t) {
+					Log.error("Unable to re-highlight quote: " + t.getMessage());
+				}
 			}
 		}
 
