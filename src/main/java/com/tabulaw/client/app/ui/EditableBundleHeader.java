@@ -135,7 +135,12 @@ public class EditableBundleHeader extends Composite {
 	 */
 	public void setModel(QuoteBundle bundle) {
 		String name = bundle.getName();
+		
 		String desc = bundle.getDescription();
+		
+		// TODO debug
+		//desc = bundle.toString();
+		
 		pName.setText(name == null ? "" : name);
 		pDesc.setHTML(headerDescInnerHtmlSetter.convert(desc));
 		this.bundle = bundle;

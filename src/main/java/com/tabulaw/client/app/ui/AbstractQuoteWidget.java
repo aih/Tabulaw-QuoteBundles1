@@ -233,6 +233,9 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		String title, subTitle = "", quoteText = quote.getQuote();
 		DocRef doc = quote.getDocument();
 		title = doc.getTitle();
+		
+		// TODO debug
+		//title += "<br />" + quote.toString();
 
 		// case doc?
 		CaseRef caseRef = doc.getCaseRef();

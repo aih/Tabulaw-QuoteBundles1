@@ -130,8 +130,9 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 		cc.objectClass(Quote.class).updateDepth(0);
 		
 		// we want to cascade persist contained quotes
-		// but not the docs for each quote (i.e. updateDepth of 2)
-		cc.objectClass(QuoteBundle.class).updateDepth(1);
+		// but not the docs for each quote
+		// NOTE: apparently, an update depth of 2 is required to "remember" the quote list
+		cc.objectClass(QuoteBundle.class).updateDepth(2);
 		
 		cc.objectClass(BundleUserBinding.class).updateDepth(0);
 		cc.objectClass(DocUserBinding.class).updateDepth(0);
