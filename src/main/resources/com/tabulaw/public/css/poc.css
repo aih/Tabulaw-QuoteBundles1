@@ -438,7 +438,7 @@ div.ro {
 	display: none;
 }
 .orphaned .qheader .buttons {
-	display: none;
+	/*display: none;*/
 }
 
 /* wquote */

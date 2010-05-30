@@ -67,17 +67,20 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 					public void onClick(ClickEvent event) {
 						if(Window.confirm("Remove '" + bundle.descriptor() + "'?")) {
 	
-							// client side
+							// client side (moved quote to orphaned container bundle then remove bundle)
 							List<Quote> quotes = bundle.getQuotes();
 							if(quotes != null) {
+								QuoteBundle oqc = ClientModelCache.get().getOrphanedQuoteBundle();
 								for(Quote q : bundle.getQuotes()) {
-									ClientModelCache.get().remove(q.getModelKey(), Poc.getPortal());
+									//ClientModelCache.get().remove(q.getModelKey(), Poc.getPortal());
+									oqc.addQuote(q);
 								}
+								ClientModelCache.get().persist(oqc, EditHeader.this);
 							}
-							ClientModelCache.get().remove(bundle.getModelKey(), Poc.getPortal());
+							ClientModelCache.get().remove(bundle.getModelKey(), EditHeader.this);
 	
-							// server side
-							ServerPersistApi.get().removeBundleUserBinding(bundle.getId());
+							// server side (move quotes to orphaned quotes container)
+							ServerPersistApi.get().deleteBundle(bundle.getId(), false);
 						}
 					}
 				});
@@ -128,7 +131,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		void modelStateCheck() {
 			QuoteBundle cqb = ClientModelCache.get().getCurrentQuoteBundle();
 			boolean isCurrent = cqb != null && cqb.equals(bundle);
-			close.setVisible(!isCurrent);
+			//close.setVisible(!isCurrent);
 			if(isCurrent) {
 				lblQb.setText("Current Quote Bundle");
 				addStyleName(Styles.QB_CURRENT);
@@ -138,7 +141,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 				removeStyleName(Styles.QB_CURRENT);
 			}
 			if(current != null) current.setVisible(!isCurrent);
-			if(delete != null) delete.setVisible(!isCurrent);
+			//if(delete != null) delete.setVisible(!isCurrent);
 		}
 
 	} // EditHeader
@@ -203,8 +206,9 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	@Override
 	protected void onLoad() {
 		super.onLoad();
-		makeModelChangeAware();
+		header.modelStateCheck();
 		dropAreaCheck();
+		makeModelChangeAware();
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import com.tabulaw.common.model.Quote;
  * @author jpk
  */
 public class QuoteDocWidget extends AbstractQuoteWidget<BundleDocWidget> {
-	
+
 	/**
 	 * Constructor
 	 * @param parentQuoteBundleWidget
@@ -20,7 +20,10 @@ public class QuoteDocWidget extends AbstractQuoteWidget<BundleDocWidget> {
 	 */
 	public QuoteDocWidget(BundleDocWidget parentQuoteBundleWidget, Quote mQuote) {
 		super(parentQuoteBundleWidget, mQuote);
-		
+
+		showQuoteLinkButton(true);
+		showXButton(true);
+
 		// add quote copy icon
 		Image img = new Image(Resources.INSTANCE.plus());
 		img.setTitle("Copy to cursor");

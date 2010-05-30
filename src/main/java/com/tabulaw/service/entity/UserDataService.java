@@ -89,7 +89,8 @@ public class UserDataService extends AbstractEntityService {
 				docIds.add(b.getDocId());
 			}
 			List<DocRef> list = dao.findByIds(DocRef.class, docIds, new Sorting("name"));
-			if(list.size() != docIds.size()) throw new IllegalStateException("Doc id list and doc entity list size mis-match.");
+			if(list.size() != docIds.size())
+				throw new IllegalStateException("Doc id list and doc entity list size mis-match.");
 			return list;
 		}
 		catch(InvalidCriteriaException e) {
@@ -145,6 +146,43 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
+	 * Gets the sole bundle dedicated to housing orphaned quotes for the given
+	 * user id.
+	 * <p>
+	 * Auto-creates this bundle if it is found not to exist.
+	 * @param userId user id
+	 * @return non-<code>null</code> {@link QuoteBundle} instance
+	 */
+	@Transactional
+	public QuoteBundle getOrphanedQuotesBundleForUser(String userId) {
+		if(userId == null) throw new NullPointerException();
+
+		QuoteBundle oqc = null;
+
+		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		c.getPrimaryGroup().addCriterion("orphaned", Boolean.TRUE, Comparator.EQUALS, true);
+		try {
+			BundleUserBinding binding = dao.findEntity(c);
+			oqc = dao.load(QuoteBundle.class, binding.getBundleId());
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
+		catch(EntityNotFoundException e) {
+			// create the orphaned quote container
+			oqc = new QuoteBundle();
+			oqc.setName("Un-Assigned Quotes");
+			oqc.setDescription("Quotes not currently assigned to a bundle");
+			oqc = dao.persist(oqc);
+			BundleUserBinding binding = new BundleUserBinding(oqc.getId(), userId, true);
+			dao.persist(binding);
+		}
+
+		return oqc;
+	}
+
+	/**
 	 * Gets all bundles for a given user.
 	 * <p>
 	 * Auto-creates an orphaned quote bundle if one doesn't exist for the user.
@@ -154,6 +192,10 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional
 	public BundleContainer getBundlesForUser(String userId) {
 		if(userId == null) throw new NullPointerException();
+
+		// first ensure an orphaned quotes container exists for user
+		getOrphanedQuotesBundleForUser(userId);
+
 		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
 		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
 		try {
@@ -167,20 +209,12 @@ public class UserDataService extends AbstractEntityService {
 				}
 			}
 
-			if(orphanQuoteContainerId == null) {
-				// auto-create orphan quote container
-				QuoteBundle oqc = new QuoteBundle();
-				oqc.setName("Un-Assigned Quotes");
-				oqc.setDescription("Quotes not currently assigned to a bundle");
-				oqc = dao.persist(oqc);
-				BundleUserBinding binding = new BundleUserBinding(oqc.getId(), userId, true);
-				dao.persist(binding);
-				bundleIds.add(oqc.getId());
-				orphanQuoteContainerId = oqc.getId();
-			}
+			if(orphanQuoteContainerId == null)
+				throw new IllegalStateException("No orphaned quotes container found for user");
 
 			List<QuoteBundle> list = dao.findByIds(QuoteBundle.class, bundleIds, new Sorting("name"));
-			if(list.size() != bundleIds.size()) throw new IllegalStateException("Bundle id list and bundle entity list size mis-match.");
+			if(list.size() != bundleIds.size())
+				throw new IllegalStateException("Bundle id list and bundle entity list size mis-match.");
 			return new BundleContainer(list, orphanQuoteContainerId);
 		}
 		catch(InvalidCriteriaException e) {
@@ -367,26 +401,40 @@ public class UserDataService extends AbstractEntityService {
 	 * @param userId
 	 * @param bundleId
 	 * @param deleteQuotes delete contained quotes as well? if <code>false</code>,
-	 *        any contained quotes may end up in an orphaned state meaning they
-	 *        will not be referenced by any existing bundle
+	 *        any contained quotes will be moved to the un-assigned bundle for the
+	 *        given user
 	 * @throws EntityNotFoundException When either the user or bundle can't be
 	 *         resolved
 	 */
 	@Transactional
 	public void deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes) throws EntityNotFoundException {
-		if(deleteQuotes) {
-			QuoteBundle bundle = dao.load(QuoteBundle.class, bundleId);
-			List<Quote> quotes = bundle.getQuotes();
-			if(quotes != null) {
-				for(Quote q : quotes) {
+		if(userId == null || bundleId == null) throw new NullPointerException();
+
+		QuoteBundle bundle = dao.load(QuoteBundle.class, bundleId);
+
+		List<Quote> quotes = bundle.getQuotes();
+		if(quotes != null) {
+
+			// get handle to user's orphaned quotes container if we're not deleting
+			// quotes
+			QuoteBundle oqc = deleteQuotes ? null : getOrphanedQuotesBundleForUser(userId);
+
+			for(Quote q : quotes) {
+				if(deleteQuotes) {
+					removeQuoteUserBinding(userId, q.getId());
 					dao.purge(q);
 				}
+				else {
+					// bundle.removeQuote(q);
+					assert oqc != null;
+					oqc.addQuote(q);
+				}
 			}
-			dao.purge(bundle);
+
+			if(oqc != null) dao.persist(oqc);
 		}
-		else {
-			dao.purge(QuoteBundle.class, bundleId);
-		}
+
+		dao.purge(bundle);
 		removeBundleUserBinding(userId, bundleId);
 	}
 
@@ -445,31 +493,36 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
-	 * Permanantly deletes an existing quote from an existing bundle.
+	 * Permanantly deletes an existing quote for a given user from all bundles
+	 * that contain it.
 	 * @param userId needed for removing the quote/user binding
-	 * @param bundleId
 	 * @param quoteId
 	 * @throws EntityNotFoundException when the quote isn't found to exist in the
 	 *         bundle
 	 */
 	@Transactional
-	public void removeQuoteFromBundle(String userId, String bundleId, String quoteId) throws EntityNotFoundException {
-		if(userId == null || bundleId == null || quoteId == null) throw new NullPointerException();
-		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);
-		Quote tormv = null;
-		if(qb.getQuotes() != null) {
-			for(Quote q : qb.getQuotes()) {
-				if(q.getId().equals(quoteId)) {
-					tormv = q;
-					break;
+	public void deleteQuote(String userId, String quoteId) throws EntityNotFoundException {
+		if(userId == null || quoteId == null) throw new NullPointerException();
+
+		removeQuoteUserBinding(userId, quoteId);
+
+		List<QuoteBundle> qbs = dao.loadAll(QuoteBundle.class);
+		for(QuoteBundle qb : qbs) {
+			Quote tormv = null;
+			if(qb.getQuotes() != null) {
+				for(Quote q : qb.getQuotes()) {
+					if(q.getId().equals(quoteId)) {
+						tormv = q;
+						break;
+					}
 				}
 			}
+			if(tormv != null) {
+				qb.removeQuote(tormv);
+				dao.persist(qb);
+				dao.purge(tormv);
+			}
 		}
-		if(tormv == null) throw new EntityNotFoundException("Quote: " + quoteId + " not found in bundle: " + bundleId);
-		qb.removeQuote(tormv);
-		dao.persist(qb);
-		dao.purge(tormv);
-		removeQuoteUserBinding(userId, quoteId);
 	}
 
 	/**

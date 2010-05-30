@@ -168,6 +168,23 @@ public class ServerPersistApi {
 		});
 	}
 
+	public void deleteQuote(String quoteId) {
+		if(!doServerPersist) return;
+		String userId = ClientModelCache.get().getUser().getId();
+		Poc.getUserDataService().deleteQuote(userId, quoteId, new AsyncCallback<Payload>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Notifier.get().showFor(caught);
+			}
+
+			@Override
+			public void onSuccess(Payload result) {
+				handlePersistResponse(result);
+			}
+		});
+	}
+
 	public void addBundleUserBinding(String bundleId) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();

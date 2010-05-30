@@ -181,6 +181,12 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle> {
 				// server side persist (move to un-assigned bundle)
 				ServerPersistApi.get().moveQuote(mQuote.getId(), bundle.getId(), ocq.getId());
 			}
+			else {
+				ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
+				
+				// delete the quote
+				ServerPersistApi.get().deleteQuote(mQuote.getId());
+			}
 		}
 
 		return qw;

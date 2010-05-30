@@ -22,11 +22,12 @@ public class QuoteEditWidget extends AbstractQuoteWidget<BundleEditWidget> {
 		super(parentQuoteBundleWidget, mQuote);
 	}
 
-	/**
-	 * Constructor
-	 * @param parentQuoteBundleWidget
-	 */
-	public QuoteEditWidget(BundleEditWidget parentQuoteBundleWidget) {
-		super(parentQuoteBundleWidget);
+	@Override
+	public void setParentQuoteBundleWidget(BundleEditWidget parentQuoteBundleWidget) {
+		super.setParentQuoteBundleWidget(parentQuoteBundleWidget);
+		boolean oc = parentQuoteBundleWidget.isOrphanedQuoteContainer();
+		showDeleteButton(oc);
+		showQuoteLinkButton(!oc);
+		showXButton(!oc);
 	}
 }

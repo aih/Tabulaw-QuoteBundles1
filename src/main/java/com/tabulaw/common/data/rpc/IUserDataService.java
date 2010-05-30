@@ -96,7 +96,8 @@ public interface IUserDataService extends RemoteService {
 	 * This is an admin related operation.
 	 * @param userId
 	 * @param bundleId
-	 * @param deleteQuotes delete contained qoutes as well?
+	 * @param deleteQuotes delete contained qoutes or move them the un-assigned
+	 *        quotes bundle?
 	 * @return payload containing the status of the operation
 	 */
 	Payload deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes);
@@ -111,7 +112,17 @@ public interface IUserDataService extends RemoteService {
 	ModelPayload<Quote> addQuoteToBundle(String userId, String bundleId, Quote quote);
 
 	/**
-	 * Moves an existing quote from an existing source bundle to an existing target bundle.
+	 * Permanantly deletes the given quote for the given user (from any and all
+	 * bundles containing it).
+	 * @param userId
+	 * @param quoteId
+	 * @return the status of the deletion
+	 */
+	Payload deleteQuote(String userId, String quoteId);
+
+	/**
+	 * Moves an existing quote from an existing source bundle to an existing
+	 * target bundle.
 	 * @param userId
 	 * @param quoteId id of the quote to move
 	 * @param sourceBundleId id of the bundle currently containing the quote
@@ -126,7 +137,7 @@ public interface IUserDataService extends RemoteService {
 	 * @return doc listing payload
 	 */
 	DocListingPayload getDocsForUser(String userId);
-	
+
 	/**
 	 * Requires user administrator priviliges.
 	 * @return All docs in the system w/out html content.
@@ -147,7 +158,7 @@ public interface IUserDataService extends RemoteService {
 	 * @return the created doc wrapped in a doc payload
 	 */
 	DocPayload createDoc(DocRef docRef);
-	
+
 	/**
 	 * Updates the contents of an existing (localized) document.
 	 * @param docRef the doc containing the contents to update
