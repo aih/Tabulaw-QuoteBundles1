@@ -16,18 +16,22 @@ import org.testng.annotations.Test;
  * @author jpk
  */
 @Test
-public class OpenOfficeFileConverterTest {
+public class DocToHtmlConverterTest {
 
 	public void testDocToHtmlConversion() throws Exception {
-		URL url = getClass().getResource("");
-		String canonicalname = url.getPath() + "test.doc";
-		File fin = new File(canonicalname);
-		IToHtmlConverter fc = OpenOfficeFileConverter.create();
+		URL url = getClass().getResource("test.doc");
+		File fin = new File(url.toURI());
+		IFileConverter fc = DocToHtmlConverter.create();
 		File fout = fc.convert(fin, null);
 		Assert.assertNotNull(fout);
 	}
-	
+
+	/**
+	 * This conversion is not supported by open office api currently.
+	 * @throws Exception
+	 */
+	@Test(enabled = false)
 	public void testDocxToHtmlConversion() throws Exception {
-		
+		// TODO
 	}
 }

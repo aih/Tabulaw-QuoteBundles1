@@ -15,7 +15,14 @@ import com.tabulaw.service.DocUtils;
  * Converts text files to html files.
  * @author jpk
  */
-public class TextToHtmlConverter extends AbstractToHtmlConverter {
+public class TextToHtmlConverter extends AbstractFileConverter {
+
+	@Override
+	public boolean supportsContentType(String contentType) {
+		// NOTE: this is a crude assumption to make
+		// and it may not be robust enough for some cases.
+		return contentType.toLowerCase().contains("text");
+	}
 
 	@Override
 	public File convert(File input, String contentType) throws Exception {
@@ -33,12 +40,4 @@ public class TextToHtmlConverter extends AbstractToHtmlConverter {
 		FileUtils.writeStringToFile(fout, sb.toString(), "UTF-8");
 		return fout;
 	}
-
-	@Override
-	public boolean supportsContentType(String contentType) {
-		// NOTE: this is a crude assumption to make
-		// and it may not be robust enough for some cases.
-		return contentType.toLowerCase().contains("text");
-	}
-
 }

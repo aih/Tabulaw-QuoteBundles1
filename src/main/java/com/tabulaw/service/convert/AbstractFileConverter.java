@@ -10,7 +10,7 @@ import java.io.File;
 /**
  * @author jpk
  */
-abstract class AbstractToHtmlConverter implements IToHtmlConverter {
+abstract class AbstractFileConverter implements IFileConverter {
 	
 	/**
 	 * Is the file named such that is implies it has html content?

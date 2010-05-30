@@ -74,6 +74,8 @@ public class MailSender implements IMailSender {
 		final IComposer<C> composer = getComposerFromContext(context);
 		int retries;
 
+		//java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+		
 		for(final JavaMailSender sender : javaMailSenders) {
 			retries = 0;// reset
 			final MimeMessage mimeMessage = sender.createMimeMessage();

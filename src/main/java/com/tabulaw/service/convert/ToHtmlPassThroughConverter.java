@@ -10,11 +10,11 @@ import java.io.File;
 /**
  * @author jpk
  */
-public class ToHtmlPassThroughConverter extends AbstractToHtmlConverter {
+public class ToHtmlPassThroughConverter extends AbstractFileConverter {
 
 	@Override
 	public boolean supportsContentType(String contentType) {
-		return false;
+		return "text/html".equals(contentType);
 	}
 
 	@Override

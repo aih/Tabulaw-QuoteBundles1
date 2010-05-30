@@ -53,9 +53,11 @@ public final class MailModule extends AbstractModule implements IConfigAware {
 		DEFAULT_TO_NAME("mail.default.ToName"),
 		DEFAULT_TO_ADDRESS("mail.default.ToAddress"),
 		PRIMARY_HOST("mail.host.primary"),
+		PRIMARY_PROTOCOL("mail.host.primary.protocol"),
 		PRIMARY_HOST_USERNAME("mail.host.primary.username"),
 		PRIMARY_HOST_PASSWORD("mail.host.primary.password"),
 		SECONDARY_HOST("mail.host.secondary"),
+		SECONDARY_PROTOCOL("mail.host.secondary.protocol"),
 		SECONDARY_HOST_USERNAME("mail.host.secondary.username"),
 		SECONDARY_HOST_PASSWORD("mail.host.secondary.password"),
 		NUM_SEND_RETRIES("mail.numberOfSendRetries"),
@@ -193,9 +195,12 @@ public final class MailModule extends AbstractModule implements IConfigAware {
 
 			public JavaMailSender get() {
 				String host = config.getString(ConfigKeys.PRIMARY_HOST.getKey());
+				String protocol = config.getString(ConfigKeys.PRIMARY_PROTOCOL.getKey(), "smtp");
 				String username = config.getString(ConfigKeys.PRIMARY_HOST_USERNAME.getKey());
 				String password = config.getString(ConfigKeys.PRIMARY_HOST_PASSWORD.getKey());
 				final JavaMailSenderImpl impl = new JavaMailSenderImpl();
+				
+				impl.setProtocol(protocol);
 				impl.setHost(host);
 				impl.setUsername(username);
 				impl.setPassword(password);
@@ -208,9 +213,12 @@ public final class MailModule extends AbstractModule implements IConfigAware {
 
 			public JavaMailSender get() {
 				String host = config.getString(ConfigKeys.SECONDARY_HOST.getKey());
+				String protocol = config.getString(ConfigKeys.SECONDARY_PROTOCOL.getKey(), "smtp");
 				String username = config.getString(ConfigKeys.SECONDARY_HOST_USERNAME.getKey());
 				String password = config.getString(ConfigKeys.SECONDARY_HOST_PASSWORD.getKey());
 				final JavaMailSenderImpl impl = new JavaMailSenderImpl();
+				
+				impl.setProtocol(protocol);
 				impl.setHost(host);
 				impl.setUsername(username);
 				impl.setPassword(password);

@@ -11,7 +11,7 @@ import java.io.File;
  * Converts a file of a particular type to a another file of a different type.
  * @author jpk
  */
-public interface IToHtmlConverter {
+public interface IFileConverter {
 	
 	/**
 	 * Does this converter support the given input file content type?

@@ -14,22 +14,22 @@ import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConne
 import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
 
 /**
- * Converts files using the open office api
+ * Converts *.doc files to HTML files using the open office api.
  * @see "http://www.artofsolving.com/opensource/jodconverter"
  * @author jpk
  */
-public class OpenOfficeFileConverter extends AbstractToHtmlConverter {
-	
+public class DocToHtmlConverter extends AbstractFileConverter {
+
 	/**
 	 * Factory method for creating instances.
 	 * @return newly created instance having a separate open office connection.
-	 * @throws ConnectException Upon failure to connect with open office. 
+	 * @throws ConnectException Upon failure to connect with open office.
 	 */
-	public static OpenOfficeFileConverter create() throws ConnectException {
+	public static DocToHtmlConverter create() throws ConnectException {
 		// open office file converter
 		SocketOpenOfficeConnection ooc = new SocketOpenOfficeConnection();
 		ooc.connect();
-		return new OpenOfficeFileConverter(ooc);
+		return new DocToHtmlConverter(ooc);
 	}
 
 	private final OpenOfficeConnection ooc;
@@ -38,7 +38,7 @@ public class OpenOfficeFileConverter extends AbstractToHtmlConverter {
 	 * Constructor
 	 * @param ooc required
 	 */
-	private OpenOfficeFileConverter(OpenOfficeConnection ooc) {
+	private DocToHtmlConverter(OpenOfficeConnection ooc) {
 		super();
 		if(ooc == null) throw new NullPointerException();
 		this.ooc = ooc;
@@ -46,8 +46,7 @@ public class OpenOfficeFileConverter extends AbstractToHtmlConverter {
 
 	@Override
 	public boolean supportsContentType(String contentType) {
-		// default to all
-		return true;
+		return "application/msword".equals(contentType);
 	}
 
 	@Override
