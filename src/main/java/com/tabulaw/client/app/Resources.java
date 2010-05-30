@@ -17,6 +17,9 @@ public interface Resources extends ClientBundle {
 
 	Resources INSTANCE = GWT.create(Resources.class);
 
+	@Source("../../public/images/trash.gif")
+	ImageResource trash();
+
 	@Source("../../public/images/magnifying_glass_alt_24x24.png")
 	ImageResource magnifyingGlass();
 
@@ -32,11 +35,11 @@ public interface Resources extends ClientBundle {
 	@Source("../../public/images/edit-icon.png")
 	ImageResource edit();
 	
-	@Source("../../public/images/delete-button.png")
-	ImageResource delete();
+	//@Source("../../public/images/delete-button.png")
+	//ImageResource delete();
 
-	@Source("../../public/images/delete-button-larger.png")
-	ImageResource deleteLarger();
+	//@Source("../../public/images/delete-button-larger.png")
+	//ImageResource deleteLarger();
 	
 	@Source("../../public/images/x-button.png")
 	ImageResource XButton();
@@ -49,4 +52,10 @@ public interface Resources extends ClientBundle {
 	
 	@Source("../../public/images/plus.png")
 	ImageResource plus();
+
+	@Source("../../public/images/upload-button.png")
+	ImageResource uploadButton();
+
+	@Source("../../public/images/permalink.gif")
+	ImageResource permalink();
 }

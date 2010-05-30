@@ -88,16 +88,24 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 
 		private final FlowPanel pnl = new FlowPanel();
 		private final Image imgEdit = new Image(Resources.INSTANCE.edit());
+		private final Image imgExport = new Image(Resources.INSTANCE.permalink());
 		private final HTML html = new HTML();
 
 		public DocViewHeader() {
 			super();
 			pnl.setStyleName(Styles.DOC_HEADER);
+			
 			imgEdit.setStyleName("imgEdit");
 			imgEdit.setTitle("Edit document");
+			
+			imgExport.setStyleName("imgExport");
+			imgExport.setTitle("Export to MS Word");
+			
 			html.setStyleName(Styles.DOC_HEADER_LABEL);
 			pnl.add(html);
 			pnl.add(imgEdit);
+			pnl.add(imgExport);
+			
 			initWidget(pnl);
 		}
 
@@ -197,6 +205,14 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 		header.html.setHTML("<p>" + html + "</p>");
 		// header.html.setTitle("Double click to edit");
 
+		header.imgExport.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO impl
+			}
+		});
+		
 		header.imgEdit.addClickHandler(new ClickHandler() {
 
 			@Override

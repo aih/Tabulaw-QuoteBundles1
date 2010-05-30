@@ -58,7 +58,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			super();
 
 			if(!orphan) {
-				delete = new Image(Resources.INSTANCE.deleteLarger());
+				delete = new Image(Resources.INSTANCE.trash());
 				delete.setTitle("Remove Quote Bundle..");
 				delete.setStyleName(Styles.DELETE);
 				delete.addClickHandler(new ClickHandler() {

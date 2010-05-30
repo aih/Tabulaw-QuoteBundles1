@@ -42,7 +42,7 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 		private DocUploadDialog docUploadDialog;
 
 		private DocUploadButton() {
-			super(Resources.INSTANCE.documentIcon(), "Upload");
+			super(Resources.INSTANCE.uploadButton(), "Upload");
 			setTitle("Upload one or more documents...");
 			addClickHandler(new ClickHandler() {
 

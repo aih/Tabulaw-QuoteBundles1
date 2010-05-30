@@ -419,6 +419,9 @@ div.ro {
 			margin-left: 10px;
 			cursor: pointer;
 		} 
+		.qbundle .qbbuttons img.delete {
+			padding-bottom: 2px;
+		} 
 	.qbundle .quotes {
 		/*height: 100%;*/
 		width: 100%;
@@ -643,6 +646,13 @@ div.ro {
 	}
 	.documents .searchDp .tableView {
 	}
+	
+	.documents #docListing {
+	}
+	.documents #docListing .buttonPanel img {
+		margin-right: 8px;
+	}
+	
 	.documents .gwt-DisclosurePanel-open {
 		width: 100%;
 	}

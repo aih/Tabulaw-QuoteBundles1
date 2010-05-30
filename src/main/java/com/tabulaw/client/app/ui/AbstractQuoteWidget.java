@@ -154,13 +154,13 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 	protected final void showDeleteButton(boolean show) {
 		if(show) {
 			if(btnDelete == null) {
-				btnDelete = new Image(Resources.INSTANCE.delete());
-				btnDelete.setTitle("Permanantly delete quote");
+				btnDelete = new Image(Resources.INSTANCE.trash());
+				btnDelete.setTitle("Delete quote");
 				btnDelete.addClickHandler(new ClickHandler() {
 
 					@Override
 					public void onClick(ClickEvent event) {
-						if(Window.confirm("Remove " + getModel().descriptor() + " from this Quote Bundle?")) {
+						if(Window.confirm("Delete " + getModel().descriptor() + " permanantly?")) {
 							AbstractQuoteWidget.this.parentQuoteBundleWidget.removeQuote(quote, true, true);
 						}
 					}

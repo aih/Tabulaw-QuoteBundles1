@@ -79,6 +79,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		public DocListing() {
 			super(config.getListingId(), config.getListingElementName(), new Table(config), new ListingNavBar<DocRef>(config,
 					null));
+			getElement().setId("docListing");
 			//rpcui = new RpcUiHandler(this);
 			//addHandler(this, RpcEvent.TYPE);
 		}
@@ -135,10 +136,14 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 					table.setText(rowIndex, cellIndex, sdate);
 					break;
 				case 2: {
+					FlowPanel fpanel = new FlowPanel();
+					fpanel.setStyleName("buttonPanel");
+					
+					// delete button
 					final User liu = ClientModelCache.get().getUser();
 					final boolean isAdmin = liu.isAdministrator();
 					final String title = isAdmin ? "Permanantly delete document" : "Remove document";
-					Image img = new Image(Resources.INSTANCE.deleteLarger());
+					Image img = new Image(Resources.INSTANCE.trash());
 					img.setTitle(title);
 					img.addClickHandler(new ClickHandler() {
 
@@ -177,7 +182,25 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 							}
 						}
 					});
-					table.setWidget(rowIndex, cellIndex, img);
+					fpanel.add(img);
+					
+					// export to word icon
+					if(!rowData.isCaseDoc()) {
+						img = new Image(Resources.INSTANCE.permalink());
+						img.setTitle("Export to MS Word");
+						img.addClickHandler(new ClickHandler() {
+							
+							@Override
+							public void onClick(ClickEvent event) {
+								event.stopPropagation();
+								// TODO impl - export to MS Word doc
+								Window.alert("TODO impl - export to MS Word doc");
+							}
+						});
+						fpanel.add(img);
+					}
+
+					table.setWidget(rowIndex, cellIndex, fpanel);
 					break;
 				}
 			}
