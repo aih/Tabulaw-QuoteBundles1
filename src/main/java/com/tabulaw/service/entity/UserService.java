@@ -129,8 +129,22 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	}
 
 	/**
+	 * Loads a user given from the given user id.
+	 * @param userId
+	 * @return the found user
+	 * @throws EntityNotFoundException when the user can't be found
+	 */
+	@Transactional(readOnly = true)
+	public User loadUser(String userId) throws EntityNotFoundException {
+		if(userId == null) throw new NullPointerException();
+		User existing = dao.load(User.class, userId);
+		return existing;
+	}
+
+	/**
 	 * Purges a user given its id from the system entirely.
-	 * <p><b>WARNING:</b>All user dependent quote and bundle data is also deleted.
+	 * <p>
+	 * <b>WARNING:</b>All user dependent quote and bundle data is also deleted.
 	 * @param userId
 	 * @throws EntityNotFoundException When the user of the given id isn't found
 	 */

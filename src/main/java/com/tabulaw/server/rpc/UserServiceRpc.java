@@ -7,14 +7,13 @@ package com.tabulaw.server.rpc;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.activation.FileDataSource;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 
-import org.apache.commons.io.FileUtils;
 import org.springframework.mail.MailSendException;
 
 import com.tabulaw.common.data.ModelPayload;
@@ -45,10 +44,12 @@ import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailManager;
 import com.tabulaw.mail.MailRouting;
+import com.tabulaw.server.FileConverterBootstrapper;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
 import com.tabulaw.service.DocUtils;
+import com.tabulaw.service.convert.FileConverterDelegate;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 import com.tabulaw.service.entity.UserDataService.BundleContainer;
@@ -61,7 +62,9 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 	private static final long serialVersionUID = 7908647379731614097L;
 
-	private static final String EMAIL_TEMPLATE_NAME = "forgot-password";
+	private static final String EMAIL_TEMPLATE_FORGOT_PASSWORD = "forgot-password";
+
+	private static final String EMAIL_TEMPLATE_DOC_EXPORT = "doc-export";
 
 	@Override
 	public UserListPayload getAllUsers() {
@@ -451,7 +454,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 				data.put("password", rp);
 				final MailManager mailManager = context.getMailManager();
 				final MailRouting mr = mailManager.buildAppSenderMailRouting(user.getEmailAddress());
-				final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, EMAIL_TEMPLATE_NAME, data);
+				final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, EMAIL_TEMPLATE_FORGOT_PASSWORD, data);
 				mailManager.sendEmail(mailContext);
 				status.addMsg("Password reminder email was sent.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 			}
@@ -707,36 +710,25 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		return payload;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public DocListingPayload getAllDocs() {
 		Status status = new Status();
 		DocListingPayload payload = new DocListingPayload(status);
 
-		// get user doc bindings
-		//PersistContext pc = getPersistContext();
-		//UserDataService uds = pc.getUserDataService();
 		UserContext uc = getUserContext();
 		User user = uc.getUser();
+		
 		if(!user.inRole(Role.ADMINISTRATOR)) {
 			status.addMsg("Permission denied.", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag);
 		}
-		
-		try {
-			ArrayList<DocRef> docList = new ArrayList<DocRef>();
-			File docDir = DocUtils.getDocDirRef();
-			Iterator<File> itr = FileUtils.iterateFiles(docDir, new String[] {
-				"htm", "html"
-			}, false);
-			while(itr.hasNext()) {
-				File f = itr.next();
-				DocRef mDoc = DocUtils.deserializeDocument(f);
-				if(mDoc != null) docList.add(mDoc);
+		else {
+			try {
+				List<DocRef> docList = getPersistContext().getUserDataService().getAllDocs();
+				payload.setDocList(docList);
 			}
-			payload.setDocList(docList);
-		}
-		catch(Exception e) {
-			RpcServlet.exceptionToStatus(e, status);
+			catch(Exception e) {
+				RpcServlet.exceptionToStatus(e, status);
+			}
 		}
 
 		return payload;
@@ -751,14 +743,8 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		UserDataService uds = pc.getUserDataService();
 		
 		try {
-			final List<DocRef> docList;
-	
-			// get user doc bindings
-	
-			// non-admin users only see docs they have previously seen
-			docList = uds.getDocsForUser(userId);
+			List<DocRef> docList = uds.getDocsForUser(userId);
 			payload.setDocList(docList);
-	
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
@@ -788,11 +774,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 				throw new Exception("Permission denied.");
 			}
 
-			// remove from disk
-			DocUtils.deleteDoc(docId);
-
-			// remove all doc/user bindings for the doc
-			pc.getUserDataService().removeAllDocUserBindingsForDoc(docId);
+			pc.getUserDataService().deleteDoc(docId);
 
 			status.addMsg("Document deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
@@ -817,7 +799,10 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 		try {
 			if(docRef == null) throw new IllegalArgumentException("Null document");
-			DocUtils.setDocContent(docRef.getHash(), docRef.getHtmlContent());
+			
+			//DocUtils.setDocContent(docRef.getHash(), docRef.getHtmlContent());
+			pc.getUserDataService().saveDoc(docRef);
+			
 			status.addMsg("Document content updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final RuntimeException e) {
@@ -844,11 +829,10 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			if(docRef == null || !docRef.isNew()) throw new IllegalArgumentException("Null or non-new document");
 
 			User user = uc.getUser();
-
-			int userHash = user.hashCode();
-			int cti = Long.valueOf(System.currentTimeMillis()).hashCode();
-			int hash = Math.abs(userHash ^ cti);
-
+			//int userHash = user.hashCode();
+			//int cti = Long.valueOf(System.currentTimeMillis()).hashCode();
+			//int hash = Math.abs(userHash ^ cti);
+			
 			// stub initial html content if none specified
 			if(docRef.getHtmlContent() == null) {
 				String docHtml = "<p><b>Title: </b>" + docRef.getTitle() + "</p>";
@@ -857,17 +841,65 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 				docRef.setHtmlContent(docHtml);
 			}
 
-			DocUtils.createNewDoc(hash, docRef);
-
-			// persist the doc user binding
 			UserDataService uds = pc.getUserDataService();
-			DocRef persistedDoc = uds.saveDocForUser(uc.getUser().getId(), docRef);
+			
+			// save the doc
+			DocRef persistedDoc = uds.saveDoc(docRef);
+			
+			// save the doc/user binding
+			uds.addDocUserBinding(uc.getUser().getId(), persistedDoc.getId());
 
 			payload.setDocRef(persistedDoc);
 			status.addMsg("Document created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final ConstraintViolationException cve) {
 			PersistHelper.handleValidationException(pc, cve, payload);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			pc.getExceptionHandler().handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload exportDoc(String docId, String userId) {
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		final PersistContext pc = getPersistContext();
+		
+		FileConverterDelegate fcd = (FileConverterDelegate) getServletContext().getAttribute(FileConverterBootstrapper.FILE_CONVERTER_KEY);
+
+		try {
+			// load the doc
+			DocRef doc = pc.getUserDataService().getDoc(docId);
+			
+			// load the user
+			User user = pc.getUserService().loadUser(userId);
+			
+			// convert the doc to MS Word
+			File f = DocUtils.docContentsToFile(doc);
+			File fconverted = fcd.convert(f, "text/html");
+			
+			// email the doc
+			final MailManager mailManager = pc.getMailManager();
+			final MailRouting mr = mailManager.buildAppSenderMailRouting(user.getEmailAddress());
+			final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, EMAIL_TEMPLATE_DOC_EXPORT, null);
+			FileDataSource fds = new FileDataSource(fconverted);
+			mailContext.addAttachment(fconverted.getName(), fds);
+			mailManager.sendEmail(mailContext);
+			status.addMsg("Document emailed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+			
+			// clean up
+			// TODO ensure this doesn't delete the file before emailing it!
+			f.delete();
+			fconverted.delete();
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());

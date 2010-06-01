@@ -73,16 +73,21 @@ public class DocUploadServlet extends HttpServlet {
 
 				List<FileItem> items = upload.parseRequest(req);
 
-				File f = null;
+				File fupload = null;
 				int numSuccessful = 0;
 				for(FileItem item : items) {
 					if(!item.isFormField()) {
 						String filename = item.getName();
 						if(StringUtil.isEmpty(filename)) continue;
 						filename = FilenameUtils.getName(filename);
-						f = DocUtils.getDocRef(filename);
+
+						// ensure we have a non-path filename
+						int li = filename.lastIndexOf(File.separatorChar);
+						if(li >= 0) filename = filename.substring(li + 1);
+
+						fupload = DocUtils.getDocFileRef(filename);
 						try {
-							item.write(f);
+							item.write(fupload);
 						}
 						catch(Exception e) {
 							throw new Exception("Unable to write uploaded file to disk: " + e.getMessage(), e);
@@ -90,34 +95,33 @@ public class DocUploadServlet extends HttpServlet {
 						numSuccessful++;
 
 						// convert to html
-						File fconverted = fconverter.convert(f, item.getContentType());
+						File fconverted = fconverter.convert(fupload, item.getContentType());
 
 						// serialize the just created html doc file
-						// NOTE: the doc hash for uploaded docs is just hash of the non-path
-						// filename given
-						String docHash = fconverted.getName();
-						String docTitle = docHash; // for now
+						String docTitle = fconverted.getName(); // for now
 						Date docDate = new Date();
-						DocRef mDoc = EntityFactory.get().buildDoc(docTitle, docHash, docDate);
-						String sdoc = DocUtils.serializeDocument(mDoc);
+						DocRef mDoc = EntityFactory.get().buildDoc(docTitle, docDate);
 
 						// localize converted doc html
-						{
-							String htmlContent = FileUtils.readFileToString(fconverted, "UTF-8");
-							StringBuilder docsb = new StringBuilder(htmlContent);
-							DocUtils.localizeDoc(docsb, docTitle);
-							htmlContent = docsb.toString();
+						String htmlContent = FileUtils.readFileToString(fconverted, "UTF-8");
+						StringBuilder docsb = new StringBuilder(htmlContent);
+						DocUtils.localizeDoc(docsb, docTitle);
+						htmlContent = docsb.toString();
 
-							// write to disk
-							if(!fconverted.delete()) {
-								throw new Exception("Unable to delete converted html file");
-							}
-							FileUtils.writeStringToFile(fconverted, sdoc + htmlContent);
-							fconverted = null;
-						}
+						// set the doc html content
+						mDoc.setHtmlContent(htmlContent);
 
-						// persist the doc user binding
-						uds.saveDocForUser(user.getId(), mDoc);
+						// save the doc in the db and create a doc/user binding
+						mDoc = uds.saveDoc(mDoc);
+						uds.addDocUserBinding(user.getId(), mDoc.getId());
+
+						// clean up
+						if(!fconverted.delete()) throw new Exception("Unable to delete converted html file");
+						fconverted = null;
+						if(!fupload.delete()) throw new Exception("Unable to delete uploaded file");
+						fupload = null;
+
+						String sdoc = DocUtils.serializeDocument(mDoc);
 
 						if(sb.length() == 0) {
 							sb.append("[START]");

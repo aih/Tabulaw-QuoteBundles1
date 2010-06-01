@@ -15,21 +15,25 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
- * NOTE: No surrogate primary key is needed here.
+ * The doc entity.
  * @author jpk
  */
-// NO business keys since this is the primary key!
-// @BusinessObject(businessKeys = @BusinessKeyDef(name = "Doc Hash", properties
-// = { "hash"
-// }))
 public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEntity {
 
 	private static final long serialVersionUID = -8257785916791525146L;
 
-	private String title, hash;
+	/**
+	 * Surrogate primary key. 
+	 */
+	private String id;
+
+	private String title;
 	private Date date;
 	private CaseRef caseRef;
 
+	/**
+	 *  The HTML content of the doc.
+	 */
 	private String htmlContent;
 
 	/**
@@ -41,12 +45,13 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 
 	@Override
 	public String getId() {
-		return hash;
+		return id;
 	}
 
 	@Override
 	public void setId(String id) {
-		throw new UnsupportedOperationException();
+		if(id == null) throw new NullPointerException();
+		this.id = id;
 	}
 
 	@Override
@@ -63,8 +68,8 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	public void doClone(IEntity cln) {
 		super.doClone(cln);
 		DocRef dr = (DocRef) cln;
+		dr.id = id;
 		dr.title = title;
-		dr.hash = hash;
 		dr.date = date == null ? null : new Date(date.getTime());
 		dr.caseRef = (CaseRef) (caseRef == null ? null : caseRef.clone());
 	}
@@ -99,17 +104,6 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	@NotEmpty
-	@Length(max = 64)
-	public String getHash() {
-		return hash;
-	}
-
-	public void setHash(String hash) {
-		if(hash == null) throw new NullPointerException();
-		this.hash = hash;
 	}
 
 	@NotNull
@@ -161,16 +155,16 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	@Override
 	public Object getPropertyValue(String propertyPath) {
 
+		if("id".equals(propertyPath)) {
+			return getId();
+		}
+
 		if("title".equals(propertyPath) || "name".equals(propertyPath)) {
 			return getTitle();
 		}
 
-		if("hash".equals(propertyPath)) {
-			return getHash();
-		}
-
 		if("date".equals(propertyPath)) {
-			return getHash();
+			return getDate();
 		}
 
 		return null;

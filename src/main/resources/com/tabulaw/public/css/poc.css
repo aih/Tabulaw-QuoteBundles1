@@ -529,7 +529,7 @@ div.ro {
 	width: 100%;
 	height: 22px;
 }
-.docHeader .imgEdit {
+.docHeader img {
 	float: right;
 	margin: 2px 8px 0 0;
 	cursor: pointer;

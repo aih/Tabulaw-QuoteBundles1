@@ -336,7 +336,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 			throw new IllegalArgumentException(e);
 		}
 
-		DocRef doc = EntityFactory.get().buildCaseDoc(docTitle, null, date, parties, reftoken, docLoc, court, null, syear);
+		DocRef doc = EntityFactory.get().buildCaseDoc(docTitle, date, parties, reftoken, docLoc, court, null, syear);
 		doc.setHtmlContent(htmlContent);
 
 		return doc;

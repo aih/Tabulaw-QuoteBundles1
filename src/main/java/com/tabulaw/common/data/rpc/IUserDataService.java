@@ -165,4 +165,13 @@ public interface IUserDataService extends RemoteService {
 	 * @return the resultant status wrapped in a payload
 	 */
 	Payload updateDocContent(DocRef docRef);
+
+	/**
+	 * Converts the doc identified by the given id to MS Word format emailing it
+	 * to the given user.
+	 * @param docId id of the doc to export
+	 * @param userId id of the user to which the exported doc is emailed
+	 * @return the resultant status of the export op wrapped in a payload
+	 */
+	Payload exportDoc(String docId, String userId);
 }

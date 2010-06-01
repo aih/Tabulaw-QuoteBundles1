@@ -5,7 +5,6 @@
  */
 package com.tabulaw.server.rpc;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,8 +12,6 @@ import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.io.FileUtils;
 
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
@@ -25,8 +22,10 @@ import com.tabulaw.common.data.rpc.IRemoteDocService;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.User;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
+import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.DocUtils;
@@ -115,55 +114,55 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 			return payload;
 		}
 
-		IDocHandler handler = resolveHandler(remoteDocUrl);
-		if(handler == null) {
-			status.addMsg("Unable to resove a doc handler for the doc url: " + remoteDocUrl, MsgLevel.ERROR,
-					MsgAttr.EXCEPTION.flag | MsgAttr.STATUS.flag);
-			return payload;
-		}
-
-		final int remoteDocHashcode = DocUtils.docHash(remoteDocUrl);
-
-		// NOTE: this is the doc hash from the perspective of the DocRef entity
-		final String docHash = DocUtils.localDocFilename(remoteDocHashcode);
-		DocRef mDoc = null;
+		PersistContext pc = getPersistContext();
+		UserContext uc = getUserContext();
+		UserDataService uds = pc.getUserDataService();
+		User user = uc.getUser();
+		
+		// first attempt to find case doc in db by remote url
+		DocRef doc;
 		try {
-			File f = DocUtils.getDocRef(docHash);
-			if(!f.exists()) {
-				// fetch
-				String fcontents = DocUtils.fetch(new URL(remoteDocUrl));
-
-				// parse
-				mDoc = handler.parseSingleDocument(fcontents);
-				CaseRef caseRef = mDoc.getCaseRef();
-				caseRef.setUrl(remoteDocUrl);
-				mDoc.setHash(docHash);
-				String htmlContent = mDoc.getHtmlContent();
-				mDoc.setHtmlContent(null); // clear it out
-
-				// cache (write to disk)
-				String sdoc = DocUtils.serializeDocument(mDoc);
-				FileUtils.writeStringToFile(f, sdoc + htmlContent);
+			doc = uds.findCaseDocByRemoteUrl(remoteDocUrl);
+		}
+		catch(EntityNotFoundException e) {
+			// ok - need to actually fetch it
+			
+			// fetch doc data
+			String fcontents;
+			try {
+				fcontents = DocUtils.fetch(new URL(remoteDocUrl));
 			}
-			else {
-				mDoc = DocUtils.deserializeDocument(f);
+			catch(MalformedURLException e1) {
+				RpcServlet.exceptionToStatus(e, status);
+				return payload;
 			}
-			payload.setDocRef(mDoc);
+			catch(IOException e1) {
+				RpcServlet.exceptionToStatus(e, status);
+				return payload;
+			}
 
-			// persist the doc user binding
-			PersistContext pc = getPersistContext();
-			UserContext uc = getUserContext();
-			UserDataService uds = pc.getUserDataService();
-			uds.saveDocForUser(uc.getUser().getId(), mDoc);
+			// resolve the doc handler
+			IDocHandler handler = resolveHandler(remoteDocUrl);
+			if(handler == null) {
+				status.addMsg("Unable to resove a doc handler for the doc url: " + remoteDocUrl, MsgLevel.ERROR,
+						MsgAttr.EXCEPTION.flag | MsgAttr.STATUS.flag);
+				return payload;
+			}
+			
+			// parse fetched doc data
+			doc = handler.parseSingleDocument(fcontents);
+			CaseRef caseRef = doc.getCaseRef();
+			caseRef.setUrl(remoteDocUrl);
+
+			// persist the doc and create a doc/user binding
+			doc = uds.saveDoc(doc);
+			uds.addDocUserBinding(user.getId(), doc.getId());
 		}
-		catch(MalformedURLException e) {
-			e.printStackTrace();
-			RpcServlet.exceptionToStatus(e, status);
-		}
-		catch(IOException e) {
-			e.printStackTrace();
-			RpcServlet.exceptionToStatus(e, status);
-		}
+		
+		// don't send html content to client
+		doc.setHtmlContent(null);
+		
+		payload.setDocRef(doc);
 
 		return payload;
 	}

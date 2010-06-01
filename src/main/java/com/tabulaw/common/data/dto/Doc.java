@@ -14,7 +14,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class Doc implements IsSerializable {
 
-	private String title, hash;
+	private String id, title;
 
 	private Date date;
 
@@ -26,6 +26,14 @@ public class Doc implements IsSerializable {
 		super();
 		this.title = title;
 		this.date = date;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getTitle() {
@@ -42,14 +50,6 @@ public class Doc implements IsSerializable {
 
 	public void setDate(Date date) {
 		this.date = date;
-	}
-
-	public String getHash() {
-		return hash;
-	}
-
-	public void setHash(String hash) {
-		this.hash = hash;
 	}
 
 	@Override

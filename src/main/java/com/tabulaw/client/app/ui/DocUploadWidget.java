@@ -165,20 +165,21 @@ public class DocUploadWidget extends Composite implements HasValueChangeHandlers
 						String[] nvs = sdoc.split("\\|");
 						Doc doc = new Doc();
 						for(String nv : nvs) {
-							String[] arr = nv.split(":");
+							String[] arr = nv.split("::");
 							String name = arr[0].trim(), value = arr[1].trim();
-							if(name.endsWith("title")) {
+							if(name.endsWith("id")) {
+								doc.setId(value);
+							}
+							else if(name.endsWith("title")) {
 								doc.setTitle(value);
 							}
 							else if(name.endsWith("date")) {
 								Date date = Fmt.getDateTimeFormat(GlobalFormat.DATE).parse(value);
 								doc.setDate(date);
 							}
-							else if(name.endsWith("hash")) {
-								doc.setHash(value);
-							}
 						}
-						DocRef mDoc = EntityFactory.get().buildDoc(doc.getTitle(), doc.getHash(), doc.getDate());
+						DocRef mDoc = EntityFactory.get().buildDoc(doc.getTitle(), doc.getDate());
+						mDoc.setId(doc.getId());
 						mdocs.add(mDoc);
 						msgs.add(new Msg("Document: '" + doc.getTitle() + "' uploaded.", MsgLevel.INFO));
 					}

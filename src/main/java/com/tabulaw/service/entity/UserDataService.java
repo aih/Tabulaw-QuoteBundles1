@@ -27,6 +27,7 @@ import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
+import com.tabulaw.dao.NonUniqueResultException;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.util.Comparator;
 
@@ -76,6 +77,13 @@ public class UserDataService extends AbstractEntityService {
 		super(dao, validationFactory);
 	}
 
+	/**
+	 * Gets a list of all docs for a given user.
+	 * <p>
+	 * The <code>htmlContent</code> property is cleared out for each doc.
+	 * @param userId user id
+	 * @return list of docs
+	 */
 	@Transactional(readOnly = true)
 	public List<DocRef> getDocsForUser(String userId) {
 		if(userId == null) throw new NullPointerException();
@@ -91,11 +99,38 @@ public class UserDataService extends AbstractEntityService {
 			List<DocRef> list = dao.findByIds(DocRef.class, docIds, new Sorting("name"));
 			if(list.size() != docIds.size())
 				throw new IllegalStateException("Doc id list and doc entity list size mis-match.");
-			return list;
+
+			return cloneDocList(list);
 		}
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	/**
+	 * Provides a list of all docs in the system.
+	 * <p>
+	 * Each doc element has their <code>htmlContent</code> property set to
+	 * <code>null</code>.
+	 * @return doc list
+	 */
+	@Transactional(readOnly = true)
+	public List<DocRef> getAllDocs() {
+		List<DocRef> docs = dao.loadAll(DocRef.class);
+		return cloneDocList(docs);
+	}
+
+	/**
+	 * Gets the doc of the given id.
+	 * @param docId
+	 * @return to loaded doc
+	 * @throws EntityNotFoundException
+	 */
+	@Transactional(readOnly = true)
+	public DocRef getDoc(String docId) throws EntityNotFoundException {
+		if(docId == null) throw new NullPointerException();
+		DocRef dr = dao.load(DocRef.class, docId);
+		return dr;
 	}
 
 	/**
@@ -249,44 +284,68 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
-	 * Saves the doc for the given user.
-	 * @param userId
-	 * @param doc
+	 * Creates or updates the given doc.
+	 * @param doc the doc to save
 	 * @return the saved doc
 	 * @throws ConstraintViolationException When the given doc isn't valid
 	 */
 	@Transactional
-	public DocRef saveDocForUser(String userId, DocRef doc) throws ConstraintViolationException {
-		if(userId == null || doc == null) throw new NullPointerException();
+	public DocRef saveDoc(DocRef doc) throws ConstraintViolationException {
+		if(doc == null) throw new NullPointerException();
 
 		validate(doc);
 
-		DocRef existing;
+		// remove existing (db4o-ism)
 		try {
-			existing = dao.load(DocRef.class, doc.getId());
+			DocRef existing = dao.load(DocRef.class, doc.getId());
+			dao.purge(existing);
 		}
 		catch(EntityNotFoundException e) {
-			// new
-			existing = null;
-		}
-
-		// save the doc
-		if(existing == null) {
-			doc = dao.persist(doc);
-		}
-		else {
-			doc = existing;
-		}
-
-		// create binding
-		try {
-			addDocUserBinding(userId, doc.getId());
-		}
-		catch(EntityExistsException e) {
 			// ok
 		}
 
+		// save the doc
+		doc = dao.persist(doc);
+
 		return doc;
+	}
+
+	/**
+	 * Deletes the doc given its id as well as all doc/user bindings.
+	 * <p>
+	 * NOTE: Quotes (which may point to the target doc) are un-affected.
+	 * @param docId id of the doc to delete
+	 * @throws EntityNotFoundException when the doc of the given id can't be found
+	 */
+	@Transactional
+	public void deleteDoc(String docId) throws EntityNotFoundException {
+		if(docId == null) throw new NullPointerException();
+		dao.purge(DocRef.class, docId);
+		removeAllDocUserBindingsForDoc(docId);
+	}
+
+	/**
+	 * Finds a case type doc by its remote url property.
+	 * @param remoteUrl the unique remote url
+	 * @return the found doc
+	 * @throws EntityNotFoundException
+	 */
+	@Transactional(readOnly = true)
+	public DocRef findCaseDocByRemoteUrl(String remoteUrl) throws EntityNotFoundException {
+		if(remoteUrl == null) throw new NullPointerException();
+		Criteria<DocRef> c = new Criteria<DocRef>(DocRef.class);
+		c.getPrimaryGroup().addCriterion("caseRef.url", remoteUrl, Comparator.EQUALS, true);
+		try {
+			DocRef doc = dao.findEntity(c);
+			return doc;
+		}
+		catch(NonUniqueResultException e) {
+			throw new IllegalStateException("Non-unique remote url: " + remoteUrl);
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
+
 	}
 
 	/**
@@ -713,5 +772,22 @@ public class UserDataService extends AbstractEntityService {
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	/**
+	 * Returns a new list whose elements are clones of those in the given doc
+	 * list.
+	 * <p>
+	 * Consequently, the <code>htmlContent</code> property is not specified in the
+	 * new cloned elements.
+	 * @param dlist doc list to clone
+	 * @return new list of cloned doc elements
+	 */
+	private List<DocRef> cloneDocList(List<DocRef> dlist) {
+		ArrayList<DocRef> clist = new ArrayList<DocRef>(dlist.size());
+		for(DocRef d : dlist) {
+			clist.add((DocRef) d.clone());
+		}
+		return clist;
 	}
 }

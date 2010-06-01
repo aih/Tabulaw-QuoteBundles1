@@ -185,20 +185,18 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 					fpanel.add(img);
 					
 					// export to word icon
-					if(!rowData.isCaseDoc()) {
-						img = new Image(Resources.INSTANCE.permalink());
-						img.setTitle("Export to MS Word");
-						img.addClickHandler(new ClickHandler() {
-							
-							@Override
-							public void onClick(ClickEvent event) {
-								event.stopPropagation();
-								// TODO impl - export to MS Word doc
-								Window.alert("TODO impl - export to MS Word doc");
-							}
-						});
-						fpanel.add(img);
-					}
+					img = new Image(Resources.INSTANCE.permalink());
+					img.setTitle("Export to MS Word");
+					img.addClickHandler(new ClickHandler() {
+						
+						@Override
+						public void onClick(ClickEvent event) {
+							event.stopPropagation();
+							// TODO impl - export to MS Word doc
+							Window.alert("TODO impl - export to MS Word doc");
+						}
+					});
+					fpanel.add(img);
 
 					table.setWidget(rowIndex, cellIndex, fpanel);
 					break;

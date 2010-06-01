@@ -12,6 +12,9 @@ import junit.framework.Assert;
 
 import org.testng.annotations.Test;
 
+import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
+import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
+
 /**
  * @author jpk
  */
@@ -21,7 +24,7 @@ public class DocToHtmlConverterTest {
 	public void testDocToHtmlConversion() throws Exception {
 		URL url = getClass().getResource("test.doc");
 		File fin = new File(url.toURI());
-		IFileConverter fc = DocToHtmlConverter.create();
+		DocToHtmlConverter fc = new DocToHtmlConverter(makeOpenOfficeConnection());
 		File fout = fc.convert(fin, null);
 		Assert.assertNotNull(fout);
 	}
@@ -33,5 +36,11 @@ public class DocToHtmlConverterTest {
 	@Test(enabled = false)
 	public void testDocxToHtmlConversion() throws Exception {
 		// TODO
+	}
+
+	private OpenOfficeConnection makeOpenOfficeConnection() throws Exception {
+		SocketOpenOfficeConnection ooc = new SocketOpenOfficeConnection();
+		ooc.connect();
+		return ooc;
 	}
 }

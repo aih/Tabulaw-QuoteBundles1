@@ -144,22 +144,19 @@ public class EntityFactory {
 	/**
 	 * Create a new contract type doc.
 	 * @param docTitle
-	 * @param docHash
 	 * @param docDate
 	 * @return newly created model
 	 */
-	public DocRef buildDoc(String docTitle, String docHash, Date docDate) {
+	public DocRef buildDoc(String docTitle, Date docDate) {
 		DocRef doc = (DocRef) create(EntityType.DOCUMENT);
 		doc.setTitle(docTitle);
 		doc.setDate(docDate);
-		if(docHash != null) doc.setHash(docHash);
 		return doc;
 	}
 
 	/**
 	 * Creates a new Model representing a document that references a case.
 	 * @param docTitle
-	 * @param docHash the server-side filename
 	 * @param docDate
 	 * @param parties
 	 * @param reftoken
@@ -169,9 +166,9 @@ public class EntityFactory {
 	 * @param year
 	 * @return newly created model
 	 */
-	public DocRef buildCaseDoc(String docTitle, String docHash, Date docDate, String parties, String reftoken,
+	public DocRef buildCaseDoc(String docTitle, Date docDate, String parties, String reftoken,
 			String docLoc, String court, String url, String year) {
-		DocRef doc = buildDoc(docTitle, docHash, docDate);
+		DocRef doc = buildDoc(docTitle, docDate);
 		doc.setCaseRef(buildCase(parties, reftoken, docLoc, court, url, year));
 		return doc;
 	}

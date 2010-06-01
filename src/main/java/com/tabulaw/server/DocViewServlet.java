@@ -5,7 +5,6 @@
  */
 package com.tabulaw.server;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -14,9 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
-
-import com.tabulaw.service.DocUtils;
+import com.tabulaw.common.model.DocRef;
 
 /**
  * DocViewServlet
@@ -29,29 +26,16 @@ public class DocViewServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String docId = req.getParameter("id");
-		if(docId == null) {
-			throw new ServletException("No doc id specified.");
-		}
+		if(docId == null) throw new ServletException("No doc id specified.");
 
-		File f = DocUtils.getDocRef(docId);
-
-		String fstr = FileUtils.readFileToString(f, "UTF-8");
-		
-		// strip out serialized first line
-		int index = fstr.indexOf('\n');
-		if(index != -1) fstr = fstr.substring(index + 1);
-		
-		StringBuilder sb = new StringBuilder(fstr);
-
-		// inject js callback hook in window.onload
-		DocUtils.localizeDoc(sb, null);
-		
-		fstr = sb.toString();
+		PersistContext pc = (PersistContext) req.getSession(false).getServletContext().getAttribute(PersistContext.KEY);
+		DocRef doc = pc.getUserDataService().getDoc(docId);
+		String htmlContent = doc.getHtmlContent();
 
 		resp.setContentType("text/html");
 		resp.setCharacterEncoding("UTF-8");
 		PrintWriter writer = resp.getWriter();
-		writer.write(fstr);
+		writer.write(htmlContent);
 		writer.flush();
 	}
 

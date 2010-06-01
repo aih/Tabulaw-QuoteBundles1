@@ -274,9 +274,9 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 
 		// doc content
 		frame.getElement().setId(getFrameId());
-		String hash = mDocument.getHash();
-		Log.debug("Setting document content in iframe for doc: " + hash);
-		frame.setUrl("doc?id=" + hash);
+		String docId = mDocument.getId();
+		Log.debug("Setting document content in iframe for doc: " + docId);
+		frame.setUrl("doc?id=" + docId);
 	}
 
 	public native String getDocHtml() /*-{
