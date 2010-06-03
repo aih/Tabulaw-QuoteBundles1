@@ -51,9 +51,9 @@ public interface IUserDataServiceAsync {
 
 	void deleteDoc(String docId, AsyncCallback<Payload> callback);
 
-	void createDoc(DocRef docRef, AsyncCallback<DocPayload> callback);
+	void createDoc(DocRef docRef, String htmlContent, AsyncCallback<DocPayload> callback);
 
-	void updateDocContent(DocRef docRef, AsyncCallback<Payload> callback);
+	void updateDocContent(String docId, String htmlContent, AsyncCallback<Payload> callback);
 
 	void exportDoc(String docId, String userId, AsyncCallback<Payload> callback);
 }

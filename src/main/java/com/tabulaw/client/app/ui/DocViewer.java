@@ -13,6 +13,7 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -27,10 +28,14 @@ import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.util.StringUtil;
 
 /**
  * Displays a single document either statically (default) or in a rich text area
  * (edit mode).
+ * <p>
+ * Fires a {@link ValueChangeEvent} of value: "loaded" when the document view is
+ * set to edit mode.
  * <p>
  * Fires a {@link ValueChangeEvent} of value: "edit" when the document view is
  * set to edit mode.
@@ -87,25 +92,26 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 	static class DocViewHeader extends Composite {
 
 		private final FlowPanel pnl = new FlowPanel();
+		private final HTML html = new HTML();
+
 		private final Image imgEdit = new Image(Resources.INSTANCE.edit());
 		private final Image imgExport = new Image(Resources.INSTANCE.permalink());
-		private final HTML html = new HTML();
 
 		public DocViewHeader() {
 			super();
 			pnl.setStyleName(Styles.DOC_HEADER);
-			
+
 			imgEdit.setStyleName("imgEdit");
 			imgEdit.setTitle("Edit document");
-			
+
 			imgExport.setStyleName("imgExport");
 			imgExport.setTitle("Export to MS Word");
-			
+
 			html.setStyleName(Styles.DOC_HEADER_LABEL);
 			pnl.add(html);
 			pnl.add(imgEdit);
 			pnl.add(imgExport);
-			
+
 			initWidget(pnl);
 		}
 
@@ -147,7 +153,7 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 
 	private PushButton btnSave, btnCancel;
 
-	private DocRef mDocument;
+	private DocRef doc;
 
 	/**
 	 * Constructor
@@ -166,53 +172,15 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 
 		initWidget(pnl);
 
-		// set initial styling..
-		staticMode();
-	}
-
-	public DocRef getModel() {
-		return mDocument;
-	}
-
-	/**
-	 * @return The id assigned to the iframe element or <code>null</code> if the
-	 *         document model data has not been set.
-	 */
-	public String getFrameId() {
-		return mDocument == null ? null : "docframe_" + mDocument.getId();
-	}
-
-	/**
-	 * @return the DOM iframe body ref of the contained document.
-	 */
-	public native JavaScriptObject getDocBody() /*-{
-		var frameId = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
-		var frame = $wnd.goog.dom.$(frameId);
-		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
-		return fbody;
-	}-*/;
-
-	/**
-	 * Sets the document model data.
-	 * @param mDocument
-	 */
-	public void setModel(DocRef mDocument) {
-		if(mDocument == null) throw new NullPointerException();
-		this.mDocument = mDocument;
-
-		// header
-		String html = mDocument.getTitle();
-		header.html.setHTML("<p>" + html + "</p>");
-		// header.html.setTitle("Double click to edit");
-
 		header.imgExport.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
 				// TODO impl
+				Window.alert("TODO impl");
 			}
 		});
-		
+
 		header.imgEdit.addClickHandler(new ClickHandler() {
 
 			@Override
@@ -226,21 +194,21 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 
 						@Override
 						public void onClick(ClickEvent clkEvt) {
+							if(doc == null) return;
+
 							// save the doc
 							String docHtml = dew.getHTML();
 							setDocHtml(docHtml);
 							staticMode();
-							
+
 							// persist to server
-							DocRef mDocClone = (DocRef) DocViewer.this.mDocument.clone();
-							mDocClone.setHtmlContent(docHtml);
-							Poc.getUserDataService().updateDocContent(mDocClone, new AsyncCallback<Payload>() {
-								
+							Poc.getUserDataService().updateDocContent(doc.getId(), docHtml, new AsyncCallback<Payload>() {
+
 								@Override
 								public void onSuccess(Payload result) {
 									Notifier.get().showFor(result, null);
 								}
-								
+
 								@Override
 								public void onFailure(Throwable caught) {
 									Notifier.get().showFor(caught);
@@ -269,14 +237,64 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 			}
 		});
 
-		// disallow doc editing for case type docs
-		header.imgEdit.setVisible(mDocument.getCaseRef() == null);
+		// set initial styling..
+		staticMode();
+	}
 
-		// doc content
+	public DocRef getModel() {
+		return doc;
+	}
+
+	/**
+	 * @return The id assigned to the iframe element or <code>null</code> if the
+	 *         document model data has not been set.
+	 */
+	private String getFrameId() {
+		return doc == null ? null : "docframe_" + doc.getId();
+	}
+
+	/**
+	 * @return the DOM iframe body ref of the contained document.
+	 */
+	public native JavaScriptObject getDocBody() /*-{
+		var frameId = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
+		var frame = $wnd.goog.dom.$(frameId);
+		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
+		return fbody;
+	}-*/;
+
+	/**
+	 * Sets the document model data.
+	 * <p>
+	 * NOTE: <code>null</code> model is supported.
+	 * @param doc
+	 */
+	public void setModel(DocRef doc) {
+		this.doc = doc;
+
+		// header
+		String html = doc == null ? "" : doc.getTitle();
+		header.html.setHTML("<p>" + html + "</p>");
+
+		// disallow doc editing for case type docs
+		header.imgEdit.setVisible(doc != null && doc.getCaseRef() == null);
+
 		frame.getElement().setId(getFrameId());
-		String docId = mDocument.getId();
-		Log.debug("Setting document content in iframe for doc: " + docId);
-		frame.setUrl("doc?id=" + docId);
+		
+		// set html content directly or via url?
+		String htmlContent = doc == null ? null : doc.getHtmlContent();
+		if(!StringUtil.isEmpty(htmlContent)) {
+			// html content
+			frame.setUrl("");
+			setDocHtml(htmlContent);
+			Log.debug("DocViewer iframe html content set directly");
+		}
+		else {
+			// remote url
+			String furl = doc == null ? "" : "doc?id=" + doc.getId();
+			frame.setUrl(furl);
+			Log.debug("DocViewer iframe url set to: " + furl);
+		}
 	}
 
 	public native String getDocHtml() /*-{

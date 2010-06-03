@@ -647,12 +647,6 @@ div.ro {
 	.documents .searchDp .tableView {
 	}
 	
-	.documents #docListing {
-	}
-	.documents #docListing .buttonPanel img {
-		margin-right: 8px;
-	}
-	
 	.documents .gwt-DisclosurePanel-open {
 		width: 100%;
 	}
@@ -767,6 +761,12 @@ div.ro {
 		margin-right: 15px;
 	}
 
+	.documents #docListing {
+	}
+	.documents #docListing .buttonPanel img {
+		margin-right: 12px;
+	}
+
 	.documents .tableView .head {
 		font-family: Arial, Helvetica, sans-serif !important;
 		text-transform: uppercase !important;
@@ -782,8 +782,9 @@ div.ro {
 		font-weight: bold;
 		font-size: 11px;
 	}
-	.documents .tableView .delete {
+	.documents .tableView .opcol {
 		text-align: center;
+		width: 60px;
 	}
 	.documents .tableView .actv {
 		background-color: #BFBFBF;

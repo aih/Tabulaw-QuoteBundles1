@@ -16,6 +16,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * The doc entity.
+ * <p>
+ * {@link DocContent} types hold the corresponding html content constituting the
+ * document.
  * @author jpk
  */
 public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEntity {
@@ -23,7 +26,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	private static final long serialVersionUID = -8257785916791525146L;
 
 	/**
-	 * Surrogate primary key. 
+	 * Surrogate primary key.
 	 */
 	private String id;
 
@@ -32,9 +35,9 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	private CaseRef caseRef;
 
 	/**
-	 *  The HTML content of the doc.
+	 * This property is not persisted.
 	 */
-	private String htmlContent;
+	private transient String htmlContent;
 
 	/**
 	 * Constructor
@@ -139,10 +142,17 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 		this.caseRef = caseRef;
 	}
 
+	/**
+	 * @return transient html content.
+	 */
 	public String getHtmlContent() {
 		return htmlContent;
 	}
 
+	/**
+	 * Sets the non-persisting (transient) html content property
+	 * @param htmlContent
+	 */
 	public void setHtmlContent(String htmlContent) {
 		this.htmlContent = htmlContent;
 	}

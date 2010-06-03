@@ -6,7 +6,6 @@
 package com.tabulaw.client.app.ui.view;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.mvc.view.IView;
 import com.tabulaw.client.mvc.view.IViewInitializer;
 
@@ -15,7 +14,7 @@ import com.tabulaw.client.mvc.view.IViewInitializer;
  * @param <I> view initializer type
  * @author jpk
  */
-public interface IPocView<I extends IViewInitializer> extends IView<I>, IModelChangeHandler {
+public interface IPocView<I extends IViewInitializer> extends IView<I> {
 
 	/**
 	 * @return Ordered list of non-navigational widgets to display in the nav col

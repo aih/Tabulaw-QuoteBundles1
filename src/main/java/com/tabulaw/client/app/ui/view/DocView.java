@@ -6,9 +6,12 @@
 package com.tabulaw.client.app.ui.view;
 
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.DocAndBundleWidget;
+import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.mvc.ViewManager;
@@ -22,7 +25,7 @@ import com.tabulaw.common.model.DocRef;
  * Displays a single document allowing quote/bundle editing.
  * @author jpk
  */
-public class DocView extends AbstractPocView<DocViewInitializer> {
+public class DocView extends AbstractPocView<DocViewInitializer> implements IModelChangeHandler {
 
 	public static final Class klas = new Class();
 
@@ -54,6 +57,8 @@ public class DocView extends AbstractPocView<DocViewInitializer> {
 	private final DocAndBundleWidget docWidget = new DocAndBundleWidget();
 
 	private DocKey docKey;
+
+	private HandlerRegistration hrModelChange;
 
 	/**
 	 * Constructor
@@ -90,11 +95,18 @@ public class DocView extends AbstractPocView<DocViewInitializer> {
 		docKey = initializer.getDocumentKey();
 		if(docKey == null) throw new IllegalArgumentException();
 		docWidget.makeModelChangeAware();
+
+		assert hrModelChange == null;
+		hrModelChange = Poc.getPortal().addModelChangeHandler(this);
 	}
 
 	@Override
 	protected void doDestroy() {
 		super.doDestroy();
+
+		hrModelChange.removeHandler();
+		hrModelChange = null;
+
 		docWidget.unmakeModelChangeAware();
 	}
 
@@ -110,7 +122,7 @@ public class DocView extends AbstractPocView<DocViewInitializer> {
 	}
 
 	@Override
-	protected void handleModelChange(ModelChangeEvent event) {
+	public void onModelChangeEvent(ModelChangeEvent event) {
 		if(event.getChangeOp() == ModelChangeOp.DELETED && event.getModelKey().equals(docKey)) {
 			// gotta unload bro
 			Log.debug("Unloading doc view: " + this);

@@ -48,9 +48,9 @@ public interface IDocHandler {
 	List<CaseDocSearchResult> parseSearchResults(String rawHtml);
 
 	/**
-	 * Parses a single html doc returning the cleaned up and localized version
+	 * Parses raw html for a single doc record into a newly created doc ref entity.
 	 * @param rawHtml doc html as gotten from the source
-	 * @return cleaned up native version
+	 * @return newly created and transient {@link DocRef} entity.
 	 */
 	DocRef parseSingleDocument(String rawHtml);
 }

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
 import com.tabulaw.common.model.BundleUserBinding;
+import com.tabulaw.common.model.DocContent;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.DocUserBinding;
 import com.tabulaw.common.model.Quote;
@@ -121,15 +122,28 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
-	 * Gets the doc of the given id.
+	 * Gets the doc ref given the doc id.
 	 * @param docId
-	 * @return to loaded doc
+	 * @return to loaded doc ref
 	 * @throws EntityNotFoundException
 	 */
 	@Transactional(readOnly = true)
 	public DocRef getDoc(String docId) throws EntityNotFoundException {
 		if(docId == null) throw new NullPointerException();
 		DocRef dr = dao.load(DocRef.class, docId);
+		return dr;
+	}
+
+	/**
+	 * Gets the doc <em>content</em> given the doc id.
+	 * @param docId
+	 * @return to loaded doc content
+	 * @throws EntityNotFoundException
+	 */
+	@Transactional(readOnly = true)
+	public DocContent getDocContent(String docId) throws EntityNotFoundException {
+		if(docId == null) throw new NullPointerException();
+		DocContent dr = dao.load(DocContent.class, docId);
 		return dr;
 	}
 
@@ -292,26 +306,23 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional
 	public DocRef saveDoc(DocRef doc) throws ConstraintViolationException {
 		if(doc == null) throw new NullPointerException();
-
 		validate(doc);
-
-		// remove existing (db4o-ism)
-		try {
-			DocRef existing = dao.load(DocRef.class, doc.getId());
-			dao.purge(existing);
-		}
-		catch(EntityNotFoundException e) {
-			// ok
-		}
-
-		// save the doc
 		doc = dao.persist(doc);
-
 		return doc;
 	}
 
+	@Transactional
+	public void saveDocContent(DocContent docContent) throws ConstraintViolationException {
+		if(docContent == null) throw new NullPointerException();
+		validate(docContent);
+		dao.persist(docContent);
+	}
+
 	/**
-	 * Deletes the doc given its id as well as all doc/user bindings.
+	 * Deletes the doc and doc content given its id as well as all doc/user
+	 * bindings.
+	 * <p>
+	 * Both the Doc and DocContent entities are deleted.
 	 * <p>
 	 * NOTE: Quotes (which may point to the target doc) are un-affected.
 	 * @param docId id of the doc to delete
@@ -321,6 +332,12 @@ public class UserDataService extends AbstractEntityService {
 	public void deleteDoc(String docId) throws EntityNotFoundException {
 		if(docId == null) throw new NullPointerException();
 		dao.purge(DocRef.class, docId);
+		try {
+			dao.purge(DocContent.class, docId);
+		}
+		catch(EntityNotFoundException e) {
+			// ok
+		}
 		removeAllDocUserBindingsForDoc(docId);
 	}
 

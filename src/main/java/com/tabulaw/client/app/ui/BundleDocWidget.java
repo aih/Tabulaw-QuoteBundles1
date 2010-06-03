@@ -8,7 +8,6 @@ package com.tabulaw.client.app.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.tabulaw.client.app.model.MarkOverlay;
@@ -76,7 +75,9 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 	public QuoteDocWidget addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
 		QuoteDocWidget w = super.addQuote(mQuote, persist, addToThisBundleModel);
 		assert mQuote == w.getModel();
-		String wDocId = w.getModel().getDocument().getId();
+		/*
+		DocRef doc = mQuote.getDocument();
+		String wDocId = doc == null ? null : doc.getId();
 		
 		if(docId != null && docId.equals(wDocId)) {
 			// highlight
@@ -98,6 +99,7 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 				}
 			}
 		}
+		*/
 
 		return w;
 	}

@@ -101,6 +101,9 @@ public class EntityFactory {
 			case DOCUMENT:
 				e = new DocRef();
 				break;
+			case DOC_CONTENT:
+				e = new DocContent();
+				break;
 			case NOTE:
 				break;
 			case QUOTE:
@@ -142,7 +145,7 @@ public class EntityFactory {
 	}
 
 	/**
-	 * Create a new contract type doc.
+	 * Create a new non-case type doc.
 	 * @param docTitle
 	 * @param docDate
 	 * @return newly created model
@@ -151,6 +154,19 @@ public class EntityFactory {
 		DocRef doc = (DocRef) create(EntityType.DOCUMENT);
 		doc.setTitle(docTitle);
 		doc.setDate(docDate);
+		return doc;
+	}
+	
+	/**
+	 * Create a new doc content entity.
+	 * @param docId required - the doc ref id
+	 * @param htmlContent doc html content
+	 * @return newly created model
+	 */
+	public DocContent buildDocContent(String docId, String htmlContent) {
+		DocContent doc = (DocContent) create(EntityType.DOC_CONTENT);
+		doc.setId(docId);
+		doc.setHtmlContent(htmlContent);
 		return doc;
 	}
 

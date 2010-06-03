@@ -26,6 +26,7 @@ public enum EntityType implements IMarshalable, ITypeDescriptorProvider {
 
 	CASE("Case"),
 	DOCUMENT("Document"),
+	DOC_CONTENT("Doc Content"),
 
 	QUOTE("Quote"),
 	QUOTE_BUNDLE("Quote Bundle"),

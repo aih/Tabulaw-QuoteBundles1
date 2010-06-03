@@ -58,7 +58,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		static final Column[] cols = new Column[] {
 			new Column("Title", null, "title", null, "title"),
 			new Column("Date", GlobalFormat.DATE, "date", null, "date"), 
-			new Column("", null, null, null, "delete"),
+			new Column("", null, null, null, "opcol"),
 		};
 
 		public ListingConfig() {

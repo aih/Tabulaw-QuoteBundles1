@@ -27,21 +27,24 @@ public class TextSelectApi {
 	/**
 	 * Call this to turn "on" the capturing of user selected text in a document
 	 * under view.
-	 * @param frameId the dom id of the target iframe.
+	 * @param docId id of the doc
 	 */
-	public native void init(String frameId) /*-{
+	public native void init(String docId) /*-{
+		var frameId = 'docframe_' + docId;
 		var frame = $wnd.goog.dom.$(frameId);
 		//alert('init - frame: '+frame);
 		var twindow = frame.contentWindow;
 		//alert('init - twindow: '+twindow);
-		
+
 		var tsapi = this;
-		
-		$wnd.onFrameLoaded = function(iframedoc) {
-			//alert('onFrameLoaded! iframedoc:' + iframedoc);
+
+		$wnd['onDocFrameLoaded_'+docId] = function(iframedoc) {
+			//alert('onDocFrameLoaded! iframedoc:' + iframedoc);
 			//alert('iframedoc.body:' + iframedoc.body);
 
-			//////
+			// fire frame loaded callback fn
+			tsapi.@com.tabulaw.client.ui.TextSelectApi::fireDocFrameLoaded(Ljava/lang/String;)(frameId);
+
 			var mouseUpHandler = function(e){
 				//alert('onMouseUp [frameId: ' + frameId + ']');
 
@@ -80,17 +83,20 @@ public class TextSelectApi {
 	/**
 	 * Call this to turn "off" the capturing of user text selections in a document
 	 * under view.
-	 * @param frameId the dom id of the target iframe.
+	 * @param docId the doc id
 	 */
-	public native void shutdown(String frameId) /*-{
+	public native void shutdown(String docId) /*-{
 		//alert('shutdown - frameId: ' + frameId);
 		try {
+			var frameId = 'docframe_' + docId;
 			var frame = $wnd.goog.dom.$(frameId);
 			if(frame == null) return;
 			//alert('shutdown - frame: ' + frame);
 			var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 			//alert('shutdown - fbody: ' + fbody);
 			if(fbody) $wnd.goog.events.unlisten(fbody, 'mouseup');
+
+			$wnd['onDocFrameLoaded_'+docId] = null; 			
 		} catch(e) {
 			alert('text select api shutdown error: ' + e);
 		}
@@ -107,5 +113,14 @@ public class TextSelectApi {
 	 */
 	public void fireTextSelectEvent(MarkOverlay range) {
 		textSelectHandler.onTextSelect(new TextSelectEvent(range));
+	}
+
+	/**
+	 * Bridge function (JavaScript -> GWT) signaling the doc was just loaded into
+	 * the containing iframe tag.
+	 * @param frameId id of the iframe into which the doc was just loaded
+	 */
+	public void fireDocFrameLoaded(String frameId) {
+		textSelectHandler.onDocFrameLoaded(frameId);
 	}
 }

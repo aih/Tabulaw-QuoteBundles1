@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.DocContent;
 
 /**
  * DocViewServlet
@@ -29,7 +29,7 @@ public class DocViewServlet extends HttpServlet {
 		if(docId == null) throw new ServletException("No doc id specified.");
 
 		PersistContext pc = (PersistContext) req.getSession(false).getServletContext().getAttribute(PersistContext.KEY);
-		DocRef doc = pc.getUserDataService().getDoc(docId);
+		DocContent doc = pc.getUserDataService().getDocContent(docId);
 		String htmlContent = doc.getHtmlContent();
 
 		resp.setContentType("text/html");

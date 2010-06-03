@@ -21,7 +21,9 @@ import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.IRemoteDocService;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocContent;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
@@ -153,15 +155,24 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 			doc = handler.parseSingleDocument(fcontents);
 			CaseRef caseRef = doc.getCaseRef();
 			caseRef.setUrl(remoteDocUrl);
-
-			// persist the doc and create a doc/user binding
+			
+			// persist the doc ref and doc/user binding
 			doc = uds.saveDoc(doc);
 			uds.addDocUserBinding(user.getId(), doc.getId());
+			
+			// localize doc content
+			String htmlContent = doc.getHtmlContent();
+			doc.setHtmlContent(null);
+			StringBuilder sb = new StringBuilder(htmlContent.length() + 1024);
+			sb.append(htmlContent);
+			DocUtils.localizeDoc(sb, doc.getId(), doc.getTitle());
+			htmlContent = sb.toString();
+
+			// persist doc content
+			DocContent docContent = EntityFactory.get().buildDocContent(doc.getId(), htmlContent);
+			uds.saveDocContent(docContent);
 		}
-		
-		// don't send html content to client
-		doc.setHtmlContent(null);
-		
+
 		payload.setDocRef(doc);
 
 		return payload;

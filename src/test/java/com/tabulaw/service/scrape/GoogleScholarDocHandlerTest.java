@@ -15,7 +15,6 @@ import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.tabulaw.common.data.dto.CaseDoc;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
@@ -49,20 +48,20 @@ public class GoogleScholarDocHandlerTest {
 			throw new IllegalStateException(e);
 		}
 		
-		IDocHandler docHandler = new GoogleScholarDocHandler();
+		GoogleScholarDocHandler docHandler = new GoogleScholarDocHandler();
 		
 		List<CaseDocSearchResult> results = docHandler.parseSearchResults(raw);
 		Assert.assertEquals(results.size(), 3);
 		
 		for(int i = 0; i < results.size(); i++) {
-			CaseDoc dsr = results.get(i);
+			CaseDocSearchResult dsr = results.get(i);
 			System.out.println(dsr);
 		}
 	}
 
 	@Test(enabled = false)
 	public void testParseLiveSearchResultsResponse() throws Exception {
-		IDocHandler docHandler = new GoogleScholarDocHandler();
+		GoogleScholarDocHandler docHandler = new GoogleScholarDocHandler();
 		
 		// build search url
 		String searchTerm = "rowe";
@@ -78,7 +77,7 @@ public class GoogleScholarDocHandlerTest {
 		Assert.assertTrue(results.size() == numResults);
 		
 		for(int i = 0; i < results.size(); i++) {
-			CaseDoc dsr = results.get(i);
+			CaseDocSearchResult dsr = results.get(i);
 			System.out.println(dsr);
 		}
 	}
@@ -123,7 +122,7 @@ public class GoogleScholarDocHandlerTest {
 
 	@Test(enabled = true)
 	public void testParseLiveDocResponse() throws Exception {
-		IDocHandler docHandler = new GoogleScholarDocHandler();
+		GoogleScholarDocHandler docHandler = new GoogleScholarDocHandler();
 		
 		// build search url
 		String surl = "http://scholar.google.com/scholar_case?case=16513581896339453698&amp;q=allintitle:+su&amp;hl=en&amp;num=4&amp;as_sdt=2002&amp;as_vis=1";

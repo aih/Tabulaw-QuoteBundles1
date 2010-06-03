@@ -21,10 +21,10 @@ import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
-import com.tabulaw.service.DocUtils;
 import com.tabulaw.util.StringUtil;
 
 /**
+ * Handler for <code>scholar.google.com</code> searches.
  * @author jpk
  */
 public class GoogleScholarDocHandler extends AbstractDocHandler {
@@ -236,7 +236,6 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 	@Override
 	public DocRef parseSingleDocument(String rawHtml) {
 		String reftoken = "", dlcy = "", parties = "", docLoc = "", court = "", syear = "", docTitle = "", htmlContent = "";
-		Date date = new Date();
 
 		try {
 			HtmlCleaner cleaner = new HtmlCleaner();
@@ -326,16 +325,14 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 
 			// absolutize local hrefs
 			htmlContent = htmlContent.replace("/scholar_case", "http://scholar.google.com/scholar_case");
-
-			StringBuilder sb = new StringBuilder(htmlContent.length() + 1024);
-			sb.append(htmlContent);
-			DocUtils.localizeDoc(sb, docTitle);
-			htmlContent = sb.toString();
 		}
 		catch(IOException e) {
 			throw new IllegalArgumentException(e);
 		}
 
+		// we use current date (for now)
+		Date date = new Date();
+		
 		DocRef doc = EntityFactory.get().buildCaseDoc(docTitle, date, parties, reftoken, docLoc, court, null, syear);
 		doc.setHtmlContent(htmlContent);
 

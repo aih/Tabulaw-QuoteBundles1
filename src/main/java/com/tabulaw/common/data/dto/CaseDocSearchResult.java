@@ -7,15 +7,17 @@ package com.tabulaw.common.data.dto;
 
 import java.util.Date;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import com.tabulaw.common.model.IModelKeyProvider;
 import com.tabulaw.common.model.ModelKey;
 
 /**
  * @author jpk
  */
-public class CaseDocSearchResult extends CaseDoc implements IModelKeyProvider {
+public class CaseDocSearchResult implements IsSerializable, IModelKeyProvider {
 
-	private String titleHtml, summary;
+	private String title, url, citation, titleHtml, summary;
+	private Date date;
 
 	public CaseDocSearchResult() {
 		super();
@@ -31,21 +33,64 @@ public class CaseDocSearchResult extends CaseDoc implements IModelKeyProvider {
 	 * @param summary
 	 */
 	public CaseDocSearchResult(String title, Date date, String url, String citation, String titleHtml, String summary) {
-		super(title, date, url, citation);
+		this.title = title;
+		this.date = date;
+		this.url = url;
+		this.citation = citation;
 		this.titleHtml = titleHtml;
 		this.summary = summary;
 	}
 
-	@Override
-	public ModelKey getModelKey() {
-		return new ModelKey("CaseDocSearchResult", getUrl(), getTitle());
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getCitation() {
+		return citation;
+	}
+
+	public void setCitation(String citation) {
+		this.citation = citation;
 	}
 
 	public String getTitleHtml() {
 		return titleHtml;
 	}
 
+	public void setTitleHtml(String titleHtml) {
+		this.titleHtml = titleHtml;
+	}
+
 	public String getSummary() {
 		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	@Override
+	public ModelKey getModelKey() {
+		return new ModelKey("CaseDocSearchResult", getUrl(), getTitle());
 	}
 }

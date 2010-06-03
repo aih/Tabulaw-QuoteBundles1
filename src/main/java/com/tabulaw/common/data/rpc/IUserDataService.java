@@ -154,17 +154,19 @@ public interface IUserDataService extends RemoteService {
 	/**
 	 * Creates a new doc on the server given a new doc entity with all required
 	 * properties set save for the doc hash which is filled in.
-	 * @param docRef the new doc entity
+	 * @param docRef new doc ref
+	 * @param htmlContent optional html doc content
 	 * @return the created doc wrapped in a doc payload
 	 */
-	DocPayload createDoc(DocRef docRef);
+	DocPayload createDoc(DocRef docRef, String htmlContent);
 
 	/**
-	 * Updates the contents of an existing (localized) document.
-	 * @param docRef the doc containing the contents to update
+	 * Updates the contents of an existing document.
+	 * @param docId doc id 
+	 * @param htmlContent the replacing html content for the doc
 	 * @return the resultant status wrapped in a payload
 	 */
-	Payload updateDocContent(DocRef docRef);
+	Payload updateDocContent(String docId, String htmlContent);
 
 	/**
 	 * Converts the doc identified by the given id to MS Word format emailing it

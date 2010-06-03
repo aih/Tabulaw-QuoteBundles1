@@ -5,9 +5,7 @@
  */
 package com.tabulaw.client.app.ui.view;
 
-import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.mvc.view.AbstractView;
 import com.tabulaw.client.mvc.view.IViewInitializer;
 
@@ -39,15 +37,5 @@ public abstract class AbstractPocView<I extends IViewInitializer> extends Abstra
 	public Widget[] getNavColWidgets() {
 		// base impl none
 		return null;
-	}
-
-	protected void handleModelChange(ModelChangeEvent event) {
-		// base impl no-op
-	}
-	
-	@Override
-	public final void onModelChangeEvent(ModelChangeEvent event) {
-		Log.debug("View ( " + this + " ) is handling model change event: " + event.toString() + "..");
-		handleModelChange(event);
 	}
 }

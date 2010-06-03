@@ -29,7 +29,9 @@ import com.tabulaw.common.data.rpc.IdsPayload;
 import com.tabulaw.common.data.rpc.UserContextPayload;
 import com.tabulaw.common.data.rpc.UserListPayload;
 import com.tabulaw.common.data.rpc.UserRegistrationRequest;
+import com.tabulaw.common.model.DocContent;
 import com.tabulaw.common.model.DocRef;
+import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IUserRef;
 import com.tabulaw.common.model.Quote;
@@ -717,7 +719,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 		UserContext uc = getUserContext();
 		User user = uc.getUser();
-		
+
 		if(!user.inRole(Role.ADMINISTRATOR)) {
 			status.addMsg("Permission denied.", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag);
 		}
@@ -741,7 +743,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 		PersistContext pc = getPersistContext();
 		UserDataService uds = pc.getUserDataService();
-		
+
 		try {
 			List<DocRef> docList = uds.getDocsForUser(userId);
 			payload.setDocList(docList);
@@ -764,7 +766,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		Payload payload = new Payload(status);
 
 		final PersistContext pc = getPersistContext();
-		
+
 		try {
 			if(docId == null) throw new IllegalArgumentException("Null doc id");
 
@@ -791,18 +793,21 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	}
 
 	@Override
-	public Payload updateDocContent(DocRef docRef) {
+	public Payload updateDocContent(String docId, String htmlContent) {
 		Status status = new Status();
 		Payload payload = new Payload(status);
 
 		final PersistContext pc = getPersistContext();
+		final UserDataService svc = pc.getUserDataService();
 
 		try {
-			if(docRef == null) throw new IllegalArgumentException("Null document");
-			
-			//DocUtils.setDocContent(docRef.getHash(), docRef.getHtmlContent());
-			pc.getUserDataService().saveDoc(docRef);
-			
+			if(docId == null) throw new IllegalArgumentException("No doc id");
+			if(htmlContent == null) throw new IllegalArgumentException("No doc content");
+
+			DocContent dc = svc.getDocContent(docId);
+			dc.setHtmlContent(htmlContent);
+			svc.saveDocContent(dc);
+
 			status.addMsg("Document content updated.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final RuntimeException e) {
@@ -818,7 +823,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	}
 
 	@Override
-	public DocPayload createDoc(DocRef docRef) {
+	public DocPayload createDoc(DocRef docRef, String docContent) {
 		Status status = new Status();
 		DocPayload payload = new DocPayload(status);
 
@@ -829,23 +834,24 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			if(docRef == null || !docRef.isNew()) throw new IllegalArgumentException("Null or non-new document");
 
 			User user = uc.getUser();
-			//int userHash = user.hashCode();
-			//int cti = Long.valueOf(System.currentTimeMillis()).hashCode();
-			//int hash = Math.abs(userHash ^ cti);
-			
+			// int userHash = user.hashCode();
+			// int cti = Long.valueOf(System.currentTimeMillis()).hashCode();
+			// int hash = Math.abs(userHash ^ cti);
+
 			// stub initial html content if none specified
-			if(docRef.getHtmlContent() == null) {
-				String docHtml = "<p><b>Title: </b>" + docRef.getTitle() + "</p>";
-				docHtml += "<p><b>Creation Date: </b>" + docRef.getDate() + "</p>";
-				docHtml += "<p><b>Author: </b>" + user.getName() + "</p>";
-				docRef.setHtmlContent(docHtml);
+			if(docContent == null) {
+				docContent = "<p><b>Title: </b>" + docRef.getTitle() + "</p>";
+				docContent += "<p><b>Creation Date: </b>" + docRef.getDate() + "</p>";
+				docContent += "<p><b>Author: </b>" + user.getName() + "</p>";
 			}
 
 			UserDataService uds = pc.getUserDataService();
-			
+
 			// save the doc
 			DocRef persistedDoc = uds.saveDoc(docRef);
-			
+			DocContent dc = EntityFactory.get().buildDocContent(persistedDoc.getId(), docContent);
+			uds.saveDocContent(dc);
+
 			// save the doc/user binding
 			uds.addDocUserBinding(uc.getUser().getId(), persistedDoc.getId());
 
@@ -873,20 +879,21 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		Payload payload = new Payload(status);
 
 		final PersistContext pc = getPersistContext();
-		
-		FileConverterDelegate fcd = (FileConverterDelegate) getServletContext().getAttribute(FileConverterBootstrapper.FILE_CONVERTER_KEY);
+
+		FileConverterDelegate fcd =
+				(FileConverterDelegate) getServletContext().getAttribute(FileConverterBootstrapper.FILE_CONVERTER_KEY);
 
 		try {
 			// load the doc
-			DocRef doc = pc.getUserDataService().getDoc(docId);
-			
+			DocContent doc = pc.getUserDataService().getDocContent(docId);
+
 			// load the user
 			User user = pc.getUserService().loadUser(userId);
-			
+
 			// convert the doc to MS Word
 			File f = DocUtils.docContentsToFile(doc);
 			File fconverted = fcd.convert(f, "text/html");
-			
+
 			// email the doc
 			final MailManager mailManager = pc.getMailManager();
 			final MailRouting mr = mailManager.buildAppSenderMailRouting(user.getEmailAddress());
@@ -895,7 +902,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			mailContext.addAttachment(fconverted.getName(), fds);
 			mailManager.sendEmail(mailContext);
 			status.addMsg("Document emailed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
-			
+
 			// clean up
 			// TODO ensure this doesn't delete the file before emailing it!
 			f.delete();

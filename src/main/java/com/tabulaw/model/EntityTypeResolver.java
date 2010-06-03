@@ -7,6 +7,7 @@ package com.tabulaw.model;
 
 import com.tabulaw.common.model.BundleUserBinding;
 import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocContent;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.DocUserBinding;
 import com.tabulaw.common.model.EntityType;
@@ -36,6 +37,8 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 				return CaseRef.class;
 			case DOCUMENT:
 				return DocRef.class;
+			case DOC_CONTENT:
+				return DocContent.class;
 			case QUOTE:
 				return Quote.class;
 			case QUOTE_BUNDLE:
@@ -70,6 +73,9 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 		}
 		else if(clz == DocRef.class) {
 			return EntityType.DOCUMENT.name();
+		}
+		else if(clz == DocContent.class) {
+			return EntityType.DOC_CONTENT.name();
 		}
 		/*
 		else if(clz == Note.class) {

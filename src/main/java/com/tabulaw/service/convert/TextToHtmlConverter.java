@@ -9,8 +9,6 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 
-import com.tabulaw.service.DocUtils;
-
 /**
  * Converts text files to html files.
  * @author jpk
@@ -34,7 +32,7 @@ public class TextToHtmlConverter extends AbstractFileConverter {
 		if(fcontent == null) fcontent = "";
 		
 		StringBuilder sb = new StringBuilder(fcontent);
-		DocUtils.localizeDoc(sb, fname);
+		//DocUtils.localizeDoc(sb, fname);
 		
 		File fout = createSiblingFile(input, "html");
 		FileUtils.writeStringToFile(fout, sb.toString(), "UTF-8");

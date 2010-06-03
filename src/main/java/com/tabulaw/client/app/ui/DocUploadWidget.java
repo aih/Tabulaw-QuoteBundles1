@@ -32,9 +32,7 @@ import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.util.Fmt;
 import com.tabulaw.client.util.GlobalFormat;
-import com.tabulaw.common.data.dto.Doc;
 import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.msg.Msg;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.util.StringUtil;
@@ -163,7 +161,7 @@ public class DocUploadWidget extends Composite implements HasValueChangeHandlers
 					final ArrayList<Msg> msgs = new ArrayList<Msg>(sdocs.length);
 					for(String sdoc : sdocs) {
 						String[] nvs = sdoc.split("\\|");
-						Doc doc = new Doc();
+						DocRef doc = new DocRef();
 						for(String nv : nvs) {
 							String[] arr = nv.split("::");
 							String name = arr[0].trim(), value = arr[1].trim();
@@ -178,9 +176,7 @@ public class DocUploadWidget extends Composite implements HasValueChangeHandlers
 								doc.setDate(date);
 							}
 						}
-						DocRef mDoc = EntityFactory.get().buildDoc(doc.getTitle(), doc.getDate());
-						mDoc.setId(doc.getId());
-						mdocs.add(mDoc);
+						mdocs.add(doc);
 						msgs.add(new Msg("Document: '" + doc.getTitle() + "' uploaded.", MsgLevel.INFO));
 					}
 					// persist and propagate

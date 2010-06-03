@@ -24,6 +24,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.tabulaw.common.model.DocContent;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.User;
@@ -97,23 +98,26 @@ public class DocUploadServlet extends HttpServlet {
 						// convert to html
 						File fconverted = fconverter.convert(fupload, item.getContentType());
 
-						// serialize the just created html doc file
+						// create doc ref
 						String docTitle = fconverted.getName(); // for now
 						Date docDate = new Date();
 						DocRef mDoc = EntityFactory.get().buildDoc(docTitle, docDate);
 
-						// localize converted doc html
-						String htmlContent = FileUtils.readFileToString(fconverted, "UTF-8");
-						StringBuilder docsb = new StringBuilder(htmlContent);
-						DocUtils.localizeDoc(docsb, docTitle);
-						htmlContent = docsb.toString();
-
-						// set the doc html content
-						mDoc.setHtmlContent(htmlContent);
+						// save doc ref
+						mDoc = uds.saveDoc(mDoc);
 
 						// save the doc in the db and create a doc/user binding
-						mDoc = uds.saveDoc(mDoc);
 						uds.addDocUserBinding(user.getId(), mDoc.getId());
+
+						// localize converted doc html content
+						String htmlContent = FileUtils.readFileToString(fconverted, "UTF-8");
+						StringBuilder docsb = new StringBuilder(htmlContent);
+						DocUtils.localizeDoc(docsb, mDoc.getId(), docTitle);
+						htmlContent = docsb.toString();
+
+						// save doc content
+						DocContent docContent = EntityFactory.get().buildDocContent(mDoc.getId(), htmlContent);
+						uds.saveDocContent(docContent);
 
 						// clean up
 						if(!fconverted.delete()) throw new Exception("Unable to delete converted html file");

@@ -17,7 +17,7 @@ import com.tabulaw.util.StringUtil;
 /**
  * @author jpk
  */
-// NO - we don't enforce this as we want to supported "cloned" quotes that
+// NO - we don't enforce this as we want to support "cloned" quotes that
 // reference the same quote for a given doc but are distinct existing in different bundles.
 /*
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Doc Hash and Mark", properties = {
@@ -74,8 +74,8 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 		q.id = id;
 		q.quote = quote;
 		q.serializedMark = serializedMark;
-		// NOTE: keep the doc ref
-		q.document = document;
+		q.mark = null;	// don't transfer over the js mark
+		q.document = document;	// NOTE: keep the doc ref
 	}
 
 	@Override
@@ -127,38 +127,20 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 
 	@Override
 	public int compareTo(Quote o) {
+		int c = 0;
+		
+		// by doc
 		if(document != null && o.document != null) {
-			return document.compareTo(o.document);
+			c = document.compareTo(o.document);
 		}
-		// TODO figure out what to fallback on here
-		return 0;
-	}
-
-	/*
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((document == null) ? 0 : document.hashCode());
-		result = prime * result + ((serializedMark == null) ? 0 : serializedMark.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if(this == obj) return true;
-		if(!super.equals(obj)) return false;
-		if(getClass() != obj.getClass()) return false;
-		Quote other = (Quote) obj;
-		if(document == null) {
-			if(other.document != null) return false;
+		
+		// by quote text
+		if(c == 0) {
+			if(quote != null) {
+				c = quote.compareTo(o.quote);
+			}
 		}
-		else if(!document.equals(other.document)) return false;
-		if(serializedMark == null) {
-			if(other.serializedMark != null) return false;
-		}
-		else if(!serializedMark.equals(other.serializedMark)) return false;
-		return true;
+		
+		return c;
 	}
-	*/
 }

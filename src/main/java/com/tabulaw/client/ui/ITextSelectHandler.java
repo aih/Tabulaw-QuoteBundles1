@@ -8,10 +8,15 @@ package com.tabulaw.client.ui;
 import com.google.gwt.event.shared.EventHandler;
 
 /**
- * ITextSelectHandler
  * @author jpk
  */
 public interface ITextSelectHandler extends EventHandler {
+
+	/**
+	 * Called when the doc loads in the containing iframe.
+	 * @param frameId id of the iframe tag containing the just loaded doc
+	 */
+	void onDocFrameLoaded(String frameId);
 
 	/**
 	 * @param event

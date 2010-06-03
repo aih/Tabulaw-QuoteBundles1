@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.tabulaw.common.model.CaseRef;
+import com.tabulaw.common.model.DocContent;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 
@@ -46,8 +47,7 @@ public class DocUtils {
 		htmlSuffixBlock = "</body></html>";
 
 		jsScriptCallbackBlock =
-				"<script type=\"text/javascript\">" + "window.onload = function(){window.parent.onFrameLoaded(document);}"
-						+ "</script>";
+				"<script type=\"text/javascript\">window.onload=function(){window.parent.${onDocFrameLoaded}(document);}</script>";
 
 		cssHighightStylesBlock = "<style type=\"text/css\">.highlight{background-color:yellow;}</style>";
 
@@ -81,7 +81,7 @@ public class DocUtils {
 	 * @return The newly created file
 	 * @throws IOException
 	 */
-	public static File docContentsToFile(DocRef doc) throws IOException {
+	public static File docContentsToFile(DocContent doc) throws IOException {
 		String fname = Integer.toString(Math.abs(doc.hashCode()));
 		File f = DocUtils.getDocFileRef(fname);
 		String htmlContent = doc.getHtmlContent();
@@ -213,11 +213,14 @@ public class DocUtils {
 	 * <p>
 	 * Also, wraps the given html string with html, head, body tags if not present
 	 * @param doc html content string
+	 * @param docId required
 	 * @param docTitle
 	 * @throws IllegalArgumentException When the localization fails due to
 	 *         mal-formed html tags in the given html string
 	 */
-	public static void localizeDoc(StringBuilder doc, String docTitle) throws IllegalArgumentException {
+	public static void localizeDoc(StringBuilder doc, String docId, String docTitle) throws IllegalArgumentException {
+		if(doc == null || docId == null) throw new NullPointerException();
+
 		if(doc.indexOf("<html") == -1 && doc.indexOf("<HTML") == -1) {
 			String rpl = docTitle == null ? "" : docTitle;
 			doc.insert(0, htmlPrefixBlock.replace("${title}", rpl));
@@ -231,7 +234,12 @@ public class DocUtils {
 			doc.insert(index, cssHighightStylesBlock);
 			index = doc.indexOf("</head>");
 			if(index == -1) index = doc.indexOf("</HEAD>");
-			doc.insert(index, jsScriptCallbackBlock);
+
+			String docFrameLoadedFnName = "onDocFrameLoaded_" + docId;
+			String jsBlock = jsScriptCallbackBlock;
+			jsBlock = jsBlock.replace("${onDocFrameLoaded}", docFrameLoadedFnName);
+
+			doc.insert(index, jsBlock);
 		}
 	}
 

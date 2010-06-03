@@ -267,6 +267,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 	@Override
 	public void setModel(Quote quote) {
+		if(quote == null || quote.getDocument() == null) throw new IllegalArgumentException();
 		this.quote = quote;
 
 		String title, subTitle = "", quoteText = quote.getQuote();

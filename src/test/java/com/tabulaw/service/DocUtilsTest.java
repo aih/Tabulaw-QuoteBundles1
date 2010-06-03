@@ -79,7 +79,7 @@ public class DocUtilsTest {
 		String html = "<p>This is test html.</p>";
 
 		StringBuilder sb = new StringBuilder(html);
-		DocUtils.localizeDoc(sb, "test title");
+		DocUtils.localizeDoc(sb, "1", "test title");
 		String localized = sb.toString();
 
 		int htmlIndex = localized.indexOf("<html>");
@@ -105,7 +105,7 @@ public class DocUtilsTest {
 		Assert.assertTrue(endBodyIndex > bodyIndex);
 
 		int localCssIndex = localized.indexOf(DocUtils.cssHighightStylesBlock);
-		int localJsIndex = localized.indexOf(DocUtils.jsScriptCallbackBlock);
+		int localJsIndex = localized.indexOf("onDocFrameLoaded_1");
 
 		Assert.assertTrue(localCssIndex >= 0);
 		Assert.assertTrue(localJsIndex >= 0);

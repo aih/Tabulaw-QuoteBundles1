@@ -5,6 +5,8 @@
  */
 package com.tabulaw.client.app.ui;
 
+import java.util.List;
+
 import com.allen_sauer.gwt.dnd.client.DragEndEvent;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
@@ -59,9 +61,14 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 			super.onPreviewDragEnd(event);
 
 			// insert the quote text at the cursor location of the doc being edited
-			QuoteDocWidget qw = (QuoteDocWidget) event.getContext().draggable;
-			String quoteText = qw.getModel().getQuote();
-			wDocViewer.getDocEditWidget().getFormatter().insertHTML(quoteText);
+			try {
+				QuoteDocWidget qw = (QuoteDocWidget) event.getContext().draggable;
+				String quoteText = qw.getModel().getQuote();
+				wDocViewer.getDocEditWidget().getFormatter().insertHTML(quoteText);
+			}
+			catch(Throwable t) {
+				// for robustification purposes in web mode
+			}
 
 			throw new VetoDragException();
 		}
@@ -112,8 +119,6 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		boundaryPanel.add(hsp);
 
 		initWidget(boundaryPanel);
-
-		//tsapi = new TextSelectApi(this);
 	}
 
 	public Widget[] getNavColWidgets() {
@@ -121,9 +126,44 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	}
 
 	@Override
+	public void onDocFrameLoaded(String frameId) {
+		DocRef doc = wDocViewer.getModel();
+		assert doc != null;
+		// now is when we can safely highlight
+		QuoteBundle qb = wDocQuoteBundle.getModel();
+		List<Quote> quotes = qb.getQuotes();
+		for(Quote q : quotes) {
+			DocRef qdoc = q.getDocument();
+			MarkOverlay mark = (MarkOverlay) q.getMark();
+			if(doc.equals(qdoc)) {
+				// highlight
+				if(mark == null) {
+					String stoken = q.getSerializedMark();
+					if(stoken != null) {
+						mark = MarkOverlay.deserialize(wDocViewer.getDocBody(), stoken);
+						q.setMark(mark); // cache
+					}
+				}
+				if(mark != null) {
+					try {
+						mark.highlight();
+					}
+					catch(Throwable t) {
+						Log.error("Unable to re-highlight quote: " + t.getMessage());
+					}
+				}
+			}
+			else {
+				if(mark != null) mark.unhighlight();
+			}
+		}
+
+	}
+
+	@Override
 	public void onTextSelect(TextSelectEvent event) {
 		final MarkOverlay mark = event.getMark();
-		
+
 		// only add quote if a valid hightlight is possible
 		try {
 			mark.highlight();
@@ -132,7 +172,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 			Log.error("Unable to highlight quote: " + t.getMessage());
 			return;
 		}
-		
+
 		// create the quote
 		String serializedMark = mark.serialize();
 		Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
@@ -154,6 +194,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 			// auto-create a new quote bundle
 			DocRef mDoc = wDocViewer.getModel();
+			if(mDoc == null) return false;
 			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
 			String qbName = mDoc.getTitle();
 			String qbDesc = "Quote Bundle for " + qbName;
@@ -223,19 +264,19 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	}
 
 	public void setDocument(DocRef mDoc) {
-		String frameId = wDocViewer.getFrameId();
-		if(frameId != null && tsapi != null) {
-			tsapi.shutdown(frameId);
+		String docId = wDocViewer.getModel() == null ? null : wDocViewer.getModel().getId();
+		if(docId != null && tsapi != null) {
+			tsapi.shutdown(docId);
 		}
 
 		// update doc viewer with doc
 		wDocViewer.setModel(mDoc);
 
-		// we allow all doc type to be highlightable
-		//if(mDoc.isCaseDoc()) {
+		// we allow all doc types to be highlightable
+		if(mDoc != null) {
 			if(tsapi == null) tsapi = new TextSelectApi(this);
-			tsapi.init(wDocViewer.getFrameId());
-		//}
+			tsapi.init(mDoc.getId());
+		}
 
 		// grab the current quote bundle
 		maybeSetCurrentQuoteBundle();
@@ -264,6 +305,12 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		assert hrViewMode != null;
 		hrViewMode.removeHandler();
 		hrViewMode = null;
+
+		if(tsapi != null) {
+			String docId = wDocViewer.getModel() == null ? null : wDocViewer.getModel().getId();
+			if(docId != null) tsapi.shutdown(docId);
+			tsapi = null;
+		}
 
 		super.onUnload();
 	}
