@@ -63,15 +63,6 @@ import com.tabulaw.common.msg.Msg;
  */
 public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelectionHandlers<String> {
 
-	public static class Styles {
-
-		public static final String DOC_SUGGEST = "docSuggest";
-		public static final String ENTRY = "entry";
-		public static final String TITLE = "title";
-		public static final String SUMMARY = "summary";
-		public static final String POWERED_BY = "poweredBy";
-	}
-
 	static class DocSuggestion implements Suggestion {
 
 		final CaseDocSearchResult doc;
@@ -206,10 +197,10 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 		super();
 		docSuggestBox = new DocSearchSuggestBox();
 
-		pnl.setStyleName(Styles.DOC_SUGGEST);
+		pnl.setStyleName("docSuggest");
 		pnl.add(docSuggestBox);
 
-		fpPoweredBy.setStyleName(Styles.POWERED_BY);
+		fpPoweredBy.setStyleName("poweredBy");
 		Image imgGglScholarLogo = new Image(Resources.INSTANCE.googleScholarLogo());
 		fpPoweredBy.add(imgGglScholarLogo);
 		fpPoweredBy.add(new Label("Search powered by "));

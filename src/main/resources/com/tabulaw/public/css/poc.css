@@ -638,11 +638,12 @@ div.ro {
 	.documents .viewToolbar {
 		display: none;
 	}
+
 	.documents .searchDp {
-		margin: 10px 0;
+		/*margin: 10px 0;*/
 	}
 	.documents .searchDp .header {
-		font-size: 21px;
+		font-size: 17px;
 	}
 	.documents .searchDp .tableView {
 	}
@@ -682,6 +683,9 @@ div.ro {
 	}
 		.docSearch {
 			overflow: hidden;
+		}
+		.docSearchTitle {
+			font-size: 21px;
 		}
 
 		.searchPlaceholder {
