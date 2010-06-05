@@ -25,6 +25,10 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
+import com.tabulaw.client.app.model.MarkOverlay;
+import com.tabulaw.client.ui.DocEvent;
+import com.tabulaw.client.ui.IDocHandler;
+import com.tabulaw.client.ui.IHasDocHandlers;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.model.DocRef;
@@ -34,8 +38,12 @@ import com.tabulaw.util.StringUtil;
  * Displays a single document either statically (default) or in a rich text area
  * (edit mode).
  * <p>
- * Fires a {@link ValueChangeEvent} of value: "loaded" when the document view is
- * set to edit mode.
+ * Doc events are fired to signal when content is loaded/unloaded in the
+ * containing iframe element.
+ * <p>
+ * Text select events are fired upon user text selections when in static mode.
+ * <p>
+ * Fires {@link DocEvent}s.
  * <p>
  * Fires a {@link ValueChangeEvent} of value: "edit" when the document view is
  * set to edit mode.
@@ -44,45 +52,7 @@ import com.tabulaw.util.StringUtil;
  * set to read-only mode.
  * @author jpk
  */
-public class DocViewer extends Composite implements HasValueChangeHandlers<DocViewer.ViewMode> {
-
-	public static class Styles {
-
-		/**
-		 * Style for the parent vertical panel
-		 */
-		public static final String DOC_VIEW = "docView";
-
-		/**
-		 * Row just above the document content
-		 */
-		public static final String DOC_HEADER = "docHeader";
-
-		/**
-		 * Displays the document title
-		 */
-		public static final String DOC_HEADER_LABEL = "docHeaderLabel";
-
-		/**
-		 * Parent container to the doc content.
-		 */
-		public static final String DOC_CONTAINER = "docContainer";
-
-		/**
-		 * Identifies the html frame tag containing the doc's static html content.
-		 */
-		public static final String DOC_FRAME = "docFrame";
-
-		/**
-		 * Secondary style name indicating doc view is in non-edit (static) mode.
-		 */
-		public static final String STATIC = "static";
-
-		/**
-		 * Secondary style name indicating doc view is in edit mode.
-		 */
-		public static final String EDIT = "edit";
-	} // Styles
+public class DocViewer extends Composite implements IHasDocHandlers, HasValueChangeHandlers<DocViewer.ViewMode> {
 
 	public static enum ViewMode {
 		EDIT,
@@ -99,7 +69,7 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 
 		public DocViewHeader() {
 			super();
-			pnl.setStyleName(Styles.DOC_HEADER);
+			pnl.setStyleName("docHeader");
 
 			imgEdit.setStyleName("imgEdit");
 			imgEdit.setTitle("Edit document");
@@ -107,7 +77,7 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 			imgExport.setStyleName("imgExport");
 			imgExport.setTitle("Export to MS Word");
 
-			html.setStyleName(Styles.DOC_HEADER_LABEL);
+			html.setStyleName("docHeaderLabel");
 			pnl.add(html);
 			pnl.add(imgEdit);
 			pnl.add(imgExport);
@@ -124,7 +94,7 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 
 		public DocFrame() {
 			super();
-			setStyleName(Styles.DOC_FRAME);
+			setStyleName("docFrame");
 			getElement().setAttribute("frameBorder", "0"); // for IE
 		}
 	}
@@ -156,15 +126,21 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 	private DocRef doc;
 
 	/**
+	 * flag indicating whether or not actual doc content exists in the iframe
+	 * element.
+	 */
+	boolean docContentLoaded = false;
+
+	/**
 	 * Constructor
 	 */
 	public DocViewer() {
 		super();
 
-		pnl.setStylePrimaryName(Styles.DOC_VIEW);
+		pnl.setStylePrimaryName("docView");
 		pnl.add(header);
 
-		container.addStyleName(Styles.DOC_CONTAINER);
+		container.addStyleName("docContainer");
 		pnl.add(container);
 
 		frame = new DocFrame();
@@ -241,16 +217,120 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 		staticMode();
 	}
 
-	public DocRef getModel() {
-		return doc;
+	/**
+	 * @return <code>true</code> if html content exists within the containing doc
+	 *         iframe element.
+	 */
+	public boolean isDocContentLoaded() {
+		return docContentLoaded;
+	}
+
+	@Override
+	public HandlerRegistration addDocHandler(IDocHandler handler) {
+		return addHandler(handler, DocEvent.TYPE);
+	}
+
+	void fireTextSelectEvent(MarkOverlay range) {
+		fireEvent(DocEvent.createTextSelectEvent(range));
+	}
+
+	void fireDocLoaded() {
+		docContentLoaded = true;
+		fireEvent(DocEvent.createDocLoadEvent(true));
+	}
+
+	void fireDocUnloaded() {
+		fireEvent(DocEvent.createDocLoadEvent(false));
+		docContentLoaded = false;
 	}
 
 	/**
-	 * @return The id assigned to the iframe element or <code>null</code> if the
-	 *         document model data has not been set.
+	 * Call this to turn "on" the capturing of user selected text in a document
+	 * under view.
+	 * @param docId id of the doc
 	 */
-	private String getFrameId() {
-		return doc == null ? null : "docframe_" + doc.getId();
+	native void initDocFrame(String docId) /*-{
+		//alert('initDocFrame - docId: '+docId);
+
+		var onLoadFnName = 'onDocFrameLoaded_'+docId;
+		if($wnd[onLoadFnName]) return; // already init'd!
+
+		var frameId = 'docframe_' + docId;
+		var frame = $wnd.goog.dom.$(frameId);
+		//alert('init - frame: '+frame);
+		var twindow = frame.contentWindow;
+		//alert('init - twindow: '+twindow);
+
+		var tsapi = this;
+
+		$wnd[onLoadFnName] = function(iframedoc) {
+			//alert('onDocFrameLoaded! iframedoc:' + iframedoc);
+			//alert('iframedoc.body:' + iframedoc.body);
+
+			var mouseUpHandler = function(e){
+				//alert('onMouseUp [frameId: ' + frameId + ']');
+
+				var rng = $wnd.goog.dom.Range.createFromWindow(twindow);
+				//alert('rng: '+ rng);
+				if(rng == null) return;
+
+				// make sure we have a legit text selection
+				text = rng.getText();
+				if(!text || $wnd.stringTrim(text).length == 0) 
+					return;
+				if(rng.getStartNode().nodeType != 3 || rng.getEndNode().nodeType != 3)
+					return;
+
+				var mark;
+				try {
+					//if(iframedoc !== rng.getDocument()) alert('range.document != iframedoc!');
+					//alert('iframedoc: ' + iframedoc + ', rng.getDocument(): ' + rng.getDocument());
+					mark  = new $wnd.Mark(rng);
+					tsapi.@com.tabulaw.client.app.ui.DocViewer::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
+				}
+				catch(e) {
+					alert('Unable to select this portion of text\n(' + e + ')');
+					//alert('Unable to select this portion of text');
+				}
+			};
+
+			// capture user selections w/in the iframe content
+			$wnd.goog.events.listen(iframedoc.body, 'mouseup', mouseUpHandler);
+
+			// fire doc loaded
+			tsapi.@com.tabulaw.client.app.ui.DocViewer::fireDocLoaded()();
+
+			//alert('TextSelectApi.init() - DONE');
+		}
+	}-*/;
+
+	/**
+	 * Call this to turn "off" the capturing of user text selections in a document
+	 * under view.
+	 * @param docId the doc id
+	 */
+	native void shutdownDocFrame(String docId) /*-{
+		//alert('shutdown - frameId: ' + frameId);
+		try {
+			var frameId = 'docframe_' + docId;
+			var frame = $wnd.goog.dom.$(frameId);
+			if(frame == null) return;
+			//alert('shutdown - frame: ' + frame);
+			var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
+			//alert('shutdown - fbody: ' + fbody);
+			if(fbody) $wnd.goog.events.unlisten(fbody, 'mouseup');
+
+			$wnd['onDocFrameLoaded_'+docId] = null;
+
+			// fire doc unloaded
+			this.@com.tabulaw.client.app.ui.DocViewer::fireDocUnloaded()();
+		} catch(e) {
+			alert('doc shutdown error: ' + e);
+		}
+	}-*/;
+
+	public DocRef getModel() {
+		return doc;
 	}
 
 	/**
@@ -270,6 +350,11 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 	 * @param doc
 	 */
 	public void setModel(DocRef doc) {
+
+		if(this.doc != null) {
+			shutdownDocFrame(this.doc.getId());
+		}
+
 		this.doc = doc;
 
 		// header
@@ -280,7 +365,11 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 		header.imgEdit.setVisible(doc != null && doc.getCaseRef() == null);
 
 		frame.getElement().setId(getFrameId());
-		
+
+		if(doc != null) {
+			initDocFrame(doc.getId());
+		}
+
 		// set html content directly or via url?
 		String htmlContent = doc == null ? null : doc.getHtmlContent();
 		if(!StringUtil.isEmpty(htmlContent)) {
@@ -321,6 +410,32 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 		return dew;
 	}
 
+	public Widget[] getNavColWidgets() {
+		return isEditMode() ? new Widget[] {
+			btnSave, btnCancel
+		} : null;
+	}
+
+	@Override
+	protected void onUnload() {
+		super.onUnload();
+
+		String docId = doc == null ? null : doc.getId();
+		if(docId != null) {
+			shutdownDocFrame(docId);
+			// fire doc frame unload event
+			fireEvent(DocEvent.createDocLoadEvent(false));
+		}
+	}
+
+	/**
+	 * @return The id assigned to the iframe element or <code>null</code> if the
+	 *         document model data has not been set.
+	 */
+	private String getFrameId() {
+		return doc == null ? null : "docframe_" + doc.getId();
+	}
+
 	private boolean isEditMode() {
 		return dew != null && dew.isVisible();
 	}
@@ -329,8 +444,8 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 	 * Sets the mode to edit.
 	 */
 	private void editMode() {
-		pnl.removeStyleDependentName(Styles.STATIC);
-		pnl.addStyleDependentName(Styles.EDIT);
+		pnl.removeStyleDependentName("static");
+		pnl.addStyleDependentName("edit");
 
 		// so qb doc col can know which doc mode we are in
 		RootPanel.get().removeStyleName("docview-static");
@@ -353,8 +468,8 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 	 * Sets the mode to static.
 	 */
 	private void staticMode() {
-		pnl.addStyleDependentName(Styles.STATIC);
-		pnl.removeStyleDependentName(Styles.EDIT);
+		pnl.addStyleDependentName("static");
+		pnl.removeStyleDependentName("edit");
 
 		// so qb doc col can know which doc mode we are in
 		RootPanel.get().addStyleName("docview-static");
@@ -370,9 +485,4 @@ public class DocViewer extends Composite implements HasValueChangeHandlers<DocVi
 		}
 	}
 
-	public Widget[] getNavColWidgets() {
-		return isEditMode() ? new Widget[] {
-			btnSave, btnCancel
-		} : null;
-	}
 }

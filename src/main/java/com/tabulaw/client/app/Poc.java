@@ -180,7 +180,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
-					getPortal().fireEvent(new ModelChangeEvent(null, ModelChangeOp.LOADED, liu, null));
+					fireModelChangeEvent(new ModelChangeEvent(null, ModelChangeOp.LOADED, liu, null));
 					
 					// set the orphan bundle id
 					ClientModelCache.get().setOrphanedQuoteBundleId(result.getOrphanQuoteContainerId());

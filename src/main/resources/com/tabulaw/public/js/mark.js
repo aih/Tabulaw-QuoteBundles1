@@ -617,7 +617,7 @@ function Mark() {
 			// from range
 			var arg0 = arguments[0];
 			this.applyRange(arg0);
-		} else if(arguments && arguments.length ==2) {
+		} else if(arguments.length ==2) {
 			// from serialized token
 			var arg0 = arguments[0];
 			var arg1 = arguments[1];

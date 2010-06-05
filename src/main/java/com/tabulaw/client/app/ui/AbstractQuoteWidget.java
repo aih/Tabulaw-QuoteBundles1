@@ -151,10 +151,11 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 	 * Show or hide the delete button.
 	 * @param show
 	 */
-	protected final void showDeleteButton(boolean show) {
+	public final void showDeleteButton(boolean show) {
 		if(show) {
 			if(btnDelete == null) {
 				btnDelete = new Image(Resources.INSTANCE.trash());
+				btnDelete.addStyleName("delete");
 				btnDelete.setTitle("Delete quote");
 				btnDelete.addClickHandler(new ClickHandler() {
 
@@ -175,7 +176,11 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		}
 	}
 
-	protected final void showXButton(boolean show) {
+	/**
+	 * Show or hide the X (close) button.
+	 * @param show
+	 */
+	public final void showXButton(boolean show) {
 		if(show) {
 			if(btnX == null) {
 				btnX = new Image(Resources.INSTANCE.XButton());
@@ -204,11 +209,12 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 	 * Show or hide the quote link (goto highlight) button.
 	 * @param show
 	 */
-	protected final void showQuoteLinkButton(boolean show) {
+	public final void showQuoteLinkButton(boolean show) {
 		if(show) {
 			if(btnQlink == null) {
 				btnQlink = new Image(Resources.INSTANCE.gotoHighlight());
 				btnQlink.setTitle("Goto quote");
+				btnQlink.addStyleName("gotoQuote");
 				btnQlink.addStyleName("hlink");
 				btnQlink.addClickHandler(new ClickHandler() {
 	
@@ -234,7 +240,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 					}
 				});
 			}
-			header.addButton(btnQlink);
+			header.insertButton(btnQlink, 0);
 		}
 		else {
 			if(btnQlink != null) {

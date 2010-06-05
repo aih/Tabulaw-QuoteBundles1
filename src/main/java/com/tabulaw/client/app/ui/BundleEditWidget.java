@@ -102,7 +102,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 							Notifier.get().info("Current Quote Bundle set.");
 							// we need to globally notify all views of the current quote bundle
 							// change and we do it by firing a model change event
-							Poc.getPortal().fireEvent(new ModelChangeEvent(current, ModelChangeOp.UPDATED, bundle, null));
+							Poc.fireModelChangeEvent(new ModelChangeEvent(current, ModelChangeOp.UPDATED, bundle, null));
 						}
 					}
 				});
@@ -125,10 +125,9 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		}
 
 		/**
-		 * Sets relevant state based on the current quote bundle and the current
-		 * bundle model.
+		 * bundle header level model state check method.
 		 */
-		void modelStateCheck() {
+		private void modelStateCheck() {
 			QuoteBundle cqb = ClientModelCache.get().getCurrentQuoteBundle();
 			boolean isCurrent = cqb != null && cqb.equals(bundle);
 			//close.setVisible(!isCurrent);
@@ -202,11 +201,32 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			quotePanel.getElement().getStyle().clearHeight();
 		}
 	}
+	
+	/**
+	 * Sets relevant state based on the current quote bundle and the current
+	 * bundle model.
+	 */
+	private void modelStateCheck() {
+		header.modelStateCheck();
+		QuoteBundle cqb = ClientModelCache.get().getCurrentQuoteBundle();
+		boolean isCurrent = cqb != null && cqb.equals(bundle);
+		if(isCurrent) {
+			// i.e. quotes-current
+			quotePanel.addStyleDependentName("current");
+		}
+		else {
+			quotePanel.removeStyleDependentName("current");
+		}
+		// only show the goto highlight link for the current quote bundle
+		for(QuoteEditWidget qw : getQuoteWidgets()) {
+			qw.showQuoteLinkButton(isCurrent);
+		}
+	}
 
 	@Override
 	protected void onLoad() {
 		super.onLoad();
-		header.modelStateCheck();
+		modelStateCheck();
 		dropAreaCheck();
 		makeModelChangeAware();
 	}
@@ -220,6 +240,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
-		header.modelStateCheck();
+		modelStateCheck();
 	}
 }

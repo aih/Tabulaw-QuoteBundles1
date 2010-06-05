@@ -18,6 +18,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.client.app.model.ServerPersistApi;
@@ -26,10 +27,9 @@ import com.tabulaw.client.app.ui.QuoteEvent.QuoteType;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
-import com.tabulaw.client.ui.ITextSelectHandler;
+import com.tabulaw.client.ui.DocEvent;
+import com.tabulaw.client.ui.IDocHandler;
 import com.tabulaw.client.ui.LoggingDragHandler;
-import com.tabulaw.client.ui.TextSelectApi;
-import com.tabulaw.client.ui.TextSelectEvent;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.EntityType;
@@ -48,7 +48,7 @@ import com.tabulaw.common.model.QuoteBundle;
  * existing quotes in the bundle are re-displayed upon widget load.
  * @author jpk
  */
-public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implements ITextSelectHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
+public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implements IDocHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
 
 	class DocQuoteDragHandler extends LoggingDragHandler {
 
@@ -76,13 +76,11 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 	private final DocViewer wDocViewer = new DocViewer();
 
-	private HandlerRegistration hrViewMode;
+	private HandlerRegistration hrViewMode, hrDoc;
 
 	private final BundleDocWidget wDocQuoteBundle;
 
 	private final HorizontalSplitPanel hsp = new HorizontalSplitPanel();
-
-	private TextSelectApi tsapi;
 
 	/**
 	 * Facilitate drag/drop ops.
@@ -125,17 +123,20 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		return wDocViewer.getNavColWidgets();
 	}
 
-	@Override
-	public void onDocFrameLoaded(String frameId) {
+	/**
+	 * Highlights or un-highlights the given quote contingent on the quote's
+	 * referenced document matching that being viewed.
+	 * <p>
+	 * NOTE: the doc content is presumed loaded
+	 * @param highlight highlight or un-highlight?
+	 */
+	private void highlightQuote(Quote q, boolean highlight) {
 		DocRef doc = wDocViewer.getModel();
 		assert doc != null;
-		// now is when we can safely highlight
-		QuoteBundle qb = wDocQuoteBundle.getModel();
-		List<Quote> quotes = qb.getQuotes();
-		for(Quote q : quotes) {
-			DocRef qdoc = q.getDocument();
-			MarkOverlay mark = (MarkOverlay) q.getMark();
-			if(doc.equals(qdoc)) {
+		DocRef qdoc = q.getDocument();
+		MarkOverlay mark = (MarkOverlay) q.getMark();
+		if(doc.equals(qdoc)) {
+			if(highlight) {
 				// highlight
 				if(mark == null) {
 					String stoken = q.getSerializedMark();
@@ -154,32 +155,63 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				}
 			}
 			else {
-				if(mark != null) mark.unhighlight();
+				// un-highlight
+				if(mark != null) {
+					mark.unhighlight();
+				}
 			}
 		}
+	}
 
+	/**
+	 * Highlights or un-highlights the qoutes in the current quote bundle bound to
+	 * the doc under view.
+	 * <p>
+	 * NOTE: the doc content is presumed loaded
+	 * @param highlight highlight or un-highlight?
+	 */
+	private void highlightQuotes(boolean highlight) {
+		DocRef doc = wDocViewer.getModel();
+		assert doc != null;
+		// now is when we can safely highlight
+		QuoteBundle qb = wDocQuoteBundle.getModel();
+		List<Quote> quotes = qb.getQuotes();
+		for(Quote q : quotes) {
+			highlightQuote(q, highlight);
+		}
 	}
 
 	@Override
-	public void onTextSelect(TextSelectEvent event) {
-		final MarkOverlay mark = event.getMark();
+	public void onDocEvent(DocEvent event) {
+		switch(event.getDocEventType()) {
+			case TEXT_SELECT: {
+				final MarkOverlay mark = event.getMark();
 
-		// only add quote if a valid hightlight is possible
-		try {
-			mark.highlight();
-		}
-		catch(Throwable t) {
-			Log.error("Unable to highlight quote: " + t.getMessage());
-			return;
-		}
+				// only add quote if a valid hightlight is possible
+				try {
+					mark.highlight();
+				}
+				catch(Throwable t) {
+					Log.error("Unable to highlight quote: " + t.getMessage());
+					return;
+				}
 
-		// create the quote
-		String serializedMark = mark.serialize();
-		Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
-		quote.setMark(mark);
-		// eagerly set id since EntityBase.equals() depends on it
-		quote.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
-		wDocQuoteBundle.addQuote(quote, true, true);
+				// create the quote
+				String serializedMark = mark.serialize();
+				Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
+				quote.setMark(mark);
+				// eagerly set id since EntityBase.equals() depends on it
+				quote.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
+				wDocQuoteBundle.addQuote(quote, true, true);
+				break;
+			}
+			case DOC_CONTENT_LOADED:
+				highlightQuotes(true);
+				break;
+			case DOC_CONTENT_UNLOADED:
+				// TODO anything? (we don't really need to un-highlight quotes)
+				break;
+		}
 	}
 
 	/**
@@ -188,41 +220,55 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	 * than what is current.
 	 * @return <code>true</code> if the current quote bundle was changed
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean maybeSetCurrentQuoteBundle() {
 		QuoteBundle crntQb = ClientModelCache.get().getCurrentQuoteBundle();
 		if(crntQb == null) {
+			
+			// don't auto-create if there are existing eligible bundles
+			// TODO establish a priority scheme by which eligible bundles are sorted
+			QuoteBundle oqb = ClientModelCache.get().getOrphanedQuoteBundle();
+			List<QuoteBundle> qbs = (List<QuoteBundle>) ClientModelCache.get().getAll(EntityType.QUOTE_BUNDLE);
+			for(QuoteBundle qb : qbs) {
+				if(!qb.equals(oqb)) {
+					// set this as the current qb
+					crntQb = qb;
+					Log.debug("Current buneld set to: " + crntQb);
+					ClientModelCache.get().getUserState().setCurrentQuoteBundleId(qb.getId());
+					// notify app of current qb change via update model change
+					Poc.fireModelChangeEvent(new ModelChangeEvent(this, ModelChangeOp.UPDATED, crntQb, null));
+					break;
+				}
+			}
 
-			// auto-create a new quote bundle
-			DocRef mDoc = wDocViewer.getModel();
-			if(mDoc == null) return false;
-			Log.debug("Auto-creating quote bundle for doc: " + mDoc);
-			String qbName = mDoc.getTitle();
-			String qbDesc = "Quote Bundle for " + qbName;
-			crntQb = EntityFactory.get().buildBundle(qbName, qbDesc);
-			crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
+			if(crntQb == null) {
+				// auto-create a new quote bundle
+				DocRef mDoc = wDocViewer.getModel();
+				if(mDoc == null) return false;
+				Log.debug("Auto-creating quote bundle for doc: " + mDoc);
+				String qbName = mDoc.getTitle();
+				String qbDesc = "Quote Bundle for " + qbName;
+				crntQb = EntityFactory.get().buildBundle(qbName, qbDesc);
+				crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
+				
+				// client-side persist
+				ClientModelCache.get().getUserState().setCurrentQuoteBundleId(crntQb.getId());
+				ClientModelCache.get().persist(crntQb, this);
+				
+				// server-side persist
+				ServerPersistApi.get().addBundle(crntQb);
+			}
 
-			ClientModelCache.get().getUserState().setCurrentQuoteBundleId(crntQb.getId());
-
-			// client-side persist
-			ClientModelCache.get().persist(crntQb, this);
-
-			// server-side persist
-			ServerPersistApi.get().addBundle(crntQb);
 		}
 
 		if(crntQbId == null || !crntQbId.equals(crntQb.getId())) {
 			if(crntQbId != null) {
+				// un-hightlight quotes
+				highlightQuotes(false);
+				
 				wDocQuoteBundle.clearQuotesFromUi();
 				wDocQuoteBundle.clearQuoteEventBindings();
 			}
-			if(Log.isDebugEnabled()) {
-				String from = wDocQuoteBundle.getModel() == null ? "-empty-" : wDocQuoteBundle.getModel().descriptor();
-				String to = crntQb.descriptor();
-				Log.debug("maybeSetCurrentQuoteBundle() - Re-setting model from: " + from + " to " + to);
-			}
-			String docId = wDocViewer.getModel().getId();
-			assert docId != null;
-			wDocQuoteBundle.init(docId, wDocViewer.getDocBody());
 			wDocQuoteBundle.setModel(crntQb);
 			crntQbId = crntQb.getId();
 			return true;
@@ -253,30 +299,25 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
-		if(!maybeSetCurrentQuoteBundle()) {
-			ModelChangeOp op = event.getChangeOp();
-			IEntity m = event.getModel();
-			EntityType et = EntityType.fromString(m.getEntityType());
-			if(op == ModelChangeOp.UPDATED && et == EntityType.QUOTE_BUNDLE && m.getId().equals(crntQbId)) {
-				wDocQuoteBundle.sync((QuoteBundle) m);
+		boolean qbChanged = maybeSetCurrentQuoteBundle();
+		ModelChangeOp op = event.getChangeOp();
+		IEntity m = event.getModel();
+		EntityType et = EntityType.fromString(m.getEntityType());
+		if(et == EntityType.QUOTE_BUNDLE && m.getId().equals(crntQbId)) {
+
+			// sync
+			if(op == ModelChangeOp.UPDATED && !qbChanged) wDocQuoteBundle.sync((QuoteBundle) m);
+			
+			// re-apply quote highlights
+			if(wDocViewer.isDocContentLoaded()) {
+				highlightQuotes(true);
 			}
 		}
 	}
 
 	public void setDocument(DocRef mDoc) {
-		String docId = wDocViewer.getModel() == null ? null : wDocViewer.getModel().getId();
-		if(docId != null && tsapi != null) {
-			tsapi.shutdown(docId);
-		}
-
 		// update doc viewer with doc
 		wDocViewer.setModel(mDoc);
-
-		// we allow all doc types to be highlightable
-		if(mDoc != null) {
-			if(tsapi == null) tsapi = new TextSelectApi(this);
-			tsapi.init(mDoc.getId());
-		}
 
 		// grab the current quote bundle
 		maybeSetCurrentQuoteBundle();
@@ -298,19 +339,20 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 		assert hrViewMode == null;
 		hrViewMode = wDocViewer.addValueChangeHandler(this);
+
+		assert hrDoc == null;
+		hrDoc = wDocViewer.addDocHandler(this);
 	}
 
 	@Override
 	protected void onUnload() {
+		assert hrDoc != null;
+		hrDoc.removeHandler();
+		hrDoc = null;
+
 		assert hrViewMode != null;
 		hrViewMode.removeHandler();
 		hrViewMode = null;
-
-		if(tsapi != null) {
-			String docId = wDocViewer.getModel() == null ? null : wDocViewer.getModel().getId();
-			if(docId != null) tsapi.shutdown(docId);
-			tsapi = null;
-		}
 
 		super.onUnload();
 	}
