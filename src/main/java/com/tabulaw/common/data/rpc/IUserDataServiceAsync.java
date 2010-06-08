@@ -55,5 +55,5 @@ public interface IUserDataServiceAsync {
 
 	void updateDocContent(String docId, String htmlContent, AsyncCallback<Payload> callback);
 
-	void exportDoc(String docId, String userId, AsyncCallback<Payload> callback);
+	//void exportDoc(String docId, String userId, AsyncCallback<Payload> callback);
 }

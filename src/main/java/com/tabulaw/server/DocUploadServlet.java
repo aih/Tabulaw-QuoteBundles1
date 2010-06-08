@@ -29,7 +29,7 @@ import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.User;
 import com.tabulaw.service.DocUtils;
-import com.tabulaw.service.convert.IFileConverter;
+import com.tabulaw.service.convert.FileConverterDelegate;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.util.StringUtil;
 
@@ -63,12 +63,9 @@ public class DocUploadServlet extends HttpServlet {
 
 			// Parse the request
 			try {
-				IFileConverter fconverter =
-						(IFileConverter) req.getSession().getServletContext().getAttribute(
-								FileConverterBootstrapper.FILE_CONVERTER_KEY);
-				if(fconverter == null) {
-					throw new Exception("No file converters found.");
-				}
+				FileConverterDelegate fconverter =
+						(FileConverterDelegate) getServletContext().getAttribute(FileConverterDelegate.KEY);
+				if(fconverter == null) throw new Exception("No file converter delegate found.");
 
 				StringBuilder sb = new StringBuilder();
 

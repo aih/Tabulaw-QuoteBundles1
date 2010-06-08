@@ -25,7 +25,7 @@ public class DocToHtmlConverterTest {
 		URL url = getClass().getResource("test.doc");
 		File fin = new File(url.toURI());
 		DocToHtmlConverter fc = new DocToHtmlConverter(makeOpenOfficeConnection());
-		File fout = fc.convert(fin, null);
+		File fout = fc.convert(fin);
 		Assert.assertNotNull(fout);
 	}
 

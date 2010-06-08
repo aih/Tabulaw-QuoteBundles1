@@ -55,6 +55,51 @@ public class DocUtils {
 	}
 
 	/**
+	 * Maps mime-types to file extension tokens.
+	 * @param fileExt FORMAT: ".doc"
+	 * @return the mime-type
+	 * @throws IllegalArgumentException When no mime-type is found for the given
+	 *         file extension
+	 */
+	public static String getMimeTypeFromFileExt(String fileExt) throws IllegalArgumentException {
+		fileExt = fileExt.trim().toLowerCase();
+		if(".doc".equals(fileExt) || ".docx".equals(fileExt)) return "application/msword";
+		if(".txt".equals(fileExt) || ".text".equals(fileExt)) return "text/html";
+		if(".htm".equals(fileExt) || ".html".equals(fileExt)) return "text/html";
+		throw new IllegalArgumentException("No mime-type mapped for file extension: " + fileExt);
+	}
+
+	/**
+	 * Is the file named such that is implies it has html content?
+	 * @param fname the non-path file name
+	 * @return true/false
+	 */
+	public static boolean isHtmlFileByExtension(String fname) {
+		if(fname.endsWith(".htm") || fname.endsWith(".html")) return true;
+		return false;
+	}
+
+	/**
+	 * Is the file named such that is implies it has textual content?
+	 * @param fname the non-path file name
+	 * @return true/false
+	 */
+	public static boolean isTextFileByExtension(String fname) {
+		if(fname.endsWith(".txt") || fname.endsWith(".text")) return true;
+		return false;
+	}
+
+	/**
+	 * Is the file named such that it implies it is an ms-word doc file?
+	 * @param fname the non-path file name
+	 * @return true/false
+	 */
+	public static boolean isMsWordFileByExtension(String fname) {
+		if(fname.endsWith(".doc") || fname.endsWith(".docx")) return true;
+		return false;
+	}
+
+	/**
 	 * @return ref to the directory containing all cached docs on disk.
 	 */
 	public static File getDocDirRef() {
@@ -82,8 +127,8 @@ public class DocUtils {
 	 * @throws IOException
 	 */
 	public static File docContentsToFile(DocContent doc) throws IOException {
-		String fname = Integer.toString(Math.abs(doc.hashCode()));
-		File f = DocUtils.getDocFileRef(fname);
+		String fname = Integer.toString(Math.abs(doc.hashCode())) + ".html";
+		File f = getDocFileRef(fname);
 		String htmlContent = doc.getHtmlContent();
 		FileUtils.writeStringToFile(f, htmlContent, "UTF-8");
 		return f;
@@ -254,13 +299,15 @@ public class DocUtils {
 		HttpURLConnection conn = (HttpURLConnection) anHttpUrl.openConnection();
 
 		// IMPT: we must set the user-agent otherwise a possible 403 response
-		conn
-				.setRequestProperty("User-agent",
-						"Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.3 (KHTML, like Gecko) Chrome/5.0.360.0 Safari/533.3");
+		conn.setRequestProperty("User-agent",
+		// "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.3 (KHTML, like Gecko) Chrome/5.0.360.0 Safari/533.3");
+				"Chrome/5.0.360.0");
 		conn.setRequestProperty("Accept", "text/html");
 		conn.setRequestProperty("Accept-Encoding", "deflate");
 		conn.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
-		conn.setRequestProperty("Accept-Language", "ISO-8859-1,utf-8;q=0.7,*;q=0.3");
+		// conn.setRequestProperty("Accept-Language",
+		// "ISO-8859-1,utf-8;q=0.7,*;q=0.3");
+		conn.setRequestProperty("Accept-Language", "utf-8;q=0.7,*;q=0.3");
 
 		return conn.getInputStream();
 	}
@@ -273,7 +320,7 @@ public class DocUtils {
 	 */
 	public static String fetch(URL anHttpUrl) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(openHttpUrl(anHttpUrl), "UTF-8"));
-		StringBuilder sb = new StringBuilder(102400);
+		StringBuilder sb = new StringBuilder(1024 * 1024); // 1MB initial capacity
 		String line;
 		while((line = br.readLine()) != null) {
 			// System.out.println(line);

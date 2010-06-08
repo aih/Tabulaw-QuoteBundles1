@@ -28,7 +28,7 @@ public class DocViewServlet extends HttpServlet {
 		String docId = req.getParameter("id");
 		if(docId == null) throw new ServletException("No doc id specified.");
 
-		PersistContext pc = (PersistContext) req.getSession(false).getServletContext().getAttribute(PersistContext.KEY);
+		PersistContext pc = (PersistContext) getServletContext().getAttribute(PersistContext.KEY);
 		DocContent doc = pc.getUserDataService().getDocContent(docId);
 		String htmlContent = doc.getHtmlContent();
 

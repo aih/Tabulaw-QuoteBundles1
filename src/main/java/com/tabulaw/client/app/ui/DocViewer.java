@@ -13,8 +13,8 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
@@ -65,7 +65,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		private final HTML html = new HTML();
 
 		private final Image imgEdit = new Image(Resources.INSTANCE.edit());
-		private final Image imgExport = new Image(Resources.INSTANCE.permalink());
+		//private final Image imgExport = new Image(Resources.INSTANCE.permalink());
+		private final Anchor aDwnldAsWordDoc;
 
 		public DocViewHeader() {
 			super();
@@ -74,13 +75,16 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			imgEdit.setStyleName("imgEdit");
 			imgEdit.setTitle("Edit document");
 
-			imgExport.setStyleName("imgExport");
-			imgExport.setTitle("Export to MS Word");
+			aDwnldAsWordDoc = new Anchor("Download as MS Word doc", false);
+			aDwnldAsWordDoc.setTarget("_blank");
+			//imgExport.setStyleName("imgExport");
+			//imgExport.setTitle("Export to MS Word");
 
 			html.setStyleName("docHeaderLabel");
 			pnl.add(html);
 			pnl.add(imgEdit);
-			pnl.add(imgExport);
+			//pnl.add(imgExport);
+			pnl.add(aDwnldAsWordDoc);
 
 			initWidget(pnl);
 		}
@@ -147,15 +151,6 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		container.add(frame);
 
 		initWidget(pnl);
-
-		header.imgExport.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				// TODO impl
-				Window.alert("TODO impl");
-			}
-		});
 
 		header.imgEdit.addClickHandler(new ClickHandler() {
 
@@ -329,10 +324,6 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		}
 	}-*/;
 
-	public DocRef getModel() {
-		return doc;
-	}
-
 	/**
 	 * @return the DOM iframe body ref of the contained document.
 	 */
@@ -342,6 +333,10 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 		return fbody;
 	}-*/;
+
+	public DocRef getModel() {
+		return doc;
+	}
 
 	/**
 	 * Sets the document model data.
@@ -384,6 +379,10 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			frame.setUrl(furl);
 			Log.debug("DocViewer iframe url set to: " + furl);
 		}
+		
+		// update export to ms word doc href
+		String href = doc == null ? "#" : "docdownload?mimeType=application/msword&docId=" + doc.getId();
+		header.aDwnldAsWordDoc.setHref(href);
 	}
 
 	public native String getDocHtml() /*-{

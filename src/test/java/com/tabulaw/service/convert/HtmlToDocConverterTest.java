@@ -24,8 +24,8 @@ public class HtmlToDocConverterTest {
 	public void testHtmlToDocConversion() throws Exception {
 		URL url = getClass().getResource("htmldoc.html");
 		File fin = new File(url.toURI());
-		HtmlToDocConverter fc = new HtmlToDocConverter(makeOpenOfficeConnection());
-		File fout = fc.convert(fin, null);
+		HtmlToDocByOpenOfficeFileConverter fc = new HtmlToDocByOpenOfficeFileConverter(makeOpenOfficeConnection());
+		File fout = fc.convert(fin);
 		Assert.assertNotNull(fout);
 	}
 

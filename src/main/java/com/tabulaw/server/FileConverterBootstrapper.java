@@ -18,7 +18,7 @@ import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConne
 import com.google.inject.Injector;
 import com.tabulaw.service.convert.DocToHtmlConverter;
 import com.tabulaw.service.convert.FileConverterDelegate;
-import com.tabulaw.service.convert.HtmlToDocConverter;
+import com.tabulaw.service.convert.HtmlToDocCompositeFileConverter;
 import com.tabulaw.service.convert.IFileConverter;
 import com.tabulaw.service.convert.TextToHtmlConverter;
 import com.tabulaw.service.convert.ToHtmlPassThroughConverter;
@@ -30,8 +30,6 @@ import com.tabulaw.service.convert.ToHtmlPassThroughConverter;
 public class FileConverterBootstrapper implements IBootstrapHandler {
 
 	private static final Log log = LogFactory.getLog(FileConverterBootstrapper.class);
-
-	public static final String FILE_CONVERTER_KEY = Integer.toString(FileConverterDelegate.class.getName().hashCode());
 
 	private static final String OPEN_OFFICE_CONNECTION_KEY = Integer.toString("OpenOfficeConnection".hashCode());
 
@@ -62,18 +60,18 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 			converters.add(oofc);
 
 			// html to doc converter
-			HtmlToDocConverter html2DocConverter = new HtmlToDocConverter(ooc);
+			HtmlToDocCompositeFileConverter html2DocConverter = new HtmlToDocCompositeFileConverter(ooc);
 			converters.add(html2DocConverter);
 		}
 
 		FileConverterDelegate converterDelegate =
 				converters.size() == 0 ? null : new FileConverterDelegate(converters.toArray(new IFileConverter[0]));
-		servletContext.setAttribute(FILE_CONVERTER_KEY, converterDelegate);
+		servletContext.setAttribute(FileConverterDelegate.KEY, converterDelegate);
 	}
 
 	@Override
 	public void shutdown(ServletContext servletContext) {
-		servletContext.removeAttribute(FILE_CONVERTER_KEY);
+		servletContext.removeAttribute(FileConverterDelegate.KEY);
 
 		OpenOfficeConnection ooc = (OpenOfficeConnection) servletContext.getAttribute(OPEN_OFFICE_CONNECTION_KEY);
 		if(ooc != null) {

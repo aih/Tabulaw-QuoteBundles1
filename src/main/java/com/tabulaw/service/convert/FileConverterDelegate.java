@@ -16,7 +16,9 @@ import java.util.List;
  * API.
  * @author jpk
  */
-public class FileConverterDelegate implements IFileConverter {
+public class FileConverterDelegate {
+	
+	public static final String KEY = Integer.toString(FileConverterDelegate.class.getName().hashCode());
 
 	private final IFileConverter[] converters;
 
@@ -32,28 +34,28 @@ public class FileConverterDelegate implements IFileConverter {
 		this.converters = converters;
 	}
 
-	@Override
-	public boolean supportsContentType(String contentType) {
-		for(IFileConverter c : converters) {
-			if(c.supportsContentType(contentType)) return true;
-		}
-		return false;
-	}
-
-	@Override
-	public File convert(File input, String contentType) throws Exception {
+	/**
+	 * Converts the given input file to a newly created file of type dictated by
+	 * the given mime-type.
+	 * @param input
+	 * @param targetMimeType the type to which to convert
+	 * @return new converted file ref
+	 * @throws Exception When the conversion fails
+	 */
+	public File convert(File input, String targetMimeType) throws Exception {
+		if(input == null || targetMimeType == null) throw new NullPointerException();
 
 		// get supported converters
-		List<IFileConverter> scs = getSupportedConverters(contentType);
-		if(scs.size() < 1) throw new Exception("No converter found for content-type: " + contentType);
+		List<IFileConverter> scs = getSupportedConverters(input, targetMimeType);
+		if(scs.size() < 1) throw new Exception("No converter(s) found for input file: " + input.getName());
 
 		// now iterate over these supported converters where ones closer to head
-		// are given prioroty over ones that are not
+		// are given priority over ones that are not
 		File fout = null;
 		Exception ex = null;
 		for(IFileConverter c : scs) {
 			try {
-				fout = c.convert(input, contentType);
+				fout = c.convert(input);
 				if(fout != null) break;
 			}
 			catch(Exception e) {
@@ -74,13 +76,14 @@ public class FileConverterDelegate implements IFileConverter {
 	/**
 	 * Extracts the supported converters from the held list of all converters
 	 * based on a content-type.
-	 * @param contentType
+	 * @param f file ref for which to get the supported file converters
+	 * @param targetMimeType the mime-type to which to convert
 	 * @return the supported converters which may be empty
 	 */
-	private List<IFileConverter> getSupportedConverters(String contentType) {
+	private List<IFileConverter> getSupportedConverters(File f, String targetMimeType) {
 		ArrayList<IFileConverter> supportedConverters = new ArrayList<IFileConverter>(converters.length);
 		for(IFileConverter c : converters) {
-			if(c.supportsContentType(contentType)) {
+			if(c.getTargetMimeType().equals(targetMimeType) && c.isFileConvertable(f)) {
 				supportedConverters.add(c);
 			}
 		}

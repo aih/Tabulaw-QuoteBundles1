@@ -4,13 +4,11 @@
  */
 package com.tabulaw.server.rpc;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.FileDataSource;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 
@@ -46,12 +44,9 @@ import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailManager;
 import com.tabulaw.mail.MailRouting;
-import com.tabulaw.server.FileConverterBootstrapper;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
-import com.tabulaw.service.DocUtils;
-import com.tabulaw.service.convert.FileConverterDelegate;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 import com.tabulaw.service.entity.UserDataService.BundleContainer;
@@ -65,8 +60,6 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	private static final long serialVersionUID = 7908647379731614097L;
 
 	private static final String EMAIL_TEMPLATE_FORGOT_PASSWORD = "forgot-password";
-
-	private static final String EMAIL_TEMPLATE_DOC_EXPORT = "doc-export";
 
 	@Override
 	public UserListPayload getAllUsers() {
@@ -873,6 +866,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		return payload;
 	}
 
+	/*
 	@Override
 	public Payload exportDoc(String docId, String userId) {
 		Status status = new Status();
@@ -919,4 +913,5 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 		return payload;
 	}
+	*/
 }

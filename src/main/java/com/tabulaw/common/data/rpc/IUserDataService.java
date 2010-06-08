@@ -175,5 +175,5 @@ public interface IUserDataService extends RemoteService {
 	 * @param userId id of the user to which the exported doc is emailed
 	 * @return the resultant status of the export op wrapped in a payload
 	 */
-	Payload exportDoc(String docId, String userId);
+	//Payload exportDoc(String docId, String userId);
 }

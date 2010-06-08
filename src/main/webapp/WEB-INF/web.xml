@@ -118,21 +118,30 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>DocUploadServlet</servlet-name>
-		<servlet-class>com.tabulaw.server.DocUploadServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>DocUploadServlet</servlet-name>
-		<url-pattern>/poc/docupload</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>DocViewServlet</servlet-name>
 		<servlet-class>com.tabulaw.server.DocViewServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DocViewServlet</servlet-name>
 		<url-pattern>/doc/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>DocDownloadServlet</servlet-name>
+		<servlet-class>com.tabulaw.server.DocDownloadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DocDownloadServlet</servlet-name>
+		<url-pattern>/docdownload/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>DocUploadServlet</servlet-name>
+		<servlet-class>com.tabulaw.server.DocUploadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DocUploadServlet</servlet-name>
+		<url-pattern>/poc/docupload</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

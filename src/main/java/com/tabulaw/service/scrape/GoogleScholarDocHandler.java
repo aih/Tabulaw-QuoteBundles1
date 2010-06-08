@@ -193,7 +193,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 				docUrl = href;
 				docTitleHtml = cleaner.getInnerHtml(tn);
 				// strip out html tags
-				docTitle = docTitleHtml.replaceAll("\\<.*?\\>", "");
+				//docTitle = docTitleHtml.replaceAll("\\<.*?\\>", "");
 				docTitle = StringEscapeUtils.unescapeHtml(docTitle);
 			}
 			else {
