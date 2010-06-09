@@ -107,7 +107,6 @@ public class DocDownloadServlet extends HttpServlet {
 			// clean up
 			if(fdoc != null) fdoc.delete();
 			if(fconverted != null) fconverted.delete();
-			
 		}
 	}
 }

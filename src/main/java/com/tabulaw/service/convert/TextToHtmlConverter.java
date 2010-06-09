@@ -37,7 +37,7 @@ public class TextToHtmlConverter extends AbstractFileConverter {
 		if(fcontent == null) fcontent = "";
 
 		StringBuilder sb = new StringBuilder(fcontent);
-		// DocUtils.localizeDoc(sb, fname);
+		DocUtils.htmlizeText(sb, fname);
 
 		File fout = createSiblingFile(input, "html");
 		FileUtils.writeStringToFile(fout, sb.toString(), "UTF-8");

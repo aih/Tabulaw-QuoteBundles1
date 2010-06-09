@@ -13,7 +13,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -30,13 +29,13 @@ import com.tabulaw.common.model.EntityFactory;
  */
 public class DocUtils {
 
-	static final DateFormat dateFormat = new SimpleDateFormat("M/d/yyyy");
-
 	static final String htmlPrefixBlock, htmlSuffixBlock;
 
 	static final String jsScriptCallbackBlock, cssHighightStylesBlock;
 
 	static final String docDirPath;
+
+	private static final DateFormat dateFormat = new SimpleDateFormat("M/d/yyyy");
 
 	static {
 		htmlPrefixBlock =
@@ -134,6 +133,7 @@ public class DocUtils {
 		return f;
 	}
 
+
 	/**
 	 * Serializes the state of the given doc ref into a single token.
 	 * @param doc doc to serialize
@@ -141,7 +141,7 @@ public class DocUtils {
 	 */
 	public static String serializeDocument(DocRef doc) {
 		StringBuilder sb = new StringBuilder(1024);
-
+	
 		String docId = doc.getId();
 		sb.append("id::");
 		sb.append(docId == null ? "" : docId);
@@ -149,11 +149,11 @@ public class DocUtils {
 		sb.append(doc.getTitle());
 		sb.append("|date::");
 		sb.append(dateFormat.format(doc.getDate()));
-
+	
 		CaseRef caseRef = doc.getCaseRef();
 		if(caseRef != null) {
 			sb.insert(0, "[casedoc]");
-
+	
 			sb.append("|parties::");
 			sb.append(caseRef.getParties());
 			sb.append("|reftoken::");
@@ -172,9 +172,9 @@ public class DocUtils {
 			// for now, assume it is a contract doc
 			sb.insert(0, "[doc]");
 		}
-
+	
 		sb.append("\n"); // newline
-
+	
 		return sb.toString();
 	}
 
@@ -187,27 +187,27 @@ public class DocUtils {
 	public static DocRef deserializeDocToken(String stoken) {
 		// check to see if we have a serializer first line
 		if(stoken.charAt(0) != '[') return null;
-
+	
 		// doc related
 		String title = null;
-
+	
 		// case related
 		String parties = null, reftoken = null, docLoc = null, court = null, url = null, year = null;
 		Date date = null;
-
+	
 		int nli = stoken.indexOf('\n');
 		String firstline = stoken.substring(0, nli);
 		int eti = firstline.indexOf(']');
-
+	
 		String type = stoken.substring(1, eti);
 		firstline = firstline.substring(eti + 1);
-
+	
 		String[] sarr1 = firstline.split("\\|");
 		for(String sub : sarr1) {
 			String[] sarr2 = sub.split("::");
 			String name = sarr2[0];
 			String value = (sarr2.length == 2) ? sarr2[1] : "";
-
+	
 			// doc related
 			if("title".equals(name)) {
 				title = value;
@@ -216,11 +216,11 @@ public class DocUtils {
 				try {
 					date = dateFormat.parse(value);
 				}
-				catch(ParseException e) {
+				catch(/*ParseException*/Exception e) {
 					throw new IllegalArgumentException("Un-parseable date string: " + value);
 				}
 			}
-
+	
 			else if("casedoc".equals(type)) {
 				// case related
 				if("parties".equals(name)) {
@@ -243,7 +243,7 @@ public class DocUtils {
 				}
 			}
 		}
-
+	
 		if("casedoc".equals(type))
 			return EntityFactory.get().buildCaseDoc(title, date, parties, reftoken, docLoc, court, url, year);
 		else if("doc".equals(type))
@@ -251,7 +251,7 @@ public class DocUtils {
 		else
 			throw new IllegalArgumentException("Unhandled doc type: " + type);
 	}
-
+	
 	/**
 	 * "Localizes" doc html content by injecting local css and js blocks needed
 	 * for client-side doc functionality if not already present.
@@ -287,6 +287,17 @@ public class DocUtils {
 			doc.insert(index, jsBlock);
 		}
 	}
+	
+	/**
+	 * Generic html-ization of arbitrary input text.
+	 * @param sb buffer holding the input text
+	 * @param title the title to use in the html header
+	 */
+	public static void htmlizeText(StringBuilder sb, String title) {
+		String prefix = htmlPrefixBlock.replace("${title}", title);
+		sb.insert(0, prefix);
+		sb.append(htmlSuffixBlock);
+	}
 
 	/**
 	 * Opens a connection for the given http url setting the user-agent property
@@ -299,14 +310,11 @@ public class DocUtils {
 		HttpURLConnection conn = (HttpURLConnection) anHttpUrl.openConnection();
 
 		// IMPT: we must set the user-agent otherwise a possible 403 response
-		conn.setRequestProperty("User-agent",
-		// "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.3 (KHTML, like Gecko) Chrome/5.0.360.0 Safari/533.3");
-				"Chrome/5.0.360.0");
+		conn.setRequestProperty("User-agent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US)");
 		conn.setRequestProperty("Accept", "text/html");
 		conn.setRequestProperty("Accept-Encoding", "deflate");
 		conn.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
-		// conn.setRequestProperty("Accept-Language",
-		// "ISO-8859-1,utf-8;q=0.7,*;q=0.3");
+		// conn.setRequestProperty("Accept-Language", "ISO-8859-1,utf-8;q=0.7,*;q=0.3");
 		conn.setRequestProperty("Accept-Language", "utf-8;q=0.7,*;q=0.3");
 
 		return conn.getInputStream();

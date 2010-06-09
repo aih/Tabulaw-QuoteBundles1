@@ -76,7 +76,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			imgEdit.setTitle("Edit document");
 
 			aDwnldAsWordDoc = new Anchor("Download as MS Word doc", false);
-			aDwnldAsWordDoc.setTarget("_blank");
+			aDwnldAsWordDoc.setTarget("_top");
 			//imgExport.setStyleName("imgExport");
 			//imgExport.setTitle("Export to MS Word");
 

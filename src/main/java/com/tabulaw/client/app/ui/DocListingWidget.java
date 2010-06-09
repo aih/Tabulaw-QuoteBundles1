@@ -192,8 +192,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 						@Override
 						public void onClick(ClickEvent event) {
 							event.stopPropagation();
-							// TODO impl - export to MS Word doc
-							Window.alert("TODO impl - export to MS Word doc");
+							Window.open("docdownload?mimeType=application/msword&docId=" + rowData.getId(), "_top", null);
 						}
 					});
 					fpanel.add(img);

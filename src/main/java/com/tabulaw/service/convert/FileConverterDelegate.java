@@ -83,7 +83,7 @@ public class FileConverterDelegate {
 	private List<IFileConverter> getSupportedConverters(File f, String targetMimeType) {
 		ArrayList<IFileConverter> supportedConverters = new ArrayList<IFileConverter>(converters.length);
 		for(IFileConverter c : converters) {
-			if(c.getTargetMimeType().equals(targetMimeType) && c.isFileConvertable(f)) {
+			if(c.isFileConvertable(f)) {
 				supportedConverters.add(c);
 			}
 		}

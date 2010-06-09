@@ -238,6 +238,26 @@ function textNodeSurround(textNode, surroundElm) {
 	surroundElm.appendChild(textNode);
 }
 
+/**
+ * Finds the nearest non-whitespace char index in a text node starting the the
+ * specified offset checking either left or right
+ * @param tn text node to check
+ * @param startOffset offset to start at
+ * @param toleft iterate to the left or right
+ * @return nearest index (relative to start of text node) containing non-whitespace char or -1 if none is found
+ */
+function getNearestNonWhitespaceIndex(tn, startOffset, toleft) {
+	var tnv = tn.nodeValue;
+	var tlen = tnv.length;
+	
+	if(!isWhitespaceChar(tnv[startOffset])) return startOffset;
+
+	if(toleft) {
+		
+	} else {
+	}
+}
+
 var mcounter = 0;
 
 /**
@@ -613,11 +633,11 @@ function Mark() {
 	}
 	
 	if(arguments) {
-		if(arguments.length ==1) {
+		if(arguments.length == 1) {
 			// from range
 			var arg0 = arguments[0];
 			this.applyRange(arg0);
-		} else if(arguments.length ==2) {
+		} else if(arguments.length == 2) {
 			// from serialized token
 			var arg0 = arguments[0];
 			var arg1 = arguments[1];
