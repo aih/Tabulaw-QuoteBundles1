@@ -15,7 +15,7 @@ import com.tabulaw.service.DocUtils;
  * Converts text files to html files.
  * @author jpk
  */
-public class TextToHtmlConverter extends AbstractFileConverter {
+public class TextToHtmlManualConverter extends AbstractFileConverter {
 
 	@Override
 	public String getTargetMimeType() {

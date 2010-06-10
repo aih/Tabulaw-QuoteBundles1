@@ -37,26 +37,28 @@ public class HtmlToDocCompositeFileConverter implements IFileConverter {
 
 	@Override
 	public File convert(File input) throws Exception {
-		// try the open office converter first
-		try {
-			return openOfficeConverter.convert(input);
+		if(openOfficeConverter != null) {
+			try {
+				// try the open office converter first
+				return openOfficeConverter.convert(input);
+			}
+			catch(Exception e) {
+				if(log.isInfoEnabled()) log.info("Unable to convert html to doc via open office due to error: " + e.getMessage() + ".  Now trying manual conversion..");
+			}
 		}
-		catch(Exception e) {
-			log.info("Unable to convert html to doc via open office due to error: " + e.getMessage() + ".  Now trying manual conversion..");
-			// fall back on manual conversion
-			return manualConverter.convert(input);
-		}
+		// fall back on manual conversion
+		return manualConverter.convert(input);
 	}
 
 	@Override
 	public String getTargetMimeType() {
 		// NOTE: either one is suitable to delegating to
-		return openOfficeConverter.getTargetMimeType();
+		return manualConverter.getTargetMimeType();
 	}
 
 	@Override
 	public boolean isFileConvertable(File f) {
 		// NOTE: either one is suitable to delegating to
-		return openOfficeConverter.isFileConvertable(f);
+		return manualConverter.isFileConvertable(f);
 	}
 }

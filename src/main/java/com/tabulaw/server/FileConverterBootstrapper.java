@@ -20,7 +20,7 @@ import com.tabulaw.service.convert.DocToHtmlConverter;
 import com.tabulaw.service.convert.FileConverterDelegate;
 import com.tabulaw.service.convert.HtmlToDocCompositeFileConverter;
 import com.tabulaw.service.convert.IFileConverter;
-import com.tabulaw.service.convert.TextToHtmlConverter;
+import com.tabulaw.service.convert.TextToHtmlCompositeFileConverter;
 import com.tabulaw.service.convert.ToHtmlPassThroughConverter;
 
 /**
@@ -52,7 +52,7 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 		converters.add(new ToHtmlPassThroughConverter());
 
 		// text to html converter
-		converters.add(new TextToHtmlConverter());
+		converters.add(new TextToHtmlCompositeFileConverter(ooc));
 
 		if(ooc != null) {
 			// doc to html converter
