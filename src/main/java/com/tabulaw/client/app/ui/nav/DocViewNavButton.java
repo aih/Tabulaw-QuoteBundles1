@@ -5,6 +5,8 @@
  */
 package com.tabulaw.client.app.ui.nav;
 
+import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.DOM;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.mvc.view.IViewInitializer;
@@ -28,7 +30,14 @@ public class DocViewNavButton extends AbstractNavButton implements IModelKeyProv
 		super();
 		this.documentKey = docKey;
 		setTitle(documentKey.descriptor());
-		setDisplay(docKey.getName(), "doc", Resources.INSTANCE.documentIcon());
+		setDisplay(docKey.getName(), "doc", Resources.INSTANCE.XButton());
+	}
+
+	@Override
+	public void setDisplay(String text, String buttonSecondaryStyle, ImageResource imageResource) {
+		super.setDisplay(text, buttonSecondaryStyle, imageResource);
+		// image goes last
+		DOM.appendChild(getElement(), img.getElement());
 	}
 
 	@Override

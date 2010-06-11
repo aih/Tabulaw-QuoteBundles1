@@ -93,7 +93,7 @@ public class DocUploadServlet extends HttpServlet {
 						numSuccessful++;
 
 						// convert to html
-						File fconverted = fconverter.convert(fupload, item.getContentType());
+						File fconverted = fconverter.convert(fupload, "text/html");
 
 						// create doc ref
 						String docTitle = fconverted.getName(); // for now

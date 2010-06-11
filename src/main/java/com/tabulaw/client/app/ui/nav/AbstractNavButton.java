@@ -19,8 +19,8 @@ import com.tabulaw.client.mvc.view.IViewInitializerProvider;
  */
 abstract class AbstractNavButton extends FocusWidget implements IViewInitializerProvider {
 
-	private Image img;
-	private Element span;
+	protected Image img;
+	protected Element span;
 
 	/**
 	 * Constructor
@@ -53,7 +53,7 @@ abstract class AbstractNavButton extends FocusWidget implements IViewInitializer
 			if(img == null) {
 				img = new Image();
 				img.setStyleName("icon");
-				DOM.insertBefore(getElement(), img.getElement(), DOM.getFirstChild(getElement()));
+				DOM.insertChild(getElement(), img.getElement(), 0);
 			}
 			img.setResource(imageResource);
 		}
