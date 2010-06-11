@@ -5,11 +5,14 @@
  */
 package com.tabulaw.client.app.ui.nav;
 
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
+import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.IViewInitializer;
+import com.tabulaw.client.mvc.view.UnloadViewRequest;
+import com.tabulaw.client.mvc.view.ViewKey;
 import com.tabulaw.common.model.DocKey;
 import com.tabulaw.common.model.IModelKeyProvider;
 import com.tabulaw.common.model.ModelKey;
@@ -31,13 +34,10 @@ public class DocViewNavButton extends AbstractNavButton implements IModelKeyProv
 		this.documentKey = docKey;
 		setTitle(documentKey.descriptor());
 		setDisplay(docKey.getName(), "doc", Resources.INSTANCE.XButton());
-	}
-
-	@Override
-	public void setDisplay(String text, String buttonSecondaryStyle, ImageResource imageResource) {
-		super.setDisplay(text, buttonSecondaryStyle, imageResource);
 		// image goes last
 		DOM.appendChild(getElement(), img.getElement());
+		img.setTitle("Close");
+		sinkEvents(Event.ONCLICK);
 	}
 
 	@Override
@@ -48,5 +48,18 @@ public class DocViewNavButton extends AbstractNavButton implements IModelKeyProv
 	@Override
 	public ModelKey getModelKey() {
 		return documentKey;
+	}
+
+	@Override
+	public void onBrowserEvent(Event event) {
+		if(DOM.eventGetType(event) == Event.ONCLICK) {
+			if(event.getEventTarget().cast() == img.getElement()) {
+				ViewKey vk = getViewInitializer().getViewKey();
+				ViewManager.get().dispatch(new UnloadViewRequest(vk, true, false));
+				event.stopPropagation();
+				return;
+			}
+		}
+		super.onBrowserEvent(event);
 	}
 }

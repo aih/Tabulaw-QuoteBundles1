@@ -357,14 +357,16 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 			pendingUnload.vc.getView().onDestroy();
 
 			// fire view un-load event
+			final ViewKey vk = pendingUnload.getViewKey();
 			DeferredCommand.addCommand(new Command() {
 
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void execute() {
-					viewChangeHandlers.fireEvent(ViewChangeEvent.viewUnloadedEvent(pendingUnload.getViewKey()));
+					viewChangeHandlers.fireEvent(ViewChangeEvent.viewUnloadedEvent(vk));
 				}
 			});
+			
 			pendingUnload = null;
 		}
 

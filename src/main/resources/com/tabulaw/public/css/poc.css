@@ -153,6 +153,9 @@ div.ro {
 		width: inherit;
 		font-weight: bold;
 	}
+	.gwt-TabBarItem .navButton-doc img {
+		margin: 1px 0 0 10px;
+	}
 
 #navCol {
 	float: left;
