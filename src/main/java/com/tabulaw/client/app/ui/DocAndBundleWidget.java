@@ -224,7 +224,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	private boolean maybeSetCurrentQuoteBundle() {
 		QuoteBundle crntQb = ClientModelCache.get().getCurrentQuoteBundle();
 		if(crntQb == null) {
-			
+
 			// don't auto-create if there are existing eligible bundles
 			// TODO establish a priority scheme by which eligible bundles are sorted
 			QuoteBundle oqb = ClientModelCache.get().getOrphanedQuoteBundle();
@@ -250,11 +250,11 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				String qbDesc = "Quote Bundle for " + qbName;
 				crntQb = EntityFactory.get().buildBundle(qbName, qbDesc);
 				crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
-				
+
 				// client-side persist
 				ClientModelCache.get().getUserState().setCurrentQuoteBundleId(crntQb.getId());
 				ClientModelCache.get().persist(crntQb, this);
-				
+
 				// server-side persist
 				ServerPersistApi.get().addBundle(crntQb);
 			}
@@ -265,7 +265,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 			if(crntQbId != null) {
 				// un-hightlight quotes
 				highlightQuotes(false);
-				
+
 				wDocQuoteBundle.clearQuotesFromUi();
 				wDocQuoteBundle.clearQuoteEventBindings();
 			}
@@ -307,11 +307,14 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 			// sync
 			if(op == ModelChangeOp.UPDATED && !qbChanged) wDocQuoteBundle.sync((QuoteBundle) m);
-			
+
 			// re-apply quote highlights
 			if(wDocViewer.isDocContentLoaded()) {
 				highlightQuotes(true);
 			}
+		}
+		else if(et == EntityType.QUOTE && op == ModelChangeOp.DELETED) {
+			wDocQuoteBundle.removeQuote((Quote) m, true, false);
 		}
 	}
 

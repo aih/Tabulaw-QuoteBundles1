@@ -103,14 +103,15 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 	@Override
 	public QuoteDocWidget removeQuote(Quote mQuote, boolean removeFromModel, boolean persist) {
 		QuoteDocWidget w = super.removeQuote(mQuote, removeFromModel, persist);
-
-		// un-highlight
-		MarkOverlay mark = (MarkOverlay) w.getModel().getMark();
-		if(mark != null) mark.unhighlight();
-
-		// un-bind quote event registration
-		if(hrQuoteEventBindings != null) hrQuoteEventBindings.remove(w);
-
+		if(w != null) {
+	
+			// un-highlight
+			MarkOverlay mark = (MarkOverlay) w.getModel().getMark();
+			if(mark != null) mark.unhighlight();
+	
+			// un-bind quote event registration
+			if(hrQuoteEventBindings != null) hrQuoteEventBindings.remove(w);
+		}
 		return w;
 	}
 }

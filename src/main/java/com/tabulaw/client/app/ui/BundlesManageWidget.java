@@ -508,5 +508,20 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 					break;
 			}
 		}
+		else if(et == EntityType.QUOTE) {
+			Quote q = (Quote) m;
+			switch(event.getChangeOp()) {
+				case DELETED:
+					// iterate through the bundles and remove the quote 
+					for(int i = 0; i < columns.getWidgetCount(); i++) {
+						BundleEditWidget qbw = (BundleEditWidget) columns.getWidget(i);
+						if(qbw.removeQuote(q, true, false) != null) {
+							// found it
+							break;
+						}
+					}
+					break;
+			}
+		}
 	}
 }

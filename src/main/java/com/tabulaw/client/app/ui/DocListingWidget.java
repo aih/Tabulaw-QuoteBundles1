@@ -41,6 +41,7 @@ import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.rpc.DocListingPayload;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityType;
+import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.User;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.listhandler.InMemoryListHandler;
@@ -157,6 +158,12 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 							if(Window.confirm(confirm)) {
 
 								// client
+								// remove quotes bound to the doc
+								List<Quote> quotesToRemove = ClientModelCache.get().getQuotesByDoc(rowData.getId());
+								for(Quote q : quotesToRemove) {
+									ClientModelCache.get().remove(q.getModelKey(), table);
+								}
+								// remove the doc
 								ClientModelCache.get().remove(rowData.getModelKey(), table);
 
 								operator.refresh();

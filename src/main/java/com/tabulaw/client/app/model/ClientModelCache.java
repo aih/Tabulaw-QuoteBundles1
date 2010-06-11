@@ -23,6 +23,7 @@ import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityType;
 import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.User;
 import com.tabulaw.common.model.UserState;
@@ -379,5 +380,17 @@ public class ClientModelCache {
 			if(surl != null && surl.equals(remoteCaseUrl)) return (DocRef) m;
 		}
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Quote> getQuotesByDoc(String docId) {
+		List<Quote> quotes = (List) entities.get(EntityType.QUOTE.name());
+		ArrayList<Quote> rlist = new ArrayList<Quote>();
+		for(Quote q : quotes) {
+			if(q.getDocument().getId().equals(docId)) {
+				rlist.add(q);
+			}
+		}
+		return rlist;
 	}
 }

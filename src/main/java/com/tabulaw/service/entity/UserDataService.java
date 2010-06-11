@@ -320,17 +320,31 @@ public class UserDataService extends AbstractEntityService {
 
 	/**
 	 * Deletes the doc and doc content given its id as well as all doc/user
-	 * bindings.
+	 * bindings as well as any referenced quotes <em>permanantly</em>.
 	 * <p>
 	 * Both the Doc and DocContent entities are deleted.
 	 * <p>
-	 * NOTE: Quotes (which may point to the target doc) are un-affected.
+	 * NOTE: Quotes (which may point to the target doc) are also permanantly
+	 * deleted!
 	 * @param docId id of the doc to delete
 	 * @throws EntityNotFoundException when the doc of the given id can't be found
 	 */
 	@Transactional
 	public void deleteDoc(String docId) throws EntityNotFoundException {
 		if(docId == null) throw new NullPointerException();
+
+		removeAllDocUserBindingsForDoc(docId);
+
+		// remove all quotes and quote/user bindings
+		List<Quote> quotes = findQuotesByDoc(docId);
+		for(Quote q : quotes) {
+			List<QuoteUserBinding> bindings = getQuoteUserBindingsForQuote(q.getId());
+			for(QuoteUserBinding b : bindings) {
+				dao.purge(b);
+			}
+			dao.purge(Quote.class, q.getId());
+		}
+
 		dao.purge(DocRef.class, docId);
 		try {
 			dao.purge(DocContent.class, docId);
@@ -338,7 +352,6 @@ public class UserDataService extends AbstractEntityService {
 		catch(EntityNotFoundException e) {
 			// ok
 		}
-		removeAllDocUserBindingsForDoc(docId);
 	}
 
 	/**
@@ -582,6 +595,10 @@ public class UserDataService extends AbstractEntityService {
 
 		removeQuoteUserBinding(userId, quoteId);
 
+		dao.purge(Quote.class, quoteId);
+
+		// this shouldn't be necessary
+		/*
 		List<QuoteBundle> qbs = dao.loadAll(QuoteBundle.class);
 		for(QuoteBundle qb : qbs) {
 			Quote tormv = null;
@@ -599,6 +616,7 @@ public class UserDataService extends AbstractEntityService {
 				dao.purge(tormv);
 			}
 		}
+		*/
 	}
 
 	/**
@@ -748,6 +766,19 @@ public class UserDataService extends AbstractEntityService {
 		QuoteUserBinding binding = findQuoteUserBinding(userId, quoteId);
 		dao.purge(binding);
 	}
+	
+	@Transactional(readOnly = true)
+	public List<QuoteUserBinding> getQuoteUserBindingsForQuote(String quoteId) {
+		if(quoteId == null) throw new NullPointerException();
+		Criteria<QuoteUserBinding> c = new Criteria<QuoteUserBinding>(QuoteUserBinding.class);
+		c.getPrimaryGroup().addCriterion("quoteId", quoteId, Comparator.EQUALS, true);
+		try {
+			return dao.findEntities(c, null);
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
 	/**
 	 * Updates an existing quote/user binding's orphan property.
@@ -763,6 +794,25 @@ public class UserDataService extends AbstractEntityService {
 		BundleUserBinding binding = findBundleUserBinding(userId, bundleId);
 		binding.setOrphaned(orphan);
 		dao.persist(binding);
+	}
+
+	/**
+	 * Gets all quotes that point to the doc having the given doc id.
+	 * @param docId
+	 * @return non-<code>null</code> list of quotes
+	 */
+	@Transactional(readOnly = true)
+	public List<Quote> findQuotesByDoc(String docId) {
+		Criteria<Quote> c = new Criteria<Quote>(Quote.class);
+		c.getPrimaryGroup().addCriterion("document.id", docId, Comparator.EQUALS, true);
+		List<Quote> list;
+		try {
+			list = dao.findEntities(c, null);
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
+		return list;
 	}
 
 	private BundleUserBinding findBundleUserBinding(String userId, String bundleId) throws EntityNotFoundException {

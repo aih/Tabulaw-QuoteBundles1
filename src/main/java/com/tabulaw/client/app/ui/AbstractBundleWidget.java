@@ -156,14 +156,15 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle> {
 	 * @param removeFromModel 
 	 * @param persist update the datastore (which will trigger a model change
 	 *        event)?
-	 * @return the widget of the removed quote
+	 * @return the widget of the removed quote or <code>null</code> if not present
 	 */
 	public Q removeQuote(final Quote mQuote, boolean removeFromModel, boolean persist) {
 		if(mQuote == null) throw new NullPointerException();
 
 		Q qw = getQuoteWidget(mQuote.getId());
 		if(qw == null)
-			throw new IllegalArgumentException("No quote widget contained having quote with id: " + mQuote.getId());
+			//throw new IllegalArgumentException("No quote widget contained having quote with id: " + mQuote.getId());
+			return null;
 
 		removeQuoteWidget(qw, true, removeFromModel);
 
