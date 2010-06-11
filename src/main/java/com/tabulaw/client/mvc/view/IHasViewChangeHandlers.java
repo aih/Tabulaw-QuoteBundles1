@@ -5,23 +5,19 @@
  */
 package com.tabulaw.client.mvc.view;
 
-
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.HasHandlers;
 
 /**
  * IHasViewChangeHandlers
  * @author jpk
  */
-public interface IHasViewChangeHandlers {
+public interface IHasViewChangeHandlers extends HasHandlers {
 
 	/**
-	 * Adds a handler.
+	 * Adds a view change handler.
 	 * @param handler
+	 * @return the handler registration
 	 */
-	void addViewChangeHandler(IViewChangeHandler handler);
-
-	/**
-	 * Removes a handler.
-	 * @param handler
-	 */
-	void removeViewChangeHandler(IViewChangeHandler handler);
+	HandlerRegistration addViewChangeHandler(IViewChangeHandler handler);
 }
