@@ -6,7 +6,6 @@ package com.tabulaw.client.mvc;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -25,6 +24,8 @@ import com.tabulaw.client.mvc.view.IView;
 import com.tabulaw.client.mvc.view.IViewChangeHandler;
 import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.IViewRequest;
+import com.tabulaw.client.mvc.view.ShowViewRequest;
+import com.tabulaw.client.mvc.view.UnloadViewRequest;
 import com.tabulaw.client.mvc.view.ViewChangeEvent;
 import com.tabulaw.client.mvc.view.ViewKey;
 import com.tabulaw.client.mvc.view.ViewOptions;
@@ -144,11 +145,6 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	private CView initial, current, pendingUnload;
 
 	/**
-	 * The controllers to handle view requests.
-	 */
-	private final List<IController> controllers = new ArrayList<IController>();
-
-	/**
 	 * The view request that is pending.
 	 * <p>
 	 * In order to comply with the history event system, we must be routed from
@@ -175,10 +171,6 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		parentViewPanel = new PanelWrapper(parentPanel);
 		cache = new ViewCache(cacheCapacity);
 		History.addValueChangeHandler(this);
-
-		// add supported controllers
-		controllers.add(new ShowViewController());
-		controllers.add(new UnloadViewController());
 	}
 
 	@Override
@@ -651,18 +643,14 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	private void doDispatch(IViewRequest request) {
 		// do actual disptach
 		Log.debug("Dispatching view request: " + request + " ..");
-		for(final IController c : controllers) {
-			if(c.canHandle(request)) {
-				c.handle(request);
-				
-				// execute on complete command if specified
-				Command cmd = request.onCompleteCommand();
-				if(cmd != null) cmd.execute();
-				
-				return;
-			}
+		if(request instanceof ShowViewRequest) {
+			setCurrentView(((ShowViewRequest) request).getViewInitializer());
 		}
-		throw new IllegalStateException("Unhandled view request: " + request);
+		else if(request instanceof UnloadViewRequest) {
+			UnloadViewRequest u= (UnloadViewRequest) request;
+			unloadView(u.getViewKey(), u.isDestroy(), u.isErradicate());
+		}
+		else throw new IllegalStateException("Unhandled view request: " + request);
 	}
 
 	public void onValueChange(ValueChangeEvent<String> event) {
