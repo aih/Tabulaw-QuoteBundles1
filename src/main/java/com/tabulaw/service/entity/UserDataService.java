@@ -203,7 +203,7 @@ public class UserDataService extends AbstractEntityService {
 	 * @return non-<code>null</code> {@link QuoteBundle} instance
 	 */
 	@Transactional
-	public QuoteBundle getOrphanedQuotesBundleForUser(String userId) {
+	public QuoteBundle getOrphanedQuoteBundleForUser(String userId) {
 		if(userId == null) throw new NullPointerException();
 
 		QuoteBundle oqc = null;
@@ -243,7 +243,7 @@ public class UserDataService extends AbstractEntityService {
 		if(userId == null) throw new NullPointerException();
 
 		// first ensure an orphaned quotes container exists for user
-		getOrphanedQuotesBundleForUser(userId);
+		getOrphanedQuoteBundleForUser(userId);
 
 		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
 		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
@@ -342,6 +342,10 @@ public class UserDataService extends AbstractEntityService {
 			for(QuoteUserBinding b : bindings) {
 				dao.purge(b);
 			}
+
+			// db4o-ism
+			removeQuoteRefFromBundles(q.getId());
+
 			dao.purge(Quote.class, q.getId());
 		}
 
@@ -506,7 +510,7 @@ public class UserDataService extends AbstractEntityService {
 
 			// get handle to user's orphaned quotes container if we're not deleting
 			// quotes
-			QuoteBundle oqc = deleteQuotes ? null : getOrphanedQuotesBundleForUser(userId);
+			QuoteBundle oqc = deleteQuotes ? null : getOrphanedQuoteBundleForUser(userId);
 
 			for(Quote q : quotes) {
 				if(deleteQuotes) {
@@ -595,28 +599,10 @@ public class UserDataService extends AbstractEntityService {
 
 		removeQuoteUserBinding(userId, quoteId);
 
-		dao.purge(Quote.class, quoteId);
+		// db4o-ism
+		removeQuoteRefFromBundles(quoteId);
 
-		// this shouldn't be necessary
-		/*
-		List<QuoteBundle> qbs = dao.loadAll(QuoteBundle.class);
-		for(QuoteBundle qb : qbs) {
-			Quote tormv = null;
-			if(qb.getQuotes() != null) {
-				for(Quote q : qb.getQuotes()) {
-					if(q.getId().equals(quoteId)) {
-						tormv = q;
-						break;
-					}
-				}
-			}
-			if(tormv != null) {
-				qb.removeQuote(tormv);
-				dao.persist(qb);
-				dao.purge(tormv);
-			}
-		}
-		*/
+		dao.purge(Quote.class, quoteId);
 	}
 
 	/**
@@ -766,7 +752,7 @@ public class UserDataService extends AbstractEntityService {
 		QuoteUserBinding binding = findQuoteUserBinding(userId, quoteId);
 		dao.purge(binding);
 	}
-	
+
 	@Transactional(readOnly = true)
 	public List<QuoteUserBinding> getQuoteUserBindingsForQuote(String quoteId) {
 		if(quoteId == null) throw new NullPointerException();
@@ -856,5 +842,31 @@ public class UserDataService extends AbstractEntityService {
 			clist.add((DocRef) d.clone());
 		}
 		return clist;
+	}
+
+	/**
+	 * Removes the quote specified by the given id from any and all bundles that
+	 * reference the quote so that a null element isn't left in the quotes list
+	 * <p>
+	 * this is a db4o-ism only.
+	 * @param quoteId
+	 */
+	private void removeQuoteRefFromBundles(String quoteId) {
+		List<QuoteBundle> qbs = dao.loadAll(QuoteBundle.class);
+		for(QuoteBundle qb : qbs) {
+			Quote tormv = null;
+			if(qb.getQuotes() != null) {
+				for(Quote q : qb.getQuotes()) {
+					if(q.getId().equals(quoteId)) {
+						tormv = q;
+						break;
+					}
+				}
+			}
+			if(tormv != null) {
+				qb.removeQuote(tormv);
+				dao.persist(qb);
+			}
+		}
 	}
 }
