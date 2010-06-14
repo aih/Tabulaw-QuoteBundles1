@@ -6,15 +6,17 @@ package com.tabulaw.client.mvc;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.ComplexPanel;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.tabulaw.client.mvc.view.IHasViewChangeHandlers;
@@ -22,6 +24,8 @@ import com.tabulaw.client.mvc.view.IView;
 import com.tabulaw.client.mvc.view.IViewChangeHandler;
 import com.tabulaw.client.mvc.view.IViewInitializer;
 import com.tabulaw.client.mvc.view.IViewRequest;
+import com.tabulaw.client.mvc.view.ShowViewRequest;
+import com.tabulaw.client.mvc.view.UnloadViewRequest;
 import com.tabulaw.client.mvc.view.ViewChangeEvent;
 import com.tabulaw.client.mvc.view.ViewKey;
 import com.tabulaw.client.mvc.view.ViewOptions;
@@ -39,24 +43,18 @@ import com.tabulaw.client.ui.view.ViewContainer;
  * @author jpk
  */
 public final class ViewManager implements ValueChangeHandler<String>, IHasViewChangeHandlers {
+	
+	private static final class PanelWrapper extends Composite implements IHasViewChangeHandlers {
+		private final ComplexPanel panel;
 
-	/**
-	 * ViewChangeHandlers
-	 * @author jpk
-	 */
-	@SuppressWarnings("serial")
-	static final class ViewChangeHandlers extends ArrayList<IViewChangeHandler> {
+		public PanelWrapper(ComplexPanel panel) {
+			super();
+			this.panel = panel;
+		}
 
-		public void fireEvent(ViewChangeEvent event) {
-			Log.debug("Firing " + event);
-			// creting a new list avoids concurrent modification exception
-			// TODO use a queuing system instead! to ensure view change events are
-			// recieved in proper order by the listeners!!
-			// TODO if we do queue view change events, do we then need to defer them??
-			ArrayList<IViewChangeHandler> ihandlers = new ArrayList<IViewChangeHandler>(this);
-			for(final IViewChangeHandler handler : ihandlers) {
-				handler.onViewChange(event);
-			}
+		@Override
+		public HandlerRegistration addViewChangeHandler(IViewChangeHandler handler) {
+			return addHandler(handler, ViewChangeEvent.TYPE);
 		}
 	}
 
@@ -134,7 +132,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	 * The parent view panel. This property must be set so that views can attach
 	 * to the DOM. The panel must support multiple children.
 	 */
-	private final ComplexPanel parentViewPanel;
+	private final PanelWrapper parentViewPanel;
 
 	/**
 	 * The view cache.
@@ -145,17 +143,6 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	 * The first and currently pinned view.
 	 */
 	private CView initial, current, pendingUnload;
-
-	/**
-	 * The controllers to handle view requests.
-	 */
-	private final List<IController> controllers = new ArrayList<IController>();
-
-	/**
-	 * The collection of view change listeners that are notified when the current
-	 * view changes.
-	 */
-	private final ViewChangeHandlers viewChangeHandlers = new ViewChangeHandlers();
 
 	/**
 	 * The view request that is pending.
@@ -181,30 +168,26 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	 * @see ViewManager#initialize(ComplexPanel, int)
 	 */
 	private ViewManager(ComplexPanel parentPanel, int cacheCapacity) {
-		parentViewPanel = parentPanel;
+		parentViewPanel = new PanelWrapper(parentPanel);
 		cache = new ViewCache(cacheCapacity);
 		History.addValueChangeHandler(this);
-
-		// add supported controllers
-		controllers.add(new ShowViewController());
-		controllers.add(new UnloadViewController());
 	}
 
 	@Override
-	public void addViewChangeHandler(IViewChangeHandler handler) {
-		viewChangeHandlers.add(handler);
+	public HandlerRegistration addViewChangeHandler(IViewChangeHandler handler) {
+		return parentViewPanel.addViewChangeHandler(handler);
 	}
-
+	
 	@Override
-	public void removeViewChangeHandler(IViewChangeHandler handler) {
-		viewChangeHandlers.remove(handler);
+	public void fireEvent(GwtEvent<?> event) {
+		parentViewPanel.fireEvent(event);
 	}
 
 	/**
 	 * @return The assigned panel to which views are shown.
 	 */
 	public Panel getParentViewPanel() {
-		return parentViewPanel;
+		return parentViewPanel.panel;
 	}
 
 	/**
@@ -328,11 +311,11 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 			// ** pin the view (the current view in the dom) **
 			// vc.makePinReady();
 
-			if(options.isKeepInDom() && parentViewPanel.getWidgetIndex(vc) >= 0) {
+			if(options.isKeepInDom() && parentViewPanel.panel.getWidgetIndex(vc) >= 0) {
 				vc.setVisible(true);
 			}
 			else {
-				parentViewPanel.add(vc);
+				parentViewPanel.panel.add(vc);
 			}
 		}
 		// set as current
@@ -344,7 +327,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void execute() {
-				viewChangeHandlers.fireEvent(ViewChangeEvent.viewLoadedEvent(current.getViewKey()));
+				fireEvent(ViewChangeEvent.viewLoadedEvent(current.getViewKey()));
 			}
 		});
 
@@ -357,14 +340,16 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 			pendingUnload.vc.getView().onDestroy();
 
 			// fire view un-load event
+			final ViewKey vk = pendingUnload.getViewKey();
 			DeferredCommand.addCommand(new Command() {
 
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void execute() {
-					viewChangeHandlers.fireEvent(ViewChangeEvent.viewUnloadedEvent(pendingUnload.getViewKey()));
+					fireEvent(ViewChangeEvent.viewUnloadedEvent(vk));
 				}
 			});
+			
 			pendingUnload = null;
 		}
 
@@ -387,7 +372,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void execute() {
-					viewChangeHandlers.fireEvent(ViewChangeEvent.viewUnloadedEvent(old.getViewKey()));
+					fireEvent(ViewChangeEvent.viewUnloadedEvent(old.getViewKey()));
 				}
 			});
 		}
@@ -437,7 +422,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 					@SuppressWarnings("synthetic-access")
 					@Override
 					public void execute() {
-						viewChangeHandlers.fireEvent(ViewChangeEvent.viewUnloadedEvent(pendingUnload.getViewKey()));
+						fireEvent(ViewChangeEvent.viewUnloadedEvent(pendingUnload.getViewKey()));
 						pendingUnload = null;
 					}
 				});
@@ -658,18 +643,14 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	private void doDispatch(IViewRequest request) {
 		// do actual disptach
 		Log.debug("Dispatching view request: " + request + " ..");
-		for(final IController c : controllers) {
-			if(c.canHandle(request)) {
-				c.handle(request);
-				
-				// execute on complete command if specified
-				Command cmd = request.onCompleteCommand();
-				if(cmd != null) cmd.execute();
-				
-				return;
-			}
+		if(request instanceof ShowViewRequest) {
+			setCurrentView(((ShowViewRequest) request).getViewInitializer());
 		}
-		throw new IllegalStateException("Unhandled view request: " + request);
+		else if(request instanceof UnloadViewRequest) {
+			UnloadViewRequest u= (UnloadViewRequest) request;
+			unloadView(u.getViewKey(), u.isDestroy(), u.isErradicate());
+		}
+		else throw new IllegalStateException("Unhandled view request: " + request);
 	}
 
 	public void onValueChange(ValueChangeEvent<String> event) {

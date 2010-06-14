@@ -7,7 +7,6 @@ package com.tabulaw.client.mvc.view;
 
 import com.google.gwt.event.shared.EventHandler;
 
-
 /**
  * IViewChangeHandler - Handles {@link ViewChangeEvent}s.
  * @author jpk
