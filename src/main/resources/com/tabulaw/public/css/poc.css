@@ -144,15 +144,6 @@ div.ro {
 	.navButton .text {
 		vertical-align: middle;
 	}
-	.gwt-TabBarItem .navButton-doc {
-		width: 60px;
-		font-weight: normal;
-		overflow: hidden;
-	}
-	.gwt-TabBarItem-selected .navButton-doc {
-		width: inherit;
-		font-weight: bold;
-	}
 
 #navCol {
 	float: left;
@@ -279,6 +270,19 @@ div.ro {
 	.navRow .navButton .text {
 	}
 	.navRow .navButton-docs .text {
+	}
+
+	.gwt-TabBarItem .navButton-doc {
+		width: 60px;
+		font-weight: normal;
+		overflow: hidden;
+	}
+	.gwt-TabBarItem .navButton-doc img {
+		margin: 1px -4px 0 3px;
+	}
+	.gwt-TabBarItem-selected .navButton-doc {
+		width: inherit;
+		font-weight: bold;
 	}
 
 	/* nav row tab bar */
