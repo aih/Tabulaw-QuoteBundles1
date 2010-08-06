@@ -136,6 +136,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>QuoteBundleDownloadServlet</servlet-name>
+		<servlet-class>com.tabulaw.server.QuoteBundleDownloadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>QuoteBundleDownloadServlet</servlet-name>
+		<url-pattern>/quotebundledownload/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>DocUploadServlet</servlet-name>
 		<servlet-class>com.tabulaw.server.DocUploadServlet</servlet-class>
 	</servlet>
