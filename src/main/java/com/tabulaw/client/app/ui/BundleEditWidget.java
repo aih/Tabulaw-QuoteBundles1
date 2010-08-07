@@ -48,7 +48,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	 */
 	static class EditHeader extends EditableBundleHeader {
 
-		private final Image delete, current, close;
+		private final Image delete, current, word,close;
 
 		/**
 		 * Constructor
@@ -111,6 +111,26 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			else {
 				current = null;
 			}
+			word = new Image(Resources.INSTANCE.msword());
+			word.setTitle("Export to MS Word");
+			word.setStyleName(Styles.X);
+			word.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					if (bundle!=null){
+						String href = "quotebundledownload?mimeType=application/msword&bundleid=" + bundle.getId();
+						setLocation(href);
+						
+					}
+				}
+				public native void setLocation(String url) /*-{
+
+				$wnd.location.href = url;
+
+				}-*/;				
+			});
+			
+			buttons.add(word);
 
 			close = new Image(Resources.INSTANCE.XButton());
 			close.setTitle("Close");

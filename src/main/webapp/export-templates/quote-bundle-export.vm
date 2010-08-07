@@ -1,0 +1,12 @@
+<div>
+<font size="5">Quote Bundle</font><br/>
+<font size="3"><b> $quoteBundle.getName() </b></font><br/>
+DESCRIPTION: $quoteBundle.getDescription() <br/>
+<br/>
+<br/>
+#foreach( $quoteInfo in $quoteList )
+    <b>$quoteInfo.getTitle()</b><br/>
+    $quoteInfo.getSubTitle()<br/>
+    $quoteInfo.geQuote()<br/>
+#end
+</div>

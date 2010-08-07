@@ -20,6 +20,9 @@ public interface Resources extends ClientBundle {
 	@Source("../../public/images/trash.gif")
 	ImageResource trash();
 
+	@Source("../../public/images/word-16.gif")
+	ImageResource msword();
+
 	@Source("../../public/images/magnifying_glass_alt_24x24.png")
 	ImageResource magnifyingGlass();
 
