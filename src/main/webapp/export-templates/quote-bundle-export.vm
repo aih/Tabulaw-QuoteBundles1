@@ -7,6 +7,6 @@ DESCRIPTION: $quoteBundle.getDescription() <br/>
 #foreach( $quoteInfo in $quoteList )
     <b>$quoteInfo.getTitle()</b><br/>
     $quoteInfo.getSubTitle()<br/>
-    $quoteInfo.geQuote()<br/>
+    $quoteInfo.getQuote()<br/>
 #end
 </div>
