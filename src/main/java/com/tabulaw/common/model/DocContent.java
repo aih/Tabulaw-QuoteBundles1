@@ -6,7 +6,13 @@
  */
 package com.tabulaw.common.model;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.hibernate.validator.constraints.NotEmpty;
+
+import com.sun.xml.txw2.annotation.XmlCDATA;
 
 /**
  * Holds html content for a document.
@@ -15,6 +21,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * type.
  * @author jpk
  */
+@XmlRootElement(name = "docContent")
 public class DocContent extends EntityBase {
 
 	private static final long serialVersionUID = 7579142517520079175L;
@@ -66,11 +73,14 @@ public class DocContent extends EntityBase {
 	}
 
 	@Override
+	@XmlTransient
 	public String getEntityType() {
 		return EntityType.DOC_CONTENT.name();
 	}
 
 	@NotEmpty
+	@XmlElement
+	@XmlCDATA
 	public String getHtmlContent() {
 		return htmlContent;
 	}

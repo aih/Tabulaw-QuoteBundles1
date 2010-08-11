@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -16,6 +20,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * NOTE: there are no natural business keys defined for quote bundles.
  * @author jpk
  */
+@XmlRootElement(name = "quoteBundle")
 public class QuoteBundle extends TimeStampEntity implements INamedEntity, Comparable<QuoteBundle> {
 
 	private static final long serialVersionUID = -6606826756860275551L;
@@ -112,6 +117,8 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 	 * @return A newly created list containing the referenced quotes in this
 	 *         bundle.
 	 */
+	@XmlElementWrapper
+	@XmlElement(name = "quote")
 	public List<Quote> getQuotes() {
 		if(quotes == null) quotes = new ArrayList<Quote>();
 		return quotes;

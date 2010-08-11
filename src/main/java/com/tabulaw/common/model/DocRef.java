@@ -10,6 +10,8 @@ import java.util.Date;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -21,6 +23,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * document.
  * @author jpk
  */
+@XmlRootElement(name = "docRef")
 public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEntity {
 
 	private static final long serialVersionUID = -8257785916791525146L;
@@ -58,6 +61,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	}
 
 	@Override
+	@XmlTransient
 	public final DocKey getModelKey() {
 		return new DocKey(getEntityType(), getId(), getName(), getCitation());
 	}
@@ -95,6 +99,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	 * not a case doc.
 	 * @return the citation text or <code>null</code>
 	 */
+	@XmlTransient
 	public String getCitation() {
 		return caseRef == null ? null : caseRef.descriptor();
 	}
@@ -145,6 +150,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	/**
 	 * @return transient html content.
 	 */
+	@XmlTransient
 	public String getHtmlContent() {
 		return htmlContent;
 	}

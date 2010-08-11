@@ -45,6 +45,10 @@
 	<listener>
 		<listener-class>com.tabulaw.server.Bootstrapper</listener-class>
 	</listener>
+	<listener>
+		<listener-class>com.tabulaw.rest.RESTSessionManager</listener-class>
+	</listener>
+
 
 	<filter>
 		<filter-name>AuthenticationProcessingFilter</filter-name>
@@ -153,6 +157,27 @@
 		<url-pattern>/poc/doc</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>RESTServlet</servlet-name>
+		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+		<init-param>
+			<param-name>com.sun.jersey.config.property.packages</param-name>
+			<param-value>com.tabulaw.rest</param-value>
+		</init-param>
+		<init-param> 
+			<param-name>com.sun.jersey.spi.container.ResourceFilters</param-name> 
+			<param-value>com.tabulaw.rest.AuthorizationFilterFactory</param-value> 
+		</init-param>	
+		<init-param>
+			<param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+			<param-value>com.tabulaw.rest.TabulawUriConnegFilter,com.tabulaw.rest.FakeHttpMethodsFilter</param-value>
+		</init-param>			
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RESTServlet</servlet-name>
+		<url-pattern>/services/*</url-pattern>
+	</servlet-mapping>
+	
 	<!-- 
 	<login-config>
 	  <auth-method>BASIC</auth-method>

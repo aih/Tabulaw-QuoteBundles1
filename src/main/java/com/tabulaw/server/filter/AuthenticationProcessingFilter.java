@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import com.tabulaw.common.model.User;
 import com.tabulaw.config.Config;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.rest.RESTServletRequest;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.entity.UserService;
@@ -33,7 +34,8 @@ public final class AuthenticationProcessingFilter implements Filter {
 
 	private static final Log log = LogFactory.getLog(AuthenticationProcessingFilter.class);
 
-	public static final String AUTH_EXCEPTION_KEY = AuthenticationProcessingFilter.class.getName();
+	public static final String AUTH_EXCEPTION_KEY = AuthenticationProcessingFilter.class.getName();	
+	private static final String REST_SERVICES_PATH = "/services";
 
 	private static final String filterProcessesUrl = "/poc/login";
 
@@ -80,7 +82,7 @@ public final class AuthenticationProcessingFilter implements Filter {
 	*/
 
 	private boolean loginBypass = false;
-
+	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
 			ServletException {
@@ -88,7 +90,15 @@ public final class AuthenticationProcessingFilter implements Filter {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		HttpSession session = httpRequest.getSession(false);
-
+		
+		// because REST services are currently in one application with GWT
+		// implement for REST another logic
+		String restService = httpRequest.getContextPath() + REST_SERVICES_PATH;
+		if (httpRequest.getRequestURI().startsWith(restService)) {
+			chain.doFilter(new RESTServletRequest(httpRequest), response);
+			return;
+		}		
+		
 		// auto-create session if necessary
 		if(session == null) {
 			log.info("Creating http session");

@@ -6,8 +6,10 @@
 package com.tabulaw.service.entity;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidatorFactory;
@@ -270,6 +272,20 @@ public class UserDataService extends AbstractEntityService {
 			throw new IllegalStateException(e);
 		}
 	}
+	
+	/**
+	 * Gets the quote bundle given the bundle id.
+	 * @param bundleId
+	 * @throws EntityNotFoundException
+	 */
+	@Transactional(readOnly = true)
+	public QuoteBundle getQuoteBundle(String bundleId) throws EntityNotFoundException {
+		if(bundleId == null) {
+			throw new NullPointerException();
+		}
+		QuoteBundle bundle = dao.load(QuoteBundle.class, bundleId);
+		return bundle;
+	}
 
 	/**
 	 * Updates the non-relational bundle properties in the given bundle. The
@@ -295,6 +311,13 @@ public class UserDataService extends AbstractEntityService {
 		existingQb.setName(bundle.getName());
 		existingQb.setDescription(bundle.getDescription());
 		dao.persist(existingQb);
+	}
+	
+	@Transactional 
+	public void updateQuote(Quote quote) {
+		Quote exists = dao.load(Quote.class, quote.getId());
+		quote.doClone(exists);
+		dao.persist(exists);
 	}
 
 	/**
@@ -333,7 +356,8 @@ public class UserDataService extends AbstractEntityService {
 	public void deleteDoc(String docId) throws EntityNotFoundException {
 		if(docId == null) throw new NullPointerException();
 
-		removeAllDocUserBindingsForDoc(docId);
+		List<DocUserBinding> userBindings = getDocUserBindingsForDoc(docId);
+		dao.purgeAll(userBindings);
 
 		// remove all quotes and quote/user bindings
 		List<Quote> quotes = findQuotesByDoc(docId);
@@ -530,6 +554,20 @@ public class UserDataService extends AbstractEntityService {
 		dao.purge(bundle);
 		removeBundleUserBinding(userId, bundleId);
 	}
+	
+	/**
+	 * Gets the quote given the quote id.
+	 * @param quoteId
+	 * @throws EntityNotFoundException
+	 */
+	@Transactional(readOnly = true)
+	public Quote getQuote(String quoteId) throws EntityNotFoundException {
+		if (quoteId == null) {
+			throw new NullPointerException();
+		}
+		Quote quote = dao.load(Quote.class, quoteId);
+		return quote;
+	}
 
 	/**
 	 * Adds the given quote to the quote bundle identified by the given bundle id.
@@ -706,25 +744,21 @@ public class UserDataService extends AbstractEntityService {
 		}
 		dao.purge(binding);
 	}
-
+	
 	/**
-	 * Removes all user/doc bindings that exist for a given doc
+	 * Returns all user/doc bindings that exist for a given doc
 	 * @param docId id of the doc
 	 */
 	@Transactional
-	public void removeAllDocUserBindingsForDoc(String docId) {
+	public List<DocUserBinding> getDocUserBindingsForDoc(String docId) {
 		if(docId == null) throw new NullPointerException();
 		Criteria<DocUserBinding> c = new Criteria<DocUserBinding>(DocUserBinding.class);
 		c.getPrimaryGroup().addCriterion("docId", docId, Comparator.EQUALS, true);
-		Collection<DocUserBinding> bindings;
 		try {
-			bindings = dao.findEntities(c, null);
+			return dao.findEntities(c, null);
 		}
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
-		}
-		if(bindings != null && bindings.size() > 0) {
-			dao.purgeAll(bindings);
 		}
 	}
 
@@ -783,22 +817,161 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
-	 * Gets all quotes that point to the doc having the given doc id.
+	 * Checks does the specified document available for the user
+	 * 
+	 * @param userId
 	 * @param docId
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	public boolean isDocAvailableForUser(String userId, String docId) {
+		if(userId == null || docId == null) {
+			throw new NullPointerException();
+		}
+		
+		Criteria<DocUserBinding> c = new Criteria<DocUserBinding>(DocUserBinding.class);
+		c.getPrimaryGroup().addCriterion("docId", docId, Comparator.EQUALS, true);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		try {
+			dao.findEntity(c);
+			return true;
+		} catch (EntityNotFoundException ex) {
+			return false;
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}		
+	}
+	
+	/**
+	 * Checks does the bundle available for the user
+	 * 
+	 * @param userId
+	 * @param bundleId
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	public boolean isBundleAvailableForUser(String userId, String bundleId) {
+		if(userId == null || bundleId == null) {
+			throw new NullPointerException();
+		}
+		
+		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
+		c.getPrimaryGroup().addCriterion("bundleId", bundleId, Comparator.EQUALS, true);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		try {
+			dao.findEntity(c);
+			return true;
+		} catch (EntityNotFoundException ex) {
+			return false;
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}		
+	}	
+	
+	/**
+	 * Checks does the bundle available for the user
+	 * 
+	 * @param userId
+	 * @param bundleId
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	public boolean isQuoteAvailableForUser(String userId, String quoteId) {
+		if(userId == null || quoteId == null) {
+			throw new NullPointerException();
+		}
+		
+		Criteria<QuoteUserBinding> c = new Criteria<QuoteUserBinding>(QuoteUserBinding.class);
+		c.getPrimaryGroup().addCriterion("quoteId", quoteId, Comparator.EQUALS, true);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		try {
+			dao.findEntity(c);
+			return true;
+		} catch (EntityNotFoundException ex) {
+			return false;
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}		
+	}		
+
+	/**
+	 * Gets all quotes that point to the doc and available for current user 
+	 * having the given doc id.
+	 * @param docId
+	 * @param userId
 	 * @return non-<code>null</code> list of quotes
 	 */
 	@Transactional(readOnly = true)
-	public List<Quote> findQuotesByDoc(String docId) {
+	public List<Quote> findQuotesByDocForUser(String docId, String userId) {
 		Criteria<Quote> c = new Criteria<Quote>(Quote.class);
 		c.getPrimaryGroup().addCriterion("document.id", docId, Comparator.EQUALS, true);
 		List<Quote> list;
 		try {
 			list = dao.findEntities(c, null);
+			if (userId != null) {
+				Set<String> allowedIds = new HashSet<String>();
+				for (Quote quote : list) {
+					allowedIds.add(quote.getId());
+				}
+				Criteria<QuoteUserBinding> bindingCriteria = new Criteria<QuoteUserBinding>(QuoteUserBinding.class);
+				bindingCriteria.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+				bindingCriteria.getPrimaryGroup().addCriterion("quoteId", allowedIds, Comparator.IN, true);
+				
+				List<QuoteUserBinding> bindings = dao.findEntities(bindingCriteria, null);				
+				allowedIds.clear();
+				for (QuoteUserBinding binding : bindings) {
+					allowedIds.add(binding.getQuoteId());
+				}
+				
+				Iterator<Quote> iterator = list.iterator();
+				while (iterator.hasNext()) {
+					if (! allowedIds.contains(iterator.next().getId())) {
+						iterator.remove();
+					}
+				}				
+			}
 		}
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
 		}
 		return list;
+	}
+	
+	/**
+	 * Gets all quotes that point to the doc having the given doc id.
+	 * @param docId
+	 * @return non-<code>null</code> list of quotes
+	 */
+	public List<Quote> findQuotesByDoc(String docId) {
+		return findQuotesByDocForUser(docId, null);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<Quote> findQuotesForUser(String userId) {
+		if (userId == null) {
+			throw new NullPointerException();
+		}
+		Criteria<QuoteUserBinding> c = new Criteria<QuoteUserBinding>(QuoteUserBinding.class);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		try {
+			List<QuoteUserBinding> bindings = dao.findEntities(c, null);
+			if(bindings.size() < 1) return new ArrayList<Quote>(0);
+			ArrayList<String> quoteIds = new ArrayList<String>(bindings.size());
+			for(QuoteUserBinding b : bindings) {
+				quoteIds.add(b.getQuoteId());
+			}
+			List<Quote> list = dao.findByIds(Quote.class, quoteIds, null);
+			if(list.size() != quoteIds.size())
+				throw new IllegalStateException("Doc id list and doc entity list size mis-match.");
+
+			return list;
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	private BundleUserBinding findBundleUserBinding(String userId, String bundleId) throws EntityNotFoundException {

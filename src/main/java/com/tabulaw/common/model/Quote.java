@@ -7,6 +7,9 @@ package com.tabulaw.common.model;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -24,6 +27,7 @@ import com.tabulaw.util.StringUtil;
 	"document.hash", "serializedMark"
 }))
 */
+@XmlRootElement(name = "quote")
 public class Quote extends TimeStampEntity implements Comparable<Quote> {
 
 	private static final long serialVersionUID = -2887172300623884436L;
@@ -85,6 +89,7 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 
 	@NotEmpty
 	@Length(max = 4000)
+	@XmlElement(name = "quoteText")
 	public String getQuote() {
 		return quote;
 	}
@@ -106,6 +111,7 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 		this.serializedMark = serializedMark;
 	}
 
+	@XmlTransient
 	public Object getMark() {
 		return mark;
 	}
@@ -117,6 +123,7 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	@Valid
 	@Reference
 	@NotNull
+	@XmlElement(name = "docRef")
 	public DocRef getDocument() {
 		return document;
 	}

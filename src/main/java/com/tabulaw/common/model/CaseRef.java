@@ -5,6 +5,8 @@
  */
 package com.tabulaw.common.model;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.tabulaw.schema.BusinessKeyDef;
 import com.tabulaw.schema.BusinessObject;
 import com.tabulaw.util.StringUtil;
@@ -36,6 +38,7 @@ import com.tabulaw.util.StringUtil;
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Url", properties = { "url"
 }))
+@XmlRootElement(name = "caseRef")
 public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 
 	/**

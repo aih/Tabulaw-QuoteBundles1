@@ -11,6 +11,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
@@ -26,6 +28,7 @@ import com.tabulaw.schema.BusinessObject;
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress"
 }))
+@XmlRootElement(name = "user")
 public class User extends TimeStampEntity implements IUserRef, INamedEntity, Comparable<User> {
 
 	/**
@@ -152,6 +155,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	 */
 	@NotEmpty
 	@Length(max = MAXLEN_PASSWORD)
+	@XmlTransient
 	public String getPassword() {
 		return password;
 	}
