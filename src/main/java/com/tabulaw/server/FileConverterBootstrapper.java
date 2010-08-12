@@ -18,8 +18,8 @@ import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConne
 import com.google.inject.Injector;
 import com.tabulaw.service.convert.DocToHtmlConverter;
 import com.tabulaw.service.convert.FileConverterDelegate;
-import com.tabulaw.service.convert.HtmlToDocCompositeFileConverter;
 import com.tabulaw.service.convert.IFileConverter;
+import com.tabulaw.service.convert.SimpleHtmlConvertor;
 import com.tabulaw.service.convert.TextToHtmlCompositeFileConverter;
 import com.tabulaw.service.convert.ToHtmlPassThroughConverter;
 
@@ -60,7 +60,8 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 			converters.add(oofc);
 
 			// html to doc converter
-			HtmlToDocCompositeFileConverter html2DocConverter = new HtmlToDocCompositeFileConverter(ooc);
+//			HtmlToDocCompositeFileConverter html2DocConverter = new HtmlToDocCompositeFileConverter(ooc);
+			SimpleHtmlConvertor html2DocConverter = new SimpleHtmlConvertor();
 			converters.add(html2DocConverter);
 		}
 
