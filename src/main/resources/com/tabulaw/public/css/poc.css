@@ -50,6 +50,11 @@ a:active {
 .imgBtn-quoteBundle .text {
 	font-size: 12px;
 }
+.quoteBundleMenuItem{
+	width: 16px;
+	float:left;
+}
+
 
 /* global message panel */
 .gmsg {
@@ -558,6 +563,10 @@ div.ro {
 	-moz-border-radius-bottomleft: 2px;
 	-webkit-border-bottom-left-radius: 2px;
 }
+.docHeaderMenuItem{
+	text-decoration: underline;
+}
+
 .docFrame { 
 	width: 100%;
 	height: 553px;

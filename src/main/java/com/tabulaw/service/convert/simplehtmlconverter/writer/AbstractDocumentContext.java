@@ -19,14 +19,9 @@ public abstract class AbstractDocumentContext implements IDocumentContext {
 		}
 	}
 
-	public void pushRangeInfo() {
+	public void pushRangeInfo() throws Exception {
 		RangeInfo storedRangeInfo=null;
-		try {
-			storedRangeInfo = (RangeInfo)rangeInfo.clone();
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		storedRangeInfo = (RangeInfo)rangeInfo.clone();
 		rangeInfoStack.push(storedRangeInfo);
 	}
 
@@ -36,14 +31,9 @@ public abstract class AbstractDocumentContext implements IDocumentContext {
 		}
 	}
 
-	public void pushParagraphInfo() {
+	public void pushParagraphInfo() throws Exception {
 		ParagraphInfo storedParagraphInfo=null;
-		try {
-			storedParagraphInfo = (ParagraphInfo )paragraphInfo.clone();
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		storedParagraphInfo = (ParagraphInfo )paragraphInfo.clone();
 		paragraphInfoStack.push(storedParagraphInfo);
 	}
 

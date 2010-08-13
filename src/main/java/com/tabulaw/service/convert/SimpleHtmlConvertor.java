@@ -16,8 +16,31 @@ import com.tabulaw.service.convert.simplehtmlconverter.ElementBuilderFactory;
 import com.tabulaw.service.convert.simplehtmlconverter.element.ElementBuilder;
 import com.tabulaw.service.convert.simplehtmlconverter.writer.Docx4jDocumentContext;
 import com.tabulaw.service.convert.simplehtmlconverter.writer.IDocumentContext;
+import com.tabulaw.service.convert.simplehtmlconverter.writer.RtfDocumentContext;
 
-public class SimpleHtmlConvertor extends AbstractFileConverter{
+public class SimpleHtmlConvertor extends AbstractFileConverter {
+	private String fileExtension;
+	private String mimeType;
+
+	public SimpleHtmlConvertor(String mimeType) {
+		if ("text/rtf".equals(mimeType)) {
+			this.mimeType = mimeType;
+			fileExtension = "rtf";
+		} else {
+			this.mimeType = "application/msword";
+			fileExtension = "docx";
+		}
+	}
+
+	private IDocumentContext createDocumentContext() {
+		IDocumentContext documentContext = null;
+		if (this.mimeType.equals("text/rtf")) {
+			documentContext = new RtfDocumentContext();
+		} else {
+			documentContext = new Docx4jDocumentContext();
+		}
+		return documentContext;
+	}
 
 	private Element loadDocument(Reader r) throws Exception {
 
@@ -33,31 +56,33 @@ public class SimpleHtmlConvertor extends AbstractFileConverter{
 		}
 	}
 
-	private void processDomElement(Node node, IDocumentContext documentContext) throws Exception {
+	private void processDomElement(Node node, IDocumentContext parentDocumentContext) throws Exception {
 		ElementBuilder elementBuilder = ElementBuilderFactory.getElementBuilder(node);
-		elementBuilder.process(node, documentContext);
+		elementBuilder.process(node, parentDocumentContext);
 		for (int i = 0; i < node.getChildNodes().getLength(); i++) {
 			Node child = node.getChildNodes().item(i);
-			processDomElement(child, documentContext);
+			processDomElement(child, parentDocumentContext);
 		}
-		elementBuilder.afterProcessChilds(node, documentContext);
+		elementBuilder.afterProcessChilds(node, parentDocumentContext);
 	}
 
 	@Override
 	public File convert(File input) throws Exception {
 		final String BODY_TAG_NAME = "body";
-		File fdoc = createSiblingFile(input, "docx");
-		Reader r = new InputStreamReader( new FileInputStream(input), "UTF-8");
-		Docx4jDocumentContext documentContext = new Docx4jDocumentContext();
+		File fdoc = createSiblingFile(input, fileExtension);
+		Reader r = new InputStreamReader(new FileInputStream(input), "UTF-8");
+
+		IDocumentContext documentContext=createDocumentContext();
+
 		documentContext.getDocumentWriter().init(fdoc);
 		Element root = loadDocument(r);
 
-		NodeList bodies=root.getElementsByTagName(BODY_TAG_NAME);
-		if (bodies.getLength()>0) {
-			Element body=(Element)bodies.item(0);
+		NodeList bodies = root.getElementsByTagName(BODY_TAG_NAME);
+		if (bodies.getLength() > 0) {
+			Element body = (Element) bodies.item(0);
 			processDomElement(body, documentContext);
 		}
-		
+
 		documentContext.getDocumentWriter().close();
 		r.close();
 		return fdoc;
@@ -65,7 +90,7 @@ public class SimpleHtmlConvertor extends AbstractFileConverter{
 
 	@Override
 	public String getTargetMimeType() {
-		return "application/msword";
+		return mimeType;
 	}
 
 	@Override

@@ -88,12 +88,12 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 			byte[] fbytes = FileUtils.readFileToByteArray(fconverted);
 			if (fbytes == null || fbytes.length < 1)
 				throw new Exception("No doc content read");
-			sos.write(fbytes);
-			responseWritten = true;
-			// resp.setContentLength(fbytes.length);
+			//resp.setContentLength(fbytes.length);
 			resp.setContentType(getMimeType(fconverted));
 			resp.setHeader("Content-disposition", "attachment; filename="
 					+ fconverted.getName());
+			sos.write(fbytes);
+			responseWritten = true;
 		} catch (Exception e) {
 			String emsg = "Unable to convert:  due to error: " + e.getMessage();
 			if (!responseWritten)

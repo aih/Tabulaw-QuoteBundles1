@@ -1,13 +1,11 @@
 package com.tabulaw.service.convert.simplehtmlconverter.writer;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 import org.w3c.dom.Node;
 
-import com.lowagie.text.DocumentException;
 import com.lowagie.text.Font;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
@@ -28,24 +26,13 @@ public class RtfDocumentWriter implements IDocumentWriter {
 	}
 
 	@Override
-	public void addParagraphToDoc(Node node) {
+	public void addParagraphToDoc(Node node) throws Exception {
 		if (documentContext.getParagraph() != null) {
-			try {
-				documentContext.getDocument().add(documentContext.getParagraph());
-			} catch (DocumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			documentContext.getDocument().add(documentContext.getParagraph());
 		}
 		Paragraph p = new Paragraph();
 		p.setSpacingAfter(10);
 		documentContext.setParagraph(p);
-	}
-
-	@Override
-	public void addPhraseToParagraph(Node node) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -56,7 +43,7 @@ public class RtfDocumentWriter implements IDocumentWriter {
 
 	@Override
 	public void addText(String text) {
-		Phrase tmpPhrase=(Phrase)documentContext.getPhrase().clone();
+		Phrase tmpPhrase = (Phrase) documentContext.getPhrase().clone();
 		tmpPhrase.add(HtmlUtil.decodeHTMLEntities(text));
 		documentContext.getParagraph().add(tmpPhrase);
 	}
@@ -98,25 +85,15 @@ public class RtfDocumentWriter implements IDocumentWriter {
 	}
 
 	@Override
-	public void close() {
-		try {
-			documentContext.getDocument().add(documentContext.getParagraph());
-		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void close() throws Exception {
+		documentContext.getDocument().add(documentContext.getParagraph());
 		documentContext.getDocument().close();
 	}
 
 	@Override
-	public void init(File outputFile) {
-		OutputStream outputStream=null;
-		try {
-			outputStream = new FileOutputStream(outputFile);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void init(File outputFile) throws Exception {
+		OutputStream outputStream = null;
+		outputStream = new FileOutputStream(outputFile);
 		RtfWriter2.getInstance(documentContext.getDocument(), outputStream);
 		documentContext.getDocument().open();
 	}

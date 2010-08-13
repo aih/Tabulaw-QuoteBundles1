@@ -3,8 +3,6 @@ package com.tabulaw.service.convert.simplehtmlconverter.writer;
 import java.io.File;
 import java.math.BigInteger;
 
-import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.wml.Br;
 import org.docx4j.wml.HpsMeasure;
@@ -46,12 +44,6 @@ public class Docx4jDocumentWriter implements IDocumentWriter {
 		p.setPPr(ppr);
 		documentContext.getMainDocumentPart().addObject(documentContext.getP());
 		
-	}
-
-	@Override
-	public void addPhraseToParagraph(Node node) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -120,24 +112,14 @@ public class Docx4jDocumentWriter implements IDocumentWriter {
 	}
 
 	@Override
-	public void close() {
-		try {
-			documentContext.getWordMLPackage().save(documentContext.getOutputFile());
-		} catch (Docx4JException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void close() throws Exception {
+		documentContext.getWordMLPackage().save(documentContext.getOutputFile());
 	}
 
 	@Override
-	public void init(File outputFile) {
+	public void init(File outputFile) throws Exception {
 		documentContext.setOutputFile(outputFile);
-		try {
-			documentContext.setWordMLPackage(WordprocessingMLPackage.createPackage());
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		documentContext.setWordMLPackage(WordprocessingMLPackage.createPackage());
 		createParagraph();
 
 	}

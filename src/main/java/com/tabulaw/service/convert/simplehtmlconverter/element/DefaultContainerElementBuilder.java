@@ -4,12 +4,10 @@ import org.w3c.dom.Node;
 
 import com.tabulaw.service.convert.simplehtmlconverter.writer.IDocumentContext;
 
-import com.lowagie.text.DocumentException;
-
 public class DefaultContainerElementBuilder implements ElementBuilder {
 
 	@Override
-	public void process(Node node, IDocumentContext context) throws DocumentException {
+	public void process(Node node, IDocumentContext context) throws Exception {
 		if (isParagraph()||!context.hasActiveParagraph()) {
 			context.getDocumentWriter().addParagraphToDoc(node);
 			context.pushParagraphInfo();

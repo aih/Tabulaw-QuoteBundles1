@@ -16,10 +16,10 @@ public interface IDocumentContext {
 	public abstract IDocumentWriter getDocumentWriter();
 
 	public void popRangeInfo();
-	public void pushRangeInfo();
+	public void pushRangeInfo() throws Exception;
 
 	public void popParagraphInfo();
-	public void pushParagraphInfo();
+	public void pushParagraphInfo() throws Exception;
 	
 	public void setHasActiveParagraph(boolean hasActiveParagraph);
 	public boolean hasActiveParagraph();

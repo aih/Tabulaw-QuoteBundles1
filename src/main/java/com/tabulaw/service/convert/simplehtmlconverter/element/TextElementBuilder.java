@@ -14,8 +14,7 @@ public class TextElementBuilder implements ElementBuilder {
 
 	@Override
 	public void afterProcessChilds(Node node, IDocumentContext documentContext) {
-		// TODO Auto-generated method stub
-		
+		// Do Nothing
 	}
 
 }
