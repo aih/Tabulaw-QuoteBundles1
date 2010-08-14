@@ -26,12 +26,10 @@ import com.tabulaw.client.data.rpc.IHasQuoteHandlers;
 import com.tabulaw.client.mvc.ViewManager;
 import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.ui.toolbar.Toolbar;
-import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.IHasModel;
 import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.CaseRef.CitationFormatFlag;
-import com.tabulaw.util.StringUtil;
+import com.tabulaw.common.model.info.QuoteInfo;
 
 /**
  * Base class for widgets displaying quotes.
@@ -276,24 +274,10 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		if(quote == null || quote.getDocument() == null) throw new IllegalArgumentException();
 		this.quote = quote;
 
-		String title, subTitle = "", quoteText = quote.getQuote();
-		DocRef doc = quote.getDocument();
-		title = doc.getTitle();
-
-		// TODO debug
-		// title += "<br />" + quote.toString();
-
-		// case doc?
-		CaseRef caseRef = doc.getCaseRef();
-		if(caseRef != null) {
-			String parties = caseRef.getParties();
-			if(!StringUtil.isEmpty(parties)) title = parties;
-			subTitle = caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag());
-		}
-
-		header.setQuoteTitle(title);
-		header.setSubTitle(subTitle);
-		quoteBlock.setQuotedText(quoteText);
+		QuoteInfo quoteInfo=new QuoteInfo(quote); 
+		header.setQuoteTitle(quoteInfo.getTitle());
+		header.setSubTitle(quoteInfo.getSubTitle());
+		quoteBlock.setQuotedText(quoteInfo.getQuote());
 	}
 
 	public final HandlerRegistration addQuoteHandler(IQuoteHandler handler) {

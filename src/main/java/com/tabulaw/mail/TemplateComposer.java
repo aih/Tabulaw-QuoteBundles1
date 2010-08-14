@@ -1,13 +1,9 @@
 package com.tabulaw.mail;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.mail.MessagingException;
 
-import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.VelocityException;
 import org.springframework.mail.MailPreparationException;
@@ -17,6 +13,7 @@ import com.google.inject.Inject;
 import com.tabulaw.di.MailModule.MailTemplatePath;
 import com.tabulaw.di.MailModule.MailTemplateSuffixHtml;
 import com.tabulaw.di.MailModule.MailTemplateSuffixText;
+import com.tabulaw.util.VelocityUtil;
 
 /**
  * Composes email mime messages from a templated mail context.
@@ -61,27 +58,15 @@ public class TemplateComposer extends AbstractComposer<TemplatedMailContext> {
 		try {
 			String templatePath = baseTemplatePath + context.getTemplate();
 			templatePath += context.isHtmlTemplate() ? htmlTemplateSuffix : textTemplateSuffix;
-
-			final StringWriter text = new StringWriter();
-			final Map<String, Object> mergeObjects = new HashMap<String, Object>();
-			mergeObjects.putAll(context.getParameters());
-
-			final VelocityContext velocityContext = new VelocityContext(mergeObjects);
-			try {
-				velocityEngine.mergeTemplate(templatePath, "UTF-8", velocityContext, text);
-			}
-			catch(final Exception e) {
-				throw new VelocityException(e);
-			}
+			
+			String mailText=VelocityUtil.mergeVelocityTemplate(this.velocityEngine, templatePath, context.getParameters());
 
 			// set the subject
-			if(mergeObjects.containsKey(SUBJECT_KEY)) {
-				helper.setSubject((String) mergeObjects.get(SUBJECT_KEY));
+			if(context.getParameters().containsKey(SUBJECT_KEY)) {
+				helper.setSubject((String) context.getParameters().get(SUBJECT_KEY));
 			}
 
-			text.close();
-
-			helper.setText(text.toString(), context.isHtmlTemplate());
+			helper.setText(mailText, context.isHtmlTemplate());
 		}
 		catch(final IOException ioe) {
 			throw new MailPreparationException("Unable to compose templated mail content due to an I/O exception: "

@@ -81,6 +81,19 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
+	 * Gets the Quote Bundle ref given the quoteBundle id.
+	 * @param docId
+	 * @return to loaded doc ref
+	 * @throws EntityNotFoundException
+	 */
+	@Transactional(readOnly = true)
+	public QuoteBundle getQuoteBundle(String bundleId) throws EntityNotFoundException {
+		if(bundleId == null) throw new NullPointerException();
+		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);
+		return qb;
+	}
+
+	/**
 	 * Gets a list of all docs for a given user.
 	 * <p>
 	 * The <code>htmlContent</code> property is cleared out for each doc.

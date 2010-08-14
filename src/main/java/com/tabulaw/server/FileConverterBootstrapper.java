@@ -18,13 +18,15 @@ import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConne
 import com.google.inject.Injector;
 import com.tabulaw.service.convert.DocToHtmlConverter;
 import com.tabulaw.service.convert.FileConverterDelegate;
-import com.tabulaw.service.convert.HtmlToDocCompositeFileConverter;
 import com.tabulaw.service.convert.IFileConverter;
+import com.tabulaw.service.convert.SimpleHtmlConvertor;
 import com.tabulaw.service.convert.TextToHtmlCompositeFileConverter;
 import com.tabulaw.service.convert.ToHtmlPassThroughConverter;
+import com.tabulaw.service.convert.simplehtmlconverter.Constants;
 
 /**
  * Bootstraps file converter impls.
+ * 
  * @author jpk
  */
 public class FileConverterBootstrapper implements IBootstrapHandler {
@@ -43,8 +45,7 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 			ooc = new SocketOpenOfficeConnection();
 			ooc.connect();
 			servletContext.setAttribute(OPEN_OFFICE_CONNECTION_KEY, ooc);
-		}
-		catch(ConnectException e) {
+		} catch (ConnectException e) {
 			log.error("Unable to establish socket connection to OpenOffice API: " + e.getMessage(), e);
 		}
 
@@ -54,18 +55,22 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 		// text to html converter
 		converters.add(new TextToHtmlCompositeFileConverter(ooc));
 
-		if(ooc != null) {
+		if (ooc != null) {
 			// doc to html converter
 			DocToHtmlConverter oofc = new DocToHtmlConverter(ooc);
 			converters.add(oofc);
 
 			// html to doc converter
-			HtmlToDocCompositeFileConverter html2DocConverter = new HtmlToDocCompositeFileConverter(ooc);
-			converters.add(html2DocConverter);
+			// HtmlToDocCompositeFileConverter html2DocConverter = new
+			// HtmlToDocCompositeFileConverter(ooc);
+			for (String s : new String[] { Constants.RTF_MIME_TYPE, Constants.DOCX_MIME_TYPE }) {
+				SimpleHtmlConvertor html2DocConverter = new SimpleHtmlConvertor(s);
+				converters.add(html2DocConverter);
+			}
 		}
 
-		FileConverterDelegate converterDelegate =
-				converters.size() == 0 ? null : new FileConverterDelegate(converters.toArray(new IFileConverter[0]));
+		FileConverterDelegate converterDelegate = converters.size() == 0 ? null : new FileConverterDelegate(converters
+				.toArray(new IFileConverter[0]));
 		servletContext.setAttribute(FileConverterDelegate.KEY, converterDelegate);
 	}
 
@@ -74,7 +79,7 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 		servletContext.removeAttribute(FileConverterDelegate.KEY);
 
 		OpenOfficeConnection ooc = (OpenOfficeConnection) servletContext.getAttribute(OPEN_OFFICE_CONNECTION_KEY);
-		if(ooc != null) {
+		if (ooc != null) {
 			ooc.disconnect();
 			servletContext.removeAttribute(OPEN_OFFICE_CONNECTION_KEY);
 		}

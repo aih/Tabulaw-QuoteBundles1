@@ -13,13 +13,15 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -54,19 +56,45 @@ import com.tabulaw.util.StringUtil;
  */
 public class DocViewer extends Composite implements IHasDocHandlers, HasValueChangeHandlers<DocViewer.ViewMode> {
 
-	public static enum ViewMode {
+        public static final String DOCX_MIME_TYPE="application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        public static final String RTF_MIME_TYPE="text/rtf";
+
+        public static enum ViewMode {
 		EDIT,
 		STATIC;
 	}
+	
+	private static class DownloadDocCommand implements Command {
+		private String mimeType;
+		private String id;
+
+		public  DownloadDocCommand(String mimeType) {
+			this.mimeType = mimeType;
+		}
+		public void setId (String id) {
+			this.id=id;
+		}
+
+		@Override
+		public void execute() {
+			setLocation("docdownload?mimeType=" + mimeType + "&docId="+id );
+		}
+
+		private final native void setLocation(String url) /*-{
+			$wnd.location.href = url;
+		}-*/;
+	}
+	
 
 	static class DocViewHeader extends Composite {
 
 		private final FlowPanel pnl = new FlowPanel();
 		private final HTML html = new HTML();
 
+		private DownloadDocCommand rtfDownloadCommand = new DownloadDocCommand(RTF_MIME_TYPE);
+		private DownloadDocCommand docxDownloadCommand = new DownloadDocCommand(DOCX_MIME_TYPE);
+
 		private final Image imgEdit = new Image(Resources.INSTANCE.edit());
-		//private final Image imgExport = new Image(Resources.INSTANCE.permalink());
-		private final Anchor aDwnldAsWordDoc;
 
 		public DocViewHeader() {
 			super();
@@ -74,20 +102,29 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 			imgEdit.setStyleName("imgEdit");
 			imgEdit.setTitle("Edit document");
+			
+			MenuBar downloadMenuTop = new MenuBar();
+			
+			MenuBar downloadMenu = new MenuBar(true);
 
-			aDwnldAsWordDoc = new Anchor("Download as MS Word doc", false);
-			aDwnldAsWordDoc.setTarget("_top");
-			//imgExport.setStyleName("imgExport");
-			//imgExport.setTitle("Export to MS Word");
+			downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>",true,downloadMenu);
+			downloadMenuTop.setStyleName("docHeaderMenuItem");
+			
+			MenuItem fireRtf = new MenuItem("rtf format", rtfDownloadCommand);
+			MenuItem fireDocx = new MenuItem("docx format",docxDownloadCommand);
+			
+			downloadMenu.addItem(fireRtf);
+			downloadMenu.addItem(fireDocx);
+			
 
 			html.setStyleName("docHeaderLabel");
 			pnl.add(html);
 			pnl.add(imgEdit);
-			//pnl.add(imgExport);
-			pnl.add(aDwnldAsWordDoc);
+			pnl.add(downloadMenuTop);
 
 			initWidget(pnl);
 		}
+		
 
 		public void insert(Widget w, int beforeIndex) {
 			pnl.insert(w, 0);
@@ -379,10 +416,11 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			frame.setUrl(furl);
 			Log.debug("DocViewer iframe url set to: " + furl);
 		}
+		if (doc!=null) {
+			header.rtfDownloadCommand.setId(doc.getId());
+			header.docxDownloadCommand.setId(doc.getId());
+		}
 		
-		// update export to ms word doc href
-		String href = doc == null ? "#" : "docdownload?mimeType=application/msword&docId=" + doc.getId();
-		header.aDwnldAsWordDoc.setHref(href);
 	}
 
 	public native String getDocHtml() /*-{
