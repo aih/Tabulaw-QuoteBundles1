@@ -5,6 +5,14 @@ import org.apache.commons.lang.StringUtils;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 
+/**
+ * Container request filter which is responsible to override
+ * POST requests with additional parameter _method to
+ * PUT or DELETE requests
+ * 
+ * @author yuri
+ *
+ */
 public class FakeHttpMethodsFilter implements ContainerRequestFilter {
 
 	private static final String FAKE_METHOD_PARAMETER = "_method"; 

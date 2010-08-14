@@ -18,6 +18,15 @@ import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.container.ResourceFilterFactory;
 
 
+/**
+ * 
+ * Resource filter which is responsible to process AuthorizationRequired annotation.
+ * If the requested resource or method has this annotation the filter automatically
+ * gets "sessionToken" parameter and checks is it valid.   
+ * 
+ * @author yuri
+ *
+ */
 public class AuthorizationFilterFactory implements ResourceFilterFactory {
 
 	@Context

@@ -34,6 +34,13 @@ import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.util.HtmlUtils;
 import com.tabulaw.util.HtmlUtils.QuotePosition;
 
+/**
+ * 
+ * REST resource to manage Quote entity 
+ * 
+ * @author yuri
+ *
+ */
 @AuthorizationRequired
 @Path("/quotes")
 @Produces({MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
@@ -52,6 +59,7 @@ public class QuoteResource extends BaseResource {
 		Set<Quote> documentQuotes = null;
 		Set<Quote> bundleQuotes = null;
 		
+		// find quotes of the specified docRef 
 		if (docRefIds != null) {
 			String[] documents = docRefIds.split("\\s*,\\s*");
 			documentQuotes = new HashSet<Quote>();
@@ -66,6 +74,7 @@ public class QuoteResource extends BaseResource {
 			}
 		}		
 		
+		// find quotes of the specified quoteBundle
 		if (quoteBundleIds != null) {
 			String[] bundles = quoteBundleIds.split("\\s*,\\s*");
 			bundleQuotes = new HashSet<Quote>();
@@ -78,23 +87,27 @@ public class QuoteResource extends BaseResource {
 				}
 				bundleQuotes.addAll(service.getQuoteBundle(bundle).getQuotes());
 			}
-		}
+		}		
 		
 		List<Quote> result;
+		// if both parameters (docRefId and quoteBundleId) are specified intersect the result 
 		if (documentQuotes != null && bundleQuotes != null) {
 			result = new ArrayList<Quote>(CollectionUtils.
 					intersection(documentQuotes, bundleQuotes));
 		} else {
+			// if specified just one parameter return exact result
 			result = new ArrayList<Quote>();
 			if (documentQuotes != null) {
 				result.addAll(documentQuotes);
 			} else if (bundleQuotes != null) {
 				result.addAll(bundleQuotes);
 			} else {
+				// if no parameters are specified return all quotes for the current user
 				result = service.findQuotesForUser(userId);
 			}
 		}
 		
+		// if we won't send docRef of every quote, clone quote and clean this property 
 		if (! fetch) {
 			for (int i = 0; i < result.size(); i++) {
 				Quote quote = (Quote) result.get(i).clone();
@@ -134,14 +147,18 @@ public class QuoteResource extends BaseResource {
 		if (! service.isDocAvailableForUser(getUserId(), docRefId)) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
+		
+		// create serialized mark for the specified quote
 		String serializedMark = "|" + quoteText + "|";
 		DocRef docRef = service.getDoc(docRefId);
 		try {
+			// find quote in the documents html
 			DocContent content = service.getDocContent(docRefId);
 			QuotePosition position = HtmlUtils.findQuoteInHtml(quoteText, content.getHtmlContent());
 			if (position == null) {
 				throw new WebApplicationException();
 			}
+			// if it exists in the doc add position into mark
 			serializedMark += positionToMark(position.startPosition);
 			serializedMark += "|" + position.startOffset + "|";
 			serializedMark += positionToMark(position.endPosition);
@@ -157,10 +174,13 @@ public class QuoteResource extends BaseResource {
 			QuoteBundle bundle = service.getOrphanedQuoteBundleForUser(getUserId());
 			bundleId = bundle.getId(); 
 		}
-		
+		// create quote 
 		Quote quote = EntityFactory.get().buildQuote(quoteText, docRef, serializedMark);
 		quote = service.addQuoteToBundle(getUserId(), bundleId, quote);
+		
+		// get id of created quote and add this id into mark property of the quote
 		quote.setSerializedMark("mark_" + quote.getId() + quote.getSerializedMark());
+		// update mark property of the quote
 		service.updateQuote(quote);
 		return quote;
 	}

@@ -9,6 +9,13 @@ import com.tabulaw.server.UserContext;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 
+/**
+ * 
+ * Base class for all REST recources
+ * 
+ * @author yuri
+ *
+ */
 public class BaseResource {	
 	static final String REST_USER_KEY = UserContext.KEY + "-rest";
 

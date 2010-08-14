@@ -17,6 +17,13 @@ import com.tabulaw.rest.dto.SessionResponse;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.entity.UserService;
 
+/**
+ * 
+ * REST resource to create user session
+ * 
+ * @author yuri
+ *
+ */
 @Path("/session")
 @Produces({MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
 public class SessionResource extends BaseResource {

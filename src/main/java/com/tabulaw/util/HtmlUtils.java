@@ -1,7 +1,5 @@
 package com.tabulaw.util;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import org.htmlcleaner.ContentToken;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
-//import org.springframework.w
 
 public class HtmlUtils {
 	
@@ -29,6 +26,29 @@ public class HtmlUtils {
 		return INLINE_ELEMENTS.contains(StringUtils.lowerCase(element));
 	}	
 	
+	/**
+	 * Finds the quote given in plain text format in the html.<br><br>
+	 * 
+	 * Returns start position of quote and end position of quote <br>
+	 * Position in html presented as: <br>
+	 * 	&nbsp;&nbsp; path to the html element which contains the text<br> 
+	 *  &nbsp;&nbsp; offset in the html element <br><br>
+	 *  
+	 *  For example: quote = "Just a test" and <br>
+	 *  			 html = "&lt;html&gt;&lt;body&gt;&lt;center&gt;&lt;p&gt;text text&lt;i&gt;text Jus&lt;b&gtt&lt;/b&gt&lt;/i&gt;&lt;b&gt; a&lt;/b&gt; test text&lt;/p&gt; text&lt;/center&gt;&lt;/body&gt;&lt;/html&gt;"
+	 *  <br><br>
+	 *  will return:<br>
+	 *  			start position: [0, 0, 1, 0] (elements: &lt;center&gt;, &lt;p&gt;, &lt;i&gt; (the second element in p), text element)<br> 
+	 *  			start offset: 5<br>
+	 *  			end position: [0, 0, 3] (elemets: &lt;center&gt;, &lt;p&gt;, text element (fourth element in p))<br> 
+	 *  			end offset: 5<br>
+	 * 
+	 * 
+	 * @param quote
+	 * @param html
+	 * @return
+	 * @throws IOException
+	 */
 	public static QuotePosition findQuoteInHtml(String quote, String html) throws IOException {
 		HtmlCleaner cleaner = new HtmlCleaner();
 		TagNode root = cleaner.clean(html);
@@ -44,10 +64,16 @@ public class HtmlUtils {
 			bodyText.replace(index, index + length, " ");
 			index += 1;
 		}
+		
+		// find the quote in the html without tags
+		// the quote in the html will be represented as
+		// 		* number of start word
+		//      * number of last word 
 		int startIndex = 0;
 		int startWordNumber = -1;
 		int lastWordPosition = 0;
 		String lastWord = words[words.length - 1];
+		// find the first word of the quote
 		while ((startIndex = bodyText.indexOf(words[0], startIndex)) != -1) {
 			if (startIndex + words[0].length() < bodyText.length() &&
 					! Character.isWhitespace(bodyText.charAt(startIndex + words[0].length()))) {
@@ -55,23 +81,26 @@ public class HtmlUtils {
 				continue;
 			}
 			startWordNumber++;
+			// checks is this start word of the whole quote
 			lastWordPosition = checkWordSequence(bodyText, startIndex, words);
 			if (lastWordPosition != -1) {
 				break;
 			}
 			startIndex += words[0].length();
 		}
+		// the quote doesn't exist in the html
 		if (startIndex == -1) {
 			startWordNumber = -1;
 			return null;
 		}
+		// find number of the last word of the quote
 		int lastWordNumber = 0;
 		startIndex = 0;
 		while ((startIndex = bodyText.indexOf(lastWord, startIndex)) != lastWordPosition) {
 			lastWordNumber++;				
 			startIndex += lastWord.length();
 		}
-				
+			
 		LevelsList startLevels = HtmlWordsFinder.findWordInTag(body, words[0], startWordNumber, false);
 		LevelsList endLevels = HtmlWordsFinder.findWordInTag(body, lastWord, lastWordNumber, true);
 		return new QuotePosition(
@@ -82,6 +111,14 @@ public class HtmlUtils {
 		);		
 	}
 	
+	/**
+	 * Checks does @content contain @words sequence after @startIndex    
+	 * 
+	 * @param content
+	 * @param startIndex
+	 * @param words
+	 * @return position after the quote or -1 if doesn't quote
+	 */
 	private static int checkWordSequence(StringBuilder content, int startIndex, String[] words) {
 		int nextIndex = startIndex;
 		String lastWord = words[words.length - 1];
@@ -146,14 +183,19 @@ public class HtmlUtils {
 		private boolean findWordStartPosition(String content, final int level) {
 			int index = 0;
 			while ((index = content.indexOf(word, index)) != -1) {
+				// if the word is placed in the end of the text element
+				// we should save it as prefix for next element
+				// because it may not be our word 
 				index += word.length();
-				if (index >= content.length() && !positionOfEnd) {
+				if (index >= content.length()) {
 					break;
 				}
 				if (Character.isWhitespace(content.charAt(index))) {
 					requestWordNumber--;
 					if (requestWordNumber == -1) {
-						if (index >= prefix.getPrefix().length()) {
+						// if the needed word starts in prefix return prefix position
+						// else return position in current tag
+						if (index > prefix.getPrefix().length()) {
 							levels.set(level + 1, index - word.length());
 						} else {
 							levels.clear();
@@ -199,11 +241,17 @@ public class HtmlUtils {
 				return;
 			}
 			
+			// if content of current text element doesn't end with whitespace
+			// we should save the last word of this element as prefix for next 
+			// text.
+			// For example. we try to find word "Just" in <i>Jus<b>t</b</i>
+			// we should save "Jus" as prefix for text in <b> tag 
 			if (! content.matches("^.*\\s$")) {
 				Pattern pattern = Pattern.compile("^.*\\s([^\\s]+)$");
 				Matcher matcher = pattern.matcher(content);
 				if (matcher.matches()) {
-					int offset = content.length() - matcher.group(1).length();
+					int offset = content.length() - prefix.getPrefix().length() -
+						matcher.group(1).length();
 					prefix.setPrefix(matcher.group(1));
 					prefix.setPosition(levels, level, offset);
 				} else {
@@ -218,18 +266,22 @@ public class HtmlUtils {
 		}
 		
 		private void findWordInTag(TagNode node, final int level) {
+			// if the current element is block element 
+			// we shouldn't use suffix of prevous element as prefix for this
 			boolean isBlock = ! isInlineElement(node.getName());
 			if (isBlock) {
 				prefix.setPrefix("");
 			}
 			for (Object child : node.getChildren()) {
 				if (child instanceof ContentToken) {
+					// if current child is text, try to find the word
 					levels.set(level, levels.get(level) + 1);
 					levels.set(level + 1, -1);
 					String content = ((ContentToken) child).getContent().replace("&nbsp;", " ");
 					processTextElement(content, level);					
 				}
 				if (child instanceof TagNode) {
+					// if current child is tag - recursion
 					levels.set(level, levels.get(level) + 1);
 					levels.set(level + 1, -1);
 					findWordInTag((TagNode) child, level + 1); 
@@ -322,21 +374,5 @@ public class HtmlUtils {
 			}
 			return get(i);
 		}
-	}
-	
-	
-	
-	public static void main(String[] args) throws IOException {
-		/*Pattern pattern = Pattern.compile("^.*\\s(.+)$");
-		String content = "adasd as af sdf safd		 asfd";
-		if (! content.matches("^.*\\s$")) {
-			Matcher matcher = pattern.matcher(content);
-			matcher.matches();
-			System.out.println(matcher.group(1));
-		}*/
-		File file = new File("d:\\1.html");
-		byte[] buf = new byte[(int) file.length()];
-		new FileInputStream(file).read(buf);
-		findQuoteInHtml("ici curiae urging reversal were filed by Osmond K. Fraenkel, Marvin M. Karpatkin, Norman Dorsen, Mr. Ennis, an", new String(buf));
 	}
 }

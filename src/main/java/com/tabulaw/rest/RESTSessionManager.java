@@ -8,6 +8,14 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
+/**
+ * 
+ * Class to save all created sessions. Used to be able find the requested
+ * session if it is specified in "sessionToken" request parameter
+ * 
+ * @author yuri
+ *
+ */
 public class RESTSessionManager implements HttpSessionListener {
 	
 	private static final Map<String, HttpSession> sessions = 

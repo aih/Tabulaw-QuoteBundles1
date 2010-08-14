@@ -4,6 +4,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 
+/**
+ * HttpServletRequest that supports HttpSession overriding<br><br>
+ * 
+ * If the request has attribute "CHANGED_SESSION_ATTRIBUTE" the session
+ * specified in this attribute is used instead of standard session for the request
+ * <br><br>
+ * 
+ * This class is used to be able specify session in GET or POST "sessionToken" parameter 
+ * 
+ * @author yuri
+ *
+ */
 public class RESTServletRequest extends HttpServletRequestWrapper {
 
 	private static final String CHANGED_SESSION_ATTRIBUTE = "CHANGED_SESSION_ATTRIBUTE"; 

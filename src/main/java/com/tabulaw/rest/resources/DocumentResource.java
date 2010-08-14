@@ -29,6 +29,13 @@ import com.tabulaw.service.DocHandlerResolver;
 import com.tabulaw.service.DocUtils;
 import com.tabulaw.service.scrape.IDocHandler;
 
+/**
+ * 
+ * REST resource to manage DocRef and DocContent entities
+ * 
+ * @author yuri
+ *
+ */
 @AuthorizationRequired
 @Path("/docrefs")
 @Produces({MediaType.TEXT_XML, MediaType.APPLICATION_JSON})

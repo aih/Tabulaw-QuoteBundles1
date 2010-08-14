@@ -31,6 +31,13 @@ import com.tabulaw.rest.dto.QuoteBundleWithDocRefs;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserDataService.BundleContainer;
 
+/**
+ * 
+ * REST resource to manage QuoteBundle entity
+ * 
+ * @author yuri
+ *
+ */
 @AuthorizationRequired
 @Path("/quotebundles")
 @Produces({MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
@@ -94,7 +101,7 @@ public class QuoteBundleResource extends BaseResource {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		return getDataService().getQuoteBundle(id);
-	}
+	}	
 	
 	@GET
 	public QuoteBundlesResult list(
@@ -110,6 +117,7 @@ public class QuoteBundleResource extends BaseResource {
 		BundleContainer bundles = getDataService().getBundlesForUser(getUserId());
 		List<QuoteBundle> resultBundles = bundles.getBundles();
 		
+		// if we won't send quotes of the bundle, clone every bundle and clear quotes list  		
 		if (! fetch) {
 			for (int i = 0; i < resultBundles.size(); i++) {
 				QuoteBundle clone = (QuoteBundle) resultBundles.get(i).clone();
@@ -117,6 +125,9 @@ public class QuoteBundleResource extends BaseResource {
 				resultBundles.set(i, clone);
 			}
 		}
+		// inverse objects hierarchy. 
+		// the standart hierarchy is: QuoteBundle -> Quote -> DocRef
+		// the inversed one: QuoteBundle -> DocRef -> Quote
 		if (inverse) {
 			List<QuoteBundleWithDocRefs> inversedResult = new ArrayList<QuoteBundleWithDocRefs>(resultBundles.size());
 			Map<String, DocRefWithQuotes> documents = new HashMap<String, DocRefWithQuotes>();
