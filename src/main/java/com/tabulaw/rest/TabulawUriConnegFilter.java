@@ -13,7 +13,7 @@ import com.sun.jersey.api.container.filter.UriConnegFilter;
  * as url extension.<br><br>
  * 
  * For example: /quotes/13.xml (text/xml),
- * 				/quotes/13.json (application/json) *  
+ * 				/quotes/13.json (application/json) 
  *  
  * @author yuri
  *
