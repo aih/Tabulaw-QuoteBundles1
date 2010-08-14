@@ -2,11 +2,13 @@ package com.tabulaw.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,13 +27,23 @@ public class QuoteBundleDownloadServlet extends AbstractDownloadServlet {
 	private static final String QUOTE_BUNDLE_TEMPLATE="quote-bundle-export.vm";
 	private static final String QUOTE_BUNDLE_KEY="quoteBundle";
 	private static final String QUOTE_LIST_KEY="quoteList";
-	private VelocityEngine ve=new VelocityEngine(); 
+        private static final String VELOCITY_CONFIG="velocity.properties";
+	private VelocityEngine ve; 
 	
 	@Override
 	public void init() throws ServletException {
 		super.init();
 		try {
-			ve.init();
+	        Properties props = new Properties();
+
+	        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+	        InputStream is=cl.getResourceAsStream(VELOCITY_CONFIG);
+
+	        props.load(is);
+
+	        ve = new VelocityEngine(props);
+		ve.init();
 		} catch (Exception ex) {
 			throw new ServletException("unable initialize velocity engine", ex);
 		}

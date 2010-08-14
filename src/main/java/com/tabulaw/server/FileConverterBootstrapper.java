@@ -22,6 +22,7 @@ import com.tabulaw.service.convert.IFileConverter;
 import com.tabulaw.service.convert.SimpleHtmlConvertor;
 import com.tabulaw.service.convert.TextToHtmlCompositeFileConverter;
 import com.tabulaw.service.convert.ToHtmlPassThroughConverter;
+import com.tabulaw.service.convert.simplehtmlconverter.Constants;
 
 /**
  * Bootstraps file converter impls.
@@ -62,7 +63,7 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 			// html to doc converter
 			// HtmlToDocCompositeFileConverter html2DocConverter = new
 			// HtmlToDocCompositeFileConverter(ooc);
-			for (String s : new String[] { "text/rtf", "application/msword" }) {
+			for (String s : new String[] { Constants.RTF_MIME_TYPE, Constants.DOCX_MIME_TYPE }) {
 				SimpleHtmlConvertor html2DocConverter = new SimpleHtmlConvertor(s);
 				converters.add(html2DocConverter);
 			}

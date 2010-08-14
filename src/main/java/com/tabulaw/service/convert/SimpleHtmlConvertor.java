@@ -1,5 +1,6 @@
 package com.tabulaw.service.convert;
 
+import com.tabulaw.service.convert.simplehtmlconverter.Constants;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -23,11 +24,11 @@ public class SimpleHtmlConvertor extends AbstractFileConverter {
 	private String mimeType;
 
 	public SimpleHtmlConvertor(String mimeType) {
-		if ("text/rtf".equals(mimeType)) {
+		if (Constants.RTF_MIME_TYPE.equals(mimeType)) {
 			this.mimeType = mimeType;
 			fileExtension = "rtf";
 		} else {
-			this.mimeType = "application/msword";
+			this.mimeType = Constants.DOCX_MIME_TYPE;
 			fileExtension = "docx";
 		}
 	}

@@ -14,9 +14,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
@@ -58,7 +56,10 @@ import com.tabulaw.util.StringUtil;
  */
 public class DocViewer extends Composite implements IHasDocHandlers, HasValueChangeHandlers<DocViewer.ViewMode> {
 
-	public static enum ViewMode {
+        public static final String DOCX_MIME_TYPE="application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        public static final String RTF_MIME_TYPE="text/rtf";
+
+        public static enum ViewMode {
 		EDIT,
 		STATIC;
 	}
@@ -90,8 +91,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		private final FlowPanel pnl = new FlowPanel();
 		private final HTML html = new HTML();
 
-		private DownloadDocCommand rtfDownloadCommand = new DownloadDocCommand("text/rtf");
-		private DownloadDocCommand docxDownloadCommand = new DownloadDocCommand("application/msword");
+		private DownloadDocCommand rtfDownloadCommand = new DownloadDocCommand(RTF_MIME_TYPE);
+		private DownloadDocCommand docxDownloadCommand = new DownloadDocCommand(DOCX_MIME_TYPE);
 
 		private final Image imgEdit = new Image(Resources.INSTANCE.edit());
 
@@ -106,7 +107,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			
 			MenuBar downloadMenu = new MenuBar(true);
 
-			downloadMenuTop.addItem("Download", downloadMenu);
+			downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>",true,downloadMenu);
 			downloadMenuTop.setStyleName("docHeaderMenuItem");
 			
 			MenuItem fireRtf = new MenuItem("rtf format", rtfDownloadCommand);

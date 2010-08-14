@@ -34,7 +34,10 @@ import com.tabulaw.common.model.QuoteBundle;
 public class BundleEditWidget extends
 		AbstractBundleWidget<BundleEditWidget, QuoteEditWidget, BundleEditWidget.EditHeader> {
 
-	static class Styles {
+        public static final String DOCX_MIME_TYPE="application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        public static final String RTF_MIME_TYPE="text/rtf";
+
+        static class Styles {
 
 		public static final String BUTTONS = "qbbuttons";
 
@@ -58,7 +61,6 @@ public class BundleEditWidget extends
 
 		private class DownloadBundleCommand implements Command {
 			private String mimeType;
-			private final String URL_TEMPLATE = "quotebundledownload?mimeType=%s&bundleid=%s";
 
 			public DownloadBundleCommand(String mimeType) {
 				this.mimeType = mimeType;
@@ -117,7 +119,6 @@ public class BundleEditWidget extends
 						}
 					}
 				});
-				buttons.add(delete);
 			} else {
 				delete = null;
 			}
@@ -155,8 +156,8 @@ public class BundleEditWidget extends
 				downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/>", true, downloadMenu);
 				downloadMenuTop.setStyleName("quoteBundleMenuItem");
 
-				MenuItem fireRtf = new MenuItem("rtf format", new DownloadBundleCommand("text/rtf"));
-				MenuItem fireDocx = new MenuItem("docx format",new DownloadBundleCommand("application/msword"));
+				MenuItem fireRtf = new MenuItem("rtf format", new DownloadBundleCommand(RTF_MIME_TYPE));
+				MenuItem fireDocx = new MenuItem("docx format",new DownloadBundleCommand(DOCX_MIME_TYPE));
 
 				downloadMenu.addItem(fireRtf);
 				downloadMenu.addItem(fireDocx);
@@ -167,8 +168,10 @@ public class BundleEditWidget extends
 			close.setTitle("Close");
 			close.setStyleName(Styles.X);
 			close.setStyleName("quoteBundleMenuItem");
-
 			buttons.add(close);
+                        if (delete!=null) {
+                            buttons.add(delete);
+                        }
 		}
 
 		@Override

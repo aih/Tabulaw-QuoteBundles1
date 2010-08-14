@@ -133,6 +133,7 @@
 	<servlet-mapping>
 		<servlet-name>DocDownloadServlet</servlet-name>
 		<url-pattern>/docdownload/*</url-pattern>
+		<url-pattern>/poc/docdownload/*</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -142,6 +143,7 @@
 	<servlet-mapping>
 		<servlet-name>QuoteBundleDownloadServlet</servlet-name>
 		<url-pattern>/quotebundledownload/*</url-pattern>
+		<url-pattern>/poc/quotebundledownload/*</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

@@ -564,8 +564,13 @@ div.ro {
 	-webkit-border-bottom-left-radius: 2px;
 }
 .docHeaderMenuItem{
-	text-decoration: underline;
+	cursor: pointer;
 }
+
+.docHeaderMenuItem img{
+	float: left;
+}
+
 
 .docFrame { 
 	width: 100%;
