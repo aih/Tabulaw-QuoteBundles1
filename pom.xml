@@ -65,10 +65,6 @@
 		  <url>http://maven.itextpdf.com/</url>
 		</repository>
 	   <repository>
-		  <id>jtidy</id>
-		  <url>http://jtidy.sourceforge.net/maven2/</url>
-		</repository>		
-	   <repository>
 		  <id>mvnrepository</id>
 		  <url>http://mvnrepository.com</url>
 		</repository>		
@@ -407,7 +403,7 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>jtidy</groupId>
+		    <groupId>net.sf.jtidy</groupId>
 		    <artifactId>jtidy</artifactId>
 		    <version>r938</version>
 		</dependency>
