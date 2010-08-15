@@ -11,7 +11,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gwt.version>2.0.0</gwt.version>
+		<gwt.version>2.0.3</gwt.version>
 		<gwt.compile.style>OBF</gwt.compile.style>
 		<gwt.log.level>INFO</gwt.log.level>
 		<gwt.compile.module>com.tabulaw.PocDev</gwt.compile.module>
@@ -79,7 +79,7 @@
 			<properties>
 				<gwt.compile.style>PRETTY</gwt.compile.style>
 				<gwt.log.level>INFO</gwt.log.level>
-				<gwt.compile.module>com.tabulaw.PocProd</gwt.compile.module>
+				<gwt.compile.module>com.tabulaw.PocDev</gwt.compile.module>
 			</properties>
 		</profile>
 		<profile>
@@ -285,29 +285,30 @@
 			</plugin>
 			
 			
-            <!--  configure the GWT-Maven plugin -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>gwt-maven-plugin</artifactId>
-                <version>1.2</version>
-                <configuration>
-                    <module>${gwt.compile.module}</module>
-                    <logLevel>${gwt.log.level}</logLevel>
-                    <style>${gwt.compile.style}</style>
-                    <gwtVersion>${gwt.version}</gwtVersion>
-                    <noServer>true</noServer>
-                    <soyc>false</soyc>
-                    <extraJvmArgs>-Xmx512M -Xss4096K</extraJvmArgs>		
-                    <runTarget>http://localhost:8080/poc</runTarget>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin> 
+			<!-- configure the GWT-Maven plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<version>1.2</version>
+				<configuration>
+					<module>${gwt.compile.module}</module>
+					<logLevel>${gwt.log.level}</logLevel>
+					<style>${gwt.compile.style}</style>
+					<gwtVersion>${gwt.version}</gwtVersion>
+					<noServer>true</noServer>
+					<soyc>false</soyc>
+					<extraJvmArgs>-Xmx512M -Xss4096K</extraJvmArgs>
+					<runTarget>http://localhost:8080/poc</runTarget>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<phase>prepare-package</phase>
+					</execution>
+				</executions>
+			</plugin> 
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -335,12 +336,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.1-beta-1</version>
-				<!--
-					<configuration> <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+				<!-- 
+				<configuration>
+					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
 					<warSourceDirectory>target/war</warSourceDirectory>
-					<warSourceExcludes>**/work/**,**/tll*</warSourceExcludes>
-					<warSourceIncludes>tll-server.jar</warSourceIncludes>
-					</configuration>
+				</configuration>
 				-->
 				<executions>
 					<execution>
@@ -351,6 +351,24 @@
 						<phase>process-resources</phase>
 						<configuration>
 							<webappDirectory>target/war</webappDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>analyze-compile-deps</id>
+						<goals>
+							<goal>analyze-only</goal>
+						</goals>
+						<phase>install</phase>
+						<configuration>
+							<failOnWarning>true</failOnWarning>
+							<ignoreNonCompile>true</ignoreNonCompile>
 						</configuration>
 					</execution>
 				</executions>
