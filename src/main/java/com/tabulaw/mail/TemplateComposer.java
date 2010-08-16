@@ -59,7 +59,7 @@ public class TemplateComposer extends AbstractComposer<TemplatedMailContext> {
 			String templatePath = baseTemplatePath + context.getTemplate();
 			templatePath += context.isHtmlTemplate() ? htmlTemplateSuffix : textTemplateSuffix;
 			
-			String mailText=VelocityUtil.mergeVelocityTemplate(this.velocityEngine, templatePath, context.getParameters());
+			String mailText=VelocityUtil.mergeVelocityTemplate(velocityEngine, templatePath, context.getParameters());
 
 			// set the subject
 			if(context.getParameters().containsKey(SUBJECT_KEY)) {

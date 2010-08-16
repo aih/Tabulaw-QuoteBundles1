@@ -46,6 +46,7 @@ import com.tabulaw.mail.MailManager;
 import com.tabulaw.mail.MailRouting;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
+import com.tabulaw.server.WebAppContext;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
@@ -439,15 +440,16 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			status.addMsg("An email address must be specified.", MsgLevel.ERROR, MsgAttr.STATUS.flag);
 		}
 		else {
-			PersistContext context = getPersistContext();
-			UserService userService = context.getUserService();
+			WebAppContext wc = getWebAppContext();
+			PersistContext pc = getPersistContext();
+			UserService userService = pc.getUserService();
 			try {
 				final IUserRef user = userService.getUserRef(emailAddress);
 				final String rp = userService.resetPassword(user.getUserRefId());
 				data.put("username", user.getName());
 				data.put("emailAddress", user.getEmailAddress());
 				data.put("password", rp);
-				final MailManager mailManager = context.getMailManager();
+				final MailManager mailManager = wc.getMailManager();
 				final MailRouting mr = mailManager.buildAppSenderMailRouting(user.getEmailAddress());
 				final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, EMAIL_TEMPLATE_FORGOT_PASSWORD, data);
 				mailManager.sendEmail(mailContext);
@@ -455,15 +457,15 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			}
 			catch(final EntityNotFoundException nfe) {
 				exceptionToStatus(nfe, status);
-				context.getExceptionHandler().handleException(nfe);
+				pc.getExceptionHandler().handleException(nfe);
 			}
 			catch(final ChangeUserCredentialsFailedException e) {
 				exceptionToStatus(e, status);
-				context.getExceptionHandler().handleException(e);
+				pc.getExceptionHandler().handleException(e);
 			}
 			catch(final MailSendException mse) {
 				exceptionToStatus(mse, status);
-				context.getExceptionHandler().handleException(mse);
+				pc.getExceptionHandler().handleException(mse);
 			}
 		}
 

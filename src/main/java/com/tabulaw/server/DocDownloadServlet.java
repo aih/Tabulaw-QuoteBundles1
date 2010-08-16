@@ -32,8 +32,6 @@ public class DocDownloadServlet extends AbstractDownloadServlet {
 
 	//private static final String EMAIL_TEMPLATE_DOC_EXPORT = "doc-export";
 
-	public static final String defaultMimeType = "text/html";
-
 	@Override
 	protected File getContentFile(HttpServletRequest req) throws ServletException, IOException {
 		String docId = req.getParameter("docId");

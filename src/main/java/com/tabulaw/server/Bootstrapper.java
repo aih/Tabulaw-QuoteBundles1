@@ -3,8 +3,10 @@
  */
 package com.tabulaw.server;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -13,10 +15,13 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.app.VelocityEngine;
 
+import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Provider;
 import com.google.inject.Stage;
 import com.tabulaw.config.Config;
 import com.tabulaw.config.ConfigRef;
@@ -29,7 +34,7 @@ import com.tabulaw.config.IConfigAware;
 public class Bootstrapper implements ServletContextListener {
 
 	private static final Log log = LogFactory.getLog(Bootstrapper.class);
-	
+
 	/**
 	 * The servlet context param name identifying the dependency injection modules
 	 * to load.
@@ -57,6 +62,32 @@ public class Bootstrapper implements ServletContextListener {
 		}
 
 		final List<Module> modules = new ArrayList<Module>(moduleClassNames.length + 1);
+
+		// velocity module
+		modules.add(new Module() {
+
+			@Override
+			public void configure(Binder binder) {
+				binder.bind(VelocityEngine.class).toProvider(new Provider<VelocityEngine>() {
+
+					public VelocityEngine get() {
+						try {
+							Properties props = new Properties();
+							final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+							InputStream is = cl.getResourceAsStream("/velocity.properties");
+							props.load(is);
+							VelocityEngine ve = new VelocityEngine(props);
+							return ve;
+						}
+						catch(final Exception e) {
+							throw new IllegalStateException("Unable to instantiate the velocity engine: " + e.getMessage(), e);
+						}
+					}
+
+				});
+			}
+		});
+
 		for(final String mcn : moduleClassNames) {
 			try {
 				final Module m = (Module) Class.forName(mcn, true, Bootstrapper.class.getClassLoader()).newInstance();
@@ -133,7 +164,7 @@ public class Bootstrapper implements ServletContextListener {
 		catch(final IllegalArgumentException e) {
 			throw new Error("Unable to load config: " + e.getMessage(), e);
 		}
-		
+
 		// put the config in the servlet context
 		servletContext.setAttribute(Config.KEY, config);
 
@@ -150,7 +181,8 @@ public class Bootstrapper implements ServletContextListener {
 
 		// create the dependency injector
 		log.debug("Creating dependency injector..");
-		final Injector injector = createInjector(servletContext, "dev".equals(stage) ? Stage.DEVELOPMENT : Stage.PRODUCTION, config);
+		final Injector injector =
+				createInjector(servletContext, "dev".equals(stage) ? Stage.DEVELOPMENT : Stage.PRODUCTION, config);
 
 		// start 'em up
 		if(handlers != null) {

@@ -276,6 +276,7 @@ public class UserDataService extends AbstractEntityService {
 	/**
 	 * Gets the quote bundle given the bundle id.
 	 * @param bundleId
+	 * @return 
 	 * @throws EntityNotFoundException
 	 */
 	@Transactional(readOnly = true)
@@ -558,6 +559,7 @@ public class UserDataService extends AbstractEntityService {
 	/**
 	 * Gets the quote given the quote id.
 	 * @param quoteId
+	 * @return the loaded quote
 	 * @throws EntityNotFoundException
 	 */
 	@Transactional(readOnly = true)
@@ -748,6 +750,7 @@ public class UserDataService extends AbstractEntityService {
 	/**
 	 * Returns all user/doc bindings that exist for a given doc
 	 * @param docId id of the doc
+	 * @return list of doc user bindings
 	 */
 	@Transactional
 	public List<DocUserBinding> getDocUserBindingsForDoc(String docId) {
@@ -874,8 +877,8 @@ public class UserDataService extends AbstractEntityService {
 	 * Checks does the bundle available for the user
 	 * 
 	 * @param userId
-	 * @param bundleId
-	 * @return
+	 * @param quoteId
+	 * @return true/false
 	 */
 	@Transactional(readOnly = true)
 	public boolean isQuoteAvailableForUser(String userId, String quoteId) {

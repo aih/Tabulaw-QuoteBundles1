@@ -28,6 +28,7 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 	public static final String defaultMimeType = "text/html";
 
 	protected PersistContext pc;
+	protected WebAppContext wc;
 	protected UserContext userContext;
 	protected String mimeType;
 
@@ -42,9 +43,11 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		super.init();
+		wc = (WebAppContext) getServletContext().getAttribute(WebAppContext.KEY);
+		pc = (PersistContext) getServletContext().getAttribute(PersistContext.KEY);
 //		MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
 	}
-
+	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -52,12 +55,8 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 		if(session == null) throw new ServletException("No user session");
 
 		mimeType = req.getParameter("mimeType");
-
 		if(StringUtil.isEmpty(mimeType)) mimeType = defaultMimeType;
-		FileConverterDelegate fcd = (FileConverterDelegate) getServletContext().getAttribute(FileConverterDelegate.KEY);
-
-		pc = (PersistContext) getServletContext().getAttribute(PersistContext.KEY);
-
+		
 		userContext = (UserContext) session.getAttribute(UserContext.KEY);
 		if(userContext == null) throw new ServletException("No user context in user session");
 		User user = userContext.getUser();
@@ -70,6 +69,7 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 
 			// convert the doc
 			fdoc = getContentFile(req);
+			FileConverterDelegate fcd = (FileConverterDelegate) getServletContext().getAttribute(FileConverterDelegate.KEY);
 			fconverted = fcd.convert(fdoc, mimeType);
 
 			// stream the doc contents
@@ -77,7 +77,7 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 			byte[] fbytes = FileUtils.readFileToByteArray(fconverted);
 			if(fbytes == null || fbytes.length < 1) throw new Exception("No doc content read");
 			// resp.setContentLength(fbytes.length);
-			//resp.setContentType(getMimeType(fconverted));
+			resp.setContentType(mimeType);
 			resp.setHeader("Content-disposition", "attachment; filename=" + fconverted.getName());
 			sos.write(fbytes);
 			responseWritten = true;

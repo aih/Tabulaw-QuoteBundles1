@@ -257,7 +257,7 @@ public final class MailModule extends AbstractModule implements IConfigAware {
 			JavaMailSender secondary;
 			@Inject
 			SimpleComposer simpleComposer;
-			@Inject(optional = true)
+			@Inject/*(optional = true)*/
 			TemplateComposer templateComposer;
 
 		}).in(Scopes.SINGLETON);

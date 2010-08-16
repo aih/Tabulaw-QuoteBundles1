@@ -5,7 +5,6 @@
  */
 package com.tabulaw.server;
 
-import java.net.ConnectException;
 import java.util.ArrayList;
 
 import javax.servlet.ServletContext;
@@ -13,16 +12,13 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
-import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
 import com.google.inject.Injector;
-import com.tabulaw.service.convert.DocToHtmlConverter;
 import com.tabulaw.service.convert.FileConverterDelegate;
 import com.tabulaw.service.convert.IFileConverter;
-import com.tabulaw.service.convert.SimpleHtmlConvertor;
-import com.tabulaw.service.convert.TextToHtmlCompositeFileConverter;
+import com.tabulaw.service.convert.SimpleHtmlToDocxFileConverter;
+import com.tabulaw.service.convert.SimpleHtmlToRtfFileConverter;
+import com.tabulaw.service.convert.TextToHtmlManualConverter;
 import com.tabulaw.service.convert.ToHtmlPassThroughConverter;
-import com.tabulaw.service.convert.simplehtmlconverter.Constants;
 
 /**
  * Bootstraps file converter impls.
@@ -33,56 +29,39 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 
 	private static final Log log = LogFactory.getLog(FileConverterBootstrapper.class);
 
-	private static final String OPEN_OFFICE_CONNECTION_KEY = Integer.toString("OpenOfficeConnection".hashCode());
-
 	@Override
 	public void startup(Injector injector, ServletContext servletContext) {
+		log.debug("Starting up file converter bootstrapping..");
+		
 		ArrayList<IFileConverter> converters = new ArrayList<IFileConverter>();
-
-		// make open office connection
-		SocketOpenOfficeConnection ooc = null;
-		try {
-			ooc = new SocketOpenOfficeConnection();
-			ooc.connect();
-			servletContext.setAttribute(OPEN_OFFICE_CONNECTION_KEY, ooc);
-		} catch (ConnectException e) {
-			log.error("Unable to establish socket connection to OpenOffice API: " + e.getMessage(), e);
-		}
 
 		// html pass through converter
 		converters.add(new ToHtmlPassThroughConverter());
 
 		// text to html converter
-		converters.add(new TextToHtmlCompositeFileConverter(ooc));
+		converters.add(new TextToHtmlManualConverter());
 
-		if (ooc != null) {
-			// doc to html converter
-			DocToHtmlConverter oofc = new DocToHtmlConverter(ooc);
-			converters.add(oofc);
+		// out of commission due to removal of open office api
+		// TODO fix or just support *.docx ???
+		// doc to html converter
+		//DocToHtmlConverter oofc = new DocToHtmlConverter();
+		//converters.add(oofc);
+		
+		// html to docx
+		converters.add(new SimpleHtmlToDocxFileConverter());
 
-			// html to doc converter
-			// HtmlToDocCompositeFileConverter html2DocConverter = new
-			// HtmlToDocCompositeFileConverter(ooc);
-			for (String s : new String[] { Constants.RTF_MIME_TYPE, Constants.DOCX_MIME_TYPE }) {
-				SimpleHtmlConvertor html2DocConverter = new SimpleHtmlConvertor(s);
-				converters.add(html2DocConverter);
-			}
-		}
+		// html to rtf
+		converters.add(new SimpleHtmlToRtfFileConverter());
 
 		FileConverterDelegate converterDelegate = converters.size() == 0 ? null : new FileConverterDelegate(converters
 				.toArray(new IFileConverter[0]));
 		servletContext.setAttribute(FileConverterDelegate.KEY, converterDelegate);
+		
+		log.debug("File converter bootstrapping complete");
 	}
 
 	@Override
 	public void shutdown(ServletContext servletContext) {
 		servletContext.removeAttribute(FileConverterDelegate.KEY);
-
-		OpenOfficeConnection ooc = (OpenOfficeConnection) servletContext.getAttribute(OPEN_OFFICE_CONNECTION_KEY);
-		if (ooc != null) {
-			ooc.disconnect();
-			servletContext.removeAttribute(OPEN_OFFICE_CONNECTION_KEY);
-		}
 	}
-
 }

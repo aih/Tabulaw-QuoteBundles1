@@ -509,13 +509,6 @@
 			<version>${springextensions.db4o.version}</version>
 		</dependency>
 
-		<!-- Open Office Java API -->
-		<dependency>
-			<groupId>com.artofsolving</groupId>
-			<artifactId>jodconverter</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache-core</artifactId>
@@ -606,7 +599,7 @@
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity</artifactId>
-			<version>1.6.2</version>
+			<version>1.6.4</version>
 			<exclusions>
 				<exclusion>
 					<groupId>oro</groupId>

@@ -4,6 +4,8 @@
  */
 package com.tabulaw.server;
 
+import java.io.Serializable;
+
 import javax.servlet.ServletContext;
 
 import net.sf.ehcache.CacheManager;
@@ -20,17 +22,16 @@ import com.tabulaw.service.entity.UserService;
  * server side.
  * @author jpk
  */
-public final class PersistContext {
+public final class PersistContext implements Serializable {
 
-	private static final long key = 7366163949288867262L;
+	private static final long serialVersionUID = 7366163949288867262L;
 
 	/**
 	 * The key identifying the {@link PersistContext} in the
 	 * {@link ServletContext}.
 	 */
-	public static final String KEY = Long.toString(key);
+	public static final String KEY = Long.toString(serialVersionUID);
 
-	private final MailManager mailManager;
 	private final ISchemaInfo schemaInfo;
 	private final IExceptionHandler exceptionHandler;
 	private final CacheManager cacheManager;
@@ -52,17 +53,12 @@ public final class PersistContext {
 			IExceptionHandler exceptionHandler, CacheManager cacheManager, UserService userService,
 			UserDataService userDataService) {
 		super();
-		this.mailManager = mailManager;
 		this.schemaInfo = schemaInfo;
 		this.exceptionHandler = exceptionHandler;
 		this.cacheManager = cacheManager;
 
 		this.userService = userService;
 		this.userDataService = userDataService;
-	}
-
-	public MailManager getMailManager() {
-		return mailManager;
 	}
 
 	public ISchemaInfo getSchemaInfo() {

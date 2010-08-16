@@ -199,7 +199,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 						@Override
 						public void onClick(ClickEvent event) {
 							event.stopPropagation();
-							Window.open("docdownload?mimeType=application/msword&docId=" + rowData.getId(), "_top", null);
+							Window.open("docdownload?mimeType=application/vnd.openxmlformats-officedocument.wordprocessingml.document&docId=" + rowData.getId(), "_top", null);
 						}
 					});
 					fpanel.add(img);

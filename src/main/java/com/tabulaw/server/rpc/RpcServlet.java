@@ -13,6 +13,7 @@ import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.RequestContext;
 import com.tabulaw.server.UserContext;
+import com.tabulaw.server.WebAppContext;
 
 /**
  * RpcServlet
@@ -69,12 +70,19 @@ public abstract class RpcServlet extends RemoteServiceServlet {
 	}
 
 	/**
+	 * @return The sole web app context instance.
+	 */
+	protected final WebAppContext getWebAppContext() {
+		return (WebAppContext) getRequestContext().getServletContext().getAttribute(WebAppContext.KEY);
+	}
+
+	/**
 	 * @return The sole persist context instance.
 	 */
 	protected final UserContext getUserContext() {
 		return (UserContext) getRequestContext().getSession().getAttribute(UserContext.KEY);
 	}
-	
+
 	/**
 	 * @return The sole persist context instance.
 	 */

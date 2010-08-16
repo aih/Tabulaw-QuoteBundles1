@@ -28,6 +28,7 @@
     </description>
 		<param-name>di.handlers</param-name>
 		<param-value>
+    	com.tabulaw.server.WebAppContextBootstrapper
     	com.tabulaw.server.Db4oBootstrapper
     	com.tabulaw.server.PersistContextBootstrapper
     	com.tabulaw.server.FileConverterBootstrapper
