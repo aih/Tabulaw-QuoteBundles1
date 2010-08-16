@@ -60,8 +60,6 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 	private static final long serialVersionUID = 7908647379731614097L;
 
-	private static final String EMAIL_TEMPLATE_FORGOT_PASSWORD = "forgot-password";
-
 	@Override
 	public UserListPayload getAllUsers() {
 		final Status status = new Status();
@@ -103,6 +101,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		Payload payload = new Payload(status);
 
 		PersistContext persistContext = getPersistContext();
+		WebAppContext webContext = getWebAppContext();
 		UserService userService = persistContext.getUserService();
 
 		String name = request.getName();
@@ -110,7 +109,17 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		String password = request.getPassword();
 
 		try {
-			userService.create(name, emailAddress, password);
+			User newUser = userService.create(name, emailAddress, password);
+			status.addMsg("Registration successful.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+			
+			// send out email
+			final MailManager mailManager = webContext.getMailManager();
+			final MailRouting mr = mailManager.buildAppSenderMailRouting(newUser.getEmailAddress());
+			Map<String, Object> data = new HashMap<String, Object>(1);
+			data.put("subject", "Tabulaw Registration");
+			data.put("emailAddress", newUser.getEmailAddress());
+			final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, "welcome-user", data);
+			mailManager.sendEmail(mailContext);
 		}
 		catch(EntityExistsException e) {
 			status.addMsg("Email already exists", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag | MsgAttr.FIELD.flag, "userEmail");
@@ -446,12 +455,13 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			try {
 				final IUserRef user = userService.getUserRef(emailAddress);
 				final String rp = userService.resetPassword(user.getUserRefId());
+				data.put("subject", "Tabulaw Password Reminder");
 				data.put("username", user.getName());
 				data.put("emailAddress", user.getEmailAddress());
 				data.put("password", rp);
 				final MailManager mailManager = wc.getMailManager();
 				final MailRouting mr = mailManager.buildAppSenderMailRouting(user.getEmailAddress());
-				final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, EMAIL_TEMPLATE_FORGOT_PASSWORD, data);
+				final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, "forgot-password", data);
 				mailManager.sendEmail(mailContext);
 				status.addMsg("Password reminder email was sent.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 			}

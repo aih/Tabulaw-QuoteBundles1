@@ -37,8 +37,7 @@ public class ExceptionHandler implements IExceptionHandler {
 	@Inject
 	public ExceptionHandler(MailManager mailManager, @OnErrorEmail NameEmail onErrorEmail) {
 		super();
-		//this.mailManager = mailManager;
-		this.mailManager = null; // TODO temp
+		this.mailManager = mailManager;
 		this.onErrorEmail = onErrorEmail;
 	}
 

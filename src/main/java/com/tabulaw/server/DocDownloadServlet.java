@@ -30,8 +30,6 @@ public class DocDownloadServlet extends AbstractDownloadServlet {
 
 	private static final Log log = LogFactory.getLog(DocDownloadServlet.class);
 
-	//private static final String EMAIL_TEMPLATE_DOC_EXPORT = "doc-export";
-
 	@Override
 	protected File getContentFile(HttpServletRequest req) throws ServletException, IOException {
 		String docId = req.getParameter("docId");
@@ -40,16 +38,6 @@ public class DocDownloadServlet extends AbstractDownloadServlet {
 
 		DocContent doc = pc.getUserDataService().getDocContent(docId);
 		File fdoc = DocUtils.docContentsToFile(doc);
-		// email the doc
-		/*
-		final MailManager mailManager = pc.getMailManager();
-		final MailRouting mr = mailManager.buildAppSenderMailRouting(user.getEmailAddress());
-		final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, EMAIL_TEMPLATE_DOC_EXPORT, null);
-		FileDataSource fds = new FileDataSource(fconverted);
-		mailContext.addAttachment(fconverted.getName(), fds);
-		mailManager.sendEmail(mailContext);
-		// status.addMsg("Document emailed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
-		*/
 		
 		return fdoc ;
 	}

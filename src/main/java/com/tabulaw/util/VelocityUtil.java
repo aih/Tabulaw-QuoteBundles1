@@ -19,8 +19,8 @@ public class VelocityUtil {
 	 * @param params parameters map used for merge
 	 * @return a result of merge.
 	 * @throws VelocityException Upon merge error
-	 * @throws IOException Upon closing the string writer that holds the text that
-	 *         is returned
+	 * @throws IOException Upon error when closing the string writer that holds
+	 *         the text that is returned
 	 */
 	public static String mergeVelocityTemplate(VelocityEngine velocityEngine, String templatePath,
 			Map<String, Object> params) throws VelocityException, IOException {

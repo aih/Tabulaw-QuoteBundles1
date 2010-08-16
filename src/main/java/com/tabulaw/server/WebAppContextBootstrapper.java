@@ -31,7 +31,6 @@ public class WebAppContextBootstrapper implements IBootstrapHandler {
 
 	@Override
 	public void shutdown(ServletContext servletContext) {
-		// TODO Auto-generated method stub
-
+		servletContext.removeAttribute(WebAppContext.KEY);
 	}
 }

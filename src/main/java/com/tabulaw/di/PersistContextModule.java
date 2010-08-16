@@ -11,7 +11,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
-import com.tabulaw.mail.MailManager;
 import com.tabulaw.schema.ISchemaInfo;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.rpc.IExceptionHandler;
@@ -25,12 +24,10 @@ public class PersistContextModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		
+
 		// PersistContext
 		bind(PersistContext.class).toProvider(new Provider<PersistContext>() {
 
-			@Inject(optional = true)
-			MailManager mailManager;
 			@Inject
 			ISchemaInfo schemaInfo;
 			@Inject
@@ -44,8 +41,7 @@ public class PersistContextModule extends AbstractModule {
 
 			@Override
 			public PersistContext get() {
-				return new PersistContext(mailManager, schemaInfo, 
-						exceptionHandler, persistCache, userService, userDataService);
+				return new PersistContext(schemaInfo, exceptionHandler, persistCache, userService, userDataService);
 			}
 		}).in(Scopes.SINGLETON);
 	}

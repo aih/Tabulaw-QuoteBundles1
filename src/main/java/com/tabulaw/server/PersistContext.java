@@ -11,7 +11,6 @@ import javax.servlet.ServletContext;
 import net.sf.ehcache.CacheManager;
 
 import com.google.inject.Inject;
-import com.tabulaw.mail.MailManager;
 import com.tabulaw.schema.ISchemaInfo;
 import com.tabulaw.server.rpc.IExceptionHandler;
 import com.tabulaw.service.entity.UserDataService;
@@ -41,7 +40,6 @@ public final class PersistContext implements Serializable {
 
 	/**
 	 * Constructor
-	 * @param mailManager
 	 * @param schemaInfo
 	 * @param exceptionHandler
 	 * @param cacheManager
@@ -49,7 +47,7 @@ public final class PersistContext implements Serializable {
 	 * @param userDataService
 	 */
 	@Inject
-	public PersistContext(MailManager mailManager, ISchemaInfo schemaInfo, 
+	public PersistContext(ISchemaInfo schemaInfo, 
 			IExceptionHandler exceptionHandler, CacheManager cacheManager, UserService userService,
 			UserDataService userDataService) {
 		super();
