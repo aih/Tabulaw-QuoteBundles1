@@ -24,10 +24,12 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabBar;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
+import com.tabulaw.client.app.ui.UserPasswordSetDialog;
 import com.tabulaw.client.app.ui.view.DocView;
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -136,13 +138,19 @@ public class NavRowPanel extends AbstractNavPanel {
 			public static final String FORM_CONTENTS = "frmContents";
 			public static final String WELCOME_TEXT = "welcomeText";
 			public static final String LOGOUT = "logout";
+			public static final String RESET_PSWD = "rpswd";
 		}
 
 		final Label welcomeText;
-		final SimpleHyperLink lnkLogOut;
+		final SimpleHyperLink lnkLogOut, lnkResetPswd;
 		final FlowPanel pnl;
 		final Hidden hiddenCurrentBundleId;
 		final FormPanel frmLogout;
+		
+		// TODO go MVP style as this is a clone of what is in UserEditPanel
+		// we need to pull out interactions with the model from the widgets 
+		// and make it purely event driven (the views and widget are supposed to be dumb)!
+		final UserPasswordSetDialog dlgResetPassword = new UserPasswordSetDialog();
 
 		// wraps the form and is the top-most widget
 		final SimplePanel wrapper;
@@ -171,6 +179,20 @@ public class NavRowPanel extends AbstractNavPanel {
 				}
 			});
 			lnkLogOut.setStyleName(Styles.LOGOUT);
+			lnkLogOut.setTitle("Logout from Tabulaw");
+			
+			lnkResetPswd = new SimpleHyperLink("Reset Password", new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					event.getNativeEvent().stopPropagation();
+					User user = ClientModelCache.get().getUser();
+					dlgResetPassword.set(user.getId(), user.getName(), user.getEmailAddress());
+					dlgResetPassword.showRelativeTo((UIObject) event.getSource());
+				}
+			});
+			lnkResetPswd.setStyleName(Styles.RESET_PSWD);
+			lnkResetPswd.setTitle("Reset your login password");
 
 			hiddenCurrentBundleId = new Hidden("currentBundleId");
 
@@ -180,6 +202,7 @@ public class NavRowPanel extends AbstractNavPanel {
 
 			pnl.add(hiddenCurrentBundleId);
 			pnl.add(welcomeText);
+			pnl.add(lnkResetPswd);
 			pnl.add(lnkLogOut);
 			frmLogout.add(pnl);
 

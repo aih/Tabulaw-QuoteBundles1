@@ -47,10 +47,10 @@ public class ExceptionHandler implements IExceptionHandler {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
 
 	public void handleException(final Throwable t) {
-		
+
 		// log the exception
 		log.error(t.getMessage(), t);
-		
+
 		// email the exception
 		if(mailManager != null) {
 			final Map<String, Object> data = new HashMap<String, Object>();
@@ -64,7 +64,7 @@ public class ExceptionHandler implements IExceptionHandler {
 			}
 			data.put("error", emsg);
 			final StackTraceElement ste =
-				(t.getStackTrace() == null || t.getStackTrace().length < 1) ? null : t.getStackTrace()[0];
+					(t.getStackTrace() == null || t.getStackTrace().length < 1) ? null : t.getStackTrace()[0];
 			data.put("trace", ste == null ? "[NO STACK TRACE]" : ste.toString());
 			mailManager.sendEmail(mailManager.buildTextTemplateContext(mailManager.buildAppSenderMailRouting(onErrorEmail),
 					"exception-notification", data));

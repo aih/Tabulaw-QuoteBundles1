@@ -113,13 +113,19 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			status.addMsg("Registration successful.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 			
 			// send out email
-			final MailManager mailManager = webContext.getMailManager();
-			final MailRouting mr = mailManager.buildAppSenderMailRouting(newUser.getEmailAddress());
-			Map<String, Object> data = new HashMap<String, Object>(1);
-			data.put("subject", "Tabulaw Registration");
-			data.put("emailAddress", newUser.getEmailAddress());
-			final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, "welcome-user", data);
-			mailManager.sendEmail(mailContext);
+			try {
+				final MailManager mailManager = webContext.getMailManager();
+				final MailRouting mr = mailManager.buildAppSenderMailRouting(newUser.getEmailAddress());
+				Map<String, Object> data = new HashMap<String, Object>(1);
+				data.put("subject", "Tabulaw Registration");
+				data.put("emailAddress", newUser.getEmailAddress());
+				final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, "welcome-user", data);
+				mailManager.sendEmail(mailContext);
+			}
+			catch(Exception e) {
+				// don't penalize for email failure
+				status.addMsg("Unable to send email confirmation at this time.", MsgLevel.WARN, MsgAttr.STATUS.flag);
+			}
 		}
 		catch(EntityExistsException e) {
 			status.addMsg("Email already exists", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag | MsgAttr.FIELD.flag, "userEmail");

@@ -76,6 +76,12 @@ public class UserPasswordSetDialog extends Dialog implements IEditHandler<FieldG
 		add(editPanel);
 	}
 	
+	/**
+	 * Readys UI state making it display and process worthy.
+	 * @param userId
+	 * @param userName
+	 * @param userEmail
+	 */
 	public void set(String userId, String userName, String userEmail) {
 		if(userId == null || userName == null || userEmail == null)
 			throw new NullPointerException();
