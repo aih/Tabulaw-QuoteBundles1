@@ -6,6 +6,7 @@
 package com.tabulaw.service.convert;
 
 import com.tabulaw.service.convert.simplehtmlconverter.Constants;
+import com.tabulaw.service.convert.simplehtmlconverter.writer.IDocumentContext;
 import com.tabulaw.service.convert.simplehtmlconverter.writer.RtfDocumentContext;
 
 /**
@@ -14,12 +15,6 @@ import com.tabulaw.service.convert.simplehtmlconverter.writer.RtfDocumentContext
  */
 public class SimpleHtmlToRtfFileConverter extends AbstractSimpleHtmlConvertor {
 
-	/**
-	 * Constructor
-	 */
-	public SimpleHtmlToRtfFileConverter() {
-		super(new RtfDocumentContext());
-	}
 
 	@Override
 	protected String getFileExtension() {
@@ -30,4 +25,9 @@ public class SimpleHtmlToRtfFileConverter extends AbstractSimpleHtmlConvertor {
 	public String getTargetMimeType() {
 		return Constants.RTF_MIME_TYPE;
 	}
+
+        @Override
+        IDocumentContext createDocumentContext() {
+                return new RtfDocumentContext();
+        }
 }
