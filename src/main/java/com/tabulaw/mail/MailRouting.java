@@ -171,8 +171,8 @@ public final class MailRouting implements Cloneable {
 			}
 			return cln;
 		}
-		catch(final CloneNotSupportedException cnse) {
-			throw new IllegalStateException("MailRouting Cloning not supported but should be!");
+		catch(final CloneNotSupportedException e) {
+			throw new Error(e);
 		}
 	}
 }

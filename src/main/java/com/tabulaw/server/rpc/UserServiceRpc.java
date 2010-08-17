@@ -48,6 +48,7 @@ import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.server.WebAppContext;
 import com.tabulaw.service.ChangeUserCredentialsFailedException;
+import com.tabulaw.service.emailer.EmailDispatcher;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 import com.tabulaw.service.entity.UserDataService.BundleContainer;
@@ -114,13 +115,19 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			
 			// send out email
 			try {
-				final MailManager mailManager = webContext.getMailManager();
+				final EmailDispatcher emailDispatcher = webContext.getEmailDispatcher();
+				MailManager mailManager = emailDispatcher.getMailManager();
 				final MailRouting mr = mailManager.buildAppSenderMailRouting(newUser.getEmailAddress());
 				Map<String, Object> data = new HashMap<String, Object>(1);
 				data.put("subject", "Tabulaw Registration");
 				data.put("emailAddress", newUser.getEmailAddress());
 				final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, "welcome-user", data);
-				mailManager.sendEmail(mailContext);
+				try {
+					emailDispatcher.queueEmail(mailContext);
+				}
+				catch(InterruptedException e) {
+					// TODO anything?
+				}
 			}
 			catch(Exception e) {
 				// don't penalize for email failure
@@ -465,11 +472,17 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 				data.put("username", user.getName());
 				data.put("emailAddress", user.getEmailAddress());
 				data.put("password", rp);
-				final MailManager mailManager = wc.getMailManager();
+				final EmailDispatcher emailDispatcher = wc.getEmailDispatcher();
+				MailManager mailManager = emailDispatcher.getMailManager();
 				final MailRouting mr = mailManager.buildAppSenderMailRouting(user.getEmailAddress());
 				final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, "forgot-password", data);
-				mailManager.sendEmail(mailContext);
-				status.addMsg("Password reminder email was sent.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+				try {
+					emailDispatcher.queueEmail(mailContext);
+				}
+				catch(InterruptedException e) {
+					// TODO anything?
+				}
+				status.addMsg("Password reminder request processed.  An email should arrive to your inbox within the hour.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 			}
 			catch(final EntityNotFoundException nfe) {
 				exceptionToStatus(nfe, status);

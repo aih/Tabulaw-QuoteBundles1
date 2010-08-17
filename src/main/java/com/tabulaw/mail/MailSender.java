@@ -15,13 +15,9 @@ import org.springframework.mail.javamail.JavaMailSender;
  * The mail sender.
  * @author jpk
  */
-public class MailSender implements IMailSender {
+public class MailSender {
 
 	private static final Log log = LogFactory.getLog(MailSender.class);
-
-	public static final int DEFAULT_NUMBER_OF_SEND_RETRIES = 0;
-
-	public static final int DEFAULT_SEND_RETRY_DELAY_MILIS = 1000;
 
 	/**
 	 * List of {@link JavaMailSender} objects. The order dictates the try priority
@@ -32,12 +28,12 @@ public class MailSender implements IMailSender {
 	/**
 	 * The number of times to re-try sending an email.
 	 */
-	private int numberOfSendRetries = DEFAULT_NUMBER_OF_SEND_RETRIES;
+	private final int numberOfSendRetries;
 
 	/**
 	 * The delay in mili-seconds to wait until re-trying to send an email.
 	 */
-	private int sendRetryDelayMilis = DEFAULT_SEND_RETRY_DELAY_MILIS;
+	private final int sendRetryDelayMilis;
 
 	/**
 	 * List of supported email composers.
@@ -82,9 +78,9 @@ public class MailSender implements IMailSender {
 			while(retries++ < numberOfSendRetries) {
 				// send the email
 				try {
-					if(log.isDebugEnabled()) log.debug("Sending email: " + context.getName() + "...");
+					if(log.isDebugEnabled()) log.debug("Sending email: " + context + "...");
 					sender.send(mimeMessage);
-					log.info(context.getName() + " Message sent.");
+					log.info(context + " Message sent.");
 					return;
 				}
 				catch(final MailAuthenticationException mae) {
@@ -103,8 +99,8 @@ public class MailSender implements IMailSender {
 			}
 		}
 
-		log.error("Email delivery for '" + context.getName() + "' FAILED");
-		throw new MailSendException("Failed email delivery attempt: " + context.getName());
+		log.error("Email delivery for '" + context + "' FAILED");
+		throw new MailSendException("Failed email delivery attempt: " + context);
 	}
 
 }

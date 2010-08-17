@@ -54,12 +54,11 @@ public class TemplateComposer extends AbstractComposer<TemplatedMailContext> {
 
 	@Override
 	public void composeImpl(MimeMessageHelper helper, TemplatedMailContext context) throws MailPreparationException {
-
 		try {
 			String templatePath = baseTemplatePath + context.getTemplate();
 			templatePath += context.isHtmlTemplate() ? htmlTemplateSuffix : textTemplateSuffix;
-			
-			String mailText=VelocityUtil.mergeVelocityTemplate(velocityEngine, templatePath, context.getParameters());
+
+			String mailText = VelocityUtil.mergeVelocityTemplate(velocityEngine, templatePath, context.getParameters());
 
 			// set the subject
 			if(context.getParameters().containsKey(SUBJECT_KEY)) {
@@ -82,5 +81,4 @@ public class TemplateComposer extends AbstractComposer<TemplatedMailContext> {
 		}
 
 	}
-
 }

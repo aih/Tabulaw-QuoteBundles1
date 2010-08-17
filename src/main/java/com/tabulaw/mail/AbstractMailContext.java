@@ -60,4 +60,8 @@ abstract class AbstractMailContext implements IMailContext {
 		return sent;
 	}
 
+	@Override
+	public final String toString() {
+		return getName();
+	}
 }

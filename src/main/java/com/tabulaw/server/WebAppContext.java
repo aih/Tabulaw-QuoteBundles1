@@ -11,7 +11,7 @@ import javax.servlet.ServletContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import com.google.inject.Inject;
-import com.tabulaw.mail.MailManager;
+import com.tabulaw.service.emailer.EmailDispatcher;
 
 /**
  * Servlet/web level context providing resources used at this the servlet
@@ -28,23 +28,23 @@ public final class WebAppContext implements Serializable {
 	 */
 	public static final String KEY = Long.toString(serialVersionUID);
 
-	private final MailManager mailManager;
+	private final EmailDispatcher emailDispatcher;
 	private final VelocityEngine velocityEngine;
 
 	/**
 	 * Constructor
-	 * @param mailManager
+	 * @param emailDispatcher
 	 * @param velocityEngine
 	 */
 	@Inject
-	public WebAppContext(MailManager mailManager, VelocityEngine velocityEngine) {
+	public WebAppContext(EmailDispatcher emailDispatcher, VelocityEngine velocityEngine) {
 		super();
-		this.mailManager = mailManager;
+		this.emailDispatcher = emailDispatcher;
 		this.velocityEngine = velocityEngine;
 	}
 
-	public MailManager getMailManager() {
-		return mailManager;
+	public EmailDispatcher getEmailDispatcher() {
+		return emailDispatcher;
 	}
 
 	public VelocityEngine getVelocityEngine() {

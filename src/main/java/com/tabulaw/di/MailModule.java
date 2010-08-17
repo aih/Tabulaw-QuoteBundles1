@@ -27,12 +27,12 @@ import com.tabulaw.config.IConfigAware;
 import com.tabulaw.config.IConfigKey;
 import com.tabulaw.mail.IComposer;
 import com.tabulaw.mail.IMailContext;
-import com.tabulaw.mail.IMailSender;
 import com.tabulaw.mail.MailRouting;
 import com.tabulaw.mail.MailSender;
 import com.tabulaw.mail.NameEmail;
 import com.tabulaw.mail.SimpleComposer;
 import com.tabulaw.mail.TemplateComposer;
+import com.tabulaw.service.emailer.EmailDispatcher;
 
 /**
  * MailModule - Module for programmatic email distribution.
@@ -234,10 +234,10 @@ public final class MailModule extends AbstractModule implements IConfigAware {
 		bindConstant().annotatedWith(MailTemplateSuffixText.class).to(tmpSfxTxt);
 		bindConstant().annotatedWith(MailTemplateSuffixHtml.class).to(tmpSfxHtm);
 
-		// IMailSender
-		bind(IMailSender.class).toProvider(new Provider<IMailSender>() {
+		// MailSender
+		bind(MailSender.class).toProvider(new Provider<MailSender>() {
 
-			public IMailSender get() {
+			public MailSender get() {
 				int numberOfSendRetries = config.getInt(ConfigKeys.NUM_SEND_RETRIES.getKey());
 				int sendRetryDelayMilis = config.getInt(ConfigKeys.SEND_RETRY_DELAY_MILIS.getKey());
 				final List<JavaMailSender> javaMailSenders = Arrays.asList(primary, secondary);
@@ -252,7 +252,7 @@ public final class MailModule extends AbstractModule implements IConfigAware {
 			@Inject
 			@PrimaryMailSender
 			JavaMailSender primary;
-			@Inject
+			@Inject(optional = true)
 			@SecondaryMailSender
 			JavaMailSender secondary;
 			@Inject
@@ -261,7 +261,9 @@ public final class MailModule extends AbstractModule implements IConfigAware {
 			TemplateComposer templateComposer;
 
 		}).in(Scopes.SINGLETON);
-
+		
+		// EmailDispatcher
+		bind(EmailDispatcher.class).in(Scopes.SINGLETON);
 	}
 
 }

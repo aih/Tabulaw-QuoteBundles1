@@ -14,8 +14,11 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.inject.Inject;
 import com.tabulaw.di.ExceptionHandlerModule.OnErrorEmail;
+import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailManager;
+import com.tabulaw.mail.MailRouting;
 import com.tabulaw.mail.NameEmail;
+import com.tabulaw.service.emailer.EmailDispatcher;
 
 /**
  * ExceptionHandler - Emails exception notification emails.
@@ -25,19 +28,19 @@ public class ExceptionHandler implements IExceptionHandler {
 
 	private static final Log log = LogFactory.getLog(ExceptionHandler.class);
 
-	private final MailManager mailManager;
+	private final EmailDispatcher emailDispatcher;
 
 	private final NameEmail onErrorEmail;
 
 	/**
 	 * Constructor
-	 * @param mailManager
+	 * @param emailDispatcher
 	 * @param onErrorEmail
 	 */
 	@Inject
-	public ExceptionHandler(MailManager mailManager, @OnErrorEmail NameEmail onErrorEmail) {
+	public ExceptionHandler(EmailDispatcher emailDispatcher, @OnErrorEmail NameEmail onErrorEmail) {
 		super();
-		this.mailManager = mailManager;
+		this.emailDispatcher = emailDispatcher;
 		this.onErrorEmail = onErrorEmail;
 	}
 
@@ -52,7 +55,7 @@ public class ExceptionHandler implements IExceptionHandler {
 		log.error(t.getMessage(), t);
 
 		// email the exception
-		if(mailManager != null) {
+		if(emailDispatcher != null) {
 			final Map<String, Object> data = new HashMap<String, Object>();
 			data.put("header", "Exception Notification (" + t.getClass().getSimpleName() + ")");
 			synchronized (this) {
@@ -66,8 +69,15 @@ public class ExceptionHandler implements IExceptionHandler {
 			final StackTraceElement ste =
 					(t.getStackTrace() == null || t.getStackTrace().length < 1) ? null : t.getStackTrace()[0];
 			data.put("trace", ste == null ? "[NO STACK TRACE]" : ste.toString());
-			mailManager.sendEmail(mailManager.buildTextTemplateContext(mailManager.buildAppSenderMailRouting(onErrorEmail),
-					"exception-notification", data));
+			MailManager mailManager = emailDispatcher.getMailManager();
+			MailRouting mailRouting = mailManager.buildAppSenderMailRouting(onErrorEmail);
+			IMailContext mailContext = mailManager.buildTextTemplateContext(mailRouting, "exception-notification", data);
+			try {
+				emailDispatcher.queueEmail(mailContext);
+			}
+			catch(InterruptedException e) {
+				// TODO anything ?
+			}
 		}
 	}
 }

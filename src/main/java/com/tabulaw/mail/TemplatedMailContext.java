@@ -12,17 +12,17 @@ class TemplatedMailContext extends AbstractMailContext {
 	/**
 	 * The name of the template
 	 */
-	private String template;
+	private final String template;
 
 	/**
 	 * Is the template html based or plain-text based?
 	 */
-	private boolean htmlTemplate = false;
+	private boolean htmlTemplate;
 
 	/**
 	 * The template parameters.
 	 */
-	private Map<String, Object> parameters;
+	private final Map<String, Object> parameters;
 
 	/**
 	 * Constructor
@@ -30,7 +30,7 @@ class TemplatedMailContext extends AbstractMailContext {
 	 * @param encoding
 	 */
 	public TemplatedMailContext(MailRouting routing, String encoding) {
-		super(routing, encoding);
+		this(routing, encoding, null, false, null);
 	}
 
 	/**
@@ -43,18 +43,14 @@ class TemplatedMailContext extends AbstractMailContext {
 	 */
 	public TemplatedMailContext(MailRouting routing, String encoding, String template, boolean htmlTemplate,
 			Map<String, Object> parameters) {
-		this(routing, encoding);
-		setTemplate(template, htmlTemplate, parameters);
+		super(routing, encoding);
+		this.template = template;
+		this.htmlTemplate = htmlTemplate;
+		this.parameters = parameters;
 	}
 
 	public String getTemplate() {
 		return template;
-	}
-
-	public void setTemplate(String templateName, boolean isHtml, Map<String, Object> parameters) {
-		this.template = templateName;
-		this.htmlTemplate = isHtml;
-		this.parameters = parameters;
 	}
 
 	public boolean isHtmlTemplate() {

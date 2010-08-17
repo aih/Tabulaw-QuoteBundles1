@@ -22,7 +22,7 @@ public final class MailManager {
 	/**
 	 * The mail sender
 	 */
-	private final IMailSender mailSender;
+	private final MailSender mailSender;
 
 	/**
 	 * Constructor
@@ -30,7 +30,7 @@ public final class MailManager {
 	 * @param mailSender
 	 */
 	@Inject
-	public MailManager(@DefaultMailRouting MailRouting defaultRouting, IMailSender mailSender) {
+	public MailManager(@DefaultMailRouting MailRouting defaultRouting, MailSender mailSender) {
 		super();
 		this.defaultRouting = defaultRouting;
 		this.mailSender = mailSender;
@@ -194,7 +194,7 @@ public final class MailManager {
 	 */
 	public void sendEmail(IMailContext context) throws MailSendException {
 		if(context.wasSent()) {
-			throw new IllegalStateException("Mail message: '" + context.getName() + "' was already sent.");
+			throw new IllegalStateException("Mail message: '" + context + "' was already sent.");
 		}
 		mailSender.send(context);
 		context.markSent();

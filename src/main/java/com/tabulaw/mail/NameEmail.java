@@ -8,16 +8,7 @@ import com.google.inject.Inject;
  */
 public class NameEmail implements Cloneable {
 
-	private String name;
-
-	private String emailAddress;
-
-	/**
-	 * Constructor
-	 */
-	public NameEmail() {
-		super();
-	}
+	private final String name, emailAddress;
 
 	/**
 	 * Constructor
@@ -26,7 +17,6 @@ public class NameEmail implements Cloneable {
 	 */
 	@Inject
 	public NameEmail(String name, String emailAddress) {
-		this();
 		this.name = name;
 		this.emailAddress = emailAddress;
 	}
@@ -43,16 +33,8 @@ public class NameEmail implements Cloneable {
 		return emailAddress;
 	}
 
-	public void setEmailAddress(String emailAddress) {
-		this.emailAddress = emailAddress;
-	}
-
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	@Override
@@ -69,14 +51,18 @@ public class NameEmail implements Cloneable {
 	}
 
 	@Override
-	protected NameEmail clone() {
+	public NameEmail clone() {
 		try {
 			final NameEmail cln = (NameEmail) super.clone();
 			return cln;
 		}
 		catch(final CloneNotSupportedException e) {
-			throw new Error("NameEmail cloning not supported and should be!");
+			throw new Error(e);
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "NameEmail [emailAddress=" + emailAddress + ", name=" + name + "]";
+	}
 }
