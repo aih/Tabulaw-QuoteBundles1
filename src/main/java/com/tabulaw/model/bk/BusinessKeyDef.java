@@ -3,7 +3,7 @@
  * @author jpk
  * Jan 19, 2009
  */
-package com.tabulaw.schema;
+package com.tabulaw.model.bk;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -12,17 +12,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * BusinessObject - Defines one or more business keys for a particular domain
- * object.
+ * BusinessKeyDef
  * @author jpk
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface BusinessObject {
+public @interface BusinessKeyDef {
+	
+	/**
+	 * @return The presentation worthy name of this business key.
+	 */
+	String name();
 
 	/**
-	 * @return All defined business keys for this business object.
+	 * @return The bean properties that define this business key declaration.
 	 */
-	BusinessKeyDef[] businessKeys();
+	String[] properties();
 }

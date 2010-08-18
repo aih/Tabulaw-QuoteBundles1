@@ -19,7 +19,6 @@ import org.testng.annotations.Test;
 
 import com.tabulaw.IDescriptorProvider;
 import com.tabulaw.ITypeDescriptorProvider;
-import com.tabulaw.model.IEntityMetadata;
 import com.tabulaw.model.validate.AtLeastOne;
 
 /**

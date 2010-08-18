@@ -3,11 +3,9 @@
  * @author jpk
  * @since Mar 14, 2010
  */
-package com.tabulaw.model;
+package com.tabulaw.schema;
 
 import com.tabulaw.common.model.IEntity;
-import com.tabulaw.schema.Extended;
-import com.tabulaw.schema.Root;
 
 /**
  * IEntity's metadata definition.

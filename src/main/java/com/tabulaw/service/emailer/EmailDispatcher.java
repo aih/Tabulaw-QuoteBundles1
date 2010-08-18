@@ -73,10 +73,10 @@ public class EmailDispatcher implements Runnable {
 		if(log.isDebugEnabled()) log.debug("Processing email job: " + item);
 		try {
 			mailManager.sendEmail(item);
+			if(log.isDebugEnabled()) log.debug("Email job: " + item + " processed.");
 		}
 		catch(Exception e) {
 			log.error("Unable to process email: " + e.getMessage(), e);
 		}
-		if(log.isDebugEnabled()) log.debug("Email job: " + item + " processed.");
 	}
 }

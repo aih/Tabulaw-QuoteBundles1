@@ -1,4 +1,4 @@
-package com.tabulaw.util;
+package com.tabulaw.criteria;
 
 /**
  * Comparator - Enumarates comparators that can be used to specify a criterion.

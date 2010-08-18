@@ -3,10 +3,8 @@
  * @author jpk
  * @since Mar 14, 2010
  */
-package com.tabulaw.model;
+package com.tabulaw.schema;
 
-import com.tabulaw.schema.Extended;
-import com.tabulaw.schema.Root;
 
 /**
  * Holds key facts about a particular entity hierarchy (set of model types).
