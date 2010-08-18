@@ -36,15 +36,12 @@ import com.tabulaw.client.ui.view.ViewContainer;
  * ViewManager - Singleton managing view life-cycles and view caching. Also
  * serves as an MVC dispatcher dispatching view requests to the appropriate view
  * controller. View history is also managed here.
- * <p>
- * <b>NOTE:</b> we use the double type rather than the int type when dealing
- * with view key hash codes to avoid js exceptions when parsing history view
- * tokens in script mode!
  * @author jpk
  */
 public final class ViewManager implements ValueChangeHandler<String>, IHasViewChangeHandlers {
-	
+
 	private static final class PanelWrapper extends Composite implements IHasViewChangeHandlers {
+
 		private final ComplexPanel panel;
 
 		public PanelWrapper(ComplexPanel panel) {
@@ -65,37 +62,6 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	 */
 	private static ViewRef ref(CView e) {
 		return new ViewRef(e.init, e.vc.getView().getShortViewName(), e.vc.getView().getLongViewName());
-	}
-
-	/**
-	 * Used to dis-ambiguate {@link History} tokens. I.e. whether the history
-	 * token passed to the {@link History} {@link ValueChangeEvent} method is a
-	 * call for a view.
-	 */
-	private static final char VIEW_TOKEN_PREFIX = 'v';
-
-	/**
-	 * Generates a history token from a {@link ViewKey}.
-	 * @param key
-	 * @return the complimenting history token.
-	 */
-	private static String generateViewKeyHistoryToken(ViewKey key) {
-		return VIEW_TOKEN_PREFIX + Double.toString(key.hashCode());
-	}
-
-	/**
-	 * Extracts the view key hash from the given history token. <code>-1</code> is
-	 * returned if the historyToken is <em>not</em> view related.
-	 * @param historyToken The possibly view related history token
-	 * @return Extracted hash of the associated {@link ViewKey} or <code>-1</code>
-	 *         if the history token is not a view history token.
-	 */
-	@SuppressWarnings("null")
-	private static double extractViewKeyHash(String historyToken) {
-		final int len = historyToken == null ? 0 : historyToken.length();
-		if(len < 2) return -1;
-		if(historyToken.charAt(0) != VIEW_TOKEN_PREFIX) return -1;
-		return Double.parseDouble(historyToken.substring(1));
 	}
 
 	private static ViewManager instance;
@@ -177,7 +143,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	public HandlerRegistration addViewChangeHandler(IViewChangeHandler handler) {
 		return parentViewPanel.addViewChangeHandler(handler);
 	}
-	
+
 	@Override
 	public void fireEvent(GwtEvent<?> event) {
 		parentViewPanel.fireEvent(event);
@@ -349,7 +315,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 					fireEvent(ViewChangeEvent.viewUnloadedEvent(vk));
 				}
 			});
-			
+
 			pendingUnload = null;
 		}
 
@@ -409,7 +375,7 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 			pendingCurrent = initial;
 		}
 		if(pendingCurrent != null && pendingCurrent != current) {
-			History.newItem(generateViewKeyHistoryToken(pendingCurrent.getViewKey()));
+			History.newItem(pendingCurrent.getViewKey().getToken());
 		}
 		else {
 			// we're unloading a view that isn't current but we still need to notify
@@ -485,18 +451,18 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	}
 
 	/**
-	 * Locates a cached view given a view key hash.
-	 * @param viewKeyHash
+	 * Locates a cached view given a view key token.
+	 * @param viewKeyToken
 	 * @return The found {@link IView} or <code>null</code> if not present in the
 	 *         view cache.
 	 */
-	private CView findView(double viewKeyHash) {
+	private CView findView(String viewKeyToken) {
 		final Iterator<CView> itr = cache.queueIterator();
 		if(itr != null) {
 			while(itr.hasNext()) {
 				final CView e = itr.next();
-				final double hc = e.getViewKey().hashCode();
-				if(hc == viewKeyHash) {
+				final String vhtoken = e.getViewKey().getToken();
+				if(vhtoken.equals(viewKeyToken)) {
 					return e;
 				}
 			}
@@ -512,17 +478,17 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 	 * resolve any view key hash to a view ref but we account for possibility the
 	 * user may have manually changed the view key hash in the query string or
 	 * equivalent.
-	 * @param viewKeyHash
+	 * @param viewKeyToken
 	 * @return The found view ref or <code>null</code> if not found.
 	 */
-	private ViewRef findViewRef(double viewKeyHash) {
+	private ViewRef findViewRef(String viewKeyToken) {
 		// try visited view ref cache
 		final Iterator<ViewRef> vitr = cache.visitedRefIterator();
 		if(vitr != null) {
 			while(vitr.hasNext()) {
 				final ViewRef r = vitr.next();
-				final int hc = r.getViewKey().hashCode();
-				if(hc == viewKeyHash) {
+				final String hc = r.getViewKey().getToken();
+				if(hc.equals(viewKeyToken)) {
 					return r;
 				}
 			}
@@ -612,18 +578,19 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		if(request == null) throw new IllegalArgumentException("No view request specified.");
 
 		if(pendingViewRequest == null) {
+			String htoken;
 			if(request.addHistory()) {
 				// history routing required
 				assert request.getViewKey() != null : "Unable to add history: No view key specified.";
-				final double hash = extractViewKeyHash(History.getToken());
-				final double vkhash = request.getViewKey().hashCode();
-				if(hash != -1 && vkhash == hash) {
+				htoken = History.getToken();
+				final String vtoken = request.getViewKey().getToken();
+				if(vtoken != null && vtoken.equals(htoken)) {
 					doDispatch(request);
 				}
 				else {
 					// need to route through history first
 					this.pendingViewRequest = request;
-					final String htoken = generateViewKeyHistoryToken(request.getViewKey());
+					htoken = request.getViewKey().getToken();
 					Log.debug("Routing view '" + request.getViewKey() + "' through history with hash: " + htoken);
 					History.newItem(htoken);
 				}
@@ -647,16 +614,17 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 			setCurrentView(((ShowViewRequest) request).getViewInitializer());
 		}
 		else if(request instanceof UnloadViewRequest) {
-			UnloadViewRequest u= (UnloadViewRequest) request;
+			UnloadViewRequest u = (UnloadViewRequest) request;
 			unloadView(u.getViewKey(), u.isDestroy(), u.isErradicate());
 		}
-		else throw new IllegalStateException("Unhandled view request: " + request);
+		else
+			throw new IllegalStateException("Unhandled view request: " + request);
 	}
 
 	public void onValueChange(ValueChangeEvent<String> event) {
-		final double viewKeyHash = extractViewKeyHash(event.getValue());
-		if(viewKeyHash != -1) {
-			Log.debug("Handling view history token: " + viewKeyHash + "..");
+		final String htoken = event.getValue();
+		if(htoken != null) {
+			Log.debug("Considering history token: " + htoken + "..");
 			if(pendingViewRequest != null) {
 				// dispatch the view request
 				dispatch(pendingViewRequest);
@@ -664,30 +632,28 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 			else {
 				// user pressed the back button or a non-show type view request was
 				// invoked or equivalant
-				CView e = findView(viewKeyHash);
+				CView e = findView(htoken);
 				if(e == null) {
 					// probably the user is clicking the back button a number of times
 					// beyond the cache capacity
 					// resort to the visited view ref cache
-					final ViewRef r = findViewRef(viewKeyHash);
-					if(r == null) {
-						Log.warn("Un-resolved view hash: " + viewKeyHash);
-					}
-					else {
+					final ViewRef r = findViewRef(htoken);
+					if(r != null) {
 						setCurrentView(r.getViewInitializer());
 						return;
 					}
 					// this should only happen when the user mucks with the view key hash
 					// in the query string
 					// resort to the initial view
-					e = initial;
+					//Log.debug("Un-resolved : " + htoken);
+					//e = initial;
 				}
 				if(e != null) {
 					setCurrentView(e);
 				}
-				else {
-					Log.debug("Un-resolvable view hash: " + viewKeyHash + ". No action performed.");
-				}
+				//else {
+					//Log.debug("Un-resolvable view hash: " + htoken + ". No action performed.");
+				//}
 			}
 		}
 	}

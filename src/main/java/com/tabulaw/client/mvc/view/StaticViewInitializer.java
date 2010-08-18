@@ -19,7 +19,7 @@ public class StaticViewInitializer extends AbstractViewKeyProvider implements IV
 	 * @param viewClass the view class
 	 */
 	public StaticViewInitializer(ViewClass viewClass) {
-		this.key = new ViewKey(viewClass, 0);
+		this.key = new ViewKey(viewClass);
 	}
 
 	@Override

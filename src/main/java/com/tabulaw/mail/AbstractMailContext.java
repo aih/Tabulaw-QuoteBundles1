@@ -52,11 +52,11 @@ abstract class AbstractMailContext implements IMailContext {
 		addAttachment(attachmentName, dataSource);
 	}
 
-	public void markSent() {
+	public synchronized void markSent() {
 		this.sent = true;
 	}
 
-	public boolean wasSent() {
+	public synchronized boolean wasSent() {
 		return sent;
 	}
 

@@ -29,12 +29,12 @@ public abstract class AbstractDynamicViewInitializer extends AbstractViewKeyProv
 	 * @return The runtime view id that uniquely identifies this view among like
 	 *         views having the same view class.
 	 */
-	protected abstract int getViewId();
+	protected abstract String getInstanceToken();
 
 	@Override
 	public final ViewKey getViewKey() {
 		if(key == null) {
-			key = new ViewKey(viewClass, getViewId());
+			key = new ViewKey(viewClass, getInstanceToken());
 		}
 		return key;
 	}

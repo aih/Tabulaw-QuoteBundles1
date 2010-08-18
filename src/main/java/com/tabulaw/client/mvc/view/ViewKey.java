@@ -16,9 +16,10 @@ public class ViewKey {
 	private final ViewClass viewClass;
 
 	/**
-	 * The runtime unique view id for the associated ViewClass.
+	 * Unique token that disambiguates between {@link IView} instances (at
+	 * runtime) of like type (having the same {@link ViewClass}).
 	 */
-	private int viewId;
+	private final String instanceToken;
 
 	/**
 	 * Constructor
@@ -27,21 +28,21 @@ public class ViewKey {
 	public ViewKey(ViewClass viewClass) {
 		super();
 		this.viewClass = viewClass;
-		this.viewId = 0;
+		this.instanceToken = null;
 	}
 
 	/**
 	 * Constructor
 	 * @param viewClass The ViewClass
-	 * @param viewId The unique view id
+	 * @param instanceToken Unique token that disambiguates between {@link IView}
+	 *        instances (at runtime) of like type (having the same
+	 *        {@link ViewClass}). The instance token may be <code>null</code>.
 	 */
-	public ViewKey(ViewClass viewClass, int viewId) {
+	public ViewKey(ViewClass viewClass, String instanceToken) {
 		super();
-		if(viewClass == null) {
-			throw new IllegalArgumentException("A view key must always specify a view class.");
-		}
+		if(viewClass == null) throw new NullPointerException();
 		this.viewClass = viewClass;
-		this.viewId = viewId;
+		this.instanceToken = instanceToken;
 	}
 
 	/**
@@ -52,36 +53,46 @@ public class ViewKey {
 	}
 
 	/**
-	 * The "runtime" or dynamic component of the view key. Non-zero view ids imply
-	 * the view is <em>dynamic</em> meaning its identifiability is only
-	 * ascertainable at runtime.
-	 * @return the unique view id. If <code>0</code>, the view to which this key
-	 *         refers is considered "static". If non-zero, the view is said to be
-	 *         dynamic.
+	 * @return The full state of this view key expressed as a String.
 	 */
-	public int getViewId() {
-		return viewId;
-	}
-
-	public void setViewId(int viewId) {
-		this.viewId = viewId;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if(obj == this) return true;
-		if(obj == null || obj.getClass() != getClass()) return false;
-		final ViewKey that = (ViewKey) obj;
-		return that.viewClass.equals(this.viewClass) && that.viewId == viewId;
+	public String getToken() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(viewClass.getName());
+		if(instanceToken != null) {
+			//sb.append('_');
+			sb.append(instanceToken);
+		}
+		return sb.toString();
 	}
 
 	@Override
 	public int hashCode() {
-		return viewId * 31 + viewClass.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((instanceToken == null) ? 0 : instanceToken.hashCode());
+		result = prime * result + ((viewClass == null) ? 0 : viewClass.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) return true;
+		if(obj == null) return false;
+		if(getClass() != obj.getClass()) return false;
+		ViewKey other = (ViewKey) obj;
+		if(instanceToken == null) {
+			if(other.instanceToken != null) return false;
+		}
+		else if(!instanceToken.equals(other.instanceToken)) return false;
+		if(viewClass == null) {
+			if(other.viewClass != null) return false;
+		}
+		else if(!viewClass.equals(other.viewClass)) return false;
+		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "view Class: " + viewClass + ", hash: " + hashCode();
+		return "ViewKey [viewClass=" + viewClass + ", instanceToken=" + instanceToken + "]";
 	}
 }

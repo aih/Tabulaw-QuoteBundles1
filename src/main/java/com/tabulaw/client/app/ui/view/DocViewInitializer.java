@@ -26,8 +26,8 @@ public class DocViewInitializer extends AbstractDynamicViewInitializer {
 	}
 
 	@Override
-	protected int getViewId() {
-		return documentKey.hashCode();
+	protected String getInstanceToken() {
+		return documentKey.getId();
 	}
 
 	public DocKey getDocumentKey() {

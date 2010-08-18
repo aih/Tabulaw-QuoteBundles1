@@ -167,6 +167,6 @@ public abstract class AbstractView<I extends IViewInitializer> extends Composite
 
 	@Override
 	public final String toString() {
-		return getViewClass() + " [" + (viewKey == null ? "-nokey-" : Integer.toString(viewKey.getViewId())) + "]";
+		return getViewClass() + " [" + (viewKey == null ? "-nokey-" : viewKey) + "]";
 	}
 }
