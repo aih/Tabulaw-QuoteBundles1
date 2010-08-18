@@ -17,39 +17,39 @@ import com.tabulaw.service.convert.simplehtmlconverter.element.ElementBuilder;
 import com.tabulaw.service.convert.simplehtmlconverter.writer.IDocumentContext;
 
 /**
- * TODO
- * @author ???
+ * @author Andrey Levchenko
  */
 abstract class AbstractSimpleHtmlConvertor extends AbstractFileConverter {
 
-	private final IDocumentContext documentContext;
 
-	/**
-	 * Constructor
-	 * @param docContext
-	 */
-	protected AbstractSimpleHtmlConvertor(IDocumentContext docContext) {
-		this.documentContext = docContext;
-	}
-	
+        abstract IDocumentContext createDocumentContext();
 
 	@Override
 	public final File convert(File input) throws Exception {
 		final String BODY_TAG_NAME = "body";
-		File fdoc = createSiblingFile(input, getFileExtension());
-		Reader r = new InputStreamReader(new FileInputStream(input), "UTF-8");
+                File fdoc;
+                Reader r = null;
+                IDocumentContext documentContext = null;
+                try {
+                        documentContext = createDocumentContext();
+                        fdoc = createSiblingFile(input, getFileExtension());
+                        r = new InputStreamReader(new FileInputStream(input), "UTF-8");
 
-		documentContext.getDocumentWriter().init(fdoc);
-		Element root = loadDocument(r);
+                        documentContext.getDocumentWriter().init(fdoc);
+                        Element root = loadDocument(r);
 
-		NodeList bodies = root.getElementsByTagName(BODY_TAG_NAME);
-		if(bodies.getLength() > 0) {
-			Element body = (Element) bodies.item(0);
-			processDomElement(body, documentContext);
-		}
+                        NodeList bodies = root.getElementsByTagName(BODY_TAG_NAME);
+                        if(bodies.getLength() > 0) {
+                                Element body = (Element) bodies.item(0);
+                                processDomElement(body, documentContext);
+                        }
 
-		documentContext.getDocumentWriter().close();
-		r.close();
+                } finally {
+                        if (documentContext !=null && documentContext.getDocumentWriter() != null) {
+                            documentContext.getDocumentWriter().close();
+                        }
+                        r.close();
+                }
 		return fdoc;
 	}
 
