@@ -11,7 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.inject.Injector;
-import com.tabulaw.service.emailer.EmailDispatcher;
+import com.tabulaw.mail.EmailDispatcher;
 
 /**
  * Bootstraps stuff needed at the servlet/rpc processing level.

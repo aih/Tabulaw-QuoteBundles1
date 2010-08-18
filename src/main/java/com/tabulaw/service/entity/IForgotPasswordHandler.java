@@ -3,7 +3,7 @@
  * @author jpk
  * Feb 11, 2009
  */
-package com.tabulaw.service;
+package com.tabulaw.service.entity;
 
 import com.tabulaw.common.model.IUserRef;
 import com.tabulaw.dao.EntityNotFoundException;

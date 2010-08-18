@@ -14,11 +14,11 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.inject.Inject;
 import com.tabulaw.di.ExceptionHandlerModule.OnErrorEmail;
+import com.tabulaw.mail.EmailDispatcher;
 import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailManager;
 import com.tabulaw.mail.MailRouting;
 import com.tabulaw.mail.NameEmail;
-import com.tabulaw.service.emailer.EmailDispatcher;
 
 /**
  * ExceptionHandler - Emails exception notification emails.

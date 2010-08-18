@@ -3,7 +3,7 @@
  * @author jopaki
  * @since Aug 16, 2010
  */
-package com.tabulaw.service.emailer;
+package com.tabulaw.mail;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -11,8 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.inject.Inject;
-import com.tabulaw.mail.IMailContext;
-import com.tabulaw.mail.MailManager;
 
 /**
  * Dispatches emails in a dedicated thread.

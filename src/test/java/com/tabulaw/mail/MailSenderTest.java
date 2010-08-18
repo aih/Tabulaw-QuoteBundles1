@@ -17,7 +17,7 @@ import com.tabulaw.config.ConfigRef;
 import com.tabulaw.di.MailModule;
 
 /**
- * {@link IMailSender} test.
+ * {@link MailSender} test.
  * @author jpk
  */
 @Test(groups = {

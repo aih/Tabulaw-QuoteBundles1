@@ -39,7 +39,6 @@ import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.dao.Sorting;
 
@@ -86,7 +85,7 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 				@Override
 				protected void doExecute() {
 					setSource(Operator.this.sourcingWidget);
-					DocSearchRequest dsr = new DocSearchRequest(DocDataProvider.GOOGLE_SCHOLAR, query, ofst, getPageSize(), true);
+					DocSearchRequest dsr = new DocSearchRequest("GOOGLE_SCHOLAR", query, ofst, getPageSize(), true);
 					Poc.getDocService().search(dsr, this);
 				}
 

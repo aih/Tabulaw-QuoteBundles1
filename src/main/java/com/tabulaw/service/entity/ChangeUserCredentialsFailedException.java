@@ -1,4 +1,4 @@
-package com.tabulaw.service;
+package com.tabulaw.service.entity;
 
 /**
  * ChangeUserCredentialsFailedException

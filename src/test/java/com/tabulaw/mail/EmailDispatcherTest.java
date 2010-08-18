@@ -3,7 +3,7 @@
  * @author jopaki
  * @since Aug 16, 2010
  */
-package com.tabulaw.service.emailer;
+package com.tabulaw.mail;
 
 import java.util.List;
 
@@ -14,6 +14,7 @@ import com.google.inject.Module;
 import com.tabulaw.AbstractInjectedTest;
 import com.tabulaw.config.Config;
 import com.tabulaw.di.MailModule;
+import com.tabulaw.mail.EmailDispatcher;
 import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailManager;
 import com.tabulaw.mail.MailRouting;
@@ -23,7 +24,7 @@ import com.tabulaw.mail.NameEmail;
  * EmailDispatcherTest
  * @author jopaki
  */
-@Test(groups = "service")
+@Test(groups = "mail")
 public class EmailDispatcherTest extends AbstractInjectedTest {
 	
 	private MailManager mailManager;

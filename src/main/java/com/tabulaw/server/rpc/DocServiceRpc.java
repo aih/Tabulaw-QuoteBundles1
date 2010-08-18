@@ -27,9 +27,9 @@ import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
-import com.tabulaw.service.DocHandlerResolver;
 import com.tabulaw.service.DocUtils;
 import com.tabulaw.service.entity.UserDataService;
+import com.tabulaw.service.scrape.DocHandlerResolver;
 import com.tabulaw.service.scrape.IDocHandler;
 import com.tabulaw.util.StringUtil;
 
@@ -46,8 +46,11 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 		Status status = new Status();
 		DocSearchPayload payload = new DocSearchPayload(status);
 
-		IDocHandler handler = DocHandlerResolver.resolveHandler(request.getDataProvider());
-		if(handler == null) {
+		IDocHandler handler;
+		try {
+			handler = DocHandlerResolver.resolveHandlerFromDataProvider(request.getDataProvider());
+		}
+		catch(IllegalArgumentException e) {
 			status.addMsg("Unable to resove a doc handler for the given request", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag);
 			return payload;
 		}
@@ -110,18 +113,21 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 			try {
 				fcontents = DocUtils.fetch(new URL(remoteDocUrl));
 			}
-			catch(MalformedURLException e1) {
-				RpcServlet.exceptionToStatus(e, status);
+			catch(MalformedURLException ex) {
+				RpcServlet.exceptionToStatus(ex, status);
 				return payload;
 			}
-			catch(IOException e1) {
-				RpcServlet.exceptionToStatus(e, status);
+			catch(IOException ex) {
+				RpcServlet.exceptionToStatus(ex, status);
 				return payload;
 			}
 
 			// resolve the doc handler
-			IDocHandler handler = DocHandlerResolver.resolveHandler(remoteDocUrl);
-			if(handler == null) {
+			IDocHandler handler;
+			try {
+				handler = DocHandlerResolver.resolveHandlerFromRemoteUrl(remoteDocUrl);
+			}
+			catch(IllegalArgumentException ex) {
 				status.addMsg("Unable to resove a doc handler for the doc url: " + remoteDocUrl, MsgLevel.ERROR,
 						MsgAttr.EXCEPTION.flag | MsgAttr.STATUS.flag);
 				return payload;

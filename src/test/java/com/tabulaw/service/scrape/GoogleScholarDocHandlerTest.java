@@ -17,7 +17,6 @@ import org.testng.annotations.Test;
 
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.service.DocUtils;
@@ -67,7 +66,7 @@ public class GoogleScholarDocHandlerTest {
 		String searchTerm = "rowe";
 		int offset = 0;
 		int numResults = 4;
-		DocSearchRequest sr = new DocSearchRequest(DocDataProvider.GOOGLE_SCHOLAR, searchTerm, offset, numResults, false);
+		DocSearchRequest sr = new DocSearchRequest("GOOGLE_SCHOLAR", searchTerm, offset, numResults, false);
 		String surl = docHandler.createSearchUrlString(sr);
 		URL url = new URL(surl);
 		

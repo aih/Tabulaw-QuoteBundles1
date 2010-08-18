@@ -48,7 +48,6 @@ import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.DocKey;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.msg.Msg;
@@ -126,7 +125,7 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 			rquery = rquery.trim();
 			if(rquery.equals(query)) return;
 			final String aquery = rquery;
-			DocSearchRequest dsr = new DocSearchRequest(DocDataProvider.GOOGLE_SCHOLAR, rquery, 0, 4, false);
+			DocSearchRequest dsr = new DocSearchRequest("GOOGLE_SCHOLAR", rquery, 0, 4, false);
 			Poc.getDocService().search(dsr, new AsyncCallback<DocSearchPayload>() {
 
 				@Override
