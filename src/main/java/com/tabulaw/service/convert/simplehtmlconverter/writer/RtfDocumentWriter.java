@@ -86,8 +86,11 @@ public class RtfDocumentWriter implements IDocumentWriter {
 
 	@Override
 	public void close() throws Exception {
-		documentContext.getDocument().add(documentContext.getParagraph());
-		documentContext.getDocument().close();
+		try {
+			documentContext.getDocument().add(documentContext.getParagraph());
+		} finally {
+			documentContext.getDocument().close();
+		}
 	}
 
 	@Override

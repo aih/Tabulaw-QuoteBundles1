@@ -430,12 +430,40 @@
 		   <groupId>com.lowagie</groupId>
 		   <artifactId>itext-rtf</artifactId>
 		   <version>2.1.7</version>
+			<exclusions>
+				<exclusion>
+					<groupId>bouncycastle</groupId>
+					<artifactId>bcmail-jdk14</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>bouncycastle</groupId>
+					<artifactId>bcprov-jdk14</artifactId>
+				</exclusion>	
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bctsp-jdk14</artifactId>
+				</exclusion>								
+			</exclusions>			
 		</dependency>	
 
 		<dependency>
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>2.1.7</version>
+			<exclusions>
+				<exclusion>
+					<groupId>bouncycastle</groupId>
+					<artifactId>bcmail-jdk14</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>bouncycastle</groupId>
+					<artifactId>bcprov-jdk14</artifactId>
+				</exclusion>	
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bctsp-jdk14</artifactId>
+				</exclusion>								
+			</exclusions>			
 		</dependency>		
 		
 		<dependency>
@@ -447,6 +475,34 @@
 					<groupId>log4j</groupId>
 					<artifactId>log4j</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.avalon.framework</groupId>
+					<artifactId>avalon-framework-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.avalon.framework</groupId>
+					<artifactId>avalon-framework-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jdom</groupId>
+					<artifactId>jdom</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>xalan</groupId>
+					<artifactId>xalan-patched</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-vfs-patched</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.jcr</groupId>
+					<artifactId>jcr</artifactId>
+				</exclusion>	
+				<exclusion>
+					<groupId>docx4j</groupId>
+					<artifactId>fop-patched</artifactId>
+				</exclusion>		
 			</exclusions>
 		</dependency>		
 
