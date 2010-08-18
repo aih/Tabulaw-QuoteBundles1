@@ -2,7 +2,7 @@
  * The Logic Lab
  * @author jpk Jan 27, 2008
  */
-package com.tabulaw.client.mvc.view;
+package com.tabulaw.client.view;
 
 /**
  * ViewRef - Uniquely identifies {@link IView}s at runtime.

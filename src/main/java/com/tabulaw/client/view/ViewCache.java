@@ -1,11 +1,9 @@
-package com.tabulaw.client.mvc;
+package com.tabulaw.client.view;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.allen_sauer.gwt.log.client.Log;
-import com.tabulaw.client.mvc.view.ViewKey;
-import com.tabulaw.client.mvc.view.ViewRef;
 
 /**
  * ViewCache - A cache container for views that are managed by the mvc

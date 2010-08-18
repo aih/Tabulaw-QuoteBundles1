@@ -1,8 +1,5 @@
-package com.tabulaw.client.mvc;
+package com.tabulaw.client.view;
 
-import com.tabulaw.client.mvc.view.AbstractViewKeyProvider;
-import com.tabulaw.client.mvc.view.IViewInitializer;
-import com.tabulaw.client.mvc.view.ViewKey;
 import com.tabulaw.client.ui.view.ViewContainer;
 
 /**

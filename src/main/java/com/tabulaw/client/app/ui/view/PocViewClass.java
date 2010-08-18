@@ -5,8 +5,8 @@
  */
 package com.tabulaw.client.app.ui.view;
 
-import com.tabulaw.client.mvc.view.ViewClass;
-import com.tabulaw.client.mvc.view.ViewOptions;
+import com.tabulaw.client.view.ViewClass;
+import com.tabulaw.client.view.ViewOptions;
 
 
 /**

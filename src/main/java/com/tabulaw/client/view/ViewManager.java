@@ -2,7 +2,7 @@
  * The Logic Lab
  * @author jpk Jan 3, 2008
  */
-package com.tabulaw.client.mvc;
+package com.tabulaw.client.view;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,17 +19,6 @@ import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.tabulaw.client.mvc.view.IHasViewChangeHandlers;
-import com.tabulaw.client.mvc.view.IView;
-import com.tabulaw.client.mvc.view.IViewChangeHandler;
-import com.tabulaw.client.mvc.view.IViewInitializer;
-import com.tabulaw.client.mvc.view.IViewRequest;
-import com.tabulaw.client.mvc.view.ShowViewRequest;
-import com.tabulaw.client.mvc.view.UnloadViewRequest;
-import com.tabulaw.client.mvc.view.ViewChangeEvent;
-import com.tabulaw.client.mvc.view.ViewKey;
-import com.tabulaw.client.mvc.view.ViewOptions;
-import com.tabulaw.client.mvc.view.ViewRef;
 import com.tabulaw.client.ui.view.ViewContainer;
 
 /**

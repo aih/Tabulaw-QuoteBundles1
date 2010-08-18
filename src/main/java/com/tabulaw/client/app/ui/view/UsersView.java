@@ -9,10 +9,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.UsersWidget;
-import com.tabulaw.client.mvc.view.StaticViewInitializer;
-import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.ui.ImageButton;
 import com.tabulaw.client.ui.view.ViewToolbar;
+import com.tabulaw.client.view.StaticViewInitializer;
+import com.tabulaw.client.view.ViewClass;
 
 /**
  * @author jpk

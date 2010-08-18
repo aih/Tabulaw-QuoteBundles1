@@ -3,7 +3,7 @@
  * @author jpk
  * @since Mar 24, 2009
  */
-package com.tabulaw.client.mvc.view;
+package com.tabulaw.client.view;
 
 /**
  * ViewRef - A Stand-alone ref to a view at runtime able to reconstitute the

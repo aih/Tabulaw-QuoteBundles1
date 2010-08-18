@@ -3,7 +3,7 @@
  * @author jpk
  * @since Mar 26, 2009
  */
-package com.tabulaw.client.mvc.view;
+package com.tabulaw.client.view;
 
 /**
  * AbstractViewKeyProvider - Consolidates {@link #equals(Object)} and

@@ -3,7 +3,7 @@
  * @author jpk
  * @since Mar 23, 2009
  */
-package com.tabulaw.client.mvc.view;
+package com.tabulaw.client.view;
 
 import com.google.gwt.user.client.Command;
 

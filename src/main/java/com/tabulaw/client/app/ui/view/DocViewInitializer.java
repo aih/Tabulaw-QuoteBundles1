@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.app.ui.view;
 
-import com.tabulaw.client.mvc.view.AbstractDynamicViewInitializer;
+import com.tabulaw.client.view.AbstractDynamicViewInitializer;
 import com.tabulaw.common.model.DocKey;
 
 /**

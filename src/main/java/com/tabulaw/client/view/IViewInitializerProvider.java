@@ -3,7 +3,7 @@
  * @author jpk
  * @since May 5, 2010
  */
-package com.tabulaw.client.mvc.view;
+package com.tabulaw.client.view;
 
 /**
  * Contract for providing view initializer instances.

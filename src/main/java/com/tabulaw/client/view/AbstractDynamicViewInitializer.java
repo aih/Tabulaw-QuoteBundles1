@@ -3,7 +3,7 @@
  * @author jpk
  * @since Mar 25, 2009
  */
-package com.tabulaw.client.mvc.view;
+package com.tabulaw.client.view;
 
 /**
  * AbstractDynamicViewInitializer - Common base class for dynamic view

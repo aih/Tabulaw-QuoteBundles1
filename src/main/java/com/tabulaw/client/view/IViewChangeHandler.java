@@ -3,7 +3,7 @@
  * @author jpk
  * Sep 3, 2007
  */
-package com.tabulaw.client.mvc.view;
+package com.tabulaw.client.view;
 
 import com.google.gwt.event.shared.EventHandler;
 

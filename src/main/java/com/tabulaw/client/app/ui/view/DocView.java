@@ -14,10 +14,10 @@ import com.tabulaw.client.app.ui.DocAndBundleWidget;
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
-import com.tabulaw.client.mvc.ViewManager;
-import com.tabulaw.client.mvc.view.UnloadViewRequest;
-import com.tabulaw.client.mvc.view.ViewClass;
-import com.tabulaw.client.mvc.view.ViewOptions;
+import com.tabulaw.client.view.UnloadViewRequest;
+import com.tabulaw.client.view.ViewClass;
+import com.tabulaw.client.view.ViewManager;
+import com.tabulaw.client.view.ViewOptions;
 import com.tabulaw.common.model.DocKey;
 import com.tabulaw.common.model.DocRef;
 

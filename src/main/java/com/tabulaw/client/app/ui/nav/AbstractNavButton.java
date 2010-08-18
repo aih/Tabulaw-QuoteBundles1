@@ -11,7 +11,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
-import com.tabulaw.client.mvc.view.IViewInitializerProvider;
+import com.tabulaw.client.view.IViewInitializerProvider;
 
 /**
  * Button like widget intended for use in a nav panel.

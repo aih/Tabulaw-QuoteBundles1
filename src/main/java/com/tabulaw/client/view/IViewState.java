@@ -3,7 +3,7 @@
  * @author jpk
  * Mar 19, 2008
  */
-package com.tabulaw.client.mvc.view;
+package com.tabulaw.client.view;
 
 /**
  * IViewState

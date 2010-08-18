@@ -2,7 +2,7 @@
  * The Logic Lab
  * @author jpk Jan 13, 2008
  */
-package com.tabulaw.client.mvc.view;
+package com.tabulaw.client.view;
 
 import com.google.gwt.user.client.Command;
 

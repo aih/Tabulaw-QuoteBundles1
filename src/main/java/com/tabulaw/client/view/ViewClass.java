@@ -3,7 +3,7 @@
  * @author jpk
  * Mar 12, 2008
  */
-package com.tabulaw.client.mvc.view;
+package com.tabulaw.client.view;
 
 import java.util.ArrayList;
 import java.util.List;
