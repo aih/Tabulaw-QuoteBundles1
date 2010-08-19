@@ -23,7 +23,7 @@ public class EmailDispatcher implements Runnable {
 	private final LinkedBlockingQueue<IMailContext> queue = new LinkedBlockingQueue<IMailContext>();
 	private final MailManager mailManager;
 
-	private boolean done;
+	private volatile boolean done;
 
 	/**
 	 * Constructor
