@@ -17,7 +17,6 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.google.inject.Inject;
-import com.tabulaw.model.IEntityMetadata;
 import com.tabulaw.util.PropertyPath;
 
 public final class SchemaInfo implements ISchemaInfo {

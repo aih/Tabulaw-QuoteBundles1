@@ -1,7 +1,7 @@
 package com.tabulaw.client.ui.listing;
 
+import com.tabulaw.IPropertyNameProvider;
 import com.tabulaw.client.util.GlobalFormat;
-import com.tabulaw.schema.IPropertyNameProvider;
 
 /**
  * Column - Listing column definition. A {@link Column} collection dictates the

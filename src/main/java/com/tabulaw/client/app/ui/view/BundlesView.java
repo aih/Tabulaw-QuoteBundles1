@@ -12,9 +12,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.AddBundleDialog;
 import com.tabulaw.client.app.ui.BundlesManageWidget;
-import com.tabulaw.client.mvc.view.StaticViewInitializer;
-import com.tabulaw.client.mvc.view.ViewClass;
 import com.tabulaw.client.ui.ImageButton;
+import com.tabulaw.client.view.StaticViewInitializer;
+import com.tabulaw.client.view.ViewClass;
 
 /**
  * A view for managing existing doc bundles.

@@ -8,11 +8,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.tabulaw.client.mvc.ViewManager;
-import com.tabulaw.client.mvc.view.IView;
-import com.tabulaw.client.mvc.view.UnloadViewRequest;
-import com.tabulaw.client.mvc.view.ViewKey;
-import com.tabulaw.client.mvc.view.ViewOptions;
+import com.tabulaw.client.view.IView;
+import com.tabulaw.client.view.UnloadViewRequest;
+import com.tabulaw.client.view.ViewKey;
+import com.tabulaw.client.view.ViewManager;
+import com.tabulaw.client.view.ViewOptions;
 
 /**
  * ViewContainer - UI container for {@link IView} implementations.

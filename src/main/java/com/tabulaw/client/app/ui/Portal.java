@@ -11,8 +11,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
-import com.tabulaw.client.mvc.ViewManager;
-import com.tabulaw.client.mvc.view.IView;
+import com.tabulaw.client.view.IView;
+import com.tabulaw.client.view.ViewManager;
 
 /**
  * This is the parent panel for {@link IView}s in the app.

@@ -22,8 +22,6 @@ import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.data.rpc.IRpcHandler;
 import com.tabulaw.client.data.rpc.RpcCommand;
 import com.tabulaw.client.data.rpc.RpcEvent;
-import com.tabulaw.client.mvc.ViewManager;
-import com.tabulaw.client.mvc.view.ShowViewRequest;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.ui.listing.AbstractListingConfig;
@@ -34,12 +32,13 @@ import com.tabulaw.client.ui.listing.ITableCellRenderer;
 import com.tabulaw.client.ui.listing.ListingNavBar;
 import com.tabulaw.client.ui.listing.ModelListingTable;
 import com.tabulaw.client.ui.listing.ModelListingWidget;
+import com.tabulaw.client.view.ShowViewRequest;
+import com.tabulaw.client.view.ViewManager;
 import com.tabulaw.common.data.ListingOp;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.dao.Sorting;
 
@@ -86,7 +85,7 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 				@Override
 				protected void doExecute() {
 					setSource(Operator.this.sourcingWidget);
-					DocSearchRequest dsr = new DocSearchRequest(DocDataProvider.GOOGLE_SCHOLAR, query, ofst, getPageSize(), true);
+					DocSearchRequest dsr = new DocSearchRequest("GOOGLE_SCHOLAR", query, ofst, getPageSize(), true);
 					Poc.getDocService().search(dsr, this);
 				}
 

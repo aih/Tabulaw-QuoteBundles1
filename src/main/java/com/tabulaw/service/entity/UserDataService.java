@@ -25,6 +25,7 @@ import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.QuoteUserBinding;
 import com.tabulaw.common.model.UserState;
+import com.tabulaw.criteria.Comparator;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.EntityExistsException;
@@ -32,7 +33,6 @@ import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
 import com.tabulaw.dao.NonUniqueResultException;
 import com.tabulaw.dao.Sorting;
-import com.tabulaw.util.Comparator;
 
 /**
  * Manages the persistence of user related data that is not part of the user

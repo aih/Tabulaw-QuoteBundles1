@@ -103,12 +103,14 @@
 				<directory>src/main/java</directory>
 				<includes>
 					<include>**/key/IKey.java</include>
+					<include>**/IPropertyNameProvider.java</include>
 					<include>**/IPropertyValueProvider.java</include>
 					<include>**/INameValueProvider.java</include>
 					<include>**/IDescriptorProvider.java</include>
 					<include>**/ITypeDescriptorProvider.java</include>
 					<include>**/IMarshalable.java</include>
 					<include>**/ApplicationException.java</include>
+					<include>**/util/PropertyPath.java</include>
 					<include>**/util/Binding.java</include>
 					<include>**/util/BindingRefSet.java</include>
 					<include>**/util/Comparator.java</include>
@@ -123,11 +125,9 @@
 
 					<include>**/schema/AbstractSchemaProperty.java</include>
 					<include>**/schema/IPropertyMetadataProvider.java</include>
-					<include>**/schema/IPropertyNameProvider.java</include>
 					<include>**/schema/ISchemaProperty.java</include>
 					<include>**/schema/PropertyMetadata.java</include>
 					<include>**/schema/PropertyType.java</include>
-					<include>**/schema/IQueryParam.java</include>
 
 					<include>**/criteria/CriteriaType.java</include>
 

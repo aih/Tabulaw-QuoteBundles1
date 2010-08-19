@@ -14,10 +14,10 @@ import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.IPropertyNameProvider;
 import com.tabulaw.client.convert.IHasConverter;
 import com.tabulaw.client.ui.IHasHelpText;
 import com.tabulaw.client.validate.IValidator;
-import com.tabulaw.schema.IPropertyNameProvider;
 import com.tabulaw.schema.PropertyMetadata;
 
 /**

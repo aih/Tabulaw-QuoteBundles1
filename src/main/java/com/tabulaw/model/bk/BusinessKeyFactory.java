@@ -15,9 +15,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.NullValueInNestedPathException;
 
 import com.google.inject.Inject;
-import com.tabulaw.model.IEntityMetadata;
-import com.tabulaw.schema.BusinessKeyDef;
-import com.tabulaw.schema.BusinessObject;
+import com.tabulaw.schema.IEntityMetadata;
 
 /**
  * BusinessKeyFactory - Defines all entity business keys in the application and

@@ -19,8 +19,8 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.tabulaw.IMarshalable;
-import com.tabulaw.schema.BusinessKeyDef;
-import com.tabulaw.schema.BusinessObject;
+import com.tabulaw.model.bk.BusinessKeyDef;
+import com.tabulaw.model.bk.BusinessObject;
 
 /**
  * The user entity. NOTE: no surrogate primary key is needed here.

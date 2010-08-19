@@ -7,8 +7,8 @@ package com.tabulaw.common.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.tabulaw.schema.BusinessKeyDef;
-import com.tabulaw.schema.BusinessObject;
+import com.tabulaw.model.bk.BusinessKeyDef;
+import com.tabulaw.model.bk.BusinessObject;
 import com.tabulaw.util.StringUtil;
 
 /**

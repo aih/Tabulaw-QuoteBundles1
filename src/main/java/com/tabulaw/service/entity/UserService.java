@@ -23,8 +23,6 @@ import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
-import com.tabulaw.service.ChangeUserCredentialsFailedException;
-import com.tabulaw.service.IForgotPasswordHandler;
 import com.tabulaw.util.CryptoUtil;
 import com.tabulaw.util.StringUtil;
 

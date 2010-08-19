@@ -6,8 +6,8 @@
 package com.tabulaw.client.app.ui.view;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.mvc.view.AbstractView;
-import com.tabulaw.client.mvc.view.IViewInitializer;
+import com.tabulaw.client.view.AbstractView;
+import com.tabulaw.client.view.IViewInitializer;
 
 /**
  * AbstractPocView

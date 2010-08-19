@@ -5,6 +5,8 @@
  */
 package com.tabulaw.util;
 
+import com.tabulaw.IMarshalable;
+
 /**
  * PropertyPath - Encapsulates a property path String providing convenience
  * methods for accessing and modifying its attributes.
@@ -16,7 +18,7 @@ package com.tabulaw.util;
  * </ol>
  * @author jpk
  */
-public final class PropertyPath {
+public final class PropertyPath implements IMarshalable {
 
 	private static final char LEFT_INDEX_CHAR = '[';
 

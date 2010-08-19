@@ -25,8 +25,8 @@ import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.rest.AuthorizationRequired;
 import com.tabulaw.rest.dto.DocDetails;
 import com.tabulaw.server.UserContext;
-import com.tabulaw.service.DocHandlerResolver;
 import com.tabulaw.service.DocUtils;
+import com.tabulaw.service.scrape.DocHandlerResolver;
 import com.tabulaw.service.scrape.IDocHandler;
 
 /**
@@ -54,8 +54,11 @@ public class DocumentResource extends BaseResource {
 		}
 
 		// resolve the doc handler
-		IDocHandler handler = DocHandlerResolver.resolveHandler(remoteUrl);
-		if(handler == null) {
+		IDocHandler handler;
+		try {
+			handler = DocHandlerResolver.resolveHandlerFromRemoteUrl(remoteUrl);
+		}
+		catch(IllegalArgumentException e) {
 			throw new WebApplicationException(Status.NOT_ACCEPTABLE);
 		}
 		

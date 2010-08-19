@@ -11,9 +11,7 @@ import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.tabulaw.model.IEntityMetadata;
-import com.tabulaw.schema.BusinessKeyDef;
-import com.tabulaw.schema.BusinessObject;
+import com.tabulaw.schema.IEntityMetadata;
 
 /**
  * BusinessKeyFactoryTest

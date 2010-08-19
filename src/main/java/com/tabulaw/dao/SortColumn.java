@@ -3,7 +3,7 @@ package com.tabulaw.dao;
 import java.io.Serializable;
 
 import com.tabulaw.IMarshalable;
-import com.tabulaw.schema.IPropertyNameProvider;
+import com.tabulaw.IPropertyNameProvider;
 
 /**
  * Represents a sort directive for a single "column".

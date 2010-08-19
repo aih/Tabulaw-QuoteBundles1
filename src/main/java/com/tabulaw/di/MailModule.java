@@ -25,6 +25,7 @@ import com.google.inject.Scopes;
 import com.tabulaw.config.Config;
 import com.tabulaw.config.IConfigAware;
 import com.tabulaw.config.IConfigKey;
+import com.tabulaw.mail.EmailDispatcher;
 import com.tabulaw.mail.IComposer;
 import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailRouting;
@@ -32,7 +33,6 @@ import com.tabulaw.mail.MailSender;
 import com.tabulaw.mail.NameEmail;
 import com.tabulaw.mail.SimpleComposer;
 import com.tabulaw.mail.TemplateComposer;
-import com.tabulaw.service.emailer.EmailDispatcher;
 
 /**
  * MailModule - Module for programmatic email distribution.

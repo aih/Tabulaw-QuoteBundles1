@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.app.ui.view;
 
-import com.tabulaw.client.mvc.view.AbstractDynamicViewInitializer;
+import com.tabulaw.client.view.AbstractDynamicViewInitializer;
 import com.tabulaw.common.model.DocKey;
 
 /**
@@ -26,8 +26,8 @@ public class DocViewInitializer extends AbstractDynamicViewInitializer {
 	}
 
 	@Override
-	protected int getViewId() {
-		return documentKey.hashCode();
+	protected String getInstanceToken() {
+		return documentKey.getId();
 	}
 
 	public DocKey getDocumentKey() {

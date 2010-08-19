@@ -14,11 +14,7 @@ import com.tabulaw.IMarshalable;
  */
 public class DocSearchRequest implements IMarshalable, IDescriptorProvider {
 
-	public static enum DocDataProvider {
-		GOOGLE_SCHOLAR;
-	}
-
-	private DocDataProvider dataProvider;
+	private String dataProvider;
 
 	private String searchToken;
 
@@ -37,13 +33,13 @@ public class DocSearchRequest implements IMarshalable, IDescriptorProvider {
 
 	/**
 	 * Constructor
-	 * @param dataProvider
+	 * @param dataProvider corresponds to the <code>DocDataProvider</code> enum.
 	 * @param searchToken
 	 * @param offset
 	 * @param numResults
 	 * @param fullTextSearch 
 	 */
-	public DocSearchRequest(DocDataProvider dataProvider, String searchToken, int offset, int numResults,
+	public DocSearchRequest(String dataProvider, String searchToken, int offset, int numResults,
 			boolean fullTextSearch) {
 		super();
 		this.dataProvider = dataProvider;
@@ -57,11 +53,11 @@ public class DocSearchRequest implements IMarshalable, IDescriptorProvider {
 		return searchToken;
 	}
 
-	public DocDataProvider getDataProvider() {
+	public String getDataProvider() {
 		return dataProvider;
 	}
 
-	public void setDataProvider(DocDataProvider dataProvider) {
+	public void setDataProvider(String dataProvider) {
 		this.dataProvider = dataProvider;
 	}
 

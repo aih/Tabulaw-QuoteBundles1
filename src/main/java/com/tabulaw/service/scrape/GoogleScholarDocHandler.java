@@ -18,7 +18,6 @@ import org.htmlcleaner.TagNode;
 
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.common.data.rpc.DocSearchRequest.DocDataProvider;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.util.StringUtil;

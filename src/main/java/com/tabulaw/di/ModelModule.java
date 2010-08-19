@@ -11,10 +11,10 @@ import javax.validation.ValidatorFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
-import com.tabulaw.model.EntityMetadata;
 import com.tabulaw.model.EntityTypeResolver;
-import com.tabulaw.model.IEntityMetadata;
 import com.tabulaw.model.IEntityTypeResolver;
+import com.tabulaw.schema.EntityMetadata;
+import com.tabulaw.schema.IEntityMetadata;
 import com.tabulaw.schema.ISchemaInfo;
 import com.tabulaw.schema.SchemaInfo;
 
