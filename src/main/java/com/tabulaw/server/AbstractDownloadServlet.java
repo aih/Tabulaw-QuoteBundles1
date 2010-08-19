@@ -1,16 +1,15 @@
 package com.tabulaw.server;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,20 +31,15 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 	protected UserContext userContext;
 	protected String mimeType;
 
-	protected abstract File getContentFile(HttpServletRequest req) throws ServletException, IOException;
-
-//	private String getMimeType(File f) {
-//		Collection<?> mimeTypes = MimeUtil.getMimeTypes(f);
-//		return (mimeTypes.toString());
-//
-//	}
+	protected abstract String getDownloadSource(HttpServletRequest req) throws ServletException, IOException;
+	
+	protected abstract String getSourceName(HttpServletRequest req); 
 
 	@Override
 	public void init() throws ServletException {
 		super.init();
 		wc = (WebAppContext) getServletContext().getAttribute(WebAppContext.KEY);
 		pc = (PersistContext) getServletContext().getAttribute(PersistContext.KEY);
-//		MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
 	}
 	
 	@Override
@@ -62,24 +56,20 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 		User user = userContext.getUser();
 		if(user == null) throw new ServletException("No user in user context");
 
-		File fdoc, fconverted;
-		fdoc = fconverted = null;
 		boolean responseWritten = false;
 		try {
 
 			// convert the doc
-			fdoc = getContentFile(req);
+			String sourceHtml = getDownloadSource(req);
 			FileConverterDelegate fcd = (FileConverterDelegate) getServletContext().getAttribute(FileConverterDelegate.KEY);
-			fconverted = fcd.convert(fdoc, mimeType);
+			
+			byte[] sourceBytes = sourceHtml.getBytes();
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			String extension = fcd.convert(new ByteArrayInputStream(sourceBytes), "text/html", output, mimeType);
 
-			// stream the doc contents
-			ServletOutputStream sos = resp.getOutputStream();
-			byte[] fbytes = FileUtils.readFileToByteArray(fconverted);
-			if(fbytes == null || fbytes.length < 1) throw new Exception("No doc content read");
-			// resp.setContentLength(fbytes.length);
 			resp.setContentType(mimeType);
-			resp.setHeader("Content-disposition", "attachment; filename=" + fconverted.getName());
-			sos.write(fbytes);
+			resp.setHeader("Content-disposition", "attachment; filename=" + getSourceName(req) + "." + extension);
+			output.writeTo(resp.getOutputStream());
 			responseWritten = true;
 		}
 		catch(Exception e) {
@@ -89,10 +79,6 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 		}
 		finally {
 			resp.flushBuffer();
-
-			// clean up
-			if(fdoc != null) fdoc.delete();
-			if(fconverted != null) fconverted.delete();
 		}
 	}
 

@@ -16,7 +16,7 @@ import com.tabulaw.service.convert.simplehtmlconverter.writer.IDocumentContext;
 public class SimpleHtmlToDocxFileConverter extends AbstractSimpleHtmlConvertor {
 
 	@Override
-	protected String getFileExtension() {
+	public String getTargetFileExtension() {
 		return "docx";
 	}
 
@@ -25,8 +25,8 @@ public class SimpleHtmlToDocxFileConverter extends AbstractSimpleHtmlConvertor {
 		return Constants.DOCX_MIME_TYPE;
 	}
 
-        @Override
-        IDocumentContext createDocumentContext() {
-                return new Docx4jDocumentContext();
-        }
+	@Override
+	protected IDocumentContext createDocumentContext() {
+		return new Docx4jDocumentContext();
+	}
 }

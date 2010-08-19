@@ -1,6 +1,5 @@
 package com.tabulaw.server;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,13 +9,11 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.velocity.app.VelocityEngine;
 
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
 import com.tabulaw.common.model.info.QuoteInfo;
-import com.tabulaw.service.DocUtils;
 import com.tabulaw.util.VelocityUtil;
 
 public class QuoteBundleDownloadServlet extends AbstractDownloadServlet {
@@ -28,7 +25,7 @@ public class QuoteBundleDownloadServlet extends AbstractDownloadServlet {
 	private static final String QUOTE_LIST_KEY = "quoteList";
 	
 	@Override
-	protected File getContentFile(HttpServletRequest req) throws ServletException, IOException {
+	protected String getDownloadSource(HttpServletRequest req) throws ServletException, IOException {
 		String bundleId = req.getParameter("bundleid");
 		QuoteBundle quoteBundle = pc.getUserDataService().getQuoteBundle(bundleId);
 		List<QuoteInfo> quoteList = new ArrayList<QuoteInfo>();
@@ -42,12 +39,12 @@ public class QuoteBundleDownloadServlet extends AbstractDownloadServlet {
 
 		VelocityEngine ve = wc.getVelocityEngine();
 		String qbText = VelocityUtil.mergeVelocityTemplate(ve, EXPORT_TEMPLATE_PATH + QUOTE_BUNDLE_TEMPLATE, parameters);
-		String fname = Integer.toString(Math.abs(quoteBundle.hashCode())) + ".html";
 
-		File qb = DocUtils.getDocFileRef(fname);
-		FileUtils.writeStringToFile(qb, qbText, "UTF-8");
-
-		return qb;
+		return qbText;
 	}
 
+	@Override
+	protected String getSourceName(HttpServletRequest req) {
+		return req.getParameter("bundleid");
+	}
 }

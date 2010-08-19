@@ -23,6 +23,7 @@ import com.tabulaw.common.model.CaseRef;
 import com.tabulaw.common.model.DocContent;
 import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
+import com.tabulaw.util.IOUtils;
 
 /**
  * @author jpk
@@ -61,6 +62,9 @@ public class DocUtils {
 	 *         file extension
 	 */
 	public static String getMimeTypeFromFileExt(String fileExt) throws IllegalArgumentException {
+		if (! fileExt.startsWith(".")) {
+			fileExt = "." + fileExt;
+		}
 		fileExt = fileExt.trim().toLowerCase();
 		if(".doc".equals(fileExt) || ".docx".equals(fileExt)) return "application/msword";
 		if(".txt".equals(fileExt) || ".text".equals(fileExt)) return "text/html";
@@ -327,16 +331,19 @@ public class DocUtils {
 	 * @throws IOException
 	 */
 	public static String fetch(URL anHttpUrl) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(openHttpUrl(anHttpUrl), "UTF-8"));
-		StringBuilder sb = new StringBuilder(1024 * 1024); // 1MB initial capacity
-		String line;
-		while((line = br.readLine()) != null) {
-			// System.out.println(line);
-			sb.append(line);
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(openHttpUrl(anHttpUrl), "UTF-8"));
+			StringBuilder sb = new StringBuilder(1024 * 1024); // 1MB initial capacity
+			String line;
+			while((line = br.readLine()) != null) {
+				// System.out.println(line);
+				sb.append(line);
+			}
+			return sb.toString();
+		} finally {
+			IOUtils.closeQuitely(br);			
 		}
-		br.close();
-
-		return sb.toString();
 		// System.out.println(fcontents);
 		// if(fcontents.indexOf("</html>") == -1) throw new IllegalStateException();
 		// return fcontents;

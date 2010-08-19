@@ -7,8 +7,10 @@ package com.tabulaw.service.convert;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
@@ -21,8 +23,8 @@ import com.tabulaw.service.DocUtils;
 public class HtmlToDocManualFileConverter extends AbstractFileConverter {
 
 	@Override
-	public String getTargetMimeType() {
-		return "application/msword";
+	public String getSourceMimeType() {
+		return "text/html";
 	}
 
 	@Override
@@ -31,8 +33,13 @@ public class HtmlToDocManualFileConverter extends AbstractFileConverter {
 	}
 
 	@Override
-	public File convert(File input) throws Exception {
-		String htmlContent = FileUtils.readFileToString(input);
+	public String getTargetFileExtension() {
+		return "doc";
+	}
+
+	@Override
+	public void convert(InputStream input, OutputStream output) throws Exception {
+		String htmlContent = IOUtils.toString(input);
 
 		// use HTMLCleaner to help us out
 		HtmlCleaner cleaner = new HtmlCleaner();
@@ -46,8 +53,6 @@ public class HtmlToDocManualFileConverter extends AbstractFileConverter {
 		
 		TagNode body = root.getElementsByName("body", true)[0];
 		String docContent = cleaner.getInnerHtml(body);
-		File fdoc = createSiblingFile(input, "doc");
-		FileUtils.writeStringToFile(fdoc, docContent);
-		return fdoc;
+		IOUtils.write(docContent, output);		
 	}
 }

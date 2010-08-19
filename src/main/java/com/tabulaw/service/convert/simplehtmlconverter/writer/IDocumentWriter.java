@@ -1,11 +1,13 @@
 package com.tabulaw.service.convert.simplehtmlconverter.writer;
 
-import java.io.File;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.OutputStream;
 
 import org.w3c.dom.Node;
 
 
-public interface IDocumentWriter {
+public interface IDocumentWriter extends Closeable {
 	public IDocumentContext getDocumentContext();
 	public void setDocumentContext(IDocumentContext documentContext);
 	public void addSoftLineBreak(Node node);
@@ -13,7 +15,7 @@ public interface IDocumentWriter {
 	public void setPharagraphSettings(Node node);
 	public void setPhraseSettings(Node node);
 	public void addText(String text);
-	public void init(File outputFile) throws Exception;
-	public void close() throws Exception;
+	public void init(OutputStream output) throws Exception;
+	public void close() throws IOException;
 
 }

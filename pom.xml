@@ -419,13 +419,6 @@
 			<version>1.2.1</version>
 		</dependency>
 
-
-		<dependency>
-		    <groupId>net.sf.jtidy</groupId>
-		    <artifactId>jtidy</artifactId>
-		    <version>r938</version>
-		</dependency>
-		
 		<dependency>
 		   <groupId>com.lowagie</groupId>
 		   <artifactId>itext-rtf</artifactId>
@@ -548,11 +541,11 @@
 			must use older version of slf4j-log4j12 binding so that jodconverter
 			doesn't error out
 		-->
-		<dependency>
+<!--		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.4.3</version>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>com.db4o</groupId>

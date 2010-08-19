@@ -54,7 +54,7 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 		converters.add(new SimpleHtmlToRtfFileConverter());
 
 		FileConverterDelegate converterDelegate = converters.size() == 0 ? null : new FileConverterDelegate(converters
-				.toArray(new IFileConverter[0]));
+				.toArray(new IFileConverter[converters.size()]));
 		servletContext.setAttribute(FileConverterDelegate.KEY, converterDelegate);
 		
 		log.debug("File converter bootstrapping complete");

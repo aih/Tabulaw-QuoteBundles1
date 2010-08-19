@@ -1,17 +1,17 @@
 package com.tabulaw.service.convert.simplehtmlconverter.writer;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.w3c.dom.Node;
 
+import com.lowagie.text.DocumentException;
 import com.lowagie.text.Font;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.rtf.RtfWriter2;
 import com.lowagie.text.rtf.direct.RtfDirectContent;
-import com.tabulaw.service.convert.simplehtmlconverter.util.HtmlUtil;
 import com.tabulaw.service.convert.simplehtmlconverter.writer.info.ParagraphInfo;
 
 public class RtfDocumentWriter implements IDocumentWriter {
@@ -43,8 +43,12 @@ public class RtfDocumentWriter implements IDocumentWriter {
 
 	@Override
 	public void addText(String text) {
+		text = text.replaceAll("\n|\r", "").replaceAll("\\s+", " ");
+		if (text.isEmpty()) {
+			return;
+		}
 		Phrase tmpPhrase = (Phrase) documentContext.getPhrase().clone();
-		tmpPhrase.add(HtmlUtil.decodeHTMLEntities(text));
+		tmpPhrase.add(StringEscapeUtils.unescapeXml(text));
 		documentContext.getParagraph().add(tmpPhrase);
 	}
 
@@ -85,19 +89,19 @@ public class RtfDocumentWriter implements IDocumentWriter {
 	}
 
 	@Override
-	public void close() throws Exception {
+	public void close() throws IOException {
 		try {
 			documentContext.getDocument().add(documentContext.getParagraph());
+		} catch (DocumentException ex) {
+			throw new IOException(ex);
 		} finally {
 			documentContext.getDocument().close();
 		}
 	}
 
 	@Override
-	public void init(File outputFile) throws Exception {
-		OutputStream outputStream = null;
-		outputStream = new FileOutputStream(outputFile);
-		RtfWriter2.getInstance(documentContext.getDocument(), outputStream);
+	public void init(OutputStream output) throws Exception {
+		RtfWriter2.getInstance(documentContext.getDocument(), output);
 		documentContext.getDocument().open();
 	}
 

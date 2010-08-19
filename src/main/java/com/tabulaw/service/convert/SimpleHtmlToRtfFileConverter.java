@@ -15,9 +15,8 @@ import com.tabulaw.service.convert.simplehtmlconverter.writer.RtfDocumentContext
  */
 public class SimpleHtmlToRtfFileConverter extends AbstractSimpleHtmlConvertor {
 
-
 	@Override
-	protected String getFileExtension() {
+	public String getTargetFileExtension() {
 		return "rtf";
 	}
 
@@ -26,8 +25,8 @@ public class SimpleHtmlToRtfFileConverter extends AbstractSimpleHtmlConvertor {
 		return Constants.RTF_MIME_TYPE;
 	}
 
-        @Override
-        IDocumentContext createDocumentContext() {
-                return new RtfDocumentContext();
-        }
+	@Override
+	protected IDocumentContext createDocumentContext() {
+		return new RtfDocumentContext();
+	}
 }

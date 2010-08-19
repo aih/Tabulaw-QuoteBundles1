@@ -5,7 +5,6 @@
  */
 package com.tabulaw.server;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -15,7 +14,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.common.model.DocContent;
-import com.tabulaw.service.DocUtils;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -31,14 +29,18 @@ public class DocDownloadServlet extends AbstractDownloadServlet {
 	private static final Log log = LogFactory.getLog(DocDownloadServlet.class);
 
 	@Override
-	protected File getContentFile(HttpServletRequest req) throws ServletException, IOException {
+	protected String getDownloadSource(HttpServletRequest req) throws ServletException, IOException {
 		String docId = req.getParameter("docId");
 		if(StringUtil.isEmpty(docId)) throw new ServletException("No doc id specified");
 		if(log.isInfoEnabled()) log.info("Processing doc download request: docId: " + docId + ", mime-type: " + mimeType);
 
 		DocContent doc = pc.getUserDataService().getDocContent(docId);
-		File fdoc = DocUtils.docContentsToFile(doc);
 		
-		return fdoc ;
+		return doc.getHtmlContent();
 	}
+
+	@Override
+	protected String getSourceName(HttpServletRequest req) {
+		return req.getParameter("docId");
+	}	
 }

@@ -1,6 +1,6 @@
 package com.tabulaw.service.convert.simplehtmlconverter.writer;
 
-import java.io.File;
+import java.io.OutputStream;
 
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
@@ -8,7 +8,7 @@ import org.docx4j.wml.ObjectFactory;
 
 public class Docx4jDocumentContext extends AbstractDocumentContext {
 	private WordprocessingMLPackage wordMLPackage;
-	private File outputFile;
+	private OutputStream outputStream;
 	private ObjectFactory factory = new ObjectFactory();
 	private org.docx4j.wml.P p = factory.createP();
 	private org.docx4j.wml.PPr ppr = factory.createPPr();
@@ -49,16 +49,16 @@ public class Docx4jDocumentContext extends AbstractDocumentContext {
 		this.p = p;
 	}
 
-	public File getOutputFile() {
-		return outputFile;
+	public OutputStream getOutputStream() {
+		return outputStream;
 	}
 
 	public ObjectFactory getFactory() {
 		return factory;
 	}
 
-	public void setOutputFile(File outputFile) {
-		this.outputFile = outputFile;
+	public void setOutputStream(OutputStream outputStream) {
+		this.outputStream = outputStream;
 	}
 
 	public WordprocessingMLPackage getWordMLPackage() {

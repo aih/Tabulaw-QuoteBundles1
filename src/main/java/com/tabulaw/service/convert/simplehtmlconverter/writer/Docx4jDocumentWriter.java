@@ -1,8 +1,12 @@
 package com.tabulaw.service.convert.simplehtmlconverter.writer;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.openpackaging.io.SaveToZipFile;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.wml.Br;
 import org.docx4j.wml.HpsMeasure;
@@ -16,7 +20,6 @@ import org.docx4j.wml.PPrBase.Ind;
 import org.docx4j.wml.PPrBase.Spacing;
 import org.w3c.dom.Node;
 
-import com.tabulaw.service.convert.simplehtmlconverter.util.HtmlUtil;
 import com.tabulaw.service.convert.simplehtmlconverter.writer.info.ParagraphInfo;
 
 public class Docx4jDocumentWriter implements IDocumentWriter {
@@ -60,7 +63,7 @@ public class Docx4jDocumentWriter implements IDocumentWriter {
 		documentContext.getP().getParagraphContent().add(run);
 
 		org.docx4j.wml.Text t = documentContext.getFactory().createText();
-		t.setValue(HtmlUtil.decodeHTMLEntities(text));
+		t.setValue(StringEscapeUtils.unescapeXml(text));
 		run.getRunContent().add(t);
 
 		run.setRPr(documentContext.getRpr());
@@ -112,16 +115,19 @@ public class Docx4jDocumentWriter implements IDocumentWriter {
 	}
 
 	@Override
-	public void close() throws Exception {
-		documentContext.getWordMLPackage().save(documentContext.getOutputFile());
+	public void close() throws IOException {
+		try {
+			SaveToZipFile saver = new SaveToZipFile(documentContext.getWordMLPackage());
+			saver.save(documentContext.getOutputStream());
+		} catch (Docx4JException ex) {
+			throw new IOException(ex);
+		}
 	}
 
 	@Override
-	public void init(File outputFile) throws Exception {
-		documentContext.setOutputFile(outputFile);
+	public void init(OutputStream output) throws Exception {
+		documentContext.setOutputStream(output);
 		documentContext.setWordMLPackage(WordprocessingMLPackage.createPackage());
 		createParagraph();
-
 	}
-
 }

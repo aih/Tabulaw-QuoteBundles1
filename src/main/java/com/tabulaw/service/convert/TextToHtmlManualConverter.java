@@ -6,8 +6,10 @@
 package com.tabulaw.service.convert;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import com.tabulaw.service.DocUtils;
 
@@ -17,9 +19,29 @@ import com.tabulaw.service.DocUtils;
  */
 public class TextToHtmlManualConverter extends AbstractFileConverter {
 
+	private ThreadLocal<String> title = new ThreadLocal<String>();
+	
 	@Override
-	public String getTargetMimeType() {
-		return "text/html";
+	public String getTargetFileExtension() {
+		return "html";
+	}
+	
+	@Override
+	public void convert(InputStream input, OutputStream output) throws Exception {
+
+		String fcontent = IOUtils.toString(input, "UTF-8");
+		if(fcontent == null) fcontent = "";
+
+		StringBuilder sb = new StringBuilder(fcontent);
+		DocUtils.htmlizeText(sb, title.get() == null ? "" : title.get());
+
+		IOUtils.write(sb.toString(), output);
+	}
+	
+
+	@Override
+	public String getSourceMimeType() {
+		return "text/plain";
 	}
 
 	@Override
@@ -29,18 +51,9 @@ public class TextToHtmlManualConverter extends AbstractFileConverter {
 
 	@Override
 	public File convert(File input) throws Exception {
-		// generate doc title
-		String fname = input.getName();
-		if(fname == null) fname = "";
-
-		String fcontent = FileUtils.readFileToString(input, "UTF-8");
-		if(fcontent == null) fcontent = "";
-
-		StringBuilder sb = new StringBuilder(fcontent);
-		DocUtils.htmlizeText(sb, fname);
-
-		File fout = createSiblingFile(input, "html");
-		FileUtils.writeStringToFile(fout, sb.toString(), "UTF-8");
-		return fout;
+		title.set(input.getName());
+		File result = super.convert(input);
+		title.set(null);
+		return result;
 	}
 }
