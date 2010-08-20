@@ -6,7 +6,6 @@
 package com.tabulaw.client.app.ui;
 
 import com.google.gwt.event.shared.GwtEvent;
-import com.tabulaw.client.data.rpc.IHasQuoteHandlers;
 
 /**
  * @author jpk

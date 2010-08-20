@@ -1,23 +1,23 @@
 /**
  * The Logic Lab
  * @author jpk
- * Feb 23, 2008
+ * @since May 9, 2010
  */
-package com.tabulaw.client.data.rpc;
+package com.tabulaw.client.app.ui;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 
 /**
- * IHasRpcHandlers
+ * Fires quote events.
  * @author jpk
  */
-public interface IHasRpcHandlers extends HasHandlers {
+public interface IHasQuoteHandlers extends HasHandlers {
 
 	/**
-	 * Adds an rpc handler.
+	 * Adds a quote handler.
 	 * @param handler the handler
 	 * @return the handler registration
 	 */
-	HandlerRegistration addRpcHandler(IRpcHandler handler);
+	HandlerRegistration addQuoteHandler(IQuoteHandler handler);
 }

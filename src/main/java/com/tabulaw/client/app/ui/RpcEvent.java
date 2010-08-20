@@ -2,7 +2,7 @@
  * The Logic Lab
  * @author jpk Feb 23, 2008
  */
-package com.tabulaw.client.data.rpc;
+package com.tabulaw.client.app.ui;
 
 import com.google.gwt.event.shared.GwtEvent;
 

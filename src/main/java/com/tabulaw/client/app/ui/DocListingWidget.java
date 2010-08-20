@@ -21,7 +21,6 @@ import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
-import com.tabulaw.client.data.rpc.RpcCommand;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.Notifier;

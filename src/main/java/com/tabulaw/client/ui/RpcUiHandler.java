@@ -9,8 +9,8 @@ import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.data.rpc.IRpcHandler;
-import com.tabulaw.client.data.rpc.RpcEvent;
+import com.tabulaw.client.app.ui.IRpcHandler;
+import com.tabulaw.client.app.ui.RpcEvent;
 
 /**
  * RpcUiHandler - Provides UI indication that an RPC call is in progress.

@@ -3,7 +3,7 @@
  * @author jpk
  * Sep 1, 2007
  */
-package com.tabulaw.client.data.rpc;
+package com.tabulaw.client.app.ui;
 
 import com.google.gwt.event.shared.EventHandler;
 

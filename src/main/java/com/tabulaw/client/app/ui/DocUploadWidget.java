@@ -27,7 +27,6 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.data.rpc.RpcEvent;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.util.Fmt;
