@@ -541,11 +541,11 @@
 			must use older version of slf4j-log4j12 binding so that jodconverter
 			doesn't error out
 		-->
-<!--		<dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.4.3</version>
-		</dependency> -->
+		</dependency> 
 
 		<dependency>
 			<groupId>com.db4o</groupId>

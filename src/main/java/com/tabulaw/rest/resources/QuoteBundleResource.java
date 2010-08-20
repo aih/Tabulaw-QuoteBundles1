@@ -2,6 +2,7 @@ package com.tabulaw.rest.resources;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,11 @@ import org.apache.commons.lang.StringUtils;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.common.model.info.QuoteInfo;
+import com.tabulaw.mail.EmailDispatcher;
+import com.tabulaw.mail.IMailContext;
+import com.tabulaw.mail.MailRouting;
+import com.tabulaw.mail.TemplateComposer;
 import com.tabulaw.rest.AuthorizationRequired;
 import com.tabulaw.rest.dto.DocRefWithQuotes;
 import com.tabulaw.rest.dto.QuoteBundleWithDocRefs;
@@ -161,6 +167,39 @@ public class QuoteBundleResource extends BaseResource {
 			result.result = resultBundles;
 		}
 		return result;
+	}
+	
+	@POST
+	@Path("/{id}/send_by_email")
+	public void sendByEmail(@PathParam("id") String id) {
+		QuoteBundle bundle = byId(id);
+		
+		List<QuoteInfo> quotes = new ArrayList<QuoteInfo>();
+		LinkedHashSet<String> urls = new LinkedHashSet<String>(); 
+		for (Quote quote : bundle.getQuotes()) {
+			QuoteInfo info = new QuoteInfo(quote);
+			quotes.add(info);
+			if (quote.getDocument().getCaseRef() != null && 
+					quote.getDocument().getCaseRef().getUrl() != null) {
+				urls.add(quote.getDocument().getCaseRef().getUrl());
+			}
+		}		
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(TemplateComposer.SUBJECT_KEY, "Quote from " + bundle.getName());
+		params.put("quoteList", quotes);
+		params.put("urls", urls);
+		
+		String email = getUser().getUser().getEmailAddress();		
+		EmailDispatcher dispatcher = getWebAppContext().getEmailDispatcher();
+		MailRouting routing = dispatcher.getMailManager().buildAppSenderMailRouting(email);
+		IMailContext mail = dispatcher.getMailManager().buildHtmlTemplateContext(routing, "quotes-list", params);
+		
+		try {
+			dispatcher.queueEmail(mail);
+		} catch (InterruptedException ex) {
+			throw new WebApplicationException(ex);
+		}
 	}
 	
 	@XmlRootElement(name = "quoteBundles")
