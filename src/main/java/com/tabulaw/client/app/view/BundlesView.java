@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 11, 2010
  */
-package com.tabulaw.client.app.ui.view;
+package com.tabulaw.client.app.view;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;

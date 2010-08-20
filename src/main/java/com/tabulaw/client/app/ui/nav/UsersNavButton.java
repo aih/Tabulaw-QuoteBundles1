@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.app.ui.nav;
 
-import com.tabulaw.client.app.ui.view.UsersView;
+import com.tabulaw.client.app.view.UsersView;
 import com.tabulaw.client.view.IViewInitializer;
 import com.tabulaw.client.view.StaticViewInitializer;
 

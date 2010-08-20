@@ -30,7 +30,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.UserPasswordSetDialog;
-import com.tabulaw.client.app.ui.view.DocView;
+import com.tabulaw.client.app.view.DocView;
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;

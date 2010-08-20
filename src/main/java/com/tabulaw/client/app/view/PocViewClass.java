@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 14, 2010
  */
-package com.tabulaw.client.app.ui.view;
+package com.tabulaw.client.app.view;
 
 import com.tabulaw.client.view.ViewClass;
 import com.tabulaw.client.view.ViewOptions;

@@ -8,7 +8,7 @@ package com.tabulaw.client.app.ui.nav;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.tabulaw.client.app.Resources;
-import com.tabulaw.client.app.ui.view.DocViewInitializer;
+import com.tabulaw.client.app.view.DocViewInitializer;
 import com.tabulaw.client.view.IViewInitializer;
 import com.tabulaw.client.view.UnloadViewRequest;
 import com.tabulaw.client.view.ViewKey;

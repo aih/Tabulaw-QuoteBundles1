@@ -6,7 +6,7 @@
 package com.tabulaw.client.app.ui.nav;
 
 import com.tabulaw.client.app.Resources;
-import com.tabulaw.client.app.ui.view.BundlesView;
+import com.tabulaw.client.app.view.BundlesView;
 import com.tabulaw.client.view.IViewInitializer;
 import com.tabulaw.client.view.StaticViewInitializer;
 

@@ -11,7 +11,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.view.DocViewInitializer;
+import com.tabulaw.client.app.view.DocViewInitializer;
 import com.tabulaw.client.ui.Dialog;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.RpcCommand;

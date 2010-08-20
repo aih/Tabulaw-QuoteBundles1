@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 12, 2010
  */
-package com.tabulaw.client.app.ui.view;
+package com.tabulaw.client.app.view;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.view.AbstractView;

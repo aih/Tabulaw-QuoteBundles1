@@ -6,7 +6,7 @@
 package com.tabulaw.client.app.ui.nav;
 
 import com.tabulaw.client.app.Resources;
-import com.tabulaw.client.app.ui.view.DocsView;
+import com.tabulaw.client.app.view.DocsView;
 import com.tabulaw.client.view.IViewInitializer;
 import com.tabulaw.client.view.StaticViewInitializer;
 

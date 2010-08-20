@@ -35,7 +35,7 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.view.DocViewInitializer;
+import com.tabulaw.client.app.view.DocViewInitializer;
 import com.tabulaw.client.ui.IRpcHandler;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.RpcCommand;

@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 13, 2010
  */
-package com.tabulaw.client.app.ui.view;
+package com.tabulaw.client.app.view;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.shared.HandlerRegistration;

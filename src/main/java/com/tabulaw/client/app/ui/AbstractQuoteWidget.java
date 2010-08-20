@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.MarkOverlay;
-import com.tabulaw.client.app.ui.view.DocViewInitializer;
+import com.tabulaw.client.app.view.DocViewInitializer;
 import com.tabulaw.client.model.IHasModel;
 import com.tabulaw.client.ui.toolbar.Toolbar;
 import com.tabulaw.client.view.ShowViewRequest;
