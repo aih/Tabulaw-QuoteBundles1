@@ -5,7 +5,6 @@
  */
 package com.tabulaw.common.data.rpc;
 
-import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
 import com.tabulaw.model.DocRef;
 

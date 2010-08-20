@@ -8,7 +8,7 @@ package com.tabulaw.server.rpc;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.model.IEntity;

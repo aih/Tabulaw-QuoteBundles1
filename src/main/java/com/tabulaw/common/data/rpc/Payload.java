@@ -3,9 +3,10 @@
  * @author jpk
  * Aug 29, 2007
  */
-package com.tabulaw.common.data;
+package com.tabulaw.common.data.rpc;
 
 import com.tabulaw.IMarshalable;
+import com.tabulaw.common.data.Status;
 
 /**
  * Payload - Common container with which to send data to client.

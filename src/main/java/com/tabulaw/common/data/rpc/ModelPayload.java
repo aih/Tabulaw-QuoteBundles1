@@ -3,8 +3,9 @@
  * @author jpk
  * Sep 14, 2007
  */
-package com.tabulaw.common.data;
+package com.tabulaw.common.data.rpc;
 
+import com.tabulaw.common.data.Status;
 import com.tabulaw.model.IEntity;
 import com.tabulaw.model.ModelKey;
 

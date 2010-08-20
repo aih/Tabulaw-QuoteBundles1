@@ -18,8 +18,8 @@ import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.edit.EditEvent;
 import com.tabulaw.client.ui.edit.IEditHandler;
-import com.tabulaw.common.data.ModelPayload;
-import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.data.rpc.ModelPayload;
+import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.model.ModelKey;
 import com.tabulaw.model.User;
 

@@ -7,7 +7,6 @@ package com.tabulaw.common.data.rpc;
 
 import java.util.Map;
 
-import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
 
 /**

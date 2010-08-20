@@ -8,7 +8,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.data.rpc.Payload;
 
 /**
  * RpcCommand - Intended base class for all client-side RPC based requests.

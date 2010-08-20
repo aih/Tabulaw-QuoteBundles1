@@ -8,7 +8,6 @@ package com.tabulaw.common.data.rpc;
 import java.util.List;
 import java.util.Map;
 
-import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.User;

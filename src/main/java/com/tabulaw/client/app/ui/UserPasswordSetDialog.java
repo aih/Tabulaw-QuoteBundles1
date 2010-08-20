@@ -25,7 +25,7 @@ import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.ui.field.IFieldWidget;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
 import com.tabulaw.client.validate.ErrorHandlerDelegate;
-import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.data.rpc.Payload;
 
 /**
  * Dialog for handling user password rest.

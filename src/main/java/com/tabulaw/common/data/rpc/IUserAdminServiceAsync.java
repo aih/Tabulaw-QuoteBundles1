@@ -6,8 +6,6 @@
 package com.tabulaw.common.data.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.tabulaw.common.data.ModelPayload;
-import com.tabulaw.common.data.Payload;
 import com.tabulaw.model.User;
 
 /**

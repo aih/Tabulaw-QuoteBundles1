@@ -11,7 +11,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.ui.msg.MsgPopup;
-import com.tabulaw.common.data.Payload;
+import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.common.msg.Msg;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;

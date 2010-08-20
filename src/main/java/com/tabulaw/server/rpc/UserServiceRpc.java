@@ -14,8 +14,6 @@ import javax.validation.ValidationException;
 
 import org.springframework.mail.MailSendException;
 
-import com.tabulaw.common.data.ModelPayload;
-import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.data.rpc.DocListingPayload;
 import com.tabulaw.common.data.rpc.DocPayload;
@@ -24,6 +22,8 @@ import com.tabulaw.common.data.rpc.IUserContextService;
 import com.tabulaw.common.data.rpc.IUserCredentialsService;
 import com.tabulaw.common.data.rpc.IUserDataService;
 import com.tabulaw.common.data.rpc.IdsPayload;
+import com.tabulaw.common.data.rpc.ModelPayload;
+import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.common.data.rpc.UserContextPayload;
 import com.tabulaw.common.data.rpc.UserListPayload;
 import com.tabulaw.common.data.rpc.UserRegistrationRequest;
