@@ -27,8 +27,6 @@ import com.tabulaw.client.app.ui.QuoteEvent.QuoteType;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
-import com.tabulaw.client.ui.DocEvent;
-import com.tabulaw.client.ui.IDocHandler;
 import com.tabulaw.client.ui.LoggingDragHandler;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;

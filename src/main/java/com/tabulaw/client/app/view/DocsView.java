@@ -28,7 +28,7 @@ public class DocsView extends AbstractPocView<StaticViewInitializer> {
 		
 		@Override
 		public String getName() {
-			return "documents";
+			return "docs";
 		}
 
 		@Override

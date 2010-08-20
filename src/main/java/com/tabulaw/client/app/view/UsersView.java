@@ -25,7 +25,7 @@ public class UsersView extends AbstractPocView<StaticViewInitializer> {
 
 		@Override
 		public String getName() {
-			return "manageUsers";
+			return "users";
 		}
 
 		@Override

@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 24, 2010
  */
-package com.tabulaw.client.ui;
+package com.tabulaw.client.app.ui;
 
 import com.google.gwt.event.shared.EventHandler;
 

@@ -28,7 +28,7 @@ public class BundlesView extends AbstractPocView<StaticViewInitializer> {
 
 		@Override
 		public String getName() {
-			return "quoteBundle";
+			return "bundles";
 		}
 
 		@Override

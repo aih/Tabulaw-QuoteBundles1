@@ -40,7 +40,7 @@ public class DocView extends AbstractPocView<DocViewInitializer> implements IMod
 
 		@Override
 		public String getName() {
-			return "docview";
+			return "doc";
 		}
 
 		@Override

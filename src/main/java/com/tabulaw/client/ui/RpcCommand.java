@@ -15,9 +15,9 @@ import com.tabulaw.common.data.rpc.Payload;
  * <p>
  * Fires {@link RpcEvent}s on the source widget if non-<code>null</code>.
  * @author jpk
- * @param <P> payload type
+ * @param <T> payload type
  */
-public abstract class RpcCommand<P extends Payload> implements AsyncCallback<P>, Command {
+public abstract class RpcCommand<T extends Payload> implements AsyncCallback<T>, Command {
 
 	/**
 	 * The sourcing widget which may be <code>null</code>.
@@ -27,17 +27,17 @@ public abstract class RpcCommand<P extends Payload> implements AsyncCallback<P>,
 	/**
 	 * The declared ref is necessary in order to chain rpc commands.
 	 */
-	private AsyncCallback<P> callback = this;
+	private AsyncCallback<T> callback = this;
 
 	public final void setSource(Widget source) {
 		this.source = source;
 	}
 
-	protected final AsyncCallback<P> getAsyncCallback() {
+	protected final AsyncCallback<T> getAsyncCallback() {
 		return callback;
 	}
 
-	final void setAsyncCallback(AsyncCallback<P> callback) {
+	final void setAsyncCallback(AsyncCallback<T> callback) {
 		this.callback = callback;
 	}
 
@@ -60,7 +60,7 @@ public abstract class RpcCommand<P extends Payload> implements AsyncCallback<P>,
 	}
 
 	@Override
-	public final void onSuccess(P result) {
+	public final void onSuccess(T result) {
 		handleSuccess(result);
 	}
 
@@ -73,7 +73,7 @@ public abstract class RpcCommand<P extends Payload> implements AsyncCallback<P>,
 	 * May be overridden by sub-classes.
 	 * @param result
 	 */
-	protected void handleSuccess(P result) {
+	protected void handleSuccess(T result) {
 		// fire RPC event
 		if(source != null) source.fireEvent(new RpcEvent(RpcEvent.Type.RECEIVED));
 		// fire status event
