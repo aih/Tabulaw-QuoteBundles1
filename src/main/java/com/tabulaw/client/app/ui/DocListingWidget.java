@@ -24,6 +24,7 @@ import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.RpcCommand;
 import com.tabulaw.client.ui.listing.AbstractListingConfig;
 import com.tabulaw.client.ui.listing.Column;
 import com.tabulaw.client.ui.listing.DataListingOperator;

@@ -14,6 +14,7 @@ import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.ui.Dialog;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.RpcCommand;
 import com.tabulaw.client.ui.edit.EditEvent;
 import com.tabulaw.client.ui.edit.IEditHandler;
 import com.tabulaw.client.ui.edit.EditEvent.EditOp;

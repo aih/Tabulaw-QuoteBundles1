@@ -15,6 +15,7 @@ import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.RpcCommand;
 import com.tabulaw.client.ui.edit.EditEvent;
 import com.tabulaw.client.ui.edit.IEditHandler;
 import com.tabulaw.common.data.rpc.ModelPayload;

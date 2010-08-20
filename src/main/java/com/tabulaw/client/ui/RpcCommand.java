@@ -2,7 +2,7 @@
  * The Logic Lab
  * @author jpk Aug 28, 2007
  */
-package com.tabulaw.client.app.ui;
+package com.tabulaw.client.ui;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
