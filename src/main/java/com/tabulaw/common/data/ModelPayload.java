@@ -13,7 +13,7 @@ import com.tabulaw.model.ModelKey;
  * @param <E> the entity type
  * @author jpk
  */
-public final class ModelPayload<E extends IEntity> extends ModelDataPayload {
+public final class ModelPayload<E extends IEntity> extends Payload {
 
 	/**
 	 * The model.
