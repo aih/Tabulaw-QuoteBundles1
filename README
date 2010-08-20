@@ -2,8 +2,9 @@ poc ("Proof of Concept") is a demo app for owned by Tabulaw, Inc. programmed by 
 
 software requiremenets:
 ----------------------
-	eclipse IDE
+	eclipse IDE v3.5+
 	maven v2.2.1+
+	GWT SDK v2.0.0+
 
 eclipse settings:
 ----------------
@@ -15,18 +16,20 @@ eclipse settings:
      TestNG
 
  2) manually install gwt-dnd v3.0.1 and gwt-log v3.0.1 into your local maven repo.
-    (These are the only 2 maven dependencies requiring a manual install to one's local maven repo.)
+
+ 3) manually install the org.springextensions.db4o-{version}.jar 
+    located under <project root>/etc/org.springextensions.db4o/{version} directory.
  
- 3) Invoking gwt debug mode w/in eclipse:
+ 4) Invoking gwt debug mode w/in eclipse:
  		-right click on project- --> Debug as.. --> [google] Web Application
 		goto url in browser: http://127.0.0.1:8888/Poc.html?gwt.codesvr=127.0.0.1:9997 		
  
- 4) Create the application WAR file.  
+ 5) Create the application WAR file.  
  		
- 		dev mode
+ 		dev mode (default)
  		========
  		From a command line at project root:
- 		"mvn package"
+ 		"mvn package [-P dev]"
  		
  		prod mode
  		=========

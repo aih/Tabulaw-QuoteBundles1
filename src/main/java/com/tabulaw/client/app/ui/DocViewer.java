@@ -482,8 +482,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		pnl.addStyleDependentName("edit");
 
 		// so qb doc col can know which doc mode we are in
-		RootPanel.get().removeStyleName("docview-static");
-		RootPanel.get().addStyleName("docview-edit");
+		RootPanel.get().removeStyleName("doc-static");
+		RootPanel.get().addStyleName("doc-edit");
 
 		dew.setHTML(getDocHtml());
 		frame.setVisible(false);
@@ -506,8 +506,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		pnl.removeStyleDependentName("edit");
 
 		// so qb doc col can know which doc mode we are in
-		RootPanel.get().addStyleName("docview-static");
-		RootPanel.get().removeStyleName("docview-edit");
+		RootPanel.get().addStyleName("doc-static");
+		RootPanel.get().removeStyleName("doc-edit");
 
 		frame.setVisible(true);
 		if(dew != null) {
