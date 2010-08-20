@@ -14,7 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.common.model.User;
-import com.tabulaw.service.convert.FileConverterDelegate;
+import com.tabulaw.service.convert.DataConverterDelegate;
 import com.tabulaw.util.StringUtil;
 
 public abstract class AbstractDownloadServlet extends HttpServlet {
@@ -61,7 +61,7 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 
 			// convert the doc
 			String sourceHtml = getDownloadSource(req);
-			FileConverterDelegate fcd = (FileConverterDelegate) getServletContext().getAttribute(FileConverterDelegate.KEY);
+			DataConverterDelegate fcd = (DataConverterDelegate) getServletContext().getAttribute(DataConverterDelegate.KEY);
 			
 			byte[] sourceBytes = sourceHtml.getBytes();
 			ByteArrayOutputStream output = new ByteArrayOutputStream();

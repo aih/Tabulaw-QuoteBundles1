@@ -1,6 +1,5 @@
 package com.tabulaw.service.convert;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -14,7 +13,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.tabulaw.service.DocUtils;
 import com.tabulaw.service.convert.simplehtmlconverter.ElementBuilderFactory;
 import com.tabulaw.service.convert.simplehtmlconverter.element.ElementBuilder;
 import com.tabulaw.service.convert.simplehtmlconverter.writer.IDocumentContext;
@@ -22,7 +20,7 @@ import com.tabulaw.service.convert.simplehtmlconverter.writer.IDocumentContext;
 /**
  * @author Andrey Levchenko
  */
-abstract class AbstractSimpleHtmlConvertor extends AbstractFileConverter {
+abstract class AbstractSimpleHtmlConvertor extends AbstractDataConverter {
 
 	protected abstract IDocumentContext createDocumentContext();
 
@@ -45,10 +43,10 @@ abstract class AbstractSimpleHtmlConvertor extends AbstractFileConverter {
 		documentContext.getDocumentWriter().close();		
 	}
 
-	@Override
-	public boolean isFileConvertable(File f) {
-		return DocUtils.isHtmlFileByExtension(f.getName());
-	}
+//	@Override
+//	public boolean isFileConvertable(File f) {
+//		return DocUtils.isHtmlFileByExtension(f.getName());
+//	}
 
 	@Override
 	public String getSourceMimeType() {

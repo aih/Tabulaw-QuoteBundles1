@@ -31,7 +31,7 @@
     	com.tabulaw.server.WebAppContextBootstrapper
     	com.tabulaw.server.Db4oBootstrapper
     	com.tabulaw.server.PersistContextBootstrapper
-    	com.tabulaw.server.FileConverterBootstrapper
+    	com.tabulaw.server.DataConverterBootstrapper
     </param-value>
 	</context-param>
 

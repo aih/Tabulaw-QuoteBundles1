@@ -13,30 +13,30 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.inject.Injector;
-import com.tabulaw.service.convert.FileConverterDelegate;
-import com.tabulaw.service.convert.IFileConverter;
+import com.tabulaw.service.convert.DataConverterDelegate;
+import com.tabulaw.service.convert.IDataConverter;
 import com.tabulaw.service.convert.SimpleHtmlToDocxFileConverter;
 import com.tabulaw.service.convert.SimpleHtmlToRtfFileConverter;
 import com.tabulaw.service.convert.TextToHtmlManualConverter;
-import com.tabulaw.service.convert.ToHtmlPassThroughConverter;
+import com.tabulaw.service.convert.HtmlPassThroughConverter;
 
 /**
  * Bootstraps file converter impls.
  * 
  * @author jpk
  */
-public class FileConverterBootstrapper implements IBootstrapHandler {
+public class DataConverterBootstrapper implements IBootstrapHandler {
 
-	private static final Log log = LogFactory.getLog(FileConverterBootstrapper.class);
+	private static final Log log = LogFactory.getLog(DataConverterBootstrapper.class);
 
 	@Override
 	public void startup(Injector injector, ServletContext servletContext) {
 		log.debug("Starting up file converter bootstrapping..");
 		
-		ArrayList<IFileConverter> converters = new ArrayList<IFileConverter>();
+		ArrayList<IDataConverter> converters = new ArrayList<IDataConverter>();
 
 		// html pass through converter
-		converters.add(new ToHtmlPassThroughConverter());
+		converters.add(new HtmlPassThroughConverter());
 
 		// text to html converter
 		converters.add(new TextToHtmlManualConverter());
@@ -53,15 +53,15 @@ public class FileConverterBootstrapper implements IBootstrapHandler {
 		// html to rtf
 		converters.add(new SimpleHtmlToRtfFileConverter());
 
-		FileConverterDelegate converterDelegate = converters.size() == 0 ? null : new FileConverterDelegate(converters
-				.toArray(new IFileConverter[converters.size()]));
-		servletContext.setAttribute(FileConverterDelegate.KEY, converterDelegate);
+		DataConverterDelegate converterDelegate = converters.size() == 0 ? null : new DataConverterDelegate(converters
+				.toArray(new IDataConverter[converters.size()]));
+		servletContext.setAttribute(DataConverterDelegate.KEY, converterDelegate);
 		
 		log.debug("File converter bootstrapping complete");
 	}
 
 	@Override
 	public void shutdown(ServletContext servletContext) {
-		servletContext.removeAttribute(FileConverterDelegate.KEY);
+		servletContext.removeAttribute(DataConverterDelegate.KEY);
 	}
 }

@@ -905,8 +905,8 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 		final PersistContext pc = getPersistContext();
 
-		FileConverterDelegate fcd =
-				(FileConverterDelegate) getServletContext().getAttribute(FileConverterBootstrapper.FILE_CONVERTER_KEY);
+		DataConverterDelegate fcd =
+				(DataConverterDelegate) getServletContext().getAttribute(DataConverterBootstrapper.FILE_CONVERTER_KEY);
 
 		try {
 			// load the doc

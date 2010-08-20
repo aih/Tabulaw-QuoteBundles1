@@ -62,7 +62,7 @@ public class DocUtils {
 	 *         file extension
 	 */
 	public static String getMimeTypeFromFileExt(String fileExt) throws IllegalArgumentException {
-		if (! fileExt.startsWith(".")) {
+		if(!fileExt.startsWith(".")) {
 			fileExt = "." + fileExt;
 		}
 		fileExt = fileExt.trim().toLowerCase();
@@ -137,15 +137,15 @@ public class DocUtils {
 		return f;
 	}
 
-
 	/**
 	 * Serializes the state of the given doc ref into a single token.
 	 * @param doc doc to serialize
 	 * @return serialized doc token
 	 */
+	// TODO move to DocUploadServlet
 	public static String serializeDocument(DocRef doc) {
 		StringBuilder sb = new StringBuilder(1024);
-	
+
 		String docId = doc.getId();
 		sb.append("id::");
 		sb.append(docId == null ? "" : docId);
@@ -153,11 +153,11 @@ public class DocUtils {
 		sb.append(doc.getTitle());
 		sb.append("|date::");
 		sb.append(dateFormat.format(doc.getDate()));
-	
+
 		CaseRef caseRef = doc.getCaseRef();
 		if(caseRef != null) {
 			sb.insert(0, "[casedoc]");
-	
+
 			sb.append("|parties::");
 			sb.append(caseRef.getParties());
 			sb.append("|reftoken::");
@@ -176,9 +176,9 @@ public class DocUtils {
 			// for now, assume it is a contract doc
 			sb.insert(0, "[doc]");
 		}
-	
+
 		sb.append("\n"); // newline
-	
+
 		return sb.toString();
 	}
 
@@ -191,27 +191,27 @@ public class DocUtils {
 	public static DocRef deserializeDocToken(String stoken) {
 		// check to see if we have a serializer first line
 		if(stoken.charAt(0) != '[') return null;
-	
+
 		// doc related
 		String title = null;
-	
+
 		// case related
 		String parties = null, reftoken = null, docLoc = null, court = null, url = null, year = null;
 		Date date = null;
-	
+
 		int nli = stoken.indexOf('\n');
 		String firstline = stoken.substring(0, nli);
 		int eti = firstline.indexOf(']');
-	
+
 		String type = stoken.substring(1, eti);
 		firstline = firstline.substring(eti + 1);
-	
+
 		String[] sarr1 = firstline.split("\\|");
 		for(String sub : sarr1) {
 			String[] sarr2 = sub.split("::");
 			String name = sarr2[0];
 			String value = (sarr2.length == 2) ? sarr2[1] : "";
-	
+
 			// doc related
 			if("title".equals(name)) {
 				title = value;
@@ -224,7 +224,7 @@ public class DocUtils {
 					throw new IllegalArgumentException("Un-parseable date string: " + value);
 				}
 			}
-	
+
 			else if("casedoc".equals(type)) {
 				// case related
 				if("parties".equals(name)) {
@@ -247,7 +247,7 @@ public class DocUtils {
 				}
 			}
 		}
-	
+
 		if("casedoc".equals(type))
 			return EntityFactory.get().buildCaseDoc(title, date, parties, reftoken, docLoc, court, url, year);
 		else if("doc".equals(type))
@@ -255,7 +255,7 @@ public class DocUtils {
 		else
 			throw new IllegalArgumentException("Unhandled doc type: " + type);
 	}
-	
+
 	/**
 	 * "Localizes" doc html content by injecting local css and js blocks needed
 	 * for client-side doc functionality if not already present.
@@ -291,14 +291,15 @@ public class DocUtils {
 			doc.insert(index, jsBlock);
 		}
 	}
-	
+
 	/**
 	 * Generic html-ization of arbitrary input text.
 	 * @param sb buffer holding the input text
-	 * @param title the title to use in the html header
+	 * @param title the title to use in the html header. May be <code>null</code>
+	 *        in which case no title will be specified.
 	 */
 	public static void htmlizeText(StringBuilder sb, String title) {
-		String prefix = htmlPrefixBlock.replace("${title}", title);
+		String prefix = htmlPrefixBlock.replace("${title}", title == null ? "" : title);
 		sb.insert(0, prefix);
 		sb.append(htmlSuffixBlock);
 	}
@@ -318,7 +319,8 @@ public class DocUtils {
 		conn.setRequestProperty("Accept", "text/html");
 		conn.setRequestProperty("Accept-Encoding", "deflate");
 		conn.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
-		// conn.setRequestProperty("Accept-Language", "ISO-8859-1,utf-8;q=0.7,*;q=0.3");
+		// conn.setRequestProperty("Accept-Language",
+		// "ISO-8859-1,utf-8;q=0.7,*;q=0.3");
 		conn.setRequestProperty("Accept-Language", "utf-8;q=0.7,*;q=0.3");
 
 		return conn.getInputStream();
@@ -341,8 +343,9 @@ public class DocUtils {
 				sb.append(line);
 			}
 			return sb.toString();
-		} finally {
-			IOUtils.closeQuitely(br);			
+		}
+		finally {
+			IOUtils.closeQuitely(br);
 		}
 		// System.out.println(fcontents);
 		// if(fcontents.indexOf("</html>") == -1) throw new IllegalStateException();

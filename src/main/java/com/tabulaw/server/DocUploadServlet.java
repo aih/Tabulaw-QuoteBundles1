@@ -5,8 +5,9 @@
  */
 package com.tabulaw.server;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +20,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,7 +29,7 @@ import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.User;
 import com.tabulaw.service.DocUtils;
-import com.tabulaw.service.convert.FileConverterDelegate;
+import com.tabulaw.service.convert.DataConverterDelegate;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.util.StringUtil;
 
@@ -63,64 +63,55 @@ public class DocUploadServlet extends HttpServlet {
 
 			// Parse the request
 			try {
-				FileConverterDelegate fconverter =
-						(FileConverterDelegate) getServletContext().getAttribute(FileConverterDelegate.KEY);
-				if(fconverter == null) throw new Exception("No file converter delegate found.");
+				DataConverterDelegate converterDelegate =
+						(DataConverterDelegate) getServletContext().getAttribute(DataConverterDelegate.KEY);
+				if(converterDelegate == null) throw new Exception("No file converter delegate found.");
 
 				StringBuilder sb = new StringBuilder();
 
 				List<FileItem> items = upload.parseRequest(req);
 
-				File fupload = null;
 				int numSuccessful = 0;
 				for(FileItem item : items) {
 					if(!item.isFormField()) {
+						
 						String filename = item.getName();
 						if(StringUtil.isEmpty(filename)) continue;
 						filename = FilenameUtils.getName(filename);
 
-						// ensure we have a non-path filename
-						int li = filename.lastIndexOf(File.separatorChar);
-						if(li >= 0) filename = filename.substring(li + 1);
-
-						fupload = DocUtils.getDocFileRef(filename);
-						try {
-							item.write(fupload);
+						InputStream is = item.getInputStream();
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						
+						String sourceMimeType = item.getContentType();
+						if(sourceMimeType == null) {
+							throw new ServletException("Unknown content type of uploaded file: " + filename);
 						}
-						catch(Exception e) {
-							throw new Exception("Unable to write uploaded file to disk: " + e.getMessage(), e);
-						}
+						converterDelegate.convert(is, sourceMimeType, baos, "text/html");
+						byte[] barr = baos.toByteArray();
+						
 						numSuccessful++;
 
-						// convert to html
-						File fconverted = fconverter.convert(fupload, "text/html");
-
+						String docTitle = filename; // for now
+						
 						// create doc ref
-						String docTitle = fconverted.getName(); // for now
 						Date docDate = new Date();
 						DocRef mDoc = EntityFactory.get().buildDoc(docTitle, docDate);
 
 						// save doc ref
 						mDoc = uds.saveDoc(mDoc);
 
-						// save the doc in the db and create a doc/user binding
-						uds.addDocUserBinding(user.getId(), mDoc.getId());
-
 						// localize converted doc html content
-						String htmlContent = FileUtils.readFileToString(fconverted, "UTF-8");
+						String htmlContent = new String(barr, "UTF-8");
 						StringBuilder docsb = new StringBuilder(htmlContent);
 						DocUtils.localizeDoc(docsb, mDoc.getId(), docTitle);
 						htmlContent = docsb.toString();
 
+						// save the doc in the db and create a doc/user binding
+						uds.addDocUserBinding(user.getId(), mDoc.getId());
+
 						// save doc content
 						DocContent docContent = EntityFactory.get().buildDocContent(mDoc.getId(), htmlContent);
 						uds.saveDocContent(docContent);
-
-						// clean up
-						if(!fconverted.delete()) throw new Exception("Unable to delete converted html file");
-						fconverted = null;
-						if(!fupload.delete()) throw new Exception("Unable to delete uploaded file");
-						fupload = null;
 
 						String sdoc = DocUtils.serializeDocument(mDoc);
 
