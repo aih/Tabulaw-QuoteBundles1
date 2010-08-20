@@ -13,7 +13,7 @@ import org.apache.velocity.app.VelocityEngine;
 
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.info.QuoteInfo;
+import com.tabulaw.common.model.QuoteInfo;
 import com.tabulaw.util.VelocityUtil;
 
 public class QuoteBundleDownloadServlet extends AbstractDownloadServlet {

@@ -1,8 +1,5 @@
-package com.tabulaw.common.model.info;
+package com.tabulaw.common.model;
 
-import com.tabulaw.common.model.CaseRef;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.CaseRef.CitationFormatFlag;
 import com.tabulaw.util.StringUtil;
 

@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.info.QuoteInfo;
+import com.tabulaw.common.model.QuoteInfo;
 import com.tabulaw.mail.EmailDispatcher;
 import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailRouting;
