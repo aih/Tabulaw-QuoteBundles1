@@ -3,7 +3,9 @@
  * @author jopaki
  * @since May 21, 2010
  */
-package com.tabulaw.common.model;
+package com.tabulaw.client.model;
+
+import com.tabulaw.common.model.IEntity;
 
 /**
  * Indicates the ability to get/set an entity of a particular type.

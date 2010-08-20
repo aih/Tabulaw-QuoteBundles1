@@ -23,11 +23,11 @@ import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.client.app.ui.view.DocViewInitializer;
 import com.tabulaw.client.data.rpc.IHasQuoteHandlers;
+import com.tabulaw.client.model.IHasModel;
 import com.tabulaw.client.ui.toolbar.Toolbar;
 import com.tabulaw.client.view.ShowViewRequest;
 import com.tabulaw.client.view.ViewManager;
 import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.IHasModel;
 import com.tabulaw.common.model.Quote;
 import com.tabulaw.common.model.QuoteInfo;
 
