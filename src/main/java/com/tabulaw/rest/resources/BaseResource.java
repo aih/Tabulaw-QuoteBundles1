@@ -6,6 +6,7 @@ import javax.ws.rs.core.Context;
 
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
+import com.tabulaw.server.WebAppContext;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 
@@ -27,6 +28,10 @@ public class BaseResource {
 	
 	protected PersistContext getPersistContext() {
 		return (PersistContext) servletContext.getAttribute(PersistContext.KEY);		
+	}
+	
+	protected WebAppContext getWebAppContext() {
+		return (WebAppContext) servletContext.getAttribute(WebAppContext.KEY);
 	}
 	
 	protected UserDataService getDataService() {

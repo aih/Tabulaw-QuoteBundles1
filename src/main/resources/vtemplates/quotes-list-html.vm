@@ -1,0 +1,19 @@
+<html>
+<body>
+<i>Url:
+#foreach( $url in $urls ) 
+	<a href="$url">$url</a> 
+#end</i> 
+<br><br>
+#foreach( $quoteInfo in $quoteList )
+	<p>
+		&quot;$quoteInfo.getQuote()&quot;
+		<i>$quoteInfo.getTitle()</i>, $quoteInfo.getSubTitle()
+	</p>
+#end
+<br>
+-------<br>
+These quotes brought to you by Tabulaw, Inc.<br>
+<a href="http://www.makinglawyershappy.com">www.makinglawyershappy.com</a>
+</body>
+</html>

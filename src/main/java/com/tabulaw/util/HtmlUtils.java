@@ -52,12 +52,12 @@ public class HtmlUtils {
 	public static QuotePosition findQuoteInHtml(String quote, String html) throws IOException {
 		HtmlCleaner cleaner = new HtmlCleaner();
 		TagNode root = cleaner.clean(html);
-		quote = StringEscapeUtils.unescapeHtml(quote);
+		quote = StringEscapeUtils.unescapeHtml(quote).replaceAll("&apos;", "'");
 		String[] words = quote.trim().split("\\s+");
 		TagNode body = root.getElementsByName("body", true)[0];
 		
 		StringBuilder bodyText = new StringBuilder( 
-			StringEscapeUtils.unescapeHtml(body.getText().toString()));
+			StringEscapeUtils.unescapeHtml(body.getText().toString()).replaceAll("&apos;", "'"));
 		int index = 0;
 		while ((index = bodyText.indexOf("&nbsp", index)) != -1) {
 			int length = index + 5 < bodyText.length() && bodyText.charAt(index + 5) == ';' ? 6 : 5;
@@ -278,6 +278,7 @@ public class HtmlUtils {
 					levels.set(level, levels.get(level) + 1);
 					levels.set(level + 1, -1);
 					String content = ((ContentToken) child).getContent().replace("&nbsp;", " ");
+					content = StringEscapeUtils.unescapeHtml(content).replace("apos;", "'");
 					processTextElement(content, level);					
 				}
 				if (child instanceof TagNode) {

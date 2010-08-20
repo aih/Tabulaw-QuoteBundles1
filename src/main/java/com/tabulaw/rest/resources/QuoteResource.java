@@ -133,13 +133,8 @@ public class QuoteResource extends BaseResource {
 		return builder.toString();
 	}
 	
-	@POST
-	@Consumes("text/plain")
-	public Quote create(
-			@QueryParam("docRefId") String docRefId,
-			@QueryParam("quoteBundleId") String bundleId,			
-			String quoteText) {
-		if (docRefId == null || StringUtils.isEmpty(quoteText)) {
+	public List<Quote> createList(String docRefId, String bundleId,	String... quotes) {
+		if (docRefId == null || quotes == null || quotes.length == 0) {
 			throw new WebApplicationException(Status.BAD_REQUEST);
 		}
 		UserDataService service = getDataService();		
@@ -148,24 +143,6 @@ public class QuoteResource extends BaseResource {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		
-		// create serialized mark for the specified quote
-		String serializedMark = "|" + quoteText + "|";
-		DocRef docRef = service.getDoc(docRefId);
-		try {
-			// find quote in the documents html
-			DocContent content = service.getDocContent(docRefId);
-			QuotePosition position = HtmlUtils.findQuoteInHtml(quoteText, content.getHtmlContent());
-			if (position == null) {
-				throw new WebApplicationException();
-			}
-			// if it exists in the doc add position into mark
-			serializedMark += positionToMark(position.startPosition);
-			serializedMark += "|" + position.startOffset + "|";
-			serializedMark += positionToMark(position.endPosition);
-			serializedMark += "|" + position.endOffset;
-		} catch (IOException ex) {
-			throw new WebApplicationException(ex);
-		}
 		if (bundleId != null) {
 			if (! service.isBundleAvailableForUser(getUserId(), bundleId)) {
 				throw new WebApplicationException(Status.FORBIDDEN);
@@ -174,21 +151,56 @@ public class QuoteResource extends BaseResource {
 			QuoteBundle bundle = service.getOrphanedQuoteBundleForUser(getUserId());
 			bundleId = bundle.getId(); 
 		}
-		// create quote 
-		Quote quote = EntityFactory.get().buildQuote(quoteText, docRef, serializedMark);
-		quote = service.addQuoteToBundle(getUserId(), bundleId, quote);
+		DocContent content = service.getDocContent(docRefId);
 		
-		// get id of created quote and add this id into mark property of the quote
-		quote.setSerializedMark("mark_" + quote.getId() + quote.getSerializedMark());
-		// update mark property of the quote
-		service.updateQuote(quote);
-		return quote;
+		List<Quote> result = new ArrayList<Quote>(quotes.length);
+		for (String quoteText : quotes) {
+			// create serialized mark for the specified quote
+			String serializedMark = "mark_1|" + quoteText + "|";
+			DocRef docRef = service.getDoc(docRefId);
+			try {
+				// find quote in the documents html
+
+				QuotePosition position = HtmlUtils.findQuoteInHtml(quoteText, content.getHtmlContent());
+				if (position == null) {
+					throw new WebApplicationException();
+				}
+				// if it exists in the doc add position into mark
+				serializedMark += positionToMark(position.startPosition);
+				serializedMark += "|" + position.startOffset + "|";
+				serializedMark += positionToMark(position.endPosition);
+				serializedMark += "|" + position.endOffset;
+			} catch (IOException ex) {
+				throw new WebApplicationException(ex);
+			}
+			// create quote 
+			Quote quote = EntityFactory.get().buildQuote(quoteText, docRef, serializedMark);
+			result.add(quote);
+		}
+		for (int i = 0; i < result.size(); i++) {
+			Quote quote = service.addQuoteToBundle(getUserId(), bundleId, result.get(i));
+			result.set(i, quote);
+		}
+		return result;		
+	}
+	
+	@POST
+	@Consumes("text/plain")
+	public Quote create(
+			@QueryParam("docRefId") String docRefId,
+			@QueryParam("quoteBundleId") String bundleId,			
+			String quoteText) {
+		return createList(docRefId, bundleId, quoteText).get(0);
 	}
 	
 	@POST
 	@Consumes({"text/xml", "application/xml"}) 
-	public Quote createFromXml(QuoteCreationData data) {		
-		return create(data.getDocRefId(), data.getQuoteBundleId(), data.getQuoteText());
+	public List<Quote> createFromXml(QuoteCreationData data) {
+		if (data.getQuoteText() != null) {
+			return createList(data.getDocRefId(), data.getQuoteBundleId(), data.getQuoteText());
+		}
+		String[] quotes = data.getQuotes().toArray(new String[data.getQuotes().size()]);
+		return createList(data.getDocRefId(), data.getQuoteBundleId(), quotes);
 	}
 	
 	@POST
