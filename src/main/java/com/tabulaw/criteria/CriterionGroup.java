@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.NameKey;
+import com.tabulaw.model.IEntity;
+import com.tabulaw.model.NameKey;
 import com.tabulaw.model.bk.IBusinessKey;
 import com.tabulaw.util.DBType;
 import com.tabulaw.util.DateRange;

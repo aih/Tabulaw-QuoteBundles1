@@ -19,8 +19,8 @@ import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.ui.field.IFieldWidget;
 import com.tabulaw.client.validate.IValidator;
 import com.tabulaw.client.validate.ValidationException;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.schema.PropertyMetadata;
 import com.tabulaw.schema.PropertyType;
 

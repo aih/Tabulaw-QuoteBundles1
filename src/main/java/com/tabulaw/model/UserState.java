@@ -3,7 +3,7 @@
  * @author jpk
  * @since Apr 23, 2010
  */
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 import javax.validation.constraints.NotNull;
 

@@ -33,7 +33,7 @@ import com.tabulaw.client.ui.IDocHandler;
 import com.tabulaw.client.ui.IHasDocHandlers;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.Payload;
-import com.tabulaw.common.model.DocRef;
+import com.tabulaw.model.DocRef;
 import com.tabulaw.util.StringUtil;
 
 /**

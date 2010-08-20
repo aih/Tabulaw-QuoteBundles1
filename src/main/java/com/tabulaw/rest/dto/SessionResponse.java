@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.tabulaw.common.model.User;
+import com.tabulaw.model.User;
 
 @XmlRootElement(name = "session")
 public class SessionResponse implements Serializable {

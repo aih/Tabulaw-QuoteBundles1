@@ -42,11 +42,11 @@ import com.tabulaw.client.view.ShowViewRequest;
 import com.tabulaw.client.view.UnloadViewRequest;
 import com.tabulaw.client.view.ViewKey;
 import com.tabulaw.client.view.ViewManager;
-import com.tabulaw.common.model.DocKey;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.User;
+import com.tabulaw.model.DocKey;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.IEntity;
+import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.User;
 
 /**
  * The top nav row.

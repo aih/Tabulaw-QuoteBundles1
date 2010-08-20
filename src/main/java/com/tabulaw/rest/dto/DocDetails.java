@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.tabulaw.common.model.DocContent;
-import com.tabulaw.common.model.DocRef;
+import com.tabulaw.model.DocContent;
+import com.tabulaw.model.DocRef;
 
 @XmlRootElement(name = "docDetails")
 public class DocDetails implements Serializable {

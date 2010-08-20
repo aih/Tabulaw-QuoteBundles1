@@ -10,9 +10,9 @@ import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.model.IHasModel;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.util.ObjectUtil;
 
 /**

@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 
-import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.INamedEntity;
-import com.tabulaw.common.model.NameKey;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
+import com.tabulaw.model.IEntity;
+import com.tabulaw.model.INamedEntity;
+import com.tabulaw.model.NameKey;
 import com.tabulaw.model.bk.IBusinessKey;
 
 /**

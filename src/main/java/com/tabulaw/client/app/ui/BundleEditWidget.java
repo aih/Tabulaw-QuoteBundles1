@@ -23,8 +23,8 @@ import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
 
 /**
  * Supports editing capabilty for a quote bundle.

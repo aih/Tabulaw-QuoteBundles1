@@ -17,8 +17,8 @@ import org.testng.annotations.Test;
 
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.common.model.CaseRef;
-import com.tabulaw.common.model.DocRef;
+import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.DocRef;
 import com.tabulaw.service.DocUtils;
 import com.tabulaw.util.ClassUtil;
 

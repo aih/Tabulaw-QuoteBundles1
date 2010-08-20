@@ -43,6 +43,10 @@
     <include name="PropertyType.java" />
   </source>
   
+  <source path="model">
+  	<include name="*.java" />
+  </source>
+  
   <source path="criteria">
     <include name="CriteriaType.java" />
   </source>

@@ -6,7 +6,7 @@
 package com.tabulaw.client.app.ui.view;
 
 import com.tabulaw.client.view.AbstractDynamicViewInitializer;
-import com.tabulaw.common.model.DocKey;
+import com.tabulaw.model.DocKey;
 
 /**
  * DocViewInitializer

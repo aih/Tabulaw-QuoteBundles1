@@ -13,9 +13,9 @@ import com.tabulaw.client.view.IViewInitializer;
 import com.tabulaw.client.view.UnloadViewRequest;
 import com.tabulaw.client.view.ViewKey;
 import com.tabulaw.client.view.ViewManager;
-import com.tabulaw.common.model.DocKey;
-import com.tabulaw.common.model.IModelKeyProvider;
-import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.model.DocKey;
+import com.tabulaw.model.IModelKeyProvider;
+import com.tabulaw.model.ModelKey;
 
 /**
  * Routes to an open document when clicked.

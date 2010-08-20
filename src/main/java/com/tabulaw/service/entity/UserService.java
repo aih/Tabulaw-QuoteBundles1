@@ -15,14 +15,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
-import com.tabulaw.common.model.IUserRef;
-import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.User.Role;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
+import com.tabulaw.model.IUserRef;
+import com.tabulaw.model.User;
+import com.tabulaw.model.User.Role;
 import com.tabulaw.util.CryptoUtil;
 import com.tabulaw.util.StringUtil;
 

@@ -11,9 +11,9 @@ import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.UserState;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.UserState;
 
 /**
  * @author jpk

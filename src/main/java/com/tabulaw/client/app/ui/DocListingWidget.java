@@ -39,12 +39,12 @@ import com.tabulaw.client.view.ShowViewRequest;
 import com.tabulaw.client.view.ViewManager;
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.rpc.DocListingPayload;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.User;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.listhandler.InMemoryListHandler;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.User;
 
 /**
  * Lists documents for a given user.

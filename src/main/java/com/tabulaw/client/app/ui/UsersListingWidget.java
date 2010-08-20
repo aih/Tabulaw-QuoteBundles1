@@ -27,10 +27,10 @@ import com.tabulaw.client.ui.listing.ModelListingWidget;
 import com.tabulaw.client.util.Fmt;
 import com.tabulaw.client.util.GlobalFormat;
 import com.tabulaw.common.data.rpc.UserListPayload;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.User;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.listhandler.InMemoryListHandler;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.User;
 
 /**
  * Lists user entities that fires

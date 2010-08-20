@@ -4,7 +4,7 @@
  * @author jpk
  * @since Apr 10, 2010
  */
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

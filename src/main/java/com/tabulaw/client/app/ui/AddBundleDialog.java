@@ -17,9 +17,9 @@ import com.tabulaw.client.ui.edit.IEditHandler;
 import com.tabulaw.client.ui.edit.EditEvent.EditOp;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
-import com.tabulaw.common.model.EntityFactory;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.model.EntityFactory;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.QuoteBundle;
 
 /**
  * Dialog for handling quote bundles to the app.

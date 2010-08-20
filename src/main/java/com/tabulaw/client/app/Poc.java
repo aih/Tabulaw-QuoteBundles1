@@ -41,9 +41,9 @@ import com.tabulaw.common.data.rpc.IUserCredentialsServiceAsync;
 import com.tabulaw.common.data.rpc.IUserDataService;
 import com.tabulaw.common.data.rpc.IUserDataServiceAsync;
 import com.tabulaw.common.data.rpc.UserContextPayload;
-import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.UserState;
+import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.User;
+import com.tabulaw.model.UserState;
 
 /**
  * Poc

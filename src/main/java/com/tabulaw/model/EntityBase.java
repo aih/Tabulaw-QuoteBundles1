@@ -1,4 +1,4 @@
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 import javax.xml.bind.annotation.XmlTransient;
 

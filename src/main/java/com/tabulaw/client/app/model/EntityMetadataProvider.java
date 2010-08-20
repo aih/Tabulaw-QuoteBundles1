@@ -8,7 +8,7 @@ package com.tabulaw.client.app.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.tabulaw.common.model.EntityType;
+import com.tabulaw.model.EntityType;
 import com.tabulaw.schema.PropertyMetadata;
 import com.tabulaw.schema.PropertyType;
 /**

@@ -23,11 +23,11 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.tabulaw.common.model.DocContent;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.model.DocContent;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityFactory;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.rest.AuthorizationRequired;
 import com.tabulaw.rest.dto.QuoteCreationData;
 import com.tabulaw.service.entity.UserDataService;

@@ -19,10 +19,10 @@ import java.util.Date;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.tabulaw.common.model.CaseRef;
-import com.tabulaw.common.model.DocContent;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
+import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.DocContent;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityFactory;
 import com.tabulaw.util.IOUtils;
 
 /**

@@ -16,12 +16,12 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import com.tabulaw.common.model.CaseRef;
-import com.tabulaw.common.model.DocContent;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.DocContent;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityFactory;
 import com.tabulaw.rest.AuthorizationRequired;
 import com.tabulaw.rest.dto.DocDetails;
 import com.tabulaw.server.UserContext;

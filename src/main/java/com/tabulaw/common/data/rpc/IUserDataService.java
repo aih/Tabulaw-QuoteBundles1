@@ -9,10 +9,10 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.UserState;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.UserState;
 
 /**
  * Contract to persisting user related data to/from client.

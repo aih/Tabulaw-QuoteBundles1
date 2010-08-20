@@ -5,7 +5,7 @@
  */
 package com.tabulaw.schema;
 
-import com.tabulaw.common.model.IEntity;
+import com.tabulaw.model.IEntity;
 
 /**
  * IEntity's metadata definition.

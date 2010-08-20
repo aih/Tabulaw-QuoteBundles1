@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.model.QuoteBundle;
 
 @XmlRootElement(name = "quoteBundle")
 public class QuoteBundleWithDocRefs extends QuoteBundle {

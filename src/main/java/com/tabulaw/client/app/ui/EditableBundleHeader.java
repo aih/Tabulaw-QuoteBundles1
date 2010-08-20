@@ -11,7 +11,7 @@ import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.BundleEditWidget.Styles;
 import com.tabulaw.client.convert.IConverter;
 import com.tabulaw.client.ui.edit.EditableTextWidget;
-import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.model.QuoteBundle;
 
 /**
  * Bundle header widget with editable name/desc fields.

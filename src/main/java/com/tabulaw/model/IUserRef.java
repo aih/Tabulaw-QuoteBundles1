@@ -1,4 +1,4 @@
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 /**
  * UserRef - Simple def to hold needed user data for resetting the password.

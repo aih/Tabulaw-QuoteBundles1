@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.velocity.app.VelocityEngine;
 
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.QuoteInfo;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.QuoteInfo;
 import com.tabulaw.util.VelocityUtil;
 
 public class QuoteBundleDownloadServlet extends AbstractDownloadServlet {

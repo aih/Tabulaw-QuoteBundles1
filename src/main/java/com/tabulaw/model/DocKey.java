@@ -3,7 +3,7 @@
  * @author jpk
  * @since May 16, 2010
  */
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 public class DocKey extends ModelKey {
 	private static final long serialVersionUID = -6924690054100145683L;

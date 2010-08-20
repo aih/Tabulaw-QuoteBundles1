@@ -6,8 +6,8 @@ package com.tabulaw.client.model;
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.model.IEntity;
+import com.tabulaw.model.ModelKey;
 
 /**
  * Used to dissemminate <em>successful</em> model changes.

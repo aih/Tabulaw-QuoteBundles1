@@ -13,7 +13,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.tabulaw.common.model.User;
+import com.tabulaw.model.User;
 import com.tabulaw.service.convert.DataConverterDelegate;
 import com.tabulaw.util.StringUtil;
 

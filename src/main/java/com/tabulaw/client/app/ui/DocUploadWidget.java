@@ -32,9 +32,9 @@ import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.RpcUiHandler;
 import com.tabulaw.client.util.Fmt;
 import com.tabulaw.client.util.GlobalFormat;
-import com.tabulaw.common.model.DocRef;
 import com.tabulaw.common.msg.Msg;
 import com.tabulaw.common.msg.Msg.MsgLevel;
+import com.tabulaw.model.DocRef;
 import com.tabulaw.util.StringUtil;
 
 /**

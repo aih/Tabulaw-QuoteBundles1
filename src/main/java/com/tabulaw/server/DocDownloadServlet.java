@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.tabulaw.common.model.DocContent;
+import com.tabulaw.model.DocContent;
 import com.tabulaw.util.StringUtil;
 
 /**

@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 14, 2010
  */
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 import com.tabulaw.IMarshalable;
 import com.tabulaw.ITypeDescriptorProvider;
@@ -11,8 +11,8 @@ import com.tabulaw.ITypeDescriptorProvider;
 /**
  * The defined entity types in the app expressed as an enum.
  * <p>
- * <b>IMPT: </b>The corres. cannonical (stirng-wise) entity type is the enum's
- * desc() value.
+ * <b>IMPT: </b>The cannonical entity type token is the
+ * <code>EntityType.name()</code>. This name is used client-side.
  * @author jpk
  */
 public enum EntityType implements IMarshalable, ITypeDescriptorProvider {

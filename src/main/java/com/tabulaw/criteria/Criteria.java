@@ -1,6 +1,6 @@
 package com.tabulaw.criteria;
 
-import com.tabulaw.common.model.IEntity;
+import com.tabulaw.model.IEntity;
 
 /**
  * Criteria - Holds fairly versatile criterion for querying entity data through

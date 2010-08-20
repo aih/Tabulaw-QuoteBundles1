@@ -1,4 +1,4 @@
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 import com.tabulaw.IDescriptorProvider;
 

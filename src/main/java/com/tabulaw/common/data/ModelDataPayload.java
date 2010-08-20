@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.tabulaw.common.model.IEntity;
+import com.tabulaw.model.IEntity;
 
 /**
  * Construct to hold model data based on what is requested in model related

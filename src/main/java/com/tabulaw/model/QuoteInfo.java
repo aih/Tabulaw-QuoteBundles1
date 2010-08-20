@@ -1,6 +1,6 @@
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
-import com.tabulaw.common.model.CaseRef.CitationFormatFlag;
+import com.tabulaw.model.CaseRef.CitationFormatFlag;
 import com.tabulaw.util.StringUtil;
 
 public class QuoteInfo {

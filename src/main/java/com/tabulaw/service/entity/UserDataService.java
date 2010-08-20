@@ -17,14 +17,6 @@ import javax.validation.ValidatorFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
-import com.tabulaw.common.model.BundleUserBinding;
-import com.tabulaw.common.model.DocContent;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.DocUserBinding;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.QuoteUserBinding;
-import com.tabulaw.common.model.UserState;
 import com.tabulaw.criteria.Comparator;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
@@ -33,6 +25,14 @@ import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
 import com.tabulaw.dao.NonUniqueResultException;
 import com.tabulaw.dao.Sorting;
+import com.tabulaw.model.BundleUserBinding;
+import com.tabulaw.model.DocContent;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.DocUserBinding;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.QuoteUserBinding;
+import com.tabulaw.model.UserState;
 
 /**
  * Manages the persistence of user related data that is not part of the user

@@ -18,9 +18,9 @@ import java.util.Date;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.tabulaw.common.model.CaseRef;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
+import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityFactory;
 
 /**
  * Tests {@link DocUtils} methods.

@@ -11,8 +11,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.tabulaw.common.model.User;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.model.User;
 import com.tabulaw.rest.dto.SessionResponse;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.entity.UserService;

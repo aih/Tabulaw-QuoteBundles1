@@ -1,7 +1,7 @@
 /*
  * Created on Jan 1, 2005
  */
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 import java.util.ArrayList;
 import java.util.Collection;

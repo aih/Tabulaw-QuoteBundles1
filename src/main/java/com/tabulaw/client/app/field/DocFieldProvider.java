@@ -13,7 +13,7 @@ import com.tabulaw.client.ui.field.DateField;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.ui.field.TextAreaField;
 import com.tabulaw.client.ui.field.TextField;
-import com.tabulaw.common.model.EntityType;
+import com.tabulaw.model.EntityType;
 import com.tabulaw.schema.PropertyMetadata;
 
 /**

@@ -9,7 +9,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
-import com.tabulaw.common.model.User;
+import com.tabulaw.model.User;
 
 /**
  * @author jpk

@@ -18,8 +18,8 @@ import com.tabulaw.client.view.UnloadViewRequest;
 import com.tabulaw.client.view.ViewClass;
 import com.tabulaw.client.view.ViewManager;
 import com.tabulaw.client.view.ViewOptions;
-import com.tabulaw.common.model.DocKey;
-import com.tabulaw.common.model.DocRef;
+import com.tabulaw.model.DocKey;
+import com.tabulaw.model.DocRef;
 
 /**
  * Displays a single document allowing quote/bundle editing.

@@ -129,6 +129,8 @@
 					<include>**/schema/PropertyMetadata.java</include>
 					<include>**/schema/PropertyType.java</include>
 
+					<include>com/tabulaw/model/*.java</include>
+	
 					<include>**/criteria/CriteriaType.java</include>
 
 					<include>**/dao/PersistenceException.java</include>

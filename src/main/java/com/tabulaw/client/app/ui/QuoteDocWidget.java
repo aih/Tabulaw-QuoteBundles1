@@ -5,7 +5,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Image;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.QuoteEvent.QuoteType;
-import com.tabulaw.common.model.Quote;
+import com.tabulaw.model.Quote;
 
 /**
  * Quote widgtet that is <code>Mark</code> aware.

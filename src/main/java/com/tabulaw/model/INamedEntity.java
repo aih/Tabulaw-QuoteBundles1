@@ -1,4 +1,4 @@
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 /**
  * Interface for entities that have names.

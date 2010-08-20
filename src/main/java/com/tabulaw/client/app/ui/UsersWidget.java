@@ -20,8 +20,8 @@ import com.tabulaw.client.ui.edit.EditEvent;
 import com.tabulaw.client.ui.edit.IEditHandler;
 import com.tabulaw.common.data.ModelPayload;
 import com.tabulaw.common.data.Payload;
-import com.tabulaw.common.model.ModelKey;
-import com.tabulaw.common.model.User;
+import com.tabulaw.model.ModelKey;
+import com.tabulaw.model.User;
 
 /**
  * Shows a listing of all registered users in the system and a edit section for

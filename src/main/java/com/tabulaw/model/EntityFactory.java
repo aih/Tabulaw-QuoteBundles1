@@ -3,7 +3,7 @@
  * @author jpk
  * @since Feb 13, 2010
  */
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 import java.util.Date;
 

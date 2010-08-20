@@ -27,9 +27,9 @@ import com.tabulaw.client.model.IHasModel;
 import com.tabulaw.client.ui.toolbar.Toolbar;
 import com.tabulaw.client.view.ShowViewRequest;
 import com.tabulaw.client.view.ViewManager;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteInfo;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteInfo;
 
 /**
  * Base class for widgets displaying quotes.

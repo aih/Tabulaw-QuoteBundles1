@@ -3,7 +3,7 @@
  * @author jpk
  * @since Apr 10, 2010
  */
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 import javax.validation.constraints.NotNull;
 
@@ -11,35 +11,34 @@ import com.tabulaw.model.bk.BusinessKeyDef;
 import com.tabulaw.model.bk.BusinessObject;
 
 /**
- * Associates a {@link Quote} to a {@link User}.
+ * Associates a {@link DocRef} to a {@link User}.
  * <p>
  * NOTE: No primary surrogate key is needed here.
  * @author jpk
  */
-@BusinessObject(businessKeys = @BusinessKeyDef(name = "Quote User Binding", properties = {
-	"quoteId", "userId"
+@BusinessObject(businessKeys = @BusinessKeyDef(name = "Document User Binding", properties = {
+	"docId", "userId"
 }))
-public class QuoteUserBinding extends EntityBase {
-
-	private static final long serialVersionUID = -1625084909880633134L;
-
-	private String quoteId, userId;
+public class DocUserBinding extends EntityBase {
+	private static final long serialVersionUID = -4833982902489953899L;
+	
+	private String docId, userId;
 
 	/**
 	 * Constructor
 	 */
-	public QuoteUserBinding() {
+	public DocUserBinding() {
 		super();
 	}
 
 	/**
 	 * Constructor
-	 * @param quoteId
+	 * @param docId
 	 * @param userId
 	 */
-	public QuoteUserBinding(String quoteId, String userId) {
+	public DocUserBinding(String docId, String userId) {
 		super();
-		this.quoteId = quoteId;
+		this.docId = docId;
 		this.userId = userId;
 	}
 
@@ -55,12 +54,12 @@ public class QuoteUserBinding extends EntityBase {
 
 	@Override
 	public String getEntityType() {
-		return EntityType.QUOTE_USER_BINDING.name();
+		return EntityType.DOC_USER_BINDING.name();
 	}
 
 	@Override
 	public String getId() {
-		return quoteId + '|' + userId;
+		return docId + '|' + userId;
 	}
 
 	@Override
@@ -69,13 +68,13 @@ public class QuoteUserBinding extends EntityBase {
 	}
 
 	@NotNull
-	public String getQuoteId() {
-		return quoteId;
+	public String getDocId() {
+		return docId;
 	}
 
-	public void setQuoteId(String quoteId) {
-		if(quoteId == null) throw new NullPointerException();
-		this.quoteId = quoteId;
+	public void setDocId(String docId) {
+		if(docId == null) throw new NullPointerException();
+		this.docId = docId;
 	}
 
 	@NotNull

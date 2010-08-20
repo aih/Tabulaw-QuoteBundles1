@@ -7,8 +7,8 @@ package com.tabulaw.client.ui.listing;
 
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
-import com.tabulaw.common.model.IModelKeyProvider;
-import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.model.IModelKeyProvider;
+import com.tabulaw.model.ModelKey;
 
 /**
  * ModelListingWidget - Listing Widget dedicated to handling Model type data.

@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.tabulaw.common.model.DocContent;
+import com.tabulaw.model.DocContent;
 
 /**
  * DocViewServlet

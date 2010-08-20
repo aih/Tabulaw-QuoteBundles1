@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.model;
 
-import com.tabulaw.common.model.IEntity;
+import com.tabulaw.model.IEntity;
 
 /**
  * Indicates the ability to get/set an entity of a particular type.

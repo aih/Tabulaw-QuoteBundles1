@@ -18,16 +18,16 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
-import com.tabulaw.common.model.CaseRef;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.ModelKey;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.UserState;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.IEntity;
+import com.tabulaw.model.ModelKey;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.User;
+import com.tabulaw.model.UserState;
 
 /**
  * @author jpk

@@ -10,9 +10,9 @@ import java.util.Map;
 
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
-import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.UserState;
+import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.User;
+import com.tabulaw.model.UserState;
 
 /**
  * AdminContextPayload - Payload for initializing the client-side admin context.

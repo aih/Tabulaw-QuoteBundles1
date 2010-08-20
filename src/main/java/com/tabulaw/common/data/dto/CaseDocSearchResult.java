@@ -8,8 +8,8 @@ package com.tabulaw.common.data.dto;
 import java.util.Date;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.tabulaw.common.model.IModelKeyProvider;
-import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.model.IModelKeyProvider;
+import com.tabulaw.model.ModelKey;
 
 /**
  * @author jpk

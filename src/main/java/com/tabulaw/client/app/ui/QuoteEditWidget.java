@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.app.ui;
 
-import com.tabulaw.common.model.Quote;
+import com.tabulaw.model.Quote;
 
 /**
  * Widget holding quote data for editing eligible for drag and drop ops.

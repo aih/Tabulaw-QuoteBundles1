@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.springframework.ui.Model;
 
-import com.tabulaw.common.model.IModelKeyProvider;
-import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.model.IModelKeyProvider;
+import com.tabulaw.model.ModelKey;
 
 /**
  * A table whose rows are {@link Model}s and, consequently, identifiable by a

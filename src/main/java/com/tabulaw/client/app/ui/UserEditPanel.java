@@ -23,8 +23,8 @@ import com.tabulaw.client.ui.field.CellFieldComposer;
 import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.ui.field.IFieldWidget;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
-import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.User.Role;
+import com.tabulaw.model.User;
+import com.tabulaw.model.User.Role;
 
 /**
  * @author jpk

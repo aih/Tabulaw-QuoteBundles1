@@ -5,19 +5,6 @@
  */
 package com.tabulaw.model;
 
-import com.tabulaw.common.model.BundleUserBinding;
-import com.tabulaw.common.model.CaseRef;
-import com.tabulaw.common.model.DocContent;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.DocUserBinding;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.QuoteUserBinding;
-import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.UserState;
-
 /**
  * @author jpk
  */
@@ -88,7 +75,7 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 		else if(clz == QuoteBundle.class) {
 			return EntityType.QUOTE_BUNDLE.name();
 		}
-		
+
 		throw new IllegalArgumentException("Un-handled entity class: " + clz);
 	}
 

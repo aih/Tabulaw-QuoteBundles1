@@ -18,9 +18,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.tabulaw.common.model.User;
 import com.tabulaw.config.Config;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.model.User;
 import com.tabulaw.rest.RESTServletRequest;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;

@@ -5,7 +5,6 @@
  */
 package com.tabulaw.model;
 
-import com.tabulaw.common.model.IEntity;
 
 /**
  * IEntityTypeResolver

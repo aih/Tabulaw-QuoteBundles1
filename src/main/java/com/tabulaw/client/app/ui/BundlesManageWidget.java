@@ -28,11 +28,11 @@ import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.LoggingDragHandler;
 import com.tabulaw.client.ui.Notifier;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.ModelKey;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.IEntity;
+import com.tabulaw.model.ModelKey;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
 
 /**
  * Manages the editing of quote bundles via drag and drop.

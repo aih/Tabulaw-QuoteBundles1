@@ -3,7 +3,7 @@
  * @author jpk
  * @since Mar 14, 2009
  */
-package com.tabulaw.common.model;
+package com.tabulaw.model;
 
 import java.io.Serializable;
 

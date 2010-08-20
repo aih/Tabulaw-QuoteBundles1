@@ -30,12 +30,12 @@ import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.DocEvent;
 import com.tabulaw.client.ui.IDocHandler;
 import com.tabulaw.client.ui.LoggingDragHandler;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityFactory;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.IEntity;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
 
 /**
  * Displays a document on the left and quote bundle on the right separated by a

@@ -18,9 +18,9 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.testng.annotations.Test;
 
-import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.INamedEntity;
-import com.tabulaw.common.model.TimeStampEntity;
+import com.tabulaw.model.IEntity;
+import com.tabulaw.model.INamedEntity;
+import com.tabulaw.model.TimeStampEntity;
 
 /**
  * AbstractValidatorTest

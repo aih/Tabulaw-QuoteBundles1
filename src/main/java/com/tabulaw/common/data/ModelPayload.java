@@ -5,8 +5,8 @@
  */
 package com.tabulaw.common.data;
 
-import com.tabulaw.common.model.IEntity;
-import com.tabulaw.common.model.ModelKey;
+import com.tabulaw.model.IEntity;
+import com.tabulaw.model.ModelKey;
 
 /**
  * Generic model data transport.

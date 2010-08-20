@@ -9,9 +9,9 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import com.tabulaw.common.data.Payload;
-import com.tabulaw.common.model.IEntity;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
+import com.tabulaw.model.IEntity;
 import com.tabulaw.schema.ISchemaInfo;
 import com.tabulaw.schema.ISchemaProperty;
 import com.tabulaw.server.PersistContext;

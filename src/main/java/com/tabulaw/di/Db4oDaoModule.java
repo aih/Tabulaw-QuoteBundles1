@@ -27,19 +27,19 @@ import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
-import com.tabulaw.common.model.BundleUserBinding;
-import com.tabulaw.common.model.CaseRef;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.DocUserBinding;
-import com.tabulaw.common.model.Quote;
-import com.tabulaw.common.model.QuoteBundle;
-import com.tabulaw.common.model.QuoteUserBinding;
-import com.tabulaw.common.model.User;
-import com.tabulaw.common.model.UserState;
 import com.tabulaw.config.Config;
 import com.tabulaw.config.IConfigAware;
 import com.tabulaw.config.IConfigKey;
 import com.tabulaw.dao.IEntityDao;
+import com.tabulaw.model.BundleUserBinding;
+import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.DocUserBinding;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.QuoteUserBinding;
+import com.tabulaw.model.User;
+import com.tabulaw.model.UserState;
 
 /**
  * Db4oDaoModule

@@ -5,8 +5,8 @@
  */
 package com.tabulaw.service.entity;
 
-import com.tabulaw.common.model.IUserRef;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.model.IUserRef;
 
 /**
  * IForgotPasswordService - Contract for resetting and providing a user's

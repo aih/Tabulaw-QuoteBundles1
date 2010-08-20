@@ -7,7 +7,7 @@ package com.tabulaw.common.data.rpc;
 
 import com.tabulaw.common.data.Payload;
 import com.tabulaw.common.data.Status;
-import com.tabulaw.common.model.DocRef;
+import com.tabulaw.model.DocRef;
 
 /**
  * Transport for a single doc.

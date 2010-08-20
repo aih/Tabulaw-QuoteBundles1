@@ -24,10 +24,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.tabulaw.common.model.DocContent;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
-import com.tabulaw.common.model.User;
+import com.tabulaw.model.DocContent;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityFactory;
+import com.tabulaw.model.User;
 import com.tabulaw.service.DocUtils;
 import com.tabulaw.service.convert.DataConverterDelegate;
 import com.tabulaw.service.entity.UserDataService;

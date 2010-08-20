@@ -19,8 +19,8 @@ import com.tabulaw.client.ui.field.RadioGroupField;
 import com.tabulaw.client.ui.field.TextField;
 import com.tabulaw.client.validate.IValidator;
 import com.tabulaw.client.validate.ValidationException;
-import com.tabulaw.common.model.EntityType;
-import com.tabulaw.common.model.User.Role;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.User.Role;
 import com.tabulaw.schema.PropertyMetadata;
 import com.tabulaw.util.StringUtil;
 

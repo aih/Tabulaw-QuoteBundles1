@@ -22,8 +22,8 @@ import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.view.ShowViewRequest;
 import com.tabulaw.client.view.ViewManager;
 import com.tabulaw.common.data.rpc.DocPayload;
-import com.tabulaw.common.model.DocRef;
-import com.tabulaw.common.model.EntityFactory;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityFactory;
 
 /**
  * Dialog for adding docs.
