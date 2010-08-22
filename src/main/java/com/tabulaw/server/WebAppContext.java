@@ -12,6 +12,7 @@ import org.apache.velocity.app.VelocityEngine;
 
 import com.google.inject.Inject;
 import com.tabulaw.mail.EmailDispatcher;
+import com.tabulaw.server.rpc.IExceptionHandler;
 
 /**
  * Servlet/web level context providing resources used at this the servlet
@@ -34,19 +35,24 @@ public final class WebAppContext implements Serializable {
 	public static final String KEY = Long.toString(serialVersionUID);
 
 	private final EmailDispatcher emailDispatcher;
-	
+
 	private final VelocityEngine velocityEngine;
+
+	private final IExceptionHandler exceptionHandler;
 
 	/**
 	 * Constructor
 	 * @param emailDispatcher
 	 * @param velocityEngine
+	 * @param exceptionHandler
 	 */
 	@Inject
-	public WebAppContext(EmailDispatcher emailDispatcher, VelocityEngine velocityEngine) {
+	public WebAppContext(EmailDispatcher emailDispatcher, VelocityEngine velocityEngine,
+			IExceptionHandler exceptionHandler) {
 		super();
 		this.emailDispatcher = emailDispatcher;
 		this.velocityEngine = velocityEngine;
+		this.exceptionHandler = exceptionHandler;
 	}
 
 	public EmailDispatcher getEmailDispatcher() {
@@ -55,5 +61,9 @@ public final class WebAppContext implements Serializable {
 
 	public VelocityEngine getVelocityEngine() {
 		return velocityEngine;
+	}
+
+	public IExceptionHandler getExceptionHandler() {
+		return exceptionHandler;
 	}
 }

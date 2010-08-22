@@ -63,6 +63,16 @@ public abstract class RpcServlet extends RemoteServiceServlet {
 	}
 
 	/**
+	 * Handles the given exception by handing it off the the
+	 * {@link IExceptionHandler} held in the given {@link WebAppContext}.
+	 * @param webAppContext
+	 * @param t the exception
+	 */
+	public static final void handleException(WebAppContext webAppContext, Throwable t) {
+		webAppContext.getExceptionHandler().handleException(t);
+	}
+
+	/**
 	 * @return The request context for the current request.
 	 */
 	protected final RequestContext getRequestContext() {
@@ -88,5 +98,14 @@ public abstract class RpcServlet extends RemoteServiceServlet {
 	 */
 	protected final PersistContext getPersistContext() {
 		return (PersistContext) getRequestContext().getServletContext().getAttribute(PersistContext.KEY);
+	}
+
+	/**
+	 * Delegates to {@link #handleException(WebAppContext, Throwable)} by
+	 * extracting the web app context.
+	 * @param t the exception
+	 */
+	protected final void handleException(Throwable t) {
+		handleException(getWebAppContext(), t);
 	}
 }

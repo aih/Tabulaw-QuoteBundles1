@@ -36,6 +36,7 @@ public class WebAppContextBootstrapper implements IBootstrapHandler {
 		EmailDispatcher emailDispatcher = injector.getInstance(EmailDispatcher.class);
 		edt = new Thread(emailDispatcher, "Email Dispatcher");
 		edt.start();
+
 		log.info("Web app context bootstrapped");
 	}
 

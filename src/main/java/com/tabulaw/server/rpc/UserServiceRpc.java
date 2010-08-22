@@ -86,7 +86,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -139,7 +139,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			persistContext.getExceptionHandler().handleException(e);
+			handleException(webContext, e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -182,7 +182,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -215,7 +215,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -239,11 +239,11 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final ChangeUserCredentialsFailedException e) {
 			exceptionToStatus(e, status);
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -270,7 +270,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -288,7 +288,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			svc.saveUserState(userState);
 		}
 		catch(final Exception e) {
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			if(e instanceof RuntimeException) throw (RuntimeException) e;
 			throw new RuntimeException(e);
 		}
@@ -335,7 +335,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -362,7 +362,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -389,7 +389,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -416,7 +416,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -443,7 +443,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -486,15 +486,15 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			}
 			catch(final EntityNotFoundException nfe) {
 				exceptionToStatus(nfe, status);
-				pc.getExceptionHandler().handleException(nfe);
+				handleException(wc, nfe);
 			}
 			catch(final ChangeUserCredentialsFailedException e) {
 				exceptionToStatus(e, status);
-				pc.getExceptionHandler().handleException(e);
+				handleException(wc, e);
 			}
 			catch(final MailSendException mse) {
 				exceptionToStatus(mse, status);
-				pc.getExceptionHandler().handleException(mse);
+				handleException(wc, mse);
 			}
 		}
 
@@ -553,7 +553,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -584,7 +584,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -611,7 +611,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -638,7 +638,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -665,7 +665,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -696,7 +696,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -726,7 +726,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			context.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -774,7 +774,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -806,7 +806,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -836,7 +836,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -887,7 +887,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {

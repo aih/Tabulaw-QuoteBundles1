@@ -32,7 +32,6 @@ public final class PersistContext implements Serializable {
 	public static final String KEY = Long.toString(serialVersionUID);
 
 	private final ISchemaInfo schemaInfo;
-	private final IExceptionHandler exceptionHandler;
 	private final CacheManager cacheManager;
 
 	private final UserService userService;
@@ -47,12 +46,10 @@ public final class PersistContext implements Serializable {
 	 * @param userDataService
 	 */
 	@Inject
-	public PersistContext(ISchemaInfo schemaInfo, 
-			IExceptionHandler exceptionHandler, CacheManager cacheManager, UserService userService,
-			UserDataService userDataService) {
+	public PersistContext(ISchemaInfo schemaInfo, IExceptionHandler exceptionHandler, CacheManager cacheManager,
+			UserService userService, UserDataService userDataService) {
 		super();
 		this.schemaInfo = schemaInfo;
-		this.exceptionHandler = exceptionHandler;
 		this.cacheManager = cacheManager;
 
 		this.userService = userService;
@@ -61,10 +58,6 @@ public final class PersistContext implements Serializable {
 
 	public ISchemaInfo getSchemaInfo() {
 		return schemaInfo;
-	}
-
-	public IExceptionHandler getExceptionHandler() {
-		return exceptionHandler;
 	}
 
 	public CacheManager getCacheManager() {

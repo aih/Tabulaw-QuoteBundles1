@@ -78,6 +78,7 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 				RpcServlet.addError(emsg, status);
 			}
 			else {
+				handleException(e);
 				RpcServlet.exceptionToStatus(e, status);
 			}
 		}
@@ -118,6 +119,7 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 				return payload;
 			}
 			catch(IOException ex) {
+				handleException(e);
 				RpcServlet.exceptionToStatus(ex, status);
 				return payload;
 			}
