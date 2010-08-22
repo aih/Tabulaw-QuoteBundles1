@@ -94,7 +94,7 @@ public class DocUploadWidget extends Composite implements HasValueChangeHandlers
 				form.submit();
 			}
 		});
-		submit.setStyleName(Styles.SUBMIT);
+		submit.addStyleName(Styles.SUBMIT);
 
 		cancel = new Button("Cancel", new ClickHandler() {
 
@@ -103,7 +103,7 @@ public class DocUploadWidget extends Composite implements HasValueChangeHandlers
 				cancelHandler.onClick(event);
 			}
 		});
-		cancel.setStyleName(Styles.CANCEL);
+		cancel.addStyleName(Styles.CANCEL);
 
 		uploads = new FileUpload[numUploadSlots];
 		for(int i = 0; i < numUploadSlots; i++) {

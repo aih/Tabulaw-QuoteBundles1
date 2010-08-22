@@ -53,35 +53,36 @@ import com.tabulaw.util.StringUtil;
  */
 public class DocViewer extends Composite implements IHasDocHandlers, HasValueChangeHandlers<DocViewer.ViewMode> {
 
-        public static final String DOCX_MIME_TYPE="application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        public static final String RTF_MIME_TYPE="text/rtf";
+	public static final String DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+	public static final String RTF_MIME_TYPE = "text/rtf";
 
-        public static enum ViewMode {
+	public static enum ViewMode {
 		EDIT,
 		STATIC;
 	}
-	
+
 	private static class DownloadDocCommand implements Command {
+
 		private String mimeType;
 		private String id;
 
-		public  DownloadDocCommand(String mimeType) {
+		public DownloadDocCommand(String mimeType) {
 			this.mimeType = mimeType;
 		}
-		public void setId (String id) {
-			this.id=id;
+
+		public void setId(String id) {
+			this.id = id;
 		}
 
 		@Override
 		public void execute() {
-			setLocation("docdownload?mimeType=" + mimeType + "&docId="+id );
+			setLocation("docdownload?mimeType=" + mimeType + "&docId=" + id);
 		}
 
 		private final native void setLocation(String url) /*-{
 			$wnd.location.href = url;
 		}-*/;
 	}
-	
 
 	static class DocViewHeader extends Composite {
 
@@ -99,20 +100,19 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 			imgEdit.setStyleName("imgEdit");
 			imgEdit.setTitle("Edit document");
-			
+
 			MenuBar downloadMenuTop = new MenuBar();
-			
+
 			MenuBar downloadMenu = new MenuBar(true);
 
-			downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>",true,downloadMenu);
+			downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>", true, downloadMenu);
 			downloadMenuTop.setStyleName("docHeaderMenuItem");
-			
+
 			MenuItem fireRtf = new MenuItem("rtf format", rtfDownloadCommand);
-			MenuItem fireDocx = new MenuItem("docx format",docxDownloadCommand);
-			
+			MenuItem fireDocx = new MenuItem("docx format", docxDownloadCommand);
+
 			downloadMenu.addItem(fireRtf);
 			downloadMenu.addItem(fireDocx);
-			
 
 			html.setStyleName("docHeaderLabel");
 			pnl.add(html);
@@ -121,7 +121,6 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 			initWidget(pnl);
 		}
-		
 
 		public void insert(Widget w, int beforeIndex) {
 			pnl.insert(w, 0);
@@ -413,11 +412,11 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			frame.setUrl(furl);
 			Log.debug("DocViewer iframe url set to: " + furl);
 		}
-		if (doc!=null) {
+		if(doc != null) {
 			header.rtfDownloadCommand.setId(doc.getId());
 			header.docxDownloadCommand.setId(doc.getId());
 		}
-		
+
 	}
 
 	public native String getDocHtml() /*-{
@@ -446,8 +445,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 	public Widget[] getNavColWidgets() {
 		return isEditMode() ? new Widget[] {
-			btnSave, btnCancel
-		} : null;
+			btnSave, btnCancel } : null;
 	}
 
 	@Override

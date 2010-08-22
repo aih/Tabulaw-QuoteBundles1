@@ -95,6 +95,7 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 
 		panel.add(docSearch);
 		panel.add(docListingHeader);
+		docListing.setVisible(false); // initially hide
 		panel.add(docListing);
 
 		initWidget(panel);

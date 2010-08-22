@@ -49,7 +49,17 @@ public class DocUtils {
 		jsScriptCallbackBlock =
 				"<script type=\"text/javascript\">window.onload=function(){window.parent.${onDocFrameLoaded}(document);}</script>";
 
-		cssHighightStylesBlock = "<style type=\"text/css\">.highlight{background-color:yellow;}</style>";
+		cssHighightStylesBlock = 
+			"<style type=\"text/css\">" +
+				".highlight{background-color:yellow;} " +
+				
+				// google scholar specific
+				"body{margin-left:40px} " + 
+				"a.gsl_pagenum,a.gsl_pagenum2{font-family: Arial, Helvetica, sans-serif} " +
+				"a.gsl_pagenum{position:absolute;left:0px;color:gray;} " +
+				"a.gsl_pagenum2{color:gray;padding:0 4px;} " +
+				
+			"</style>";
 
 		docDirPath = DocUtils.class.getClassLoader().getResource("").getPath() + "docs" + File.separator;
 	}

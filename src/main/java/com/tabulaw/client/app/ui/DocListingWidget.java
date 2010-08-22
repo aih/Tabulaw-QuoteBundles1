@@ -282,6 +282,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 				if(!result.hasErrors()) {
 					ClientModelCache.get().persistAll(result.getDocList());
 					operator.refresh();
+					DocListingWidget.this.setVisible(true);
 				}
 			}
 		}.execute();

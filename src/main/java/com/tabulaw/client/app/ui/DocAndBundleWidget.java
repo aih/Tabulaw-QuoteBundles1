@@ -16,7 +16,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.HorizontalSplitPanel;
+import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
@@ -78,7 +78,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 	private final BundleDocWidget wDocQuoteBundle;
 
-	private final HorizontalSplitPanel hsp = new HorizontalSplitPanel();
+	private final SplitLayoutPanel splitPanel = new SplitLayoutPanel();
 
 	/**
 	 * Facilitate drag/drop ops.
@@ -110,9 +110,11 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 		wDocQuoteBundle = new BundleDocWidget(this);
 
-		hsp.add(wDocViewer);
-		hsp.add(wDocQuoteBundle);
-		boundaryPanel.add(hsp);
+		splitPanel.addEast(wDocQuoteBundle, 200);
+		splitPanel.add(wDocViewer);
+		splitPanel.setSize("100%", "90%");
+		splitPanel.setWidgetMinSize(wDocQuoteBundle, 100);
+		boundaryPanel.add(splitPanel);
 
 		initWidget(boundaryPanel);
 	}
@@ -333,10 +335,6 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	@Override
 	protected void onLoad() {
 		super.onLoad();
-
-		// move the splitter over to the right
-		// we want to see as much of the doc as possible
-		hsp.setSplitPosition("80%");
 
 		assert hrViewMode == null;
 		hrViewMode = wDocViewer.addValueChangeHandler(this);
