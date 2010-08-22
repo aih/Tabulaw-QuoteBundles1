@@ -22,6 +22,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provider;
+import com.google.inject.Scopes;
 import com.google.inject.Stage;
 import com.tabulaw.config.Config;
 import com.tabulaw.config.ConfigRef;
@@ -84,7 +85,7 @@ public class Bootstrapper implements ServletContextListener {
 						}
 					}
 
-				});
+				}).in(Scopes.SINGLETON);
 			}
 		});
 

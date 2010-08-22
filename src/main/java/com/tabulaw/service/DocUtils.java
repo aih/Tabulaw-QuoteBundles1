@@ -55,7 +55,7 @@ public class DocUtils {
 				
 				// google scholar specific
 				"body{margin-left:40px} " + 
-				"a.gsl_pagenum,a.gsl_pagenum2{font-family: Arial, Helvetica, sans-serif} " +
+				"a.gsl_pagenum,a.gsl_pagenum2{font-family: Arial, Helvetica, sans-serif;font-size:10px;} " +
 				"a.gsl_pagenum{position:absolute;left:0px;color:gray;} " +
 				"a.gsl_pagenum2{color:gray;padding:0 4px;} " +
 				

@@ -44,7 +44,7 @@ public class EmailDispatcher implements Runnable {
 		return mailManager;
 	}
 
-	public synchronized void setDone() {
+	public void setDone() {
 		done = true;
 	}
 
@@ -56,9 +56,7 @@ public class EmailDispatcher implements Runnable {
 				// int len = queue.size();
 				// System.out.println("List size now " + len);
 				process(item);
-				synchronized (this) {
-					if(done) return;
-				}
+				if(done) return;
 			}
 		}
 		catch(InterruptedException ex) {

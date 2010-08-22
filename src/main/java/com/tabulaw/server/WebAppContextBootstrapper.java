@@ -21,6 +21,8 @@ public class WebAppContextBootstrapper implements IBootstrapHandler {
 
 	private static final Log log = LogFactory.getLog(WebAppContextBootstrapper.class);
 
+	private Thread edt;
+
 	@Override
 	public void startup(Injector injector, ServletContext servletContext) {
 		log.info("Bootstrapping web app context..");
@@ -32,20 +34,24 @@ public class WebAppContextBootstrapper implements IBootstrapHandler {
 		// start up the email dispatcher in its own thread to keep the main web
 		// request thread from becoming latent
 		EmailDispatcher emailDispatcher = injector.getInstance(EmailDispatcher.class);
-		new Thread(emailDispatcher, "Email Dispatcher").start();
-
+		edt = new Thread(emailDispatcher, "Email Dispatcher");
+		edt.start();
 		log.info("Web app context bootstrapped");
 	}
 
 	@Override
 	public void shutdown(ServletContext servletContext) {
 		log.info("Shutting down web app context..");
+
+		// kill the email dispatcher thread
+		if(edt != null) edt.interrupt();
 		WebAppContext wc = (WebAppContext) servletContext.getAttribute(WebAppContext.KEY);
 		if(wc != null) {
 			wc.getEmailDispatcher().setDone();
 		}
+
 		servletContext.removeAttribute(WebAppContext.KEY);
-		
+
 		log.info("Web app context shutdown");
 	}
 }
