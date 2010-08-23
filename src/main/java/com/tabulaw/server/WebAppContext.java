@@ -12,7 +12,6 @@ import org.apache.velocity.app.VelocityEngine;
 
 import com.google.inject.Inject;
 import com.tabulaw.mail.EmailDispatcher;
-import com.tabulaw.server.rpc.IExceptionHandler;
 
 /**
  * Servlet/web level context providing resources used at this the servlet

@@ -12,7 +12,6 @@ import net.sf.ehcache.CacheManager;
 
 import com.google.inject.Inject;
 import com.tabulaw.schema.ISchemaInfo;
-import com.tabulaw.server.rpc.IExceptionHandler;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 
@@ -40,13 +39,12 @@ public final class PersistContext implements Serializable {
 	/**
 	 * Constructor
 	 * @param schemaInfo
-	 * @param exceptionHandler
 	 * @param cacheManager
 	 * @param userService
 	 * @param userDataService
 	 */
 	@Inject
-	public PersistContext(ISchemaInfo schemaInfo, IExceptionHandler exceptionHandler, CacheManager cacheManager,
+	public PersistContext(ISchemaInfo schemaInfo, CacheManager cacheManager,
 			UserService userService, UserDataService userDataService) {
 		super();
 		this.schemaInfo = schemaInfo;

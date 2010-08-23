@@ -10,6 +10,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.tabulaw.common.data.Status;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
+import com.tabulaw.server.IExceptionHandler;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.RequestContext;
 import com.tabulaw.server.UserContext;

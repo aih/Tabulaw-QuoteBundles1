@@ -13,7 +13,6 @@ import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.tabulaw.schema.ISchemaInfo;
 import com.tabulaw.server.PersistContext;
-import com.tabulaw.server.rpc.IExceptionHandler;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 
@@ -31,8 +30,6 @@ public class PersistContextModule extends AbstractModule {
 			@Inject
 			ISchemaInfo schemaInfo;
 			@Inject
-			IExceptionHandler exceptionHandler;
-			@Inject
 			CacheManager persistCache;
 			@Inject
 			UserService userService;
@@ -41,7 +38,7 @@ public class PersistContextModule extends AbstractModule {
 
 			@Override
 			public PersistContext get() {
-				return new PersistContext(schemaInfo, exceptionHandler, persistCache, userService, userDataService);
+				return new PersistContext(schemaInfo, persistCache, userService, userDataService);
 			}
 		}).in(Scopes.SINGLETON);
 	}

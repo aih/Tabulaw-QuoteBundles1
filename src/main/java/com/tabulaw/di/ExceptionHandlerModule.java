@@ -22,8 +22,8 @@ import com.tabulaw.config.Config;
 import com.tabulaw.config.IConfigAware;
 import com.tabulaw.config.IConfigKey;
 import com.tabulaw.mail.NameEmail;
-import com.tabulaw.server.rpc.ExceptionHandler;
-import com.tabulaw.server.rpc.IExceptionHandler;
+import com.tabulaw.server.ExceptionHandler;
+import com.tabulaw.server.IExceptionHandler;
 
 /**
  * @author jpk

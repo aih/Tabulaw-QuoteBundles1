@@ -47,6 +47,13 @@ a:active {
 		float: right;
 	}
 	
+.tll-GlassPanel {
+	background-color: #000;
+	opacity: 0.6;
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+	z-index: 1; /* critical to ensure overlaying of relatively positioned elements! */
+}
+
 /* drag and drop overrides */
 .dragdrop-positioner {
 	border: 1px dashed #BFBFBF;
@@ -915,6 +922,8 @@ div.ro {
 		margin: 5px 0 0 5px;
 	}
 	.doc .quotes {
+		overflow: auto;
+		height: 100%;
 	}
 	.doc .wquote .cite {
 		/*display: none;*/
