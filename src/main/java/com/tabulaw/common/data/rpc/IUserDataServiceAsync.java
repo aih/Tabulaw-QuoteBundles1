@@ -47,6 +47,8 @@ public interface IUserDataServiceAsync {
 
 	void getAllDocs(AsyncCallback<DocListingPayload> callback);
 
+	void getDoc(String docId, AsyncCallback<DocPayload> callback);
+	
 	void deleteDoc(String docId, AsyncCallback<Payload> callback);
 
 	void createDoc(DocRef docRef, String htmlContent, AsyncCallback<DocPayload> callback);

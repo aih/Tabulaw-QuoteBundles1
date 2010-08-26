@@ -9,9 +9,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.List;
 
 import com.tabulaw.common.data.Status;
+import com.tabulaw.common.data.dto.CaseDocData;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
@@ -20,7 +22,6 @@ import com.tabulaw.common.data.rpc.IRemoteDocService;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
@@ -34,7 +35,9 @@ import com.tabulaw.service.scrape.IDocHandler;
 import com.tabulaw.util.StringUtil;
 
 /**
- * Back-end support for rpc document tasks.
+ * Fetches remote documents and remote doc search results.
+ * <p>
+ * Employs {@link IDocHandler} implementations for the actual data fetching.
  * @author jpk
  */
 public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
@@ -100,15 +103,17 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 		UserContext uc = getUserContext();
 		UserDataService uds = pc.getUserDataService();
 		User user = uc.getUser();
-		
+
 		// first attempt to find case doc in db by remote url
-		DocRef doc;
+		DocRef doc = null;
+		DocContent docContent = null;
 		try {
 			doc = uds.findCaseDocByRemoteUrl(remoteDocUrl);
+			docContent = uds.getDocContent(doc.getId());
 		}
 		catch(EntityNotFoundException e) {
 			// ok - need to actually fetch it
-			
+
 			// fetch doc data
 			String fcontents;
 			try {
@@ -134,30 +139,31 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 						MsgAttr.EXCEPTION.flag | MsgAttr.STATUS.flag);
 				return payload;
 			}
-			
+
 			// parse fetched doc data
-			doc = handler.parseSingleDocument(fcontents);
-			CaseRef caseRef = doc.getCaseRef();
-			caseRef.setUrl(remoteDocUrl);
+			CaseDocData cdd = handler.parseSingleDocument(fcontents);
 			
+			doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), cdd.getParties(), cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteDocUrl, cdd.getYear());
+
 			// persist the doc ref and doc/user binding
 			doc = uds.saveDoc(doc);
 			uds.addDocUserBinding(user.getId(), doc.getId());
+
+			String htmlContent = cdd.getHtmlContent();
 			
 			// localize doc content
-			String htmlContent = doc.getHtmlContent();
-			doc.setHtmlContent(null);
-			StringBuilder sb = new StringBuilder(htmlContent.length() + 1024);
-			sb.append(htmlContent);
-			DocUtils.localizeDoc(sb, doc.getId(), doc.getTitle());
-			htmlContent = sb.toString();
+//			StringBuilder sb = new StringBuilder(htmlContent.length() + 1024);
+//			sb.append(htmlContent);
+//			DocUtils.localizeDoc(sb, doc.getId(), doc.getTitle());
+//			htmlContent = sb.toString();
 
 			// persist doc content
-			DocContent docContent = EntityFactory.get().buildDocContent(doc.getId(), htmlContent);
+			docContent = EntityFactory.get().buildDocContent(doc.getId(), htmlContent);
 			uds.saveDocContent(docContent);
 		}
 
 		payload.setDocRef(doc);
+		payload.setDocContent(docContent);
 
 		return payload;
 	}

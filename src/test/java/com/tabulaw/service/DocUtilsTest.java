@@ -31,7 +31,7 @@ public class DocUtilsTest {
 	
 	@Test(enabled = true)
 	public void testSerializeCaseDocModel() throws Exception {
-		DocRef m = EntityFactory.get().buildCaseDoc("docTitle", new Date(), "parties", "reftoken", "docLoc", "court", "url", "1975");
+		DocRef m = EntityFactory.get().buildCaseDoc("docTitle", new Date(), "parties", "reftoken", "docLoc", "court", "url", 1975);
 		String s = DocUtils.serializeDocument(m);
 		
 		Calendar c = Calendar.getInstance();
@@ -69,51 +69,7 @@ public class DocUtilsTest {
 		Assert.assertEquals(caseRef.getUrl(), "url");
 		Assert.assertEquals(caseRef.getYear(), 1975);
 	}
-
-	/**
-	 * Tests the localizing of a doc string
-	 * @throws Exception
-	 */
-	@Test(enabled = false)
-	public void localizeDocTest() throws Exception {
-		String html = "<p>This is test html.</p>";
-
-		StringBuilder sb = new StringBuilder(html);
-		DocUtils.localizeDoc(sb, "1", "test title");
-		String localized = sb.toString();
-
-		int htmlIndex = localized.indexOf("<html>");
-		int endHtmlIndex = localized.indexOf("</html>");
-
-		int headIndex = localized.indexOf("<head>");
-		int endHeadIndex = localized.indexOf("</head>");
-
-		int bodyIndex = localized.indexOf("<body>");
-		int endBodyIndex = localized.indexOf("</body>");
-		
-		int titleIndex = localized.indexOf("<title>test title</title>");
-		
-		Assert.assertTrue(titleIndex > 0);
-		
-		Assert.assertTrue(htmlIndex >= 0);
-		Assert.assertTrue(endHtmlIndex > htmlIndex);
-
-		Assert.assertTrue(headIndex > htmlIndex);
-		Assert.assertTrue(endHeadIndex > headIndex);
-
-		Assert.assertTrue(bodyIndex > headIndex);
-		Assert.assertTrue(endBodyIndex > bodyIndex);
-
-		int localCssIndex = localized.indexOf(DocUtils.cssHighightStylesBlock);
-		int localJsIndex = localized.indexOf("onDocFrameLoaded_1");
-
-		Assert.assertTrue(localCssIndex >= 0);
-		Assert.assertTrue(localJsIndex >= 0);
-		Assert.assertTrue(localCssIndex < localJsIndex);
-
-		Assert.assertTrue(localJsIndex < endHeadIndex);
-	}
-
+	
 	/**
 	 * Tests the fetching of html content from a doc search related url.
 	 * @throws Exception

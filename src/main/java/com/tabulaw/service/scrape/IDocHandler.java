@@ -8,9 +8,9 @@ package com.tabulaw.service.scrape;
 import java.net.URL;
 import java.util.List;
 
+import com.tabulaw.common.data.dto.CaseDocData;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.model.DocRef;
 
 /**
  * API for remote doc search and remote doc screen scraping.
@@ -29,7 +29,7 @@ public interface IDocHandler {
 	 * @return
 	 */
 	boolean isSupportedUrl(String surl);
-	
+
 	/**
 	 * Creates a doc search {@link URL} from a request specific to the supporting
 	 * doc data type.
@@ -47,9 +47,10 @@ public interface IDocHandler {
 	List<CaseDocSearchResult> parseSearchResults(String rawHtml);
 
 	/**
-	 * Parses raw html for a single doc record into a newly created doc ref entity.
+	 * Parses raw html for a single doc record into a newly created doc ref
+	 * entity.
 	 * @param rawHtml doc html as gotten from the source
-	 * @return newly created and transient {@link DocRef} entity.
+	 * @return newly created dto holding the parsed doc properties
 	 */
-	DocRef parseSingleDocument(String rawHtml);
+	CaseDocData parseSingleDocument(String rawHtml);
 }

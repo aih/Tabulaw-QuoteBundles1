@@ -6,6 +6,7 @@
 package com.tabulaw.common.data.rpc;
 
 import com.tabulaw.common.data.Status;
+import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 
 /**
@@ -14,7 +15,9 @@ import com.tabulaw.model.DocRef;
  */
 public class DocPayload extends Payload {
 
-	DocRef docRef;
+	private DocRef docRef;
+
+	private DocContent docContent;
 
 	/**
 	 * Constructor
@@ -37,5 +40,13 @@ public class DocPayload extends Payload {
 
 	public void setDocRef(DocRef docRef) {
 		this.docRef = docRef;
+	}
+
+	public DocContent getDocContent() {
+		return docContent;
+	}
+
+	public void setDocContent(DocContent docContent) {
+		this.docContent = docContent;
 	}
 }

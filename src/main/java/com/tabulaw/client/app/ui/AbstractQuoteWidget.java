@@ -228,6 +228,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 								MarkOverlay mark = (MarkOverlay) quote.getMark();
 								if(mark != null) {
 									Element elm = mark.getStartNode();
+									Window.alert("goto quote element: " + elm);
 									if(elm != null) {
 										DOM.scrollIntoView(elm);
 									}

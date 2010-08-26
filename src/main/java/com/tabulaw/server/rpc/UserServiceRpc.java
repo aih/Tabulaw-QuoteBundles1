@@ -761,6 +761,33 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	}
 
 	@Override
+	public DocPayload getDoc(String docId) {
+		Status status = new Status();
+		DocPayload payload = new DocPayload(status);
+
+		PersistContext pc = getPersistContext();
+		UserDataService uds = pc.getUserDataService();
+
+		try {
+			DocRef docRef = uds.getDoc(docId);
+			DocContent docContent = uds.getDocContent(docId);
+			
+			payload.setDocRef(docRef);
+			payload.setDocContent(docContent);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
 	public DocListingPayload getDocsForUser(String userId) {
 		Status status = new Status();
 		DocListingPayload payload = new DocListingPayload(status);
@@ -880,6 +907,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			uds.addDocUserBinding(uc.getUser().getId(), persistedDoc.getId());
 
 			payload.setDocRef(persistedDoc);
+			payload.setDocContent(dc);
 			status.addMsg("Document created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final ConstraintViolationException cve) {

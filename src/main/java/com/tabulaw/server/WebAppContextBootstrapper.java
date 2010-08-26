@@ -45,10 +45,9 @@ public class WebAppContextBootstrapper implements IBootstrapHandler {
 		log.info("Shutting down web app context..");
 
 		// kill the email dispatcher thread
-		if(edt != null) edt.interrupt();
-		WebAppContext wc = (WebAppContext) servletContext.getAttribute(WebAppContext.KEY);
-		if(wc != null) {
-			wc.getEmailDispatcher().setDone();
+		if(edt != null) {
+			edt.interrupt();
+			edt = null;
 		}
 
 		servletContext.removeAttribute(WebAppContext.KEY);

@@ -15,6 +15,7 @@ import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,10 +29,16 @@ import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.LoggingDragHandler;
+import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.common.data.rpc.DocPayload;
+import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.model.DocContent;
+import com.tabulaw.model.DocKey;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IEntity;
+import com.tabulaw.model.ModelKey;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 
@@ -175,9 +182,11 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		assert doc != null;
 		// now is when we can safely highlight
 		QuoteBundle qb = wDocQuoteBundle.getModel();
-		List<Quote> quotes = qb.getQuotes();
-		for(Quote q : quotes) {
-			highlightQuote(q, highlight);
+		if(qb != null) {
+			List<Quote> quotes = qb.getQuotes();
+			for(Quote q : quotes) {
+				highlightQuote(q, highlight);
+			}
 		}
 	}
 
@@ -318,12 +327,46 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		}
 	}
 
-	public void setDocument(DocRef mDoc) {
-		// update doc viewer with doc
-		wDocViewer.setModel(mDoc);
+	public void setDocKey(DocKey docKey) {
+		
+		// get doc ref and content
+		final DocRef docRef = (DocRef) ClientModelCache.get().get(docKey);
+		
+		DocContent docContent;
+		try {
+			docContent = (DocContent) ClientModelCache.get().get(new ModelKey(EntityType.DOC_CONTENT.name(), docKey.getId()));
+			
+			// update doc viewer with doc
+			wDocViewer.setModel(docRef, docContent);
 
-		// grab the current quote bundle
-		maybeSetCurrentQuoteBundle();
+			// grab the current quote bundle
+			maybeSetCurrentQuoteBundle();
+		}
+		catch(EntityNotFoundException e) {
+			// fetch it
+			Poc.getUserDataService().getDoc(docKey.getId(), new AsyncCallback<DocPayload>() {
+				
+				@Override
+				public void onSuccess(DocPayload result) {
+					DocContent dc = result.getDocContent();
+					
+					// cache the doc content
+					// TODO verify we want to do this
+					ClientModelCache.get().persist(dc, null);
+					
+					// update doc viewer with doc
+					wDocViewer.setModel(docRef, dc);
+
+					// grab the current quote bundle
+					maybeSetCurrentQuoteBundle();
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					Notifier.get().showFor(caught);
+				}
+			});
+		}
 	}
 
 	@Override

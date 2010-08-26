@@ -141,6 +141,13 @@ public interface IUserDataService extends RemoteService {
 	 * @return All docs in the system w/out html content.
 	 */
 	DocListingPayload getAllDocs();
+	
+	/**
+	 * Fetches both the doc ref and content for a doc.
+	 * @param docId id of doc to fetch
+	 * @return the doc payload
+	 */
+	DocPayload getDoc(String docId);
 
 	/**
 	 * Removes a doc from the system.

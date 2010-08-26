@@ -38,6 +38,16 @@
 	</developers>
 
 	<repositories>
+		<!-- to get latest GWT (2.1-SNAPSHOT)
+		<repository>
+		  <id>google-maven-snapshot-repository</id>
+		  <name>Google Maven Snapshot Repository</name>
+		  <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
+		  <snapshots>
+		    <enabled>true</enabled>
+		  </snapshots>
+		</repository>
+		-->
 		<repository>
 			<id>source.db4o</id>
 			<url>http://source.db4o.com/maven</url>

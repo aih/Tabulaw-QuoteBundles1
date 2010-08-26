@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.tabulaw.client.ui.view.ViewContainer;
 
 /**
- * ViewManager - Singleton managing view life-cycles and view caching. Also
+ * Manages view life-cycles and view caching. Also
  * serves as an MVC dispatcher dispatching view requests to the appropriate view
  * controller. View history is also managed here.
  * @author jpk
@@ -608,6 +608,12 @@ public final class ViewManager implements ValueChangeHandler<String>, IHasViewCh
 		}
 		else
 			throw new IllegalStateException("Unhandled view request: " + request);
+		
+		// fire on complete command
+		Command occ = request.onCompleteCommand();
+		if(occ != null) {
+			occ.execute();
+		}
 	}
 
 	public void onValueChange(ValueChangeEvent<String> event) {

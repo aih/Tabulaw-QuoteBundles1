@@ -602,7 +602,7 @@ public class UserDataService extends AbstractEntityService {
 
 		// get the doc ref from the db to avoid having multiple docs of the same id
 		// persisted!
-		// NOTE: this is a db40 specific issue
+		// NOTE: this is a db4o specific issue
 		DocRef persistedDoc = null;
 		try {
 			persistedDoc = dao.load(DocRef.class, quote.getDocument().getId());
