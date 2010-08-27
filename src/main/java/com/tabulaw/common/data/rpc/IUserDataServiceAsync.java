@@ -6,6 +6,8 @@
 package com.tabulaw.common.data.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.tabulaw.model.ClauseBundle;
+import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
@@ -43,17 +45,31 @@ public interface IUserDataServiceAsync {
 	void moveQuote(String userId, String quoteId, String sourceBundleId, String targetBundleId,
 			AsyncCallback<Payload> callback);
 
-	void getDocsForUser(String userId, AsyncCallback<DocListingPayload> callback);
+	void getDocsForUser(String userId, AsyncCallback<ModelListPayload<DocRef>> callback);
 
-	void getAllDocs(AsyncCallback<DocListingPayload> callback);
+	void getContractDocsForUser(String userId, AsyncCallback<ModelListPayload<ContractDoc>> callback);
+	
+	void getAllDocs(AsyncCallback<ModelListPayload<DocRef>> callback);
+
+	void getAllContractDocs(AsyncCallback<ModelListPayload<ContractDoc>> callback);
 
 	void getDoc(String docId, AsyncCallback<DocPayload> callback);
 	
+	void getContractDoc(String id, AsyncCallback<ModelPayload<ContractDoc>> callback);
+	
 	void deleteDoc(String docId, AsyncCallback<Payload> callback);
 
+	void deleteContractDoc(String id, AsyncCallback<Payload> callback);
+	
 	void createDoc(DocRef docRef, String htmlContent, AsyncCallback<DocPayload> callback);
+	
+	void persistContractDoc(ContractDoc doc, AsyncCallback<Payload> callback);
 
 	void updateDocContent(String docId, String htmlContent, AsyncCallback<Payload> callback);
-
-	//void exportDoc(String docId, String userId, AsyncCallback<Payload> callback);
+	
+	void getAllClauseBundles(AsyncCallback<ModelListPayload<ClauseBundle>> callback);
+	
+	void persistClauseBundle(ClauseBundle cb, AsyncCallback<Payload> callback);
+	
+	void deleteClauseBundle(String id, AsyncCallback<Payload> callback);
 }

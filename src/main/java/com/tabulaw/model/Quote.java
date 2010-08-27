@@ -72,7 +72,7 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	}
 
 	@Override
-	public void doClone(IEntity cln) {
+	protected void doClone(IEntity cln) {
 		super.doClone(cln);
 		Quote q = (Quote) cln;
 		q.id = id;

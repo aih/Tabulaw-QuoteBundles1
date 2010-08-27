@@ -8,16 +8,21 @@ package com.tabulaw.common.data.rpc;
 import java.util.List;
 
 import com.tabulaw.common.data.Status;
-import com.tabulaw.model.DocRef;
+import com.tabulaw.model.IEntity;
 
 /**
+ * Payload for transporting a list of entities of prescribed type.
  * @author jpk
+ * @param <E> the entity type
  */
-public class DocListingPayload extends Payload {
+public class ModelListPayload<E extends IEntity> extends Payload {
 
-	private List<DocRef> docList;
+	private List<E> modelList;
 
-	public DocListingPayload() {
+	/**
+	 * Constructor
+	 */
+	public ModelListPayload() {
 		super();
 	}
 
@@ -25,15 +30,15 @@ public class DocListingPayload extends Payload {
 	 * Constructor
 	 * @param status
 	 */
-	public DocListingPayload(Status status) {
+	public ModelListPayload(Status status) {
 		super(status);
 	}
 
-	public void setDocList(List<DocRef> docList) {
-		this.docList = docList;
+	public void setModelList(List<E> modelList) {
+		this.modelList = modelList;
 	}
 
-	public List<DocRef> getDocList() {
-		return docList;
+	public List<E> getModelList() {
+		return modelList;
 	}
 }

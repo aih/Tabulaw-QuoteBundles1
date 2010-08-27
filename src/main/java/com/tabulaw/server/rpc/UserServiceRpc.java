@@ -15,13 +15,13 @@ import javax.validation.ValidationException;
 import org.springframework.mail.MailSendException;
 
 import com.tabulaw.common.data.Status;
-import com.tabulaw.common.data.rpc.DocListingPayload;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.IUserAdminService;
 import com.tabulaw.common.data.rpc.IUserContextService;
 import com.tabulaw.common.data.rpc.IUserCredentialsService;
 import com.tabulaw.common.data.rpc.IUserDataService;
 import com.tabulaw.common.data.rpc.IdsPayload;
+import com.tabulaw.common.data.rpc.ModelListPayload;
 import com.tabulaw.common.data.rpc.ModelPayload;
 import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.common.data.rpc.UserContextPayload;
@@ -35,6 +35,8 @@ import com.tabulaw.mail.EmailDispatcher;
 import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailManager;
 import com.tabulaw.mail.MailRouting;
+import com.tabulaw.model.ClauseBundle;
+import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
@@ -737,9 +739,9 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	}
 
 	@Override
-	public DocListingPayload getAllDocs() {
+	public ModelListPayload<DocRef> getAllDocs() {
 		Status status = new Status();
-		DocListingPayload payload = new DocListingPayload(status);
+		ModelListPayload<DocRef> payload = new ModelListPayload<DocRef>(status);
 
 		UserContext uc = getUserContext();
 		User user = uc.getUser();
@@ -750,7 +752,31 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		else {
 			try {
 				List<DocRef> docList = getPersistContext().getUserDataService().getAllDocs();
-				payload.setDocList(docList);
+				payload.setModelList(docList);
+			}
+			catch(Exception e) {
+				RpcServlet.exceptionToStatus(e, status);
+			}
+		}
+
+		return payload;
+	}
+
+	@Override
+	public ModelListPayload<ContractDoc> getAllContractDocs() {
+		Status status = new Status();
+		ModelListPayload<ContractDoc> payload = new ModelListPayload<ContractDoc>(status);
+
+		UserContext uc = getUserContext();
+		User user = uc.getUser();
+
+		if(!user.inRole(Role.ADMINISTRATOR)) {
+			status.addMsg("Permission denied.", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag);
+		}
+		else {
+			try {
+				List<ContractDoc> docList = getPersistContext().getUserDataService().getAllContractDocs();
+				payload.setModelList(docList);
 			}
 			catch(Exception e) {
 				RpcServlet.exceptionToStatus(e, status);
@@ -788,16 +814,64 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	}
 
 	@Override
-	public DocListingPayload getDocsForUser(String userId) {
+	public ModelPayload<ContractDoc> getContractDoc(String id) {
 		Status status = new Status();
-		DocListingPayload payload = new DocListingPayload(status);
+		ModelPayload<ContractDoc> payload = new ModelPayload<ContractDoc>(status);
+
+		PersistContext pc = getPersistContext();
+		UserDataService uds = pc.getUserDataService();
+
+		try {
+			ContractDoc doc = uds.getContractDoc(id);
+			payload.setModel(doc);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public ModelListPayload<DocRef> getDocsForUser(String userId) {
+		Status status = new Status();
+		ModelListPayload<DocRef> payload = new ModelListPayload<DocRef>(status);
 
 		PersistContext pc = getPersistContext();
 		UserDataService uds = pc.getUserDataService();
 
 		try {
 			List<DocRef> docList = uds.getDocsForUser(userId);
-			payload.setDocList(docList);
+			payload.setModelList(docList);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public ModelListPayload<ContractDoc> getContractDocsForUser(String userId) {
+		Status status = new Status();
+		ModelListPayload<ContractDoc> payload = new ModelListPayload<ContractDoc>(status);
+
+		PersistContext pc = getPersistContext();
+		UserDataService uds = pc.getUserDataService();
+
+		try {
+			List<ContractDoc> docList = uds.getContractDocsForUser(userId);
+			payload.setModelList(docList);
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
@@ -828,6 +902,38 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			}
 
 			pc.getUserDataService().deleteDoc(docId);
+
+			status.addMsg("Document deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload deleteContractDoc(String id) {
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		final PersistContext pc = getPersistContext();
+
+		try {
+			if(id == null) throw new IllegalArgumentException("Null contract doc id");
+
+			// user must be an administrator to permanantly delete docs
+			User user = getUserContext().getUser();
+			if(!user.inRole(Role.ADMINISTRATOR)) {
+				throw new Exception("Permission denied.");
+			}
+
+			pc.getUserDataService().deleteContractDoc(id);
 
 			status.addMsg("Document deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
@@ -904,7 +1010,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			uds.saveDocContent(dc);
 
 			// save the doc/user binding
-			uds.addDocUserBinding(uc.getUser().getId(), persistedDoc.getId());
+			uds.addDocUserBinding(user.getId(), persistedDoc.getId());
 
 			payload.setDocRef(persistedDoc);
 			payload.setDocContent(dc);
@@ -925,45 +1031,35 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		return payload;
 	}
 
-	/*
 	@Override
-	public Payload exportDoc(String docId, String userId) {
+	public Payload persistContractDoc(ContractDoc doc) {
 		Status status = new Status();
 		Payload payload = new Payload(status);
 
 		final PersistContext pc = getPersistContext();
-
-		DataConverterDelegate fcd =
-				(DataConverterDelegate) getServletContext().getAttribute(DataConverterBootstrapper.FILE_CONVERTER_KEY);
+		final UserContext uc = getUserContext();
 
 		try {
-			// load the doc
-			DocContent doc = pc.getUserDataService().getDocContent(docId);
+			if(doc == null || !doc.isNew()) throw new IllegalArgumentException("Null or non-new contract doc");
 
-			// load the user
-			User user = pc.getUserService().loadUser(userId);
+			User user = uc.getUser();
 
-			// convert the doc to MS Word
-			File f = DocUtils.docContentsToFile(doc);
-			File fconverted = fcd.convert(f, "text/html");
+			UserDataService uds = pc.getUserDataService();
 
-			// email the doc
-			final MailManager mailManager = pc.getMailManager();
-			final MailRouting mr = mailManager.buildAppSenderMailRouting(user.getEmailAddress());
-			final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, EMAIL_TEMPLATE_DOC_EXPORT, null);
-			FileDataSource fds = new FileDataSource(fconverted);
-			mailContext.addAttachment(fconverted.getName(), fds);
-			mailManager.sendEmail(mailContext);
-			status.addMsg("Document emailed.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+			// save the doc
+			ContractDoc persistedDoc = uds.saveContractDoc(doc);
 
-			// clean up
-			// TODO ensure this doesn't delete the file before emailing it!
-			f.delete();
-			fconverted.delete();
+			// save the doc/user binding
+			uds.addContractDocUserBinding(user.getId(), persistedDoc.getId());
+
+			status.addMsg("Contract Document created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final ConstraintViolationException cve) {
+			PersistHelper.handleValidationException(pc, cve, payload);
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
-			pc.getExceptionHandler().handleException(e);
+			handleException(e);
 			throw e;
 		}
 		catch(Exception e) {
@@ -972,5 +1068,98 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 		return payload;
 	}
-	*/
+
+	@Override
+	public Payload deleteClauseBundle(String id) {
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		final PersistContext pc = getPersistContext();
+
+		try {
+			if(id == null) throw new IllegalArgumentException("Null id");
+
+			// user must be an administrator to permanantly clause bundles
+			User user = getUserContext().getUser();
+			if(!user.inRole(Role.ADMINISTRATOR)) {
+				throw new Exception("Permission denied.");
+			}
+
+			pc.getUserDataService().deleteClauseBundle(id);
+
+			status.addMsg("Clause Bundle deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public ModelListPayload<ClauseBundle> getAllClauseBundles() {
+		Status status = new Status();
+		ModelListPayload<ClauseBundle> payload = new ModelListPayload<ClauseBundle>(status);
+
+		UserContext uc = getUserContext();
+		User user = uc.getUser();
+
+		if(!user.inRole(Role.ADMINISTRATOR)) {
+			status.addMsg("Permission denied.", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag);
+		}
+		else {
+			try {
+				List<ClauseBundle> list = getPersistContext().getUserDataService().getAllClauseBundles();
+				payload.setModelList(list);
+			}
+			catch(Exception e) {
+				RpcServlet.exceptionToStatus(e, status);
+			}
+		}
+
+		return payload;
+	}
+
+	@Override
+	public Payload persistClauseBundle(ClauseBundle cb) {
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		final PersistContext pc = getPersistContext();
+		final UserContext uc = getUserContext();
+
+		try {
+			User user = uc.getUser();
+			if(!user.inRole(Role.ADMINISTRATOR)) {
+				status.addMsg("Permission denied.", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag);
+			}
+			else {
+				if(cb == null || !cb.isNew()) throw new IllegalArgumentException("Null or non-new clause bundle");
+				UserDataService uds = pc.getUserDataService();
+
+				// persist
+				uds.persistClauseBundle(cb);
+
+				status.addMsg("Clause Bundle persist.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+			}
+		}
+		catch(final ConstraintViolationException cve) {
+			PersistHelper.handleValidationException(pc, cve, payload);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
 }
