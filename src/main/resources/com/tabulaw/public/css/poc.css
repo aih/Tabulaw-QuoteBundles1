@@ -559,10 +559,13 @@ div.ro {
 }
 .docContainer {
 }
+.toolbarHeader {
+	width: 99%;
+	border: 1px solid #EAEAEA;
+}
 .docHeader {
 	width: 100%;
 	height: 22px;
-	position: absolute;
 }
 .docHeader img {
 	float: right;
@@ -590,15 +593,10 @@ div.ro {
 	-webkit-border-bottom-right-radius: 2px;
 }
 .docHeaderMenuItem{
-	cursor: pointer;
-	float: left;
-	background-color: #fff;
-	padding: 0 4px 4px 0;
+	background: url(../images/word-16.gif) no-repeat left;
+	padding-left: 20px;
 }
 
-.docHeaderMenuItem img{
-	float: left;
-}
 
 .docFrame { 
 	width: 100%;

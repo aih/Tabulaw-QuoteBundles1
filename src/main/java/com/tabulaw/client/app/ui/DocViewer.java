@@ -19,6 +19,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -61,7 +62,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		STATIC;
 	}
 
-	private static class DownloadDocCommand implements Command {
+	private class DownloadDocCommand implements Command {
 
 		private String mimeType;
 		private String id;
@@ -83,112 +84,32 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			$wnd.location.href = url;
 		}-*/;
 	}
+	private class DocToolbar extends Composite {
+		private final FlowPanel toolbarPnl = new FlowPanel();
 
-	static class DocViewHeader extends Composite {
+		public DocToolbar() {
+			toolbarPnl.setStyleName("toolbarHeader");
+			initWidget(toolbarPnl);
+		}
 
-		private final FlowPanel pnl = new FlowPanel();
+		public void insert(Widget w, int beforeIndex) {
+			toolbarPnl.insert(w, 0);
+		}
+		
+	}
+
+	private class DocViewHeader extends Composite {
+
+		private final FlowPanel menuPnl = new FlowPanel();
 		private final HTML html = new HTML();
 
 		private DownloadDocCommand rtfDownloadCommand = new DownloadDocCommand(RTF_MIME_TYPE);
 		private DownloadDocCommand docxDownloadCommand = new DownloadDocCommand(DOCX_MIME_TYPE);
 
-		private final Image imgEdit = new Image(Resources.INSTANCE.edit());
-
-		public DocViewHeader() {
-			super();
-			pnl.setStyleName("docHeader");
-
-			imgEdit.setStyleName("imgEdit");
-			imgEdit.setTitle("Edit document");
-
-			MenuBar downloadMenuTop = new MenuBar();
-
-			MenuBar downloadMenu = new MenuBar(true);
-
-			downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>", true, downloadMenu);
-			downloadMenuTop.setStyleName("docHeaderMenuItem");
-
-			MenuItem fireRtf = new MenuItem("rtf format", rtfDownloadCommand);
-			MenuItem fireDocx = new MenuItem("docx format", docxDownloadCommand);
-
-			downloadMenu.addItem(fireRtf);
-			downloadMenu.addItem(fireDocx);
-
-			html.setStyleName("docHeaderLabel");
-			pnl.add(html);
-			pnl.add(imgEdit);
-			pnl.add(downloadMenuTop);
-
-			initWidget(pnl);
-		}
-
-		public void insert(Widget w, int beforeIndex) {
-			pnl.insert(w, 0);
-		}
-	}
-
-	static class DocFrame extends Frame {
-
-		public DocFrame() {
-			super();
-			setStyleName("docFrame");
-			getElement().setAttribute("frameBorder", "0"); // for IE
-		}
-	}
-
-	/**
-	 * docView
-	 */
-	private final FlowPanel pnl = new FlowPanel();
-
-	/**
-	 * docHeader
-	 */
-	private final DocViewHeader header = new DocViewHeader();
-
-	/**
-	 * container
-	 */
-	private final FlowPanel container = new FlowPanel();
-
-	/**
-	 * The iframe tag in which the doc is loaded.
-	 */
-	private final DocFrame frame;
-
-	private DocEditWidget dew;
-
-	private PushButton btnSave, btnCancel;
-
-	private DocRef doc;
-
-	/**
-	 * flag indicating whether or not actual doc content exists in the iframe
-	 * element.
-	 */
-	boolean docContentLoaded = false;
-
-	/**
-	 * Constructor
-	 */
-	public DocViewer() {
-		super();
-
-		pnl.setStylePrimaryName("docView");
-		pnl.add(header);
-
-		container.addStyleName("docContainer");
-		pnl.add(container);
-
-		frame = new DocFrame();
-		container.add(frame);
-
-		initWidget(pnl);
-
-		header.imgEdit.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
+		private Command editCommand = new Command(){
+		
+		@Override
+		public void execute() {
 				if(dew == null) {
 
 					// wire up save/cancel buttons
@@ -238,8 +159,106 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 				if(!dew.isVisible()) {
 					editMode();
 				}
-			}
-		});
+		
+		}
+		
+		};
+
+		public DocViewHeader() {
+			super();
+			menuPnl.setStyleName("docHeader");
+
+
+			MenuBar topMenu = new MenuBar();
+
+			MenuBar fileMenu = new MenuBar(true);
+
+//			downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>", true, downloadMenu);
+			topMenu.addItem("File", true, fileMenu);
+
+			MenuBar downloadMenu = new MenuBar(true);
+			MenuItem editDoc = new MenuItem("Edit", editCommand);
+			fileMenu.addItem(editDoc);
+			
+			fileMenu.addItem("Download", true, downloadMenu );
+			
+			MenuItem fireRtf = new MenuItem("rtf format", rtfDownloadCommand);
+			MenuItem fireDocx = new MenuItem("docx format", docxDownloadCommand);
+//			fireDocx.addStyleName("docHeaderMenuItem"); some troubles here
+
+
+			downloadMenu.addItem(fireRtf);
+			downloadMenu.addItem(fireDocx);
+
+			menuPnl.add(topMenu);
+
+			initWidget(menuPnl);
+		}
+
+		public void insert(Widget w, int beforeIndex) {
+			menuPnl.insert(w, 0);
+		}
+	}
+
+	static class DocFrame extends Frame {
+
+		public DocFrame() {
+			super();
+			setStyleName("docFrame");
+			getElement().setAttribute("frameBorder", "0"); // for IE
+		}
+	}
+
+	/**
+	 * docView
+	 */
+	private final FlowPanel pnl = new FlowPanel();
+
+	/**
+	 * docHeader
+	 */
+	private final DocViewHeader header = new DocViewHeader();
+	private final DocToolbar toolbar = new DocToolbar();
+
+	/**
+	 * container
+	 */
+	private final FlowPanel container = new FlowPanel();
+
+	/**
+	 * The iframe tag in which the doc is loaded.
+	 */
+	private final DocFrame frame;
+
+	private DocEditWidget dew;
+
+	private PushButton btnSave, btnCancel;
+
+	private DocRef doc;
+
+	/**
+	 * flag indicating whether or not actual doc content exists in the iframe
+	 * element.
+	 */
+	boolean docContentLoaded = false;
+
+	/**
+	 * Constructor
+	 */
+	public DocViewer() {
+		super();
+
+		pnl.setStylePrimaryName("docView");
+		pnl.add(header);
+		pnl.add(toolbar);
+
+		container.addStyleName("docContainer");
+		pnl.add(container);
+
+		frame = new DocFrame();
+		container.add(frame);
+
+		initWidget(pnl);
 
 		// set initial styling..
 		staticMode();
@@ -387,10 +406,9 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 		// header
 		String html = doc == null ? "" : doc.getTitle();
-		header.html.setHTML("<p>" + html + "</p>");
 
 		// disallow doc editing for case type docs
-		header.imgEdit.setVisible(doc != null && doc.getCaseRef() == null);
+//		header.imgEdit.setVisible(doc != null && doc.getCaseRef() == null);
 
 		frame.getElement().setId(getFrameId());
 
@@ -488,7 +506,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		dew.setVisible(true);
 
 		header.html.setTitle("Editing");
-		header.insert(dew.getEditBar(), 0);
+		toolbar.insert(dew.getEditToolBar(), 0);
 
 		Poc.getNavCol().addWidget(btnSave);
 		Poc.getNavCol().addWidget(btnCancel);
@@ -510,7 +528,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		frame.setVisible(true);
 		if(dew != null) {
 			dew.setVisible(false);
-			dew.getEditBar().removeFromParent();
+			dew.getEditToolBar().removeFromParent();
 			Poc.getNavCol().removeWidget(btnSave);
 			Poc.getNavCol().removeWidget(btnCancel);
 			ValueChangeEvent.fire(this, ViewMode.STATIC);

@@ -61,4 +61,34 @@ public interface Resources extends ClientBundle {
 
 	@Source("../../public/images/permalink.gif")
 	ImageResource permalink();
+
+//-----Rich text toolbar buttons---// 
+	@Source("../../public/images/toolbar/bold.gif")
+	ImageResource bold();
+
+	@Source("../../public/images/toolbar/indent.gif")
+	ImageResource indent();
+
+	@Source("../../public/images/toolbar/outdent.gif")
+	ImageResource outdent();
+	
+	@Source("../../public/images/toolbar/italic.gif")
+	ImageResource italic();
+
+	@Source("../../public/images/toolbar/justifyCenter.gif")
+	ImageResource justifyCenter();
+
+	@Source("../../public/images/toolbar/justifyLeft.gif")
+	ImageResource justifyLeft();
+
+	@Source("../../public/images/toolbar/justifyRight.gif")
+	ImageResource justifyRight();
+
+	@Source("../../public/images/toolbar/subscript.gif")
+	ImageResource subscript();
+
+	@Source("../../public/images/toolbar/superscript.gif")
+	ImageResource superscript();
+	@Source("../../public/images/toolbar/underline.gif")
+	ImageResource underline();
 }
