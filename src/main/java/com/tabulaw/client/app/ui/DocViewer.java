@@ -50,6 +50,7 @@ import com.tabulaw.util.StringUtil;
  * <p>
  * Fires a {@link ValueChangeEvent} of value: "static" when the document view is
  * set to read-only mode.
+ * 
  * @author jpk
  */
 public class DocViewer extends Composite implements IHasDocHandlers, HasValueChangeHandlers<DocViewer.ViewMode> {
@@ -58,8 +59,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	public static final String RTF_MIME_TYPE = "text/rtf";
 
 	public static enum ViewMode {
-		EDIT,
-		STATIC;
+		EDIT, STATIC;
 	}
 
 	private class DownloadDocCommand implements Command {
@@ -84,18 +84,18 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			$wnd.location.href = url;
 		}-*/;
 	}
+
 	private class DocToolbar extends Composite {
 		private final FlowPanel toolbarPnl = new FlowPanel();
 
 		public DocToolbar() {
-			toolbarPnl.setStyleName("toolbarHeader");
 			initWidget(toolbarPnl);
 		}
 
 		public void insert(Widget w, int beforeIndex) {
 			toolbarPnl.insert(w, 0);
 		}
-		
+
 	}
 
 	private class DocViewHeader extends Composite {
@@ -105,94 +105,53 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 		private DownloadDocCommand rtfDownloadCommand = new DownloadDocCommand(RTF_MIME_TYPE);
 		private DownloadDocCommand docxDownloadCommand = new DownloadDocCommand(DOCX_MIME_TYPE);
+		private MenuItem editDoc;
 
-		private Command editCommand = new Command(){
-		
-		@Override
-		public void execute() {
-				if(dew == null) {
+		private Command editCommand = new Command() {
 
-					// wire up save/cancel buttons
-					assert btnSave == null;
-					assert btnCancel == null;
-					btnSave = new PushButton("Save", new ClickHandler() {
+			@Override
+			public void execute() {
+				createDew();
+			}
 
-						@Override
-						public void onClick(ClickEvent clkEvt) {
-							if(doc == null) return;
-
-							// save the doc
-							String docHtml = dew.getHTML();
-							setDocHtml(docHtml);
-							staticMode();
-
-							// persist to server
-							Poc.getUserDataService().updateDocContent(doc.getId(), docHtml, new AsyncCallback<Payload>() {
-
-								@Override
-								public void onSuccess(Payload result) {
-									Notifier.get().showFor(result, null);
-								}
-
-								@Override
-								public void onFailure(Throwable caught) {
-									Notifier.get().showFor(caught);
-								}
-							});
-						}
-					});
-					btnSave.setTitle("Save Document");
-					btnCancel = new PushButton("Cancel", new ClickHandler() {
-
-						@Override
-						public void onClick(ClickEvent clkEvt) {
-							staticMode();
-						}
-					});
-					btnCancel.setTitle("Revert Document");
-
-					dew = new DocEditWidget();
-					dew.setVisible(false);
-					container.add(dew);
-				}
-
-				if(!dew.isVisible()) {
-					editMode();
-				}
-		
-		}
-		
 		};
 
 		public DocViewHeader() {
 			super();
 			menuPnl.setStyleName("docHeader");
 
+			MenuBar topMenu = createMenu();  
+			menuPnl.add(topMenu);
 
+			initWidget(menuPnl);
+		}
+
+		private MenuBar createMenu() {
 			MenuBar topMenu = new MenuBar();
 
 			MenuBar fileMenu = new MenuBar(true);
 
-//			downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>", true, downloadMenu);
+			// downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>",
+			// true, downloadMenu);
 			topMenu.addItem("File", true, fileMenu);
 
 			MenuBar downloadMenu = new MenuBar(true);
-			MenuItem editDoc = new MenuItem("Edit", editCommand);
+			editDoc = new MenuItem("Edit", editCommand);
 			fileMenu.addItem(editDoc);
-			
-			fileMenu.addItem("Download", true, downloadMenu );
-			
+
+			fileMenu.addItem("Download", true, downloadMenu);
+
 			MenuItem fireRtf = new MenuItem("rtf format", rtfDownloadCommand);
 			MenuItem fireDocx = new MenuItem("docx format", docxDownloadCommand);
-//			fireDocx.addStyleName("docHeaderMenuItem"); some troubles here
-
+			// fireDocx.addStyleName("docHeaderMenuItem"); some troubles here
 
 			downloadMenu.addItem(fireRtf);
 			downloadMenu.addItem(fireDocx);
-
-			menuPnl.add(topMenu);
-
-			initWidget(menuPnl);
+			return topMenu;
+			
+		}
+		public void setVisibleEditItem(boolean visible){
+			editDoc.setVisible(visible);
 		}
 
 		public void insert(Widget w, int beforeIndex) {
@@ -265,8 +224,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	}
 
 	/**
-	 * @return <code>true</code> if html content exists within the containing doc
-	 *         iframe element.
+	 * @return <code>true</code> if html content exists within the containing
+	 *         doc iframe element.
 	 */
 	public boolean isDocContentLoaded() {
 		return docContentLoaded;
@@ -294,7 +253,9 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	/**
 	 * Call this to turn "on" the capturing of user selected text in a document
 	 * under view.
-	 * @param docId id of the doc
+	 * 
+	 * @param docId
+	 *            id of the doc
 	 */
 	native void initDocFrame(String docId) /*-{
 		//alert('initDocFrame - docId: '+docId);
@@ -311,68 +272,70 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		var tsapi = this;
 
 		$wnd[onLoadFnName] = function(iframedoc) {
-			//alert('onDocFrameLoaded! iframedoc:' + iframedoc);
-			//alert('iframedoc.body:' + iframedoc.body);
+		//alert('onDocFrameLoaded! iframedoc:' + iframedoc);
+		//alert('iframedoc.body:' + iframedoc.body);
 
-			var mouseUpHandler = function(e){
-				//alert('onMouseUp [frameId: ' + frameId + ']');
+		var mouseUpHandler = function(e){
+		//alert('onMouseUp [frameId: ' + frameId + ']');
 
-				var rng = $wnd.goog.dom.Range.createFromWindow(twindow);
-				//alert('rng: '+ rng);
-				if(rng == null) return;
+		var rng = $wnd.goog.dom.Range.createFromWindow(twindow);
+		//alert('rng: '+ rng);
+		if(rng == null) return;
 
-				// make sure we have a legit text selection
-				text = rng.getText();
-				if(!text || $wnd.stringTrim(text).length == 0) 
-					return;
-				if(rng.getStartNode().nodeType != 3 || rng.getEndNode().nodeType != 3)
-					return;
+		// make sure we have a legit text selection
+		text = rng.getText();
+		if(!text || $wnd.stringTrim(text).length == 0) 
+		return;
+		if(rng.getStartNode().nodeType != 3 || rng.getEndNode().nodeType != 3)
+		return;
 
-				var mark;
-				try {
-					//if(iframedoc !== rng.getDocument()) alert('range.document != iframedoc!');
-					//alert('iframedoc: ' + iframedoc + ', rng.getDocument(): ' + rng.getDocument());
-					mark  = new $wnd.Mark(rng);
-					tsapi.@com.tabulaw.client.app.ui.DocViewer::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
-				}
-				catch(e) {
-					alert('Unable to select this portion of text\n(' + e + ')');
-					//alert('Unable to select this portion of text');
-				}
-			};
+		var mark;
+		try {
+		//if(iframedoc !== rng.getDocument()) alert('range.document != iframedoc!');
+		//alert('iframedoc: ' + iframedoc + ', rng.getDocument(): ' + rng.getDocument());
+		mark  = new $wnd.Mark(rng);
+		tsapi.@com.tabulaw.client.app.ui.DocViewer::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
+		}
+		catch(e) {
+		alert('Unable to select this portion of text\n(' + e + ')');
+		//alert('Unable to select this portion of text');
+		}
+		};
 
-			// capture user selections w/in the iframe content
-			$wnd.goog.events.listen(iframedoc.body, 'mouseup', mouseUpHandler);
+		// capture user selections w/in the iframe content
+		$wnd.goog.events.listen(iframedoc.body, 'mouseup', mouseUpHandler);
 
-			// fire doc loaded
-			tsapi.@com.tabulaw.client.app.ui.DocViewer::fireDocLoaded()();
+		// fire doc loaded
+		tsapi.@com.tabulaw.client.app.ui.DocViewer::fireDocLoaded()();
 
-			//alert('TextSelectApi.init() - DONE');
+		//alert('TextSelectApi.init() - DONE');
 		}
 	}-*/;
 
 	/**
-	 * Call this to turn "off" the capturing of user text selections in a document
-	 * under view.
-	 * @param docId the doc id
+	 * Call this to turn "off" the capturing of user text selections in a
+	 * document under view.
+	 * 
+	 * @param docId
+	 *            the doc id
 	 */
 	native void shutdownDocFrame(String docId) /*-{
 		//alert('shutdown - frameId: ' + frameId);
 		try {
-			var frameId = 'docframe_' + docId;
-			var frame = $wnd.goog.dom.$(frameId);
-			if(frame == null) return;
-			//alert('shutdown - frame: ' + frame);
-			var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
-			//alert('shutdown - fbody: ' + fbody);
-			if(fbody) $wnd.goog.events.unlisten(fbody, 'mouseup');
+		var frameId = 'docframe_' + docId;
+		var frame = $wnd.goog.dom.$(frameId);
+		if(frame == null) return;
+		//alert('shutdown - frame: ' + frame);
+		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
+		//alert('shutdown - fbody: ' + fbody);
+		if(fbody) $wnd.goog.events.unlisten(fbody, 'mouseup');
 
-			$wnd['onDocFrameLoaded_'+docId] = null;
+		$wnd['onDocFrameLoaded_'+docId] = null;
 
-			// fire doc unloaded
-			this.@com.tabulaw.client.app.ui.DocViewer::fireDocUnloaded()();
+		// fire doc unloaded
+		this.@com.tabulaw.client.app.ui.DocViewer::fireDocUnloaded()();
 		} catch(e) {
-			alert('doc shutdown error: ' + e);
+		alert('doc shutdown error: ' + e);
 		}
 	}-*/;
 
@@ -394,11 +357,12 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	 * Sets the document model data.
 	 * <p>
 	 * NOTE: <code>null</code> model is supported.
+	 * 
 	 * @param doc
 	 */
 	public void setModel(DocRef doc) {
 
-		if(this.doc != null) {
+		if (this.doc != null) {
 			shutdownDocFrame(this.doc.getId());
 		}
 
@@ -408,29 +372,28 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		String html = doc == null ? "" : doc.getTitle();
 
 		// disallow doc editing for case type docs
-//		header.imgEdit.setVisible(doc != null && doc.getCaseRef() == null);
+		header.setVisibleEditItem(doc != null && doc.getCaseRef() == null);
 
 		frame.getElement().setId(getFrameId());
 
-		if(doc != null) {
+		if (doc != null) {
 			initDocFrame(doc.getId());
 		}
 
 		// set html content directly or via url?
 		String htmlContent = doc == null ? null : doc.getHtmlContent();
-		if(!StringUtil.isEmpty(htmlContent)) {
+		if (!StringUtil.isEmpty(htmlContent)) {
 			// html content
 			frame.setUrl("");
 			setDocHtml(htmlContent);
 			Log.debug("DocViewer iframe html content set directly");
-		}
-		else {
+		} else {
 			// remote url
 			String furl = doc == null ? "" : "doc?id=" + doc.getId();
 			frame.setUrl(furl);
 			Log.debug("DocViewer iframe url set to: " + furl);
 		}
-		if(doc != null) {
+		if (doc != null) {
 			header.rtfDownloadCommand.setId(doc.getId());
 			header.docxDownloadCommand.setId(doc.getId());
 		}
@@ -462,8 +425,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	}
 
 	public Widget[] getNavColWidgets() {
-		return isEditMode() ? new Widget[] {
-			btnSave, btnCancel } : null;
+		return isEditMode() ? new Widget[] { btnSave, btnCancel } : null;
 	}
 
 	@Override
@@ -471,7 +433,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		super.onUnload();
 
 		String docId = doc == null ? null : doc.getId();
-		if(docId != null) {
+		if (docId != null) {
 			shutdownDocFrame(docId);
 			// fire doc frame unload event
 			fireEvent(DocEvent.createDocLoadEvent(false));
@@ -488,6 +450,60 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 	private boolean isEditMode() {
 		return dew != null && dew.isVisible();
+	}
+
+	private void createDew() {
+		if (dew == null) {
+
+			// wire up save/cancel buttons
+			assert btnSave == null;
+			assert btnCancel == null;
+			btnSave = new PushButton("Save", new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent clkEvt) {
+					if (doc == null)
+						return;
+
+					// save the doc
+					String docHtml = dew.getHTML();
+					setDocHtml(docHtml);
+					staticMode();
+
+					// persist to server
+					Poc.getUserDataService().updateDocContent(doc.getId(), docHtml, new AsyncCallback<Payload>() {
+
+						@Override
+						public void onSuccess(Payload result) {
+							Notifier.get().showFor(result, null);
+						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Notifier.get().showFor(caught);
+						}
+					});
+				}
+			});
+			btnSave.setTitle("Save Document");
+			btnCancel = new PushButton("Cancel", new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent clkEvt) {
+					staticMode();
+				}
+			});
+			btnCancel.setTitle("Revert Document");
+
+			dew = new DocEditWidget();
+			dew.setVisible(false);
+			container.add(dew);
+		}
+
+		if (!dew.isVisible()) {
+			editMode();
+		}
+
 	}
 
 	/**
@@ -526,7 +542,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		RootPanel.get().removeStyleName("doc-edit");
 
 		frame.setVisible(true);
-		if(dew != null) {
+		if (dew != null) {
 			dew.setVisible(false);
 			dew.getEditToolBar().removeFromParent();
 			Poc.getNavCol().removeWidget(btnSave);

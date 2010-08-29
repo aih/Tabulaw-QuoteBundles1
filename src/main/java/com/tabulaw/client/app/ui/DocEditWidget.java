@@ -6,19 +6,31 @@
 package com.tabulaw.client.app.ui;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.CustomButton;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HasHTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.RichTextArea.Formatter;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.ui.toolbar.Toolbar;
@@ -30,98 +42,165 @@ import com.tabulaw.client.ui.toolbar.Toolbar;
  */
 public class DocEditWidget extends Composite implements HasHTML {
 
-	class EditToolBar extends Composite implements ClickHandler {
+	class EditToolBar extends Composite implements ClickHandler, ChangeHandler, KeyUpHandler {
 		private final Toolbar toolbar = new Toolbar();
 		private final FlowPanel pnl = new FlowPanel();
 
-		Map<PushButton, ClickHandler> toolbarButtons = new LinkedHashMap<PushButton, ClickHandler>();
-		Map<PushButton, String> toolbarTips = new HashMap<PushButton, String>();
+		private class SpecialCharCommand implements Command {
+			private String html;
+
+			public SpecialCharCommand(String html) {
+				this.html = html;
+			}
+
+			@Override
+			public void execute() {
+				rta.getFormatter().insertHTML(html);
+			}
+
+		}
+
+		Map<CustomButton, ClickHandler> toolbarButtons = new LinkedHashMap<CustomButton, ClickHandler>();
+		Map<ListBox, ChangeHandler> toolbarListBoxes = new LinkedHashMap<ListBox, ChangeHandler>();
+		Map<String, String> headings = new LinkedHashMap<String, String>();
+		Map<String, FocusWidget> elements = new HashMap<String, FocusWidget>();
+
+		ListBox headingListBox;
+		ToggleButton bold, italic, underline, subscript, superscript;
 
 		public EditToolBar() {
 			super();
+			headings.put("p", "text");
+			headings.put("h1", "Heading 1");
+			headings.put("h2", "Heading 2");
+			headings.put("h3", "Heading 3");
 
 			registerControls();
 
-			for (Map.Entry<PushButton, ClickHandler> entry : toolbarButtons.entrySet()) {
-				PushButton button = entry.getKey();
-				String tip = null;
-				if (toolbarTips.containsKey(button)) {
-					tip = toolbarTips.get(button);
-				}
-				toolbar.addButton(button, tip);
-
-			}
-
 			pnl.add(toolbar);
 			initWidget(pnl);
+			setStyleName("gwt-RichTextToolbar");
 
 		}
 
-		private void addImageButton(ImageResource image, String tip, ClickHandler handler) {
-			PushButton button = new PushButton(new Image(image), this);
+		private void addImageButton(CustomButton button, String tip, ClickHandler handler) {
+			button.addClickHandler(this);
 			toolbarButtons.put(button, handler);
-			toolbarTips.put(button, tip);
+			toolbar.addButton(button, tip);
+		}
+
+		private void addListBox(ListBox listBox, Map<String, String> options, ChangeHandler handler) {
+			listBox.addChangeHandler(this);
+			listBox.setVisibleItemCount(1);
+			for (Map.Entry<String, String> option : options.entrySet()) {
+				listBox.addItem(option.getValue(), option.getKey());
+			}
+
+			toolbarListBoxes.put(listBox, handler);
+			toolbar.add(listBox);
+		}
+
+		private void addSpecialCharMenuItem(MenuBar menubar, String html) {
+			MenuItem menuItem = new MenuItem(html, true, new SpecialCharCommand(html));
+			menubar.addItem(menuItem);
+
+		}
+
+		private void addSpecialCharMenu() {
+			MenuBar specialCharsMenuTop = new MenuBar();
+
+			MenuBar specialCharsMenu = new MenuBar(true);
+
+			specialCharsMenuTop.addItem("<img src='poc/images/toolbar/specialChars.gif'/>", true, specialCharsMenu);
+			// TODO Rename style. Set proper icon
+			specialCharsMenuTop.setStyleName("quoteBundleMenuItem");
+
+			addSpecialCharMenuItem(specialCharsMenu, "&sect;");
+			addSpecialCharMenuItem(specialCharsMenu, "&dagger;");
+			addSpecialCharMenuItem(specialCharsMenu, "&Dagger;");
+
+			toolbar.add(specialCharsMenuTop);
 		}
 
 		private void registerControls() {
+
 			/*------text styles----------*/
-			addImageButton(Resources.INSTANCE.bold(), "Bold", new ClickHandler() {
+			bold = new ToggleButton(new Image(Resources.INSTANCE.bold()));
+			addImageButton(bold, "Bold", new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					rta.getFormatter().toggleBold();
 				}
 			});
 
-			addImageButton(Resources.INSTANCE.italic(), "Italic", new ClickHandler() {
+			italic = new ToggleButton(new Image(Resources.INSTANCE.italic()));
+			addImageButton(italic, "Italic", new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					rta.getFormatter().toggleItalic();
 				}
 			});
-
-			addImageButton(Resources.INSTANCE.underline(), "Underline", new ClickHandler() {
+			underline = new ToggleButton(new Image(Resources.INSTANCE.underline()));
+			addImageButton(underline, "Underline", new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					rta.getFormatter().toggleUnderline();
 				}
 			});
 
-			addImageButton(Resources.INSTANCE.subscript(), "Subscript", new ClickHandler() {
+			subscript = new ToggleButton(new Image(Resources.INSTANCE.subscript()));
+			addImageButton(subscript, "Subscript", new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					rta.getFormatter().toggleSubscript();
 				}
 			});
-			addImageButton(Resources.INSTANCE.superscript(), "Superscript", new ClickHandler() {
+			superscript = new ToggleButton(new Image(Resources.INSTANCE.superscript()));
+			addImageButton(superscript, "Superscript", new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					rta.getFormatter().toggleSuperscript();
 				}
 			});
 
+			addSpecialCharMenu();
+
 			/*------paragraph styles----------*/
-			addImageButton(Resources.INSTANCE.indent(), "Left Indent", new ClickHandler() {
+			addImageButton(new PushButton(new Image(Resources.INSTANCE.indent())), "Left Indent", new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					rta.getFormatter().rightIndent();
 				}
 			});
 
-			addImageButton(Resources.INSTANCE.outdent(), "Left Indent", new ClickHandler() {
+			addImageButton(new PushButton(new Image(Resources.INSTANCE.outdent())), "Left Indent", new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					rta.getFormatter().leftIndent();
 				}
 			});
 
-			addImageButton(Resources.INSTANCE.justifyLeft(), "Justify Left", new ClickHandler() {
-				public void onClick(ClickEvent event) {
-					rta.getFormatter().setJustification(RichTextArea.Justification.LEFT);
-				}
-			});
+			addImageButton(new PushButton(new Image(Resources.INSTANCE.justifyLeft())), "Justify Left",
+					new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							rta.getFormatter().setJustification(RichTextArea.Justification.LEFT);
+						}
+					});
 
-			addImageButton(Resources.INSTANCE.justifyCenter(), "Justify Center", new ClickHandler() {
-				public void onClick(ClickEvent event) {
-					rta.getFormatter().setJustification(RichTextArea.Justification.CENTER);
-				}
-			});
+			addImageButton(new PushButton(new Image(Resources.INSTANCE.justifyCenter())), "Justify Center",
+					new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							rta.getFormatter().setJustification(RichTextArea.Justification.CENTER);
+						}
+					});
 
-			addImageButton(Resources.INSTANCE.justifyRight(), "Justify Right", new ClickHandler() {
-				public void onClick(ClickEvent event) {
-					rta.getFormatter().setJustification(RichTextArea.Justification.RIGHT);
+			addImageButton(new PushButton(new Image(Resources.INSTANCE.justifyRight())), "Justify Right",
+					new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							rta.getFormatter().setJustification(RichTextArea.Justification.RIGHT);
+						}
+					});
+			headingListBox = new ListBox();
+			addListBox(headingListBox, headings, new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					ListBox listBox = (ListBox) event.getSource();
+					int listIndex = listBox.getSelectedIndex();
+					String tag = listBox.getValue(listIndex);
+					executeCommand("FormatBlock", tag);
 				}
 			});
 		}
@@ -131,6 +210,39 @@ public class DocEditWidget extends Composite implements HasHTML {
 				ClickHandler handler = toolbarButtons.get(event.getSource());
 				handler.onClick(event);
 			}
+			updateStatus();
+		}
+
+		@Override
+		public void onChange(ChangeEvent event) {
+			if (toolbarListBoxes.containsKey(event.getSource())) {
+				ChangeHandler handler = toolbarListBoxes.get(event.getSource());
+				handler.onChange(event);
+			}
+			rta.setFocus(true);
+		}
+
+		@Override
+		public void onKeyUp(KeyUpEvent event) {
+			updateStatus();
+		}
+
+		private void updateStatus() {
+			String blockTag = queryCommandValueAssumingFocus("FormatBlock");
+
+			Iterator<String> iterator = headings.keySet().iterator();
+			for (int i = 0; iterator.hasNext(); i++) {
+				String key = iterator.next();
+				if (key.equals(blockTag)) {
+					headingListBox.setSelectedIndex(i);
+				}
+			}
+
+			bold.setDown(getFormatter().isBold());
+			italic.setDown(getFormatter().isItalic());
+			underline.setDown(getFormatter().isUnderlined());
+			subscript.setDown(getFormatter().isSubscript());
+			superscript.setDown(getFormatter().isSuperscript());
 
 		}
 
@@ -139,6 +251,8 @@ public class DocEditWidget extends Composite implements HasHTML {
 	private final EditToolBar editBar = new EditToolBar();
 
 	private final RichTextArea rta = new RichTextArea();
+
+	private final Element elem = rta.getElement();
 
 	private final SimplePanel pnl = new SimplePanel();
 
@@ -149,8 +263,18 @@ public class DocEditWidget extends Composite implements HasHTML {
 		super();
 		pnl.addStyleName("docEdit");
 		pnl.add(rta);
+		rta.addKeyUpHandler(editBar);
+		rta.addClickHandler(editBar);
 		initWidget(pnl);
 	}
+
+	private native void executeCommand(String cmd, String param) /*-{
+		this.@com.tabulaw.client.app.ui.DocEditWidget::elem.contentWindow.document.execCommand(cmd, false, param);
+	}-*/;
+
+	private native String queryCommandValueAssumingFocus(String cmd) /*-{
+		return this.@com.tabulaw.client.app.ui.DocEditWidget::elem.contentWindow.document.queryCommandValue(cmd);
+	}-*/;
 
 	public EditToolBar getEditToolBar() {
 		return editBar;
