@@ -228,4 +228,12 @@ public abstract class StringUtil {
 		}
 		return result.toString();
 	}
+	
+	public static int parseInt(String str, int def) {
+		try {
+			return Integer.parseInt(str);
+		} catch (NumberFormatException ex) {
+			return def;
+		}
+	}
 }

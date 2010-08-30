@@ -10,6 +10,7 @@ public class CaseDocData implements IMarshalable {
 
 	private String title, reftoken, parties, docLoc, court, url, htmlContent;
 	private int year;
+	private int firstPageNumber, lastPageNumber;
 
 	/**
 	 * Constructor
@@ -29,7 +30,7 @@ public class CaseDocData implements IMarshalable {
 	 * @param year
 	 * @param htmlContent
 	 */
-	public CaseDocData(String title, String reftoken, String parties, String docLoc, String court, String url, int year, String htmlContent) {
+	public CaseDocData(String title, String reftoken, String parties, String docLoc, String court, String url, int year, int firstPageNumber, int lastPageNumber, String htmlContent) {
 		super();
 		this.title = title;
 		this.reftoken = reftoken;
@@ -38,6 +39,8 @@ public class CaseDocData implements IMarshalable {
 		this.court = court;
 		this.url = url;
 		this.year = year;
+		this.firstPageNumber = firstPageNumber;
+		this.lastPageNumber = lastPageNumber;
 		this.htmlContent = htmlContent;
 	}
 
@@ -103,5 +106,21 @@ public class CaseDocData implements IMarshalable {
 
 	public void setHtmlContent(String htmlContent) {
 		this.htmlContent = htmlContent;
+	}
+
+	public int getFirstPageNumber() {
+		return firstPageNumber;
+	}
+
+	public void setFirstPageNumber(int firstPageNumber) {
+		this.firstPageNumber = firstPageNumber;
+	}
+
+	public int getLastPageNumber() {
+		return lastPageNumber;
+	}
+
+	public void setLastPageNumber(int lastPageNumber) {
+		this.lastPageNumber = lastPageNumber;
 	}
 }

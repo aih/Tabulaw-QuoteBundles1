@@ -30,6 +30,8 @@ import java.util.Date;
  *  citation
  *  url
  *  year
+ *  firstPageNumber
+ *  lastPageNumber
  * 
  * DOCUMENT props
  * --------------
@@ -126,7 +128,7 @@ public class EntityFactory {
 	 * @param year
 	 * @return
 	 */
-	public CaseRef buildCase(String parties, String reftoken, String docLoc, String court, String url, int year) {
+	public CaseRef buildCase(String parties, String reftoken, String docLoc, String court, String url, int year, int firstPage, int lastPage) {
 		CaseRef e = (CaseRef) create(EntityType.CASE);
 		e.setReftoken(reftoken);
 		e.setParties(parties);
@@ -134,6 +136,8 @@ public class EntityFactory {
 		e.setCourt(court);
 		e.setUrl(url);
 		e.setYear(year);
+		e.setFirstPageNumber(firstPage);
+		e.setLastPageNuber(lastPage);
 		return e;
 	}
 
@@ -176,9 +180,9 @@ public class EntityFactory {
 	 * @return newly created model
 	 */
 	public DocRef buildCaseDoc(String docTitle, Date docDate, String parties, String reftoken,
-			String docLoc, String court, String url, int year) {
+			String docLoc, String court, String url, int year, int firstPage, int lastPage) {
 		DocRef doc = buildDoc(docTitle, docDate);
-		doc.setCaseRef(buildCase(parties, reftoken, docLoc, court, url, year));
+		doc.setCaseRef(buildCase(parties, reftoken, docLoc, court, url, year, firstPage, lastPage));
 		return doc;
 	}
 

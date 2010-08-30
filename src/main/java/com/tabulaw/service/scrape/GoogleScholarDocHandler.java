@@ -234,6 +234,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 	@Override
 	public CaseDocData parseSingleDocument(String rawHtml) {
 		String reftoken = "", dlcy = "", parties = "", docLoc = "", court = "", syear = "", docTitle = "", htmlContent = "";
+		int firstPage = 0, lastPage = 0;
 
 		try {
 			HtmlCleaner cleaner = new HtmlCleaner();
@@ -328,6 +329,12 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 
 			// absolutize local hrefs
 			htmlContent = htmlContent.replace("/scholar_case", "http://scholar.google.com/scholar_case");
+			
+			TagNode[] pages = root.getElementsByAttValue("class", "gsl_pagenum", true, false);
+			if (pages != null && pages.length != 0) {
+				firstPage = Integer.parseInt(pages[0].getText().toString()) - 1;
+				lastPage = firstPage + pages.length - 1;
+			}			
 		}
 		catch(IOException e) {
 			throw new IllegalArgumentException(e);
@@ -335,7 +342,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 
 		int year = Integer.parseInt(syear);
 		
-		CaseDocData doc = new CaseDocData(docTitle, reftoken, parties, docLoc, court, null, year, htmlContent);
+		CaseDocData doc = new CaseDocData(docTitle, reftoken, parties, docLoc, court, null, year, firstPage, lastPage, htmlContent);
 		
 		return doc;
 	}

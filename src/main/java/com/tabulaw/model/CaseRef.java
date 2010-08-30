@@ -77,6 +77,10 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 	private String reftoken, parties, docLoc, court, url;
 	
 	private int year;
+	
+	private int firstPageNumber;
+	
+	private int lastPageNuber;
 
 	/**
 	 * Constructor
@@ -162,6 +166,8 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		cr.court = court;
 		cr.url = url;
 		cr.year = year;
+		cr.firstPageNumber = firstPageNumber;
+		cr.lastPageNuber = lastPageNuber;
 	}
 
 	@Override
@@ -240,6 +246,22 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 
 	public void setCourt(String court) {
 		this.court = court;
+	}
+	
+	public int getFirstPageNumber() {
+		return firstPageNumber;
+	}
+
+	public void setFirstPageNumber(int firstPageNumber) {
+		this.firstPageNumber = firstPageNumber;
+	}
+
+	public int getLastPageNuber() {
+		return lastPageNuber;
+	}
+
+	public void setLastPageNuber(int lastPageNuber) {
+		this.lastPageNuber = lastPageNuber;
 	}
 
 	@Override

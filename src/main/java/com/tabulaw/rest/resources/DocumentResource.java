@@ -70,7 +70,7 @@ public class DocumentResource extends BaseResource {
 		// parse fetched doc data
 		CaseDocData cdd = handler.parseSingleDocument(fcontents);
 		
-		DocRef doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), cdd.getParties(), cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteUrl, cdd.getYear());
+		DocRef doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), cdd.getParties(), cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteUrl, cdd.getYear(), cdd.getFirstPageNumber(), cdd.getLastPageNumber());
 
 		// persist the doc ref and doc/user binding
 		doc = getDataService().saveDoc(doc);
