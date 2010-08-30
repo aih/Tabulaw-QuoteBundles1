@@ -106,12 +106,21 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		private DownloadDocCommand rtfDownloadCommand = new DownloadDocCommand(RTF_MIME_TYPE);
 		private DownloadDocCommand docxDownloadCommand = new DownloadDocCommand(DOCX_MIME_TYPE);
 		private MenuItem editDoc;
+		private MenuItem viewDoc;
 
 		private Command editCommand = new Command() {
 
 			@Override
 			public void execute() {
 				createDew();
+			}
+
+		};
+		private Command viewCommand = new Command() {
+
+			@Override
+			public void execute() {
+				staticMode();
 			}
 
 		};
@@ -137,7 +146,10 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 			MenuBar downloadMenu = new MenuBar(true);
 			editDoc = new MenuItem("Edit", editCommand);
+			viewDoc = new MenuItem("View", viewCommand);
+			viewDoc.setVisible(false);
 			fileMenu.addItem(editDoc);
+			fileMenu.addItem(viewDoc);
 
 			fileMenu.addItem("Download", true, downloadMenu);
 
@@ -523,6 +535,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 		header.html.setTitle("Editing");
 		toolbar.insert(dew.getEditToolBar(), 0);
+		header.viewDoc.setVisible(true);
+		header.editDoc.setVisible(false);
 
 		Poc.getNavCol().addWidget(btnSave);
 		Poc.getNavCol().addWidget(btnCancel);
@@ -540,6 +554,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		// so qb doc col can know which doc mode we are in
 		RootPanel.get().addStyleName("doc-static");
 		RootPanel.get().removeStyleName("doc-edit");
+		header.viewDoc.setVisible(false);
+		header.editDoc.setVisible(true);
 
 		frame.setVisible(true);
 		if (dew != null) {
