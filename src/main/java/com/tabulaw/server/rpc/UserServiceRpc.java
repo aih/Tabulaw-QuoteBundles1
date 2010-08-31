@@ -5,6 +5,7 @@
 package com.tabulaw.server.rpc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import com.tabulaw.mail.EmailDispatcher;
 import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailManager;
 import com.tabulaw.mail.MailRouting;
+import com.tabulaw.model.AppFeature;
 import com.tabulaw.model.ClauseBundle;
 import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.DocContent;
@@ -111,8 +113,10 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		String emailAddress = request.getEmailAddress();
 		String password = request.getPassword();
 
+		AppFeature dfltAppFeature = AppFeature.CASE_DOCS;
+
 		try {
-			User newUser = userService.create(name, emailAddress, password);
+			User newUser = userService.create(name, emailAddress, password, Role.USER, dfltAppFeature);
 			status.addMsg("Registration successful.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 			
 			// send out email
@@ -124,12 +128,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 				data.put("subject", "Tabulaw Registration");
 				data.put("emailAddress", newUser.getEmailAddress());
 				final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, "welcome-user", data);
-				try {
-					emailDispatcher.queueEmail(mailContext);
-				}
-				catch(InterruptedException e) {
-					// TODO anything?
-				}
+				emailDispatcher.queueEmail(mailContext);
 			}
 			catch(Exception e) {
 				// don't penalize for email failure
@@ -137,7 +136,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			}
 		}
 		catch(EntityExistsException e) {
-			status.addMsg("Email already exists", MsgLevel.ERROR, MsgAttr.EXCEPTION.flag | MsgAttr.FIELD.flag, "userEmail");
+			status.addMsg("Entity already exists: " + e.getMessage(), MsgLevel.ERROR, MsgAttr.EXCEPTION.flag | MsgAttr.FIELD.flag, "userEmail");
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());
@@ -161,12 +160,18 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 		try {
 			String name = user.getName(), email = user.getEmailAddress(), password = user.getPassword();
-			User createdUser = svc.create(name, email, password);
+			Role userRole = user.getRoles().get(0);
+			
+			Collection<AppFeature> afc = user.getAppFeatures();
+			AppFeature[] arr = afc.toArray(new AppFeature[0]);
+			
+			User createdUser = svc.create(name, email, password, userRole, arr);
 
 			// set remaining user properties
 			createdUser.setEnabled(user.isEnabled());
 			createdUser.setLocked(user.isLocked());
 			createdUser.setRoles(user.getRoles());
+			
 			createdUser = svc.updateUser(createdUser);
 
 			// clear out password

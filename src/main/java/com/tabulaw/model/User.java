@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -23,6 +22,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import com.tabulaw.IMarshalable;
 import com.tabulaw.model.bk.BusinessKeyDef;
 import com.tabulaw.model.bk.BusinessObject;
+import com.tabulaw.model.validate.AtLeastOne;
 
 /**
  * The user entity. NOTE: no surrogate primary key is needed here.
@@ -113,15 +113,16 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		super.doClone(cln);
 		User u = (User) cln;
 
-		ArrayList<Role> croles = roles == null ? null : new ArrayList<Role>(roles);
-
 		u.name = name;
 		u.emailAddress = emailAddress;
 		u.password = password;
 		u.locked = locked;
 		u.enabled = enabled;
 		u.expires = expires;
-		u.roles = croles;
+		
+		u.roles = (roles == null ? null : new ArrayList<Role>(roles));
+		
+		u.appFeatures = (appFeatures == null ? null : new HashSet<AppFeature>(appFeatures));
 	}
 
 	@Override
@@ -203,7 +204,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	/**
 	 * @return roles
 	 */
-	@Valid
+	@AtLeastOne(type = "User Role")
 	public List<Role> getRoles() {
 		if(roles == null) return Collections.emptyList();
 		return new ArrayList<Role>(roles);
@@ -258,8 +259,10 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	/**
 	 * @return list of app features to which the user has privilege.
 	 */
+	@AtLeastOne(type = "App Feature")
 	public Set<AppFeature> getAppFeatures() {
-		return appFeatures;
+		if(appFeatures == null) return new HashSet<AppFeature>(0);
+		return new HashSet<AppFeature>(appFeatures);
 	}
 
 	public void setAppFeatures(Collection<AppFeature> appFeatures) {
@@ -316,6 +319,14 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		else if("roles".equals(propertyPath)) {
 			StringBuilder sb = new StringBuilder();
 			for(Role a : getRoles()) {
+				sb.append(",");
+				sb.append(a.name());
+			}
+			return sb.length() > 0 ? sb.substring(1) : "";
+		}
+		else if("appFeatures".equals(propertyPath)) {
+			StringBuilder sb = new StringBuilder();
+			for(AppFeature a : getAppFeatures()) {
 				sb.append(",");
 				sb.append(a.name());
 			}

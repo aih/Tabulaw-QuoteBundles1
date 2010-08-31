@@ -105,10 +105,12 @@ public abstract class FieldFactory {
 	 * @param propName
 	 * @param labelText
 	 * @param helpText The on hover tool tip text
+	 * @param checkedReadOnlyText
+	 * @param uncheckedReadOnlyText
 	 * @return new field
 	 */
-	public static final CheckboxField fcheckbox(String name, String propName, String labelText, String helpText) {
-		return new CheckboxField(name, propName, labelText, helpText);
+	public static final CheckboxField fcheckbox(String name, String propName, String labelText, String helpText, String checkedReadOnlyText, String uncheckedReadOnlyText) {
+		return new CheckboxField(name, propName, labelText, helpText, checkedReadOnlyText, uncheckedReadOnlyText);
 	}
 
 	/**

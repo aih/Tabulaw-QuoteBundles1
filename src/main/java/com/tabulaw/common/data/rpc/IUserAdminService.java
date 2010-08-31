@@ -23,7 +23,7 @@ public interface IUserAdminService extends RemoteService {
 	UserListPayload getAllUsers();
 
 	/**
-	 * Updates a single user record.
+	 * Creates a single user record.
 	 * @param user
 	 * @return payload containing the persisted user
 	 */

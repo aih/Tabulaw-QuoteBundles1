@@ -6,23 +6,29 @@
 package com.tabulaw.client.app.ui;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.field.UserFieldProvider;
 import com.tabulaw.client.app.field.UserFieldProvider.UserUseCase;
 import com.tabulaw.client.ui.FocusCommand;
+import com.tabulaw.client.ui.GridRenderer;
 import com.tabulaw.client.ui.SimpleHyperLink;
 import com.tabulaw.client.ui.edit.AbstractEditPanel;
 import com.tabulaw.client.ui.field.AbstractFieldPanel;
-import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.ui.field.CellFieldComposer;
+import com.tabulaw.client.ui.field.CheckboxField;
+import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.ui.field.IFieldWidget;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
+import com.tabulaw.model.AppFeature;
 import com.tabulaw.model.User;
 import com.tabulaw.model.User.Role;
 
@@ -51,8 +57,19 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userPswd"));
 					cmpsr.addField(fg.getFieldWidget("userPswdConfirm"));
+					
 					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userRoles"), true);
+					
+					cmpsr.newRow();
+					FieldGroup appFeaturesGroup = (FieldGroup) fg.getFieldByName("App Features");
+					Set<IFieldWidget<?>> fappFeatures = appFeaturesGroup.getFieldWidgets(null);
+					HashSet<Widget> fwidgets = new HashSet<Widget>(fappFeatures.size());
+					for(IFieldWidget<?> fw : fappFeatures) {
+						fwidgets.add(fw.getWidget());
+					}
+					GridRenderer gr = new GridRenderer(3, null);
+					cmpsr.addWidget("App Features", gr.render(fwidgets));
 				}
 			};
 		}
@@ -101,8 +118,19 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 					cmpsr.addField(fg.getFieldWidget("userLocked"));
 					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userExpires"));
+					
 					cmpsr.newRow();
 					cmpsr.addField(fg.getFieldWidget("userRoles"), true);
+					
+					cmpsr.newRow();
+					FieldGroup appFeaturesGroup = (FieldGroup) fg.getFieldByName("App Features");
+					Set<IFieldWidget<?>> fappFeatures = appFeaturesGroup.getFieldWidgets(null);
+					HashSet<Widget> fwidgets = new HashSet<Widget>(fappFeatures.size());
+					for(IFieldWidget<?> fw : fappFeatures) {
+						fwidgets.add(fw.getWidget());
+					}
+					GridRenderer gr = new GridRenderer(3, null);
+					cmpsr.addWidget("App Features", gr.render(fwidgets));
 				}
 			};
 		}
@@ -164,6 +192,14 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 		}
 		Role role = user.getRoles().get(0);
 		fg.getFieldWidget("userRoles").setValue(role);
+		
+		// app features
+		Set<AppFeature> userFeatures = user.getAppFeatures();
+		for(AppFeature af : AppFeature.values()) {
+			CheckboxField f = (CheckboxField) fg.getFieldWidget("user" + af.name());
+			boolean hasFeature = userFeatures == null ? false : userFeatures.contains(af);
+			f.setValue(hasFeature);
+		}
 
 		getFieldPanel().getFieldGroup().setEnabled(true);
 
@@ -176,6 +212,7 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 		this.user = user;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public User getEditContent() {
 		FieldGroup fg = getFieldPanel().getFieldGroup();
@@ -192,10 +229,23 @@ public class UserEditPanel extends AbstractEditPanel<User> {
 			user.setPassword(fg.getFieldWidget("userPswd").getFieldValue());
 		}
 
+		// roles
 		String role = fg.getFieldWidget("userRoles").getFieldValue();
 		user.getRoles().clear();
 		user.addRole(Enum.valueOf(Role.class, role));
 
+		// app features
+		for(AppFeature af : AppFeature.values()) {
+			String fname = "user" + af.name();
+			IFieldWidget<Boolean> f = fg.getFieldWidget(fname);
+			if(f.getValue() == Boolean.TRUE) {
+				user.addAppFeature(af);
+			}
+			else {
+				user.removeAppFeature(af);
+			}
+		}
+		
 		return user;
 	}
 

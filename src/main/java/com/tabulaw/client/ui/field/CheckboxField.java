@@ -43,12 +43,8 @@ public final class CheckboxField extends AbstractField<Boolean> {
 	}
 
 	private final Impl cb;
-
-	/**
-	 * This text overrides the base field label text mechanism in order to have
-	 * the text appear to the right of the form control.
-	 */
-	//protected String cblabelText;
+	
+	private final String checkedReadOnlyText, uncheckedReadOnlyText;
 
 	/**
 	 * Constructor
@@ -56,14 +52,18 @@ public final class CheckboxField extends AbstractField<Boolean> {
 	 * @param propName
 	 * @param labelText
 	 * @param helpText
+	 * @param checkedReadOnlyText
+	 * @param uncheckedReadOnlyText
 	 */
-	CheckboxField(String name, String propName, String labelText, String helpText) {
-		super(name, propName, labelText, helpText);
+	CheckboxField(String name, String propName, String labelText, String helpText, String checkedReadOnlyText, String uncheckedReadOnlyText) {
+		super(name, propName, null, helpText);
 		setConverter(ToBooleanConverter.DEFAULT);
-		cb = new Impl(name, /*cblabelText*/"");
+		cb = new Impl(name, labelText);
 		cb.addFocusHandler(this);
 		cb.addBlurHandler(this);
 		cb.addValueChangeHandler(this);
+		this.checkedReadOnlyText = checkedReadOnlyText;
+		this.uncheckedReadOnlyText = uncheckedReadOnlyText;
 	}
 
 	@Override
@@ -85,14 +85,6 @@ public final class CheckboxField extends AbstractField<Boolean> {
 		super.setEnabled(enabled);
 	}
 
-	/*
-	@Override
-	public void setReadOnly(boolean readOnly) {
-		if(cb != null) cb.setText(readOnly ? "" : cblabelText);
-		super.setReadOnly(readOnly);
-	}
-	*/
-	
 	@Override 
 	public String doGetText() {
 		return ToStringConverter.INSTANCE.convert(getValue());
@@ -102,17 +94,14 @@ public final class CheckboxField extends AbstractField<Boolean> {
 		throw new UnsupportedOperationException();
 	}
 
-	/*
 	@Override
-	public String getLabelText() {
-		return cblabelText;
+	public void setLabelText(String labelText) {
+		// TODO Auto-generated method stub
+		super.setLabelText(labelText);
 	}
 
 	@Override
-	public void setLabelText(String labelText) {
-		this.cblabelText = labelText == null ? "" : labelText;
-		if(cb != null) cb.setText(cblabelText);
-		super.setLabelText(labelText);
+	protected void setReadOnlyContent() {
+		getReadOnlyWidget().setText(isChecked()? checkedReadOnlyText : uncheckedReadOnlyText);
 	}
-	*/
 }

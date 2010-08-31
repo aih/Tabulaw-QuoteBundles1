@@ -14,11 +14,13 @@ import com.tabulaw.client.ui.field.AbstractFieldGroupProvider;
 import com.tabulaw.client.ui.field.CheckboxField;
 import com.tabulaw.client.ui.field.DateField;
 import com.tabulaw.client.ui.field.FieldGroup;
+import com.tabulaw.client.ui.field.IField;
 import com.tabulaw.client.ui.field.PasswordField;
 import com.tabulaw.client.ui.field.RadioGroupField;
 import com.tabulaw.client.ui.field.TextField;
 import com.tabulaw.client.validate.IValidator;
 import com.tabulaw.client.validate.ValidationException;
+import com.tabulaw.model.AppFeature;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.User.Role;
 import com.tabulaw.schema.PropertyMetadata;
@@ -43,6 +45,13 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 	 */
 	private static final Role[] roles = new Role[] {
 		Role.USER, Role.ANONYMOUS, Role.ADMINISTRATOR,
+	};
+	
+	/**
+	 * To retain ordinality
+	 */
+	private static final AppFeature[] appFeatures = new AppFeature[] {
+		AppFeature.CASE_DOCS, AppFeature.CONTRACT_DOCS,
 	};
 	
 	private final UserUseCase useCase;
@@ -83,12 +92,12 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 
 		if(useCase == UserUseCase.UPDATE) {
 			// locked
-			CheckboxField flocked = fcheckbox("userLocked", "locked", "Locked?", "User locked?");
+			CheckboxField flocked = fcheckbox("userLocked", "locked", "Locked?", "User locked?", "Locked", "Un-locked");
 			flocked.setPropertyMetadata(metamap.get("locked"));
 			fg.addField(flocked);
 	
 			// enabled
-			CheckboxField fenabled = fcheckbox("userEnabled", "enabled", "Enabled?", "User enabled?");
+			CheckboxField fenabled = fcheckbox("userEnabled", "enabled", "Enabled?", "User enabled?", "Enabled", "Disabled");
 			fenabled.setPropertyMetadata(metamap.get("enabled"));
 			fg.addField(fenabled);
 			
@@ -108,6 +117,37 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 			RadioGroupField<Role> fuserRoles =
 					fradiogroup("userRoles", "roles", "Role", "The user roles", dataMap, userRolesRenderer);
 			fg.addField(fuserRoles);
+		}
+
+		// app features (sub field group)
+		if(useCase == UserUseCase.CREATE || useCase == UserUseCase.UPDATE) {
+			final FieldGroup appFeaturesGroup = new FieldGroup("App Features");
+			for(AppFeature af : appFeatures) {
+				String name = af.name();
+				String desc  = StringUtil.enumStyleToPresentation(name);
+				CheckboxField cf = fcheckbox("user" + name, name, desc, desc, name, "");
+				appFeaturesGroup.addField(cf);
+				if(af == appFeatures[0]) {
+					cf.addValidator(new IValidator() {
+						
+						@Override
+						public Object validate(Object value) throws ValidationException {
+							boolean atLeastOne = false;
+							for(IField fld : appFeaturesGroup) {
+								CheckboxField cb = (CheckboxField) fld;
+								if(cb.getValue().booleanValue()) {
+									atLeastOne = true;
+									break;
+								}
+							}
+							if(!atLeastOne) 
+								throw new ValidationException("At least one App Feature must be selected.");
+							return null;
+						}
+					});
+				}
+			}
+			fg.addField(appFeaturesGroup);
 		}
 
 		// password

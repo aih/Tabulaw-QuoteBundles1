@@ -1,5 +1,6 @@
 package com.tabulaw.service.entity;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -20,6 +21,7 @@ import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
+import com.tabulaw.model.AppFeature;
 import com.tabulaw.model.IUserRef;
 import com.tabulaw.model.User;
 import com.tabulaw.model.User.Role;
@@ -192,14 +194,17 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 * @param name
 	 * @param emailAddress
 	 * @param password
-	 * @return
+	 * @param userRole required user role
+	 * @param appFeatures at least one required
+	 * @return the created persisted user
 	 * @throws ValidationException
 	 * @throws EntityExistsException
 	 */
 	@Transactional
-	public User create(String name, String emailAddress, String password) throws ValidationException,
+	public User create(String name, String emailAddress, String password, Role userRole, AppFeature... appFeatures) throws ValidationException,
 			EntityExistsException {
 		if(name == null || emailAddress == null || password == null) throw new NullPointerException();
+		if(userRole == null || appFeatures == null || appFeatures.length < 1) throw new NullPointerException();
 
 		final User user = new User();
 
@@ -225,7 +230,10 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		user.setLocked(false);
 
 		// set the role as user
-		user.addRole(Role.USER);
+		user.addRole(userRole);
+		
+		// set app features
+		user.setAppFeatures(Arrays.asList(appFeatures));
 
 		validate(user);
 
