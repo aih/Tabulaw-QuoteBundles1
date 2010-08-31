@@ -23,11 +23,11 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
-import com.tabulaw.client.app.ui.BundleListingWidget.BOption;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.LoggingDragHandler;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.option.Option;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IEntity;
 import com.tabulaw.model.ModelKey;
@@ -168,7 +168,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	/**
 	 * The life-cycle of this widget is managed by this class!
 	 */
-	private final BundleListingWidget qbListingWidget;
+	private final OptionsPanel qbListingWidget;
 
 	/**
 	 * Contains the quote bundle columns.
@@ -202,7 +202,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 		boundaryPanel.addStyleName(Styles.BOUNDARY_AREA);
 		initWidget(boundaryPanel);
 
-		qbListingWidget = new BundleListingWidget();
+		qbListingWidget = new OptionsPanel();
+		qbListingWidget.getElement().setId("qbListing");
 
 		// initialize quote bundle dragging
 		bundleController = new PickupDragController(boundaryPanel, false);
@@ -233,9 +234,9 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 */
 	void pinQuoteBundle(String bundleId) {
 		// see if option is in bundle list widget
-		BOption[] unpinnedOptions = qbListingWidget.getOptionsPanel().getOptions();
-		for(BOption option : unpinnedOptions) {
-			if(option.bundleId.equals(bundleId)) {
+		Option[] unpinnedOptions = qbListingWidget.getOptions();
+		for(Option option : unpinnedOptions) {
+			if(option.getId().equals(bundleId)) {
 				pinQuoteBundle(option);
 			}
 		}
@@ -246,9 +247,9 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 * listed in the qb listing widget.
 	 * @param option
 	 */
-	void pinQuoteBundle(BOption option) {
+	void pinQuoteBundle(Option option) {
 		option.removeFromParent();
-		String qbId = option.getBundleId();
+		String qbId = option.getId();
 		// String qbName = option.getBundleName();
 
 		// replace just dropped option with quote bundle widget
@@ -275,7 +276,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	/**
 	 * @return The <em>managed</em> quote bundle listing widget.
 	 */
-	public BundleListingWidget getQuoteBundleListingWidget() {
+	public OptionsPanel getQuoteBundleListingWidget() {
 		return qbListingWidget;
 	}
 
@@ -302,12 +303,12 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 
 	private void clearBundleOptions() {
 		/*
-		BOption[] currentOptions = qbListingWidget.getOptionsPanel().getOptions();
-		for(BOption option : currentOptions) {
+		Option[] currentOptions = qbListingWidget.getOptionsPanel().getOptions();
+		for(Option option : currentOptions) {
 			bundleOptionController.makeNotDraggable(option);
 		}
 		*/
-		qbListingWidget.getOptionsPanel().clearOptions();
+		qbListingWidget.clear();
 	}
 
 	private void clearQuoteBundleColumns() {
@@ -327,24 +328,24 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	 * @param bundle
 	 * @return new added option
 	 */
-	private BOption addBundleOption(QuoteBundle bundle) {
-		BOption option = new BOption(bundle.getId(), bundle.getName());
+	private Option addBundleOption(QuoteBundle bundle) {
+		Option option = new Option(bundle.getName(), bundle.getId());
 		option.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				pinQuoteBundle((BOption) event.getSource());
+				pinQuoteBundle((Option) event.getSource());
 			}
 		});
-		qbListingWidget.getOptionsPanel().addOption(option);
+		qbListingWidget.add(option);
 		// bundleOptionController.makeDraggable(option);
 		return option;
 	}
 
-	private BOption removeBundleOption(QuoteBundle qb) {
-		for(BOption option : qbListingWidget.getOptionsPanel().getOptions()) {
-			if(option.bundleId.equals(qb.getId())) {
-				qbListingWidget.getOptionsPanel().removeOption(option);
+	private Option removeBundleOption(QuoteBundle qb) {
+		for(Option option : qbListingWidget.getOptions()) {
+			if(option.getId().equals(qb.getId())) {
+				qbListingWidget.remove(option);
 				return option;
 			}
 		}

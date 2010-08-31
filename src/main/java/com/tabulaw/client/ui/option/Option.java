@@ -21,31 +21,42 @@ public class Option extends Label {
 		public static final String OPTION = "option";
 	}
 
-	private final String text;
+	private final String text, id;
 
 	/**
 	 * Constructor
 	 * @param text The option text
+	 * @param id optional identifier token
 	 */
-	public Option(String text) {
-		this(text, null);
+	public Option(String text, String id) {
+		this(text, id, null);
 	}
 
 	/**
 	 * Constructor
 	 * @param text The option text
+	 * @param id optional identifier token
 	 * @param img Optional image placed before the option text.
 	 */
-	public Option(String text, Image img) {
+	public Option(String text, String id, Image img) {
 		super();
+		if(text == null) throw new NullPointerException();
 		setStyleName(Styles.OPTION);
 		this.text = text;
+		this.id = id;
 		if(img != null) {
 			getElement().appendChild((new ImageContainer(img)).getElement());
 		}
 		final Element txt = DOM.createSpan();
 		txt.setInnerText(text);
 		getElement().appendChild(txt);
+	}
+
+	/**
+	 * @return id token
+	 */
+	public String getId() {
+		return id;
 	}
 
 	@Override
@@ -57,5 +68,4 @@ public class Option extends Label {
 	public String toString() {
 		return getText();
 	}
-
 }

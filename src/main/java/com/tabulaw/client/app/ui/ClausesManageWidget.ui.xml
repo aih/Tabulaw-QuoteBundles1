@@ -1,0 +1,19 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+		xmlns:g='urn:import:com.google.gwt.user.client.ui'
+		xmlns:t='urn:import:com.tabulaw.client.ui'
+		xmlns:to='urn:import:com.tabulaw.client.ui.option'
+>
+
+	<ui:style>
+		.important {
+				font-weight: bold;
+		}
+	</ui:style>
+
+	<g:AbsolutePanel ui:field="boundaryPanel">
+		<g:HorizontalPanel ui:field="columns">
+		</g:HorizontalPanel>
+	</g:AbsolutePanel>
+
+</ui:UiBinder>

@@ -18,6 +18,7 @@ import com.tabulaw.client.app.ui.nav.NavRowPanel;
 import com.tabulaw.client.app.view.BundlesView;
 import com.tabulaw.client.app.view.DocView;
 import com.tabulaw.client.app.view.DocsView;
+import com.tabulaw.client.app.view.ManageClausesView;
 import com.tabulaw.client.app.view.UsersView;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -323,5 +324,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		ViewClass.addClass(DocView.klas);
 		ViewClass.addClass(BundlesView.klas);
 		ViewClass.addClass(UsersView.klas);
+		ViewClass.addClass(ManageClausesView.klas);
 	}
 }

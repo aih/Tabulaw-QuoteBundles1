@@ -427,6 +427,10 @@ public class NavRowPanel extends AbstractNavPanel {
 				UsersNavButton nbUsers = new UsersNavButton();
 				mainViewButtons.add(nbUsers);
 				mainViewTabs.addTab(nbUsers);
+				
+				ManageClausesNavButton nbManageClauses = new ManageClausesNavButton();
+				mainViewButtons.add(nbManageClauses);
+				mainViewTabs.addTab(nbManageClauses);
 			}
 		}
 
