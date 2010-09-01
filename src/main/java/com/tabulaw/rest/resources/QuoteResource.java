@@ -1,6 +1,7 @@
 package com.tabulaw.rest.resources;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,7 +9,6 @@ import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,8 +17,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -205,11 +208,18 @@ public class QuoteResource extends BaseResource {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED) 
-	public Quote createFromForm(
-			@FormParam("docRefId") String docRefId,
-			@FormParam("quoteBundleId") String bundleId,
-			@FormParam("quoteText") String quoteText) {		
-		return create(docRefId, bundleId, quoteText);
+	public Object createFromForm(MultivaluedMap<String, String> formParams) {
+		String docRefId = formParams.getFirst("docRefId");
+		String bundleId = formParams.getFirst("quoteBundleId");
+		List<String> quotes = formParams.get("quoteText");
+		if (quotes == null || quotes.isEmpty()) {
+			throw new WebApplicationException(Status.BAD_REQUEST);
+		}
+		if (quotes.size() != 1) {
+			String[] quotesArray = quotes.toArray(new String[quotes.size()]); 
+			return new QuotesList(createList(docRefId, bundleId, quotesArray));
+		} 
+		return create(docRefId, bundleId, quotes.get(0));
 	}
 	
 	
@@ -229,5 +239,21 @@ public class QuoteResource extends BaseResource {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		getDataService().deleteQuote(getUserId(), id);
+	}	
+	
+	@XmlRootElement(name = "quotes")
+	public static class QuotesList implements Serializable {
+		private static final long serialVersionUID = 1L;
+		
+		@XmlElement(name = "quote")
+		public List<Quote> quotes;
+		
+		public QuotesList() {
+			
+		}
+		
+		public QuotesList(List<Quote> quotes) {
+			this.quotes = quotes;
+		}
 	}
 }

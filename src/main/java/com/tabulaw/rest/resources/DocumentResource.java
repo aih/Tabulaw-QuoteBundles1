@@ -17,6 +17,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.tabulaw.common.data.dto.CaseDocData;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
@@ -93,6 +95,9 @@ public class DocumentResource extends BaseResource {
 	
 	@POST
 	public DocRef create(@FormParam("remoteUrl") String remoteUrl) {
+		if (StringUtils.isEmpty(remoteUrl)) {
+			throw new WebApplicationException(Status.BAD_REQUEST);
+		}
 		DocRef document = null;
 		try {
 			document = getDataService().
