@@ -115,6 +115,7 @@ public class DocEditWidget extends Composite implements HasHTML {
 			// TODO Rename style. Set proper icon
 			specialCharsMenuTop.setStyleName("quoteBundleMenuItem");
 
+			addSpecialCharMenuItem(specialCharsMenu, "&para;");
 			addSpecialCharMenuItem(specialCharsMenu, "&sect;");
 			addSpecialCharMenuItem(specialCharsMenu, "&dagger;");
 			addSpecialCharMenuItem(specialCharsMenu, "&Dagger;");
