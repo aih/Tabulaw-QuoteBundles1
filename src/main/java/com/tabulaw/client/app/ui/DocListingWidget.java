@@ -37,7 +37,7 @@ import com.tabulaw.client.util.Fmt;
 import com.tabulaw.client.util.GlobalFormat;
 import com.tabulaw.client.view.ShowViewRequest;
 import com.tabulaw.client.view.ViewManager;
-import com.tabulaw.common.data.rpc.DocListingPayload;
+import com.tabulaw.common.data.rpc.ModelListPayload;
 import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.listhandler.InMemoryListHandler;
@@ -261,7 +261,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 
 	public void refresh() {
 		// get docs from server
-		new RpcCommand<DocListingPayload>() {
+		new RpcCommand<ModelListPayload<DocRef>>() {
 
 			@Override
 			protected void doExecute() {
@@ -276,11 +276,11 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 			}
 
 			@Override
-			protected void handleSuccess(DocListingPayload result) {
+			protected void handleSuccess(ModelListPayload<DocRef> result) {
 				super.handleSuccess(result);
 				Notifier.get().showFor(result);
 				if(!result.hasErrors()) {
-					ClientModelCache.get().persistAll(result.getDocList());
+					ClientModelCache.get().persistAll(result.getModelList());
 					operator.refresh();
 					DocListingWidget.this.setVisible(true);
 				}

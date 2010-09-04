@@ -14,10 +14,10 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -25,12 +25,14 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.rpc.Payload;
+import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.util.StringUtil;
 
@@ -39,7 +41,7 @@ import com.tabulaw.util.StringUtil;
  * (edit mode).
  * <p>
  * Doc events are fired to signal when content is loaded/unloaded in the
- * containing iframe element.
+ * containing doc frame element.
  * <p>
  * Text select events are fired upon user text selections when in static mode.
  * <p>
@@ -171,12 +173,12 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		}
 	}
 
-	static class DocFrame extends Frame {
+	static class DocFrame extends ScrollPanel {
 
 		public DocFrame() {
 			super();
 			setStyleName("docFrame");
-			getElement().setAttribute("frameBorder", "0"); // for IE
+			//getElement().setAttribute("frameBorder", "0"); // for IE
 		}
 	}
 
@@ -192,12 +194,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	private final DocToolbar toolbar = new DocToolbar();
 
 	/**
-	 * container
-	 */
-	private final FlowPanel container = new FlowPanel();
-
-	/**
-	 * The iframe tag in which the doc is loaded.
+	 * The tag in which the doc is loaded.
 	 */
 	private final DocFrame frame;
 
@@ -208,7 +205,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	private DocRef doc;
 
 	/**
-	 * flag indicating whether or not actual doc content exists in the iframe
+	 * flag indicating whether or not actual doc content exists in the doc frame
 	 * element.
 	 */
 	boolean docContentLoaded = false;
@@ -223,11 +220,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		pnl.add(header);
 		pnl.add(toolbar);
 
-		container.addStyleName("docContainer");
-		pnl.add(container);
-
 		frame = new DocFrame();
-		container.add(frame);
+		pnl.add(frame);
 
 		initWidget(pnl);
 
@@ -236,8 +230,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	}
 
 	/**
-	 * @return <code>true</code> if html content exists within the containing
-	 *         doc iframe element.
+	 * @return <code>true</code> if html content exists within the containing doc
+	 *         frame element.
 	 */
 	public boolean isDocContentLoaded() {
 		return docContentLoaded;
@@ -265,63 +259,47 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	/**
 	 * Call this to turn "on" the capturing of user selected text in a document
 	 * under view.
-	 * 
-	 * @param docId
-	 *            id of the doc
 	 */
-	native void initDocFrame(String docId) /*-{
-		//alert('initDocFrame - docId: '+docId);
-
-		var onLoadFnName = 'onDocFrameLoaded_'+docId;
-		if($wnd[onLoadFnName]) return; // already init'd!
-
-		var frameId = 'docframe_' + docId;
-		var frame = $wnd.goog.dom.$(frameId);
-		//alert('init - frame: '+frame);
-		var twindow = frame.contentWindow;
-		//alert('init - twindow: '+twindow);
-
+	native void initDocFrame() /*-{
+		//alert('TextSelectApi.init() - START');
+		
 		var tsapi = this;
-
-		$wnd[onLoadFnName] = function(iframedoc) {
-		//alert('onDocFrameLoaded! iframedoc:' + iframedoc);
-		//alert('iframedoc.body:' + iframedoc.body);
-
 		var mouseUpHandler = function(e){
-		//alert('onMouseUp [frameId: ' + frameId + ']');
+			//alert('onMouseUp [frameId: ' + frameId + ']');
 
-		var rng = $wnd.goog.dom.Range.createFromWindow(twindow);
-		//alert('rng: '+ rng);
-		if(rng == null) return;
+			var rng = $wnd.goog.dom.Range.createFromWindow($wnd);
+			//alert('rng: '+ rng);
+			if(rng == null) return;
 
-		// make sure we have a legit text selection
-		text = rng.getText();
-		if(!text || $wnd.stringTrim(text).length == 0) 
-		return;
-		if(rng.getStartNode().nodeType != 3 || rng.getEndNode().nodeType != 3)
-		return;
+			// make sure we have a legit text selection
+			var text = rng.getText();
+			if(!text || $wnd.stringTrim(text).length == 0) 
+				return;
+			if(rng.getStartNode().nodeType != 3 || rng.getEndNode().nodeType != 3)
+				return;
 
-		var mark;
-		try {
-		//if(iframedoc !== rng.getDocument()) alert('range.document != iframedoc!');
-		//alert('iframedoc: ' + iframedoc + ', rng.getDocument(): ' + rng.getDocument());
-		mark  = new $wnd.Mark(rng);
-		tsapi.@com.tabulaw.client.app.ui.DocViewer::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
-		}
-		catch(e) {
-		alert('Unable to select this portion of text\n(' + e + ')');
-		//alert('Unable to select this portion of text');
-		}
+			var mark;
+			try {
+				//if(framedoc !== rng.getDocument()) alert('range.document != framedoc!');
+				//alert('framedoc: ' + framedoc + ', rng.getDocument(): ' + rng.getDocument());
+				mark  = new $wnd.Mark(rng);
+				tsapi.@com.tabulaw.client.app.ui.DocViewer::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
+			}
+			catch(e) {
+				alert('Unable to select this portion of text\n(' + e + ')');
+				//alert('Unable to select this portion of text');
+			}
 		};
 
-		// capture user selections w/in the iframe content
-		$wnd.goog.events.listen(iframedoc.body, 'mouseup', mouseUpHandler);
+		// capture user selections w/in the doc frame
+		var frameId = tsapi.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
+		var frame = $wnd.goog.dom.$(frameId);
+		$wnd.goog.events.listen(frame, 'mouseup', mouseUpHandler);
 
 		// fire doc loaded
 		tsapi.@com.tabulaw.client.app.ui.DocViewer::fireDocLoaded()();
 
 		//alert('TextSelectApi.init() - DONE');
-		}
 	}-*/;
 
 	/**
@@ -334,31 +312,28 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	native void shutdownDocFrame(String docId) /*-{
 		//alert('shutdown - frameId: ' + frameId);
 		try {
-		var frameId = 'docframe_' + docId;
-		var frame = $wnd.goog.dom.$(frameId);
-		if(frame == null) return;
-		//alert('shutdown - frame: ' + frame);
-		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
-		//alert('shutdown - fbody: ' + fbody);
-		if(fbody) $wnd.goog.events.unlisten(fbody, 'mouseup');
+			var frameId = 'docframe_' + docId;
+			var frame = $wnd.goog.dom.$(frameId);
+			//if(frame == null) return;
+			//alert('shutdown - frame: ' + frame);
+			if(frame) $wnd.goog.events.unlisten(frame, 'mouseup');
 
-		$wnd['onDocFrameLoaded_'+docId] = null;
-
-		// fire doc unloaded
-		this.@com.tabulaw.client.app.ui.DocViewer::fireDocUnloaded()();
+			// fire doc unloaded
+			this.@com.tabulaw.client.app.ui.DocViewer::fireDocUnloaded()();
 		} catch(e) {
 		alert('doc shutdown error: ' + e);
 		}
 	}-*/;
 
 	/**
-	 * @return the DOM iframe body ref of the contained document.
+	 * @return the DOM body element ref of the contained document.
 	 */
 	public native JavaScriptObject getDocBody() /*-{
-		var frameId = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
-		var frame = $wnd.goog.dom.$(frameId);
-		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
-		return fbody;
+		//var frameId = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
+		//var frame = $wnd.goog.dom.$(frameId);
+		//var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
+		//return fbody;
+		return $wnd.body;
 	}-*/;
 
 	public DocRef getModel() {
@@ -371,8 +346,9 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	 * NOTE: <code>null</code> model is supported.
 	 * 
 	 * @param doc
+	 * @param docContent optional
 	 */
-	public void setModel(DocRef doc) {
+	public void setModel(DocRef doc, DocContent docContent) {
 
 		if (this.doc != null) {
 			shutdownDocFrame(this.doc.getId());
@@ -380,52 +356,55 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 		this.doc = doc;
 
-		// header
-		String html = doc == null ? "" : doc.getTitle();
-
 		// disallow doc editing for case type docs
 		header.setVisibleEditItem(doc != null && doc.getCaseRef() == null);
 
 		frame.getElement().setId(getFrameId());
 
-		if (doc != null) {
-			initDocFrame(doc.getId());
+		if(doc != null) {
+			initDocFrame();
 		}
 
 		// set html content directly or via url?
-		String htmlContent = doc == null ? null : doc.getHtmlContent();
-		if (!StringUtil.isEmpty(htmlContent)) {
+		String htmlContent = docContent == null ? null : docContent.getHtmlContent();
+		if(!StringUtil.isEmpty(htmlContent)) {
 			// html content
-			frame.setUrl("");
+			//frame.setUrl("");
 			setDocHtml(htmlContent);
-			Log.debug("DocViewer iframe html content set directly");
-		} else {
-			// remote url
-			String furl = doc == null ? "" : "doc?id=" + doc.getId();
-			frame.setUrl(furl);
-			Log.debug("DocViewer iframe url set to: " + furl);
+			Log.debug("DocViewer html content set directly");
 		}
-		if (doc != null) {
+		else {
+			throw new IllegalStateException("No doc content specified");
+		}
+
+		if(doc != null) {
 			header.rtfDownloadCommand.setId(doc.getId());
 			header.docxDownloadCommand.setId(doc.getId());
 		}
-
+	}
+	
+	public String getDocHtml() {
+		return frame.getElement().getInnerHTML();
 	}
 
-	public native String getDocHtml() /*-{
-		var fid = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
-		var frame = $wnd.goog.dom.$(fid);
-		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
-		return fbody.innerHTML;
-	}-*/;
+	public void setDocHtml(String html) {
+		this.frame.getElement().setInnerHTML(html);
+	}
 
-	public native void setDocHtml(String html) /*-{
-		var fid = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
-		var frame = $wnd.goog.dom.$(fid);
-		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
-		//$wnd.alert('html: ' + html);
-		fbody.innerHTML = html;
-	}-*/;
+//	public native String getDocHtml() /*-{
+//		var fid = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
+//		var frame = $wnd.goog.dom.$(fid);
+//		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
+//		return fbody.innerHTML;
+//	}-*/;
+
+//	public native void setDocHtml(String html) /*-{
+//		var fid = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
+//		var frame = $wnd.goog.dom.$(fid);
+//		var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
+//		//$wnd.alert('html: ' + html);
+//		fbody.innerHTML = html;
+//	}-*/;
 
 	@Override
 	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<ViewMode> handler) {
@@ -453,7 +432,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	}
 
 	/**
-	 * @return The id assigned to the iframe element or <code>null</code> if the
+	 * @return The id assigned to the doc frame element or <code>null</code> if the
 	 *         document model data has not been set.
 	 */
 	private String getFrameId() {
@@ -509,7 +488,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 			dew = new DocEditWidget();
 			dew.setVisible(false);
-			container.add(dew);
+			pnl.add(dew);
 		}
 
 		if (!dew.isVisible()) {

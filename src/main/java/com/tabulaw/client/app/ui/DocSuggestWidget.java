@@ -49,6 +49,7 @@ import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.common.msg.Msg;
+import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocKey;
 import com.tabulaw.model.DocRef;
 
@@ -279,9 +280,12 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 								
 								final DocRef docRef = result.getDocRef();
 								final DocKey docKey = docRef.getModelKey();
+								final DocContent docContent = result.getDocContent();
 
 								// persist the new doc and propagate through app
 								ClientModelCache.get().persist(docRef, DocSuggestWidget.this);
+								if(docContent != null) ClientModelCache.get().persist(docContent, null);
+								
 								DeferredCommand.addCommand(new Command() {
 
 									@Override

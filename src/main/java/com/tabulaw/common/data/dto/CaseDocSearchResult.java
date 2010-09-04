@@ -7,14 +7,14 @@ package com.tabulaw.common.data.dto;
 
 import java.util.Date;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import com.tabulaw.IMarshalable;
 import com.tabulaw.model.IModelKeyProvider;
 import com.tabulaw.model.ModelKey;
 
 /**
  * @author jpk
  */
-public class CaseDocSearchResult implements IsSerializable, IModelKeyProvider {
+public class CaseDocSearchResult implements IMarshalable, IModelKeyProvider {
 
 	private String title, url, citation, titleHtml, summary;
 	private Date date;

@@ -22,6 +22,7 @@ import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.view.ShowViewRequest;
 import com.tabulaw.client.view.ViewManager;
 import com.tabulaw.common.data.rpc.DocPayload;
+import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
 
@@ -80,6 +81,9 @@ public class DocCreateDialog extends Dialog implements IEditHandler<FieldGroup> 
 							final DocRef persistedDoc = result.getDocRef();
 							ClientModelCache.get().persist(persistedDoc, DocCreateDialog.this);
 
+							final DocContent persistedDocContent = result.getDocContent();
+							ClientModelCache.get().persist(persistedDocContent, null);
+
 							DeferredCommand.addCommand(new Command() {
 
 								@Override
@@ -115,6 +119,9 @@ public class DocCreateDialog extends Dialog implements IEditHandler<FieldGroup> 
 							// persist the new doc and propagate through app
 							final DocRef persistedDoc = result.getDocRef();
 							ClientModelCache.get().persist(persistedDoc, DocCreateDialog.this);
+
+							final DocContent persistedDocContent = result.getDocContent();
+							if(persistedDocContent != null) ClientModelCache.get().persist(persistedDoc, null);
 
 							DeferredCommand.addCommand(new Command() {
 

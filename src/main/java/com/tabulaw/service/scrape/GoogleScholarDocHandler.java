@@ -16,10 +16,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
+import com.tabulaw.common.data.dto.CaseDocData;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.model.DocRef;
-import com.tabulaw.model.EntityFactory;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -165,7 +164,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 		catch(IOException e) {
 			throw new IllegalArgumentException(e);
 		}
-
+		
 		// isolate all the raw search result html fragments
 		TagNode[] nlist = root.getElementsByAttValue("class", "gs_r", true, false);
 		ArrayList<TagNode> rawResults = new ArrayList<TagNode>();
@@ -233,7 +232,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 	}
 
 	@Override
-	public DocRef parseSingleDocument(String rawHtml) {
+	public CaseDocData parseSingleDocument(String rawHtml) {
 		String reftoken = "", dlcy = "", parties = "", docLoc = "", court = "", syear = "", docTitle = "", htmlContent = "";
 
 		try {
@@ -320,7 +319,12 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 					tagOpinion.removeChild(sn);
 				}
 			}
-			htmlContent = cleaner.getInnerHtml(tags[0]);
+			
+			// tag root node as google scholar type doc
+			root = tags[0];
+			root.getChildTags()[0].addAttribute("class", "googlescholar");
+
+			htmlContent = cleaner.getInnerHtml(root);
 
 			// absolutize local hrefs
 			htmlContent = htmlContent.replace("/scholar_case", "http://scholar.google.com/scholar_case");
@@ -329,12 +333,10 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 			throw new IllegalArgumentException(e);
 		}
 
-		// we use current date (for now)
-		Date date = new Date();
+		int year = Integer.parseInt(syear);
 		
-		DocRef doc = EntityFactory.get().buildCaseDoc(docTitle, date, parties, reftoken, docLoc, court, null, syear);
-		doc.setHtmlContent(htmlContent);
-
+		CaseDocData doc = new CaseDocData(docTitle, reftoken, parties, docLoc, court, null, year, htmlContent);
+		
 		return doc;
 	}
 }

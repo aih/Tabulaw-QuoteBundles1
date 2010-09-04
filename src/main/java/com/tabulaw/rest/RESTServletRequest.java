@@ -69,7 +69,12 @@ public class RESTServletRequest extends HttpServletRequestWrapper {
 		}
 		HttpSession currentSession = request.getSession(false);
 		if (currentSession != null) {
-			currentSession.invalidate();
+			if (session == currentSession || session.getId().
+					equals(currentSession.getId())) {
+				session = currentSession;
+			} else {
+				currentSession.invalidate();
+			}
 		}
 		// make changed session alive
 		Object object = session.getAttribute("alive");

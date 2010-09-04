@@ -15,10 +15,9 @@ import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.tabulaw.common.data.dto.CaseDocData;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.model.CaseRef;
-import com.tabulaw.model.DocRef;
 import com.tabulaw.service.DocUtils;
 import com.tabulaw.util.ClassUtil;
 
@@ -99,24 +98,20 @@ public class GoogleScholarDocHandlerTest {
 		
 		GoogleScholarDocHandler docHandler = new GoogleScholarDocHandler();
 		
-		DocRef caseDoc = docHandler.parseSingleDocument(raw);
-		CaseRef caseRef = caseDoc.getCaseRef();
-		
-		String caseReftoken = caseRef.getReftoken();
-		String docTitle = caseDoc.getTitle();
-		String caseParties = caseRef.getParties();
-		String caseDocLoc = caseRef.getDocLoc();
-		String caseCourt = caseRef.getCourt();
-		int caseYear = caseRef.getYear();
-		String fullCitation = caseRef.descriptor();
-		
+		CaseDocData caseDocData = docHandler.parseSingleDocument(raw);
+		String caseReftoken = caseDocData.getReftoken();
+		String docTitle = caseDocData.getTitle();
+		String caseParties = caseDocData.getParties();
+		String caseDocLoc = caseDocData.getDocLoc();
+		String caseCourt = caseDocData.getCourt();
+		int caseYear = caseDocData.getYear();
+
 		Assert.assertEquals(caseReftoken, "Board of Supervisors of James City Cty. v. Rowe, 216 SE 2d 199 - Va: Supreme Court 1975");
 		Assert.assertEquals(docTitle, "Board of Supervisors of James City Cty. v. Rowe");
 		Assert.assertEquals(caseParties, "Board of Supervisors of James City Cty. v. Rowe");
 		Assert.assertEquals(caseDocLoc, "216 SE 2d 199");
 		Assert.assertEquals(caseCourt, "Supreme Court");
 		Assert.assertEquals(caseYear, 1975);
-		Assert.assertEquals(fullCitation, "Board of Supervisors of James City Cty. v. Rowe, 216 SE 2d 199 (1975).");
 	}
 
 	@Test(enabled = true)
@@ -130,7 +125,7 @@ public class GoogleScholarDocHandlerTest {
 		
 		String rawHtml = DocUtils.fetch(url);
 		
-		DocRef caseDoc = docHandler.parseSingleDocument(rawHtml);
+		CaseDocData caseDoc = docHandler.parseSingleDocument(rawHtml);
 		System.out.println(caseDoc);
 	}
 }

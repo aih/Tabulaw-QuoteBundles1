@@ -26,6 +26,9 @@ import com.tabulaw.dao.IEntityDao;
 import com.tabulaw.dao.NonUniqueResultException;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.model.BundleUserBinding;
+import com.tabulaw.model.ClauseBundle;
+import com.tabulaw.model.ContractDoc;
+import com.tabulaw.model.ContractDocUserBinding;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.DocUserBinding;
@@ -82,8 +85,6 @@ public class UserDataService extends AbstractEntityService {
 
 	/**
 	 * Gets a list of all docs for a given user.
-	 * <p>
-	 * The <code>htmlContent</code> property is cleared out for each doc.
 	 * @param userId user id
 	 * @return list of docs
 	 */
@@ -103,7 +104,7 @@ public class UserDataService extends AbstractEntityService {
 			if(list.size() != docIds.size())
 				throw new IllegalStateException("Doc id list and doc entity list size mis-match.");
 
-			return cloneDocList(list);
+			return list;
 		}
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
@@ -111,16 +112,51 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
-	 * Provides a list of all docs in the system.
-	 * <p>
-	 * Each doc element has their <code>htmlContent</code> property set to
-	 * <code>null</code>.
+	 * Gets a list of all contract docs for a given user.
+	 * @param userId user id
+	 * @return list of docs
+	 */
+	@Transactional(readOnly = true)
+	public List<ContractDoc> getContractDocsForUser(String userId) {
+		if(userId == null) throw new NullPointerException();
+		Criteria<ContractDocUserBinding> c = new Criteria<ContractDocUserBinding>(ContractDocUserBinding.class);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		try {
+			List<ContractDocUserBinding> bindings = dao.findEntities(c, null);
+			if(bindings.size() < 1) return new ArrayList<ContractDoc>(0);
+			ArrayList<String> docIds = new ArrayList<String>(bindings.size());
+			for(ContractDocUserBinding b : bindings) {
+				docIds.add(b.getDocId());
+			}
+			List<ContractDoc> list = dao.findByIds(ContractDoc.class, docIds, new Sorting("name"));
+			if(list.size() != docIds.size())
+				throw new IllegalStateException("Contract doc id list and contract doc entity list size mis-match.");
+
+			return list;
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	/**
+	 * Provides a list of all doc refs in the system.
 	 * @return doc list
 	 */
 	@Transactional(readOnly = true)
 	public List<DocRef> getAllDocs() {
 		List<DocRef> docs = dao.loadAll(DocRef.class);
-		return cloneDocList(docs);
+		return docs;
+	}
+
+	/**
+	 * Provides a list of all contract doc in the system.
+	 * @return doc list
+	 */
+	@Transactional(readOnly = true)
+	public List<ContractDoc> getAllContractDocs() {
+		List<ContractDoc> docs = dao.loadAll(ContractDoc.class);
+		return docs;
 	}
 
 	/**
@@ -137,8 +173,21 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
+	 * Gets the contract doc given the id.
+	 * @param id
+	 * @return to loaded doc ref
+	 * @throws EntityNotFoundException
+	 */
+	@Transactional(readOnly = true)
+	public ContractDoc getContractDoc(String id) throws EntityNotFoundException {
+		if(id == null) throw new NullPointerException();
+		ContractDoc dr = dao.load(ContractDoc.class, id);
+		return dr;
+	}
+
+	/**
 	 * Gets the doc <em>content</em> given the doc id.
-	 * @param docId
+	 * @param docId {@link DocRef} id
 	 * @return to loaded doc content
 	 * @throws EntityNotFoundException
 	 */
@@ -272,11 +321,11 @@ public class UserDataService extends AbstractEntityService {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 	/**
 	 * Gets the quote bundle given the bundle id.
 	 * @param bundleId
-	 * @return 
+	 * @return
 	 * @throws EntityNotFoundException
 	 */
 	@Transactional(readOnly = true)
@@ -313,12 +362,18 @@ public class UserDataService extends AbstractEntityService {
 		existingQb.setDescription(bundle.getDescription());
 		dao.persist(existingQb);
 	}
-	
-	@Transactional 
-	public void updateQuote(Quote quote) {
-		Quote exists = dao.load(Quote.class, quote.getId());
-		quote.doClone(exists);
-		dao.persist(exists);
+
+	/**
+	 * Updates a quote.
+	 * @param quote
+	 * @return the persisted quote
+	 */
+	@Transactional
+	public Quote updateQuote(Quote quote) {
+		if(quote == null) throw new NullPointerException();
+		validate(quote);
+		quote = dao.persist(quote);
+		return quote;
 	}
 
 	/**
@@ -340,6 +395,21 @@ public class UserDataService extends AbstractEntityService {
 		if(docContent == null) throw new NullPointerException();
 		validate(docContent);
 		dao.persist(docContent);
+	}
+
+	/**
+	 * Creates or updates the given contract doc.
+	 * @param doc the doc to save
+	 * @return the saved doc
+	 * @throws ConstraintViolationException When the given contract doc isn't
+	 *         valid
+	 */
+	@Transactional
+	public ContractDoc saveContractDoc(ContractDoc doc) throws ConstraintViolationException {
+		if(doc == null) throw new NullPointerException();
+		validate(doc);
+		doc = dao.persist(doc);
+		return doc;
 	}
 
 	/**
@@ -381,6 +451,21 @@ public class UserDataService extends AbstractEntityService {
 		catch(EntityNotFoundException e) {
 			// ok
 		}
+	}
+
+	/**
+	 * Deletes the contract doc given its id as well as all contract doc/user
+	 * bindings.
+	 * @param docId id of the contract doc to delete
+	 * @throws EntityNotFoundException when the contract doc of the given id can't
+	 *         be found
+	 */
+	@Transactional
+	public void deleteContractDoc(String docId) throws EntityNotFoundException {
+		if(docId == null) throw new NullPointerException();
+		List<ContractDocUserBinding> userBindings = getContractDocUserBindingsForDoc(docId);
+		dao.purgeAll(userBindings);
+		dao.purge(ContractDoc.class, docId);
 	}
 
 	/**
@@ -555,7 +640,7 @@ public class UserDataService extends AbstractEntityService {
 		dao.purge(bundle);
 		removeBundleUserBinding(userId, bundleId);
 	}
-	
+
 	/**
 	 * Gets the quote given the quote id.
 	 * @param quoteId
@@ -564,7 +649,7 @@ public class UserDataService extends AbstractEntityService {
 	 */
 	@Transactional(readOnly = true)
 	public Quote getQuote(String quoteId) throws EntityNotFoundException {
-		if (quoteId == null) {
+		if(quoteId == null) {
 			throw new NullPointerException();
 		}
 		Quote quote = dao.load(Quote.class, quoteId);
@@ -602,7 +687,7 @@ public class UserDataService extends AbstractEntityService {
 
 		// get the doc ref from the db to avoid having multiple docs of the same id
 		// persisted!
-		// NOTE: this is a db40 specific issue
+		// NOTE: this is a db4o specific issue
 		DocRef persistedDoc = null;
 		try {
 			persistedDoc = dao.load(DocRef.class, quote.getDocument().getId());
@@ -726,6 +811,19 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
+	 * Adds an association of an existing contract doc to an existing user.
+	 * @param userId
+	 * @param docId
+	 * @throws EntityExistsException if the association already exists
+	 */
+	@Transactional
+	public void addContractDocUserBinding(String userId, String docId) throws EntityExistsException {
+		if(docId == null || userId == null) throw new NullPointerException();
+		ContractDocUserBinding binding = new ContractDocUserBinding(docId, userId);
+		dao.persist(binding);
+	}
+
+	/**
 	 * Removes a user doc association.
 	 * @param userId
 	 * @param docId
@@ -746,7 +844,29 @@ public class UserDataService extends AbstractEntityService {
 		}
 		dao.purge(binding);
 	}
-	
+
+	/**
+	 * Removes a user contract doc association.
+	 * @param userId
+	 * @param docId
+	 * @throws EntityNotFoundException when the association doesn't exist
+	 */
+	@Transactional
+	public void removeContractDocUserBinding(String userId, String docId) throws EntityNotFoundException {
+		if(docId == null || userId == null) throw new NullPointerException();
+		Criteria<ContractDocUserBinding> c = new Criteria<ContractDocUserBinding>(ContractDocUserBinding.class);
+		c.getPrimaryGroup().addCriterion("docId", docId, Comparator.EQUALS, true);
+		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
+		ContractDocUserBinding binding;
+		try {
+			binding = dao.findEntity(c);
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
+		dao.purge(binding);
+	}
+
 	/**
 	 * Returns all user/doc bindings that exist for a given doc
 	 * @param docId id of the doc
@@ -756,6 +876,24 @@ public class UserDataService extends AbstractEntityService {
 	public List<DocUserBinding> getDocUserBindingsForDoc(String docId) {
 		if(docId == null) throw new NullPointerException();
 		Criteria<DocUserBinding> c = new Criteria<DocUserBinding>(DocUserBinding.class);
+		c.getPrimaryGroup().addCriterion("docId", docId, Comparator.EQUALS, true);
+		try {
+			return dao.findEntities(c, null);
+		}
+		catch(InvalidCriteriaException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	/**
+	 * Returns all contract doc/user bindings that exist for a given contract doc
+	 * @param docId id of the contract doc
+	 * @return list of contract doc user bindings
+	 */
+	@Transactional
+	public List<ContractDocUserBinding> getContractDocUserBindingsForDoc(String docId) {
+		if(docId == null) throw new NullPointerException();
+		Criteria<ContractDocUserBinding> c = new Criteria<ContractDocUserBinding>(ContractDocUserBinding.class);
 		c.getPrimaryGroup().addCriterion("docId", docId, Comparator.EQUALS, true);
 		try {
 			return dao.findEntities(c, null);
@@ -821,34 +959,31 @@ public class UserDataService extends AbstractEntityService {
 
 	/**
 	 * Checks does the specified document available for the user
-	 * 
 	 * @param userId
 	 * @param docId
 	 * @return
 	 */
 	@Transactional(readOnly = true)
 	public boolean isDocAvailableForUser(String userId, String docId) {
-		if(userId == null || docId == null) {
-			throw new NullPointerException();
-		}
-		
+		if(userId == null || docId == null) throw new NullPointerException();
+
 		Criteria<DocUserBinding> c = new Criteria<DocUserBinding>(DocUserBinding.class);
 		c.getPrimaryGroup().addCriterion("docId", docId, Comparator.EQUALS, true);
 		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
 		try {
 			dao.findEntity(c);
 			return true;
-		} catch (EntityNotFoundException ex) {
+		}
+		catch(EntityNotFoundException ex) {
 			return false;
 		}
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
-		}		
+		}
 	}
-	
+
 	/**
 	 * Checks does the bundle available for the user
-	 * 
 	 * @param userId
 	 * @param bundleId
 	 * @return
@@ -858,24 +993,24 @@ public class UserDataService extends AbstractEntityService {
 		if(userId == null || bundleId == null) {
 			throw new NullPointerException();
 		}
-		
+
 		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
 		c.getPrimaryGroup().addCriterion("bundleId", bundleId, Comparator.EQUALS, true);
 		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
 		try {
 			dao.findEntity(c);
 			return true;
-		} catch (EntityNotFoundException ex) {
+		}
+		catch(EntityNotFoundException ex) {
 			return false;
 		}
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
-		}		
-	}	
-	
+		}
+	}
+
 	/**
 	 * Checks does the bundle available for the user
-	 * 
 	 * @param userId
 	 * @param quoteId
 	 * @return true/false
@@ -885,24 +1020,25 @@ public class UserDataService extends AbstractEntityService {
 		if(userId == null || quoteId == null) {
 			throw new NullPointerException();
 		}
-		
+
 		Criteria<QuoteUserBinding> c = new Criteria<QuoteUserBinding>(QuoteUserBinding.class);
 		c.getPrimaryGroup().addCriterion("quoteId", quoteId, Comparator.EQUALS, true);
 		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
 		try {
 			dao.findEntity(c);
 			return true;
-		} catch (EntityNotFoundException ex) {
+		}
+		catch(EntityNotFoundException ex) {
 			return false;
 		}
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
-		}		
-	}		
+		}
+	}
 
 	/**
-	 * Gets all quotes that point to the doc and available for current user 
-	 * having the given doc id.
+	 * Gets all quotes that point to the doc and available for current user having
+	 * the given doc id.
 	 * @param docId
 	 * @param userId
 	 * @return non-<code>null</code> list of quotes
@@ -914,27 +1050,27 @@ public class UserDataService extends AbstractEntityService {
 		List<Quote> list;
 		try {
 			list = dao.findEntities(c, null);
-			if (userId != null) {
+			if(userId != null) {
 				Set<String> allowedIds = new HashSet<String>();
-				for (Quote quote : list) {
+				for(Quote quote : list) {
 					allowedIds.add(quote.getId());
 				}
 				Criteria<QuoteUserBinding> bindingCriteria = new Criteria<QuoteUserBinding>(QuoteUserBinding.class);
 				bindingCriteria.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
 				bindingCriteria.getPrimaryGroup().addCriterion("quoteId", allowedIds, Comparator.IN, true);
-				
-				List<QuoteUserBinding> bindings = dao.findEntities(bindingCriteria, null);				
+
+				List<QuoteUserBinding> bindings = dao.findEntities(bindingCriteria, null);
 				allowedIds.clear();
-				for (QuoteUserBinding binding : bindings) {
+				for(QuoteUserBinding binding : bindings) {
 					allowedIds.add(binding.getQuoteId());
 				}
-				
+
 				Iterator<Quote> iterator = list.iterator();
-				while (iterator.hasNext()) {
-					if (! allowedIds.contains(iterator.next().getId())) {
+				while(iterator.hasNext()) {
+					if(!allowedIds.contains(iterator.next().getId())) {
 						iterator.remove();
 					}
-				}				
+				}
 			}
 		}
 		catch(InvalidCriteriaException e) {
@@ -942,7 +1078,7 @@ public class UserDataService extends AbstractEntityService {
 		}
 		return list;
 	}
-	
+
 	/**
 	 * Gets all quotes that point to the doc having the given doc id.
 	 * @param docId
@@ -951,10 +1087,10 @@ public class UserDataService extends AbstractEntityService {
 	public List<Quote> findQuotesByDoc(String docId) {
 		return findQuotesByDocForUser(docId, null);
 	}
-	
+
 	@Transactional(readOnly = true)
 	public List<Quote> findQuotesForUser(String userId) {
-		if (userId == null) {
+		if(userId == null) {
 			throw new NullPointerException();
 		}
 		Criteria<QuoteUserBinding> c = new Criteria<QuoteUserBinding>(QuoteUserBinding.class);
@@ -975,6 +1111,54 @@ public class UserDataService extends AbstractEntityService {
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	/**
+	 * Creates or updates a clause bundle
+	 * @param cb the clause bundle to persist
+	 * @return the persisted bundle
+	 * @throws ConstraintViolationException
+	 * @throws EntityExistsException
+	 */
+	@Transactional
+	public ClauseBundle persistClauseBundle(ClauseBundle cb) throws ConstraintViolationException, EntityExistsException {
+		if(cb == null) throw new NullPointerException();
+		validate(cb);
+		cb = dao.persist(cb);
+		return cb;
+	}
+
+	/**
+	 * Deletes a clause bundle from the system.
+	 * @param id id of the clause bundle to be deleted
+	 * @throws EntityNotFoundException
+	 */
+	@Transactional
+	public void deleteClauseBundle(String id) throws EntityNotFoundException {
+		if(id == null) throw new NullPointerException();
+		dao.purge(ClauseBundle.class, id);
+	}
+
+	/**
+	 * Retrieves the clause bundle of the given id
+	 * @param id id of the clause bundle
+	 * @return clause bundle
+	 * @throws EntityNotFoundException
+	 */
+	@Transactional(readOnly = true)
+	public ClauseBundle getClauseBundle(String id) throws EntityNotFoundException {
+		if(id == null) throw new NullPointerException();
+		ClauseBundle cb = dao.load(ClauseBundle.class, id);
+		return cb;
+	}
+	
+	/**
+	 * @return list of all defined clause bundles in the system.
+	 */
+	@Transactional(readOnly = true)
+	public List<ClauseBundle> getAllClauseBundles() {
+		List<ClauseBundle> list = dao.loadAll(ClauseBundle.class);
+		return list;
 	}
 
 	private BundleUserBinding findBundleUserBinding(String userId, String bundleId) throws EntityNotFoundException {
@@ -1001,23 +1185,6 @@ public class UserDataService extends AbstractEntityService {
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
 		}
-	}
-
-	/**
-	 * Returns a new list whose elements are clones of those in the given doc
-	 * list.
-	 * <p>
-	 * Consequently, the <code>htmlContent</code> property is not specified in the
-	 * new cloned elements.
-	 * @param dlist doc list to clone
-	 * @return new list of cloned doc elements
-	 */
-	private List<DocRef> cloneDocList(List<DocRef> dlist) {
-		ArrayList<DocRef> clist = new ArrayList<DocRef>(dlist.size());
-		for(DocRef d : dlist) {
-			clist.add((DocRef) d.clone());
-		}
-		return clist;
 	}
 
 	/**

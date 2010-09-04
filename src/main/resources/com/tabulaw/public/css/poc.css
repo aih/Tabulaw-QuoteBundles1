@@ -565,7 +565,9 @@ div.ro {
 }
 .docHeader {
 	width: 100%;
-	height: 22px;
+/*	height: 22px;*/
+/*	position: absolute;*/
+	z-index: 9;
 }
 .docHeader img {
 	float: right;
@@ -593,16 +595,50 @@ div.ro {
 	-webkit-border-bottom-right-radius: 2px;
 }
 .docHeaderMenuItem{
-	background: url(../images/word-16.gif) no-repeat left;
-	padding-left: 20px;
+	cursor: pointer;
+	float: left;
+	background-color: #fff;
+	padding: 0 4px 4px 0;
+	
 }
 
+docHeaderMenuItem img{
+	float: left;
+}
 
 .docFrame { 
 	width: 100%;
 	height: 100%;
 	border: 0;
 }
+.docFrame .highlight {
+	background-color:yellow;
+}
+/* google scholar case doc specific styling */
+.docFrame .googlescholar {
+	margin-left: 40px;
+	margin-right: 5px;
+}
+.docFrame .googlescholar {
+	margin-left: 40px;
+}
+.docFrame .googlescholar a.gsl_pagenum,
+.docFrame .googlescholar a.gsl_pagenum2 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:10px;
+}
+.docFrame .googlescholar a.gsl_pagenum {
+	position:absolute;
+	left:0px;
+	color:gray;
+}
+.docFrame .googlescholar a.gsl_pagenum2 {
+	color:gray;
+	padding:0 4px;
+}
+
+
+
 .docEdit .gwt-RichTextArea {
 	width: 100%;
 	height: 100%;

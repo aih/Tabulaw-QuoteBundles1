@@ -2,7 +2,7 @@ poc ("Proof of Concept") is a demo app for owned by Tabulaw, Inc. programmed by 
 
 software requiremenets:
 ----------------------
-	eclipse IDE v3.5+
+	eclipse IDE v3.5+ 
 	maven v2.2.1+
 	GWT SDK v2.0.0+
 

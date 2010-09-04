@@ -9,7 +9,6 @@ import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
-import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.DocAndBundleWidget;
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -19,7 +18,6 @@ import com.tabulaw.client.view.ViewClass;
 import com.tabulaw.client.view.ViewManager;
 import com.tabulaw.client.view.ViewOptions;
 import com.tabulaw.model.DocKey;
-import com.tabulaw.model.DocRef;
 
 /**
  * Displays a single document allowing quote/bundle editing.
@@ -114,11 +112,11 @@ public class DocView extends AbstractPocView<DocViewInitializer> implements IMod
 	protected void doRefresh() {
 		// fetch the mDoc
 		assert docKey != null;
-		DocRef mDocument = (DocRef) ClientModelCache.get().get(docKey);
-		docWidget.setDocument(mDocument);
+		docWidget.setDocKey(docKey);
 
+		// TODO determine why setting the name is necessary
 		// set the doc key name to the document's name (title)
-		docKey.setName(mDocument.getName());
+		//docKey.setName(mDocument.getName());
 	}
 
 	@Override

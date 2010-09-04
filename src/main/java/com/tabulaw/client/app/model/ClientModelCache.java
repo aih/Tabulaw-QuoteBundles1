@@ -284,12 +284,12 @@ public class ClientModelCache {
 			list.remove(existing);
 		}
 
-		// TODO figure out how to avoid multiple clone() calls!
-		IEntity copy = m.clone(), copy2 = m.clone();
-		list.add(copy);
+		list.add(m.clone());
 
 		// fire model change event
-		if(source != null) modelChangeDispatcher.fireEvent(new ModelChangeEvent(source, op, copy2, null));
+		if(source != null) {
+			modelChangeDispatcher.fireEvent(new ModelChangeEvent(source, op, m.clone(), null));
+		}
 	}
 
 	/**

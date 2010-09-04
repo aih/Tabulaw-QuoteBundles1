@@ -33,6 +33,11 @@ import com.tabulaw.config.IConfigKey;
 import com.tabulaw.dao.IEntityDao;
 import com.tabulaw.model.BundleUserBinding;
 import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.ClauseBundle;
+import com.tabulaw.model.ClauseDef;
+import com.tabulaw.model.ContractDoc;
+import com.tabulaw.model.ContractDocUserBinding;
+import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.DocUserBinding;
 import com.tabulaw.model.Quote;
@@ -119,13 +124,19 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 	 */
 	protected void configureConfiguration(EmbeddedConfiguration c) {
 		CommonConfiguration cc = c.common();
-		cc.objectClass(User.class).updateDepth(0);
+		cc.objectClass(User.class).updateDepth(1);
 		cc.objectClass(UserState.class).updateDepth(0);
 		cc.objectClass(CaseRef.class).updateDepth(0);
 		
 		// the case is managed in the doc's life-cycle
 		cc.objectClass(DocRef.class).updateDepth(1);
 		
+		cc.objectClass(DocContent.class).updateDepth(0);
+		
+		cc.objectClass(ContractDoc.class).updateDepth(0);
+		cc.objectClass(ClauseDef.class).updateDepth(0);
+		cc.objectClass(ClauseBundle.class).updateDepth(2);
+	
 		// only persist the qoute (not the docref too)
 		cc.objectClass(Quote.class).updateDepth(0);
 		
@@ -136,6 +147,7 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 		
 		cc.objectClass(BundleUserBinding.class).updateDepth(0);
 		cc.objectClass(DocUserBinding.class).updateDepth(0);
+		cc.objectClass(ContractDocUserBinding.class).updateDepth(0);
 		cc.objectClass(QuoteUserBinding.class).updateDepth(0);
 	}
 

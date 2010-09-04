@@ -126,21 +126,14 @@ public class EntityFactory {
 	 * @param year
 	 * @return
 	 */
-	public CaseRef buildCase(String parties, String reftoken, String docLoc, String court, String url, String year) {
+	public CaseRef buildCase(String parties, String reftoken, String docLoc, String court, String url, int year) {
 		CaseRef e = (CaseRef) create(EntityType.CASE);
 		e.setReftoken(reftoken);
 		e.setParties(parties);
 		e.setDocLoc(docLoc);
 		e.setCourt(court);
 		e.setUrl(url);
-		if(year != null) {
-			try {
-				e.setYear(Integer.parseInt(year));
-			}
-			catch(NumberFormatException ex) {
-				// ok
-			}
-		}
+		e.setYear(year);
 		return e;
 	}
 
@@ -183,7 +176,7 @@ public class EntityFactory {
 	 * @return newly created model
 	 */
 	public DocRef buildCaseDoc(String docTitle, Date docDate, String parties, String reftoken,
-			String docLoc, String court, String url, String year) {
+			String docLoc, String court, String url, int year) {
 		DocRef doc = buildDoc(docTitle, docDate);
 		doc.setCaseRef(buildCase(parties, reftoken, docLoc, court, url, year));
 		return doc;

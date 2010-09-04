@@ -21,9 +21,8 @@ public class EmailDispatcher implements Runnable {
 	private static final Log log = LogFactory.getLog(EmailDispatcher.class);
 
 	private final LinkedBlockingQueue<IMailContext> queue = new LinkedBlockingQueue<IMailContext>();
-	private final MailManager mailManager;
 
-	private volatile boolean done;
+	private final MailManager mailManager;
 
 	/**
 	 * Constructor
@@ -39,13 +38,9 @@ public class EmailDispatcher implements Runnable {
 	public void queueEmail(IMailContext job) throws InterruptedException {
 		queue.put(job);
 	}
-	
+
 	public MailManager getMailManager() {
 		return mailManager;
-	}
-
-	public void setDone() {
-		done = true;
 	}
 
 	@Override
@@ -56,12 +51,10 @@ public class EmailDispatcher implements Runnable {
 				// int len = queue.size();
 				// System.out.println("List size now " + len);
 				process(item);
-				if(done) return;
 			}
 		}
 		catch(InterruptedException ex) {
-			// TODO what?
-			System.out.println("Email Dispatcher INTERRUPTED!");
+			log.info("EmailDispatcher thread shut down");
 		}
 	}
 
@@ -69,7 +62,7 @@ public class EmailDispatcher implements Runnable {
 		if(log.isDebugEnabled()) log.debug("Processing email job: " + item);
 		try {
 			mailManager.sendEmail(item);
-			if(log.isDebugEnabled()) log.debug("Email job: " + item + " processed.");
+			if(log.isInfoEnabled()) log.debug("Email job: " + item + " processed.");
 		}
 		catch(Exception e) {
 			log.error("Unable to process email: " + e.getMessage(), e);

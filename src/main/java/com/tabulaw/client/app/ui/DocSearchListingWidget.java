@@ -40,6 +40,7 @@ import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
 import com.tabulaw.dao.Sorting;
+import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 
 /**
@@ -209,9 +210,11 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 						return;
 					}
 					final DocRef mNewDoc = result.getDocRef();
+					final DocContent mNewDocContent = result.getDocContent();
 
 					// persist the new doc and propagate through app
 					ClientModelCache.get().persist(mNewDoc, Table.this);
+					if(mNewDocContent != null) ClientModelCache.get().persist(mNewDocContent, null);
 
 					DeferredCommand.addCommand(new Command() {
 

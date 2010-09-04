@@ -27,7 +27,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEntity {
 
 	private static final long serialVersionUID = -8257785916791525146L;
-
+	
 	/**
 	 * Surrogate primary key.
 	 */
@@ -38,17 +38,12 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	private CaseRef caseRef;
 
 	/**
-	 * This property is not persisted.
-	 */
-	private transient String htmlContent;
-
-	/**
 	 * Constructor
 	 */
 	public DocRef() {
 		super();
 	}
-
+	
 	@Override
 	public String getId() {
 		return id;
@@ -145,22 +140,6 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 
 	public void setCaseRef(CaseRef caseRef) {
 		this.caseRef = caseRef;
-	}
-
-	/**
-	 * @return transient html content.
-	 */
-	@XmlTransient
-	public String getHtmlContent() {
-		return htmlContent;
-	}
-
-	/**
-	 * Sets the non-persisting (transient) html content property
-	 * @param htmlContent
-	 */
-	public void setHtmlContent(String htmlContent) {
-		this.htmlContent = htmlContent;
 	}
 
 	@Override

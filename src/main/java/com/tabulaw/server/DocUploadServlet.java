@@ -100,11 +100,12 @@ public class DocUploadServlet extends HttpServlet {
 						// save doc ref
 						mDoc = uds.saveDoc(mDoc);
 
-						// localize converted doc html content
 						String htmlContent = new String(barr, "UTF-8");
-						StringBuilder docsb = new StringBuilder(htmlContent);
-						DocUtils.localizeDoc(docsb, mDoc.getId(), docTitle);
-						htmlContent = docsb.toString();
+						
+						// localize converted doc html content
+//						StringBuilder docsb = new StringBuilder(htmlContent);
+//						DocUtils.localizeDoc(docsb, mDoc.getId(), docTitle);
+//						htmlContent = docsb.toString();
 
 						// save the doc in the db and create a doc/user binding
 						uds.addDocUserBinding(user.getId(), mDoc.getId());

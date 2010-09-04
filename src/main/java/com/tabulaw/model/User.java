@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -26,8 +28,7 @@ import com.tabulaw.model.bk.BusinessObject;
  * The user entity. NOTE: no surrogate primary key is needed here.
  * @author jpk
  */
-@BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress"
-}))
+@BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress" }))
 @XmlRootElement(name = "user")
 public class User extends TimeStampEntity implements IUserRef, INamedEntity, Comparable<User> {
 
@@ -62,14 +63,16 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	private Date expires;
 
 	private ArrayList<Role> roles;
-	
+
+	private HashSet<AppFeature> appFeatures;
+
 	/**
 	 * Constructor
 	 */
 	public User() {
 		super();
 	}
-	
+
 	public boolean isSuperuser() {
 		return SUPERUSER.equals(name);
 	}
@@ -109,7 +112,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	public void doClone(IEntity cln) {
 		super.doClone(cln);
 		User u = (User) cln;
-		
+
 		ArrayList<Role> croles = roles == null ? null : new ArrayList<Role>(roles);
 
 		u.name = name;
@@ -252,6 +255,36 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		this.enabled = enabled;
 	}
 
+	/**
+	 * @return list of app features to which the user has privilege.
+	 */
+	public Set<AppFeature> getAppFeatures() {
+		return appFeatures;
+	}
+
+	public void setAppFeatures(Collection<AppFeature> appFeatures) {
+		if(this.appFeatures == null) {
+			this.appFeatures = new HashSet<AppFeature>();
+		}
+		this.appFeatures.addAll(appFeatures);
+	}
+	
+	public void addAppFeature(AppFeature f) {
+		if(this.appFeatures == null) {
+			this.appFeatures = new HashSet<AppFeature>();
+		}
+		appFeatures.add(f);
+	}
+	
+	public boolean hasAppFeature(AppFeature f) {
+		return appFeatures == null ? false : appFeatures.contains(f);
+	}
+	
+	public boolean removeAppFeature(AppFeature f) {
+		if(appFeatures == null) return false;
+		return appFeatures.remove(f);
+	}
+
 	@Override
 	public int compareTo(User o) {
 		return name != null && o.name != null ? name.compareTo(o.name) : 0;
@@ -288,7 +321,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 			}
 			return sb.length() > 0 ? sb.substring(1) : "";
 		}
-		
+
 		return null;
 	}
 }

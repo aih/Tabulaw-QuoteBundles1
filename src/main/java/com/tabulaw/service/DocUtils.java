@@ -6,7 +6,6 @@
 package com.tabulaw.service;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,11 +15,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-
 import com.tabulaw.model.CaseRef;
-import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.util.IOUtils;
@@ -32,10 +27,6 @@ public class DocUtils {
 
 	static final String htmlPrefixBlock, htmlSuffixBlock;
 
-	static final String jsScriptCallbackBlock, cssHighightStylesBlock;
-
-	static final String docDirPath;
-
 	private static final DateFormat dateFormat = new SimpleDateFormat("M/d/yyyy");
 
 	static {
@@ -46,22 +37,17 @@ public class DocUtils {
 
 		htmlSuffixBlock = "</body></html>";
 
-		jsScriptCallbackBlock =
-				"<script type=\"text/javascript\">window.onload=function(){window.parent.${onDocFrameLoaded}(document);}</script>";
-
-		cssHighightStylesBlock = 
-			"<style type=\"text/css\">" +
-				".highlight{background-color:yellow;} " +
-				
-				// google scholar specific
-				"body{margin-left:40px} " + 
-				"a.gsl_pagenum,a.gsl_pagenum2{font-family: Arial, Helvetica, sans-serif;font-size:10px;} " +
-				"a.gsl_pagenum{position:absolute;left:0px;color:gray;} " +
-				"a.gsl_pagenum2{color:gray;padding:0 4px;} " +
-				
-			"</style>";
-
-		docDirPath = DocUtils.class.getClassLoader().getResource("").getPath() + "docs" + File.separator;
+//		cssHighightStylesBlock = 
+//			"<style type=\"text/css\">" +
+//				".highlight{background-color:yellow;} " +
+//				
+//				// google scholar specific
+//				"body{margin-left:40px} " + 
+//				"a.gsl_pagenum,a.gsl_pagenum2{font-family: Arial, Helvetica, sans-serif;font-size:10px;} " +
+//				"a.gsl_pagenum{position:absolute;left:0px;color:gray;} " +
+//				"a.gsl_pagenum2{color:gray;padding:0 4px;} " +
+//				
+//			"</style>";
 	}
 
 	/**
@@ -80,71 +66,6 @@ public class DocUtils {
 		if(".txt".equals(fileExt) || ".text".equals(fileExt)) return "text/html";
 		if(".htm".equals(fileExt) || ".html".equals(fileExt)) return "text/html";
 		throw new IllegalArgumentException("No mime-type mapped for file extension: " + fileExt);
-	}
-
-	/**
-	 * Is the file named such that is implies it has html content?
-	 * @param fname the non-path file name
-	 * @return true/false
-	 */
-	public static boolean isHtmlFileByExtension(String fname) {
-		if(fname.endsWith(".htm") || fname.endsWith(".html")) return true;
-		return false;
-	}
-
-	/**
-	 * Is the file named such that is implies it has textual content?
-	 * @param fname the non-path file name
-	 * @return true/false
-	 */
-	public static boolean isTextFileByExtension(String fname) {
-		if(fname.endsWith(".txt") || fname.endsWith(".text")) return true;
-		return false;
-	}
-
-	/**
-	 * Is the file named such that it implies it is an ms-word doc file?
-	 * @param fname the non-path file name
-	 * @return true/false
-	 */
-	public static boolean isMsWordFileByExtension(String fname) {
-		if(fname.endsWith(".doc") || fname.endsWith(".docx")) return true;
-		return false;
-	}
-
-	/**
-	 * @return ref to the directory containing all cached docs on disk.
-	 */
-	public static File getDocDirRef() {
-		File f = new File(docDirPath);
-		return f;
-	}
-
-	/**
-	 * Creates {@link File} instance given a non-path filename.
-	 * @param filename the filename to employ
-	 * @return new {@link File} instance pointing to the doc on disk
-	 * @throws IllegalArgumentException when the op fails
-	 */
-	public static File getDocFileRef(String filename) throws IllegalArgumentException {
-		if(StringUtils.isEmpty(filename)) throw new IllegalArgumentException();
-		File f = new File(docDirPath + filename);
-		return f;
-	}
-
-	/**
-	 * Creates a file under the doc dir with the html content of the given doc
-	 * written to it.
-	 * @param doc the doc to write to disk
-	 * @return The newly created file
-	 * @throws IOException
-	 */
-	public static File docContentsToFile(DocContent doc) throws IOException {
-		String fname = Integer.toString(Math.abs(doc.hashCode())) + ".html";
-		File f = getDocFileRef(fname);
-		String htmlContent = doc.getHtmlContent();
-		FileUtils.writeStringToFile(f, htmlContent, "UTF-8");
-		return f;
 	}
 
 	/**
@@ -206,7 +127,7 @@ public class DocUtils {
 		String title = null;
 
 		// case related
-		String parties = null, reftoken = null, docLoc = null, court = null, url = null, year = null;
+		String parties = null, reftoken = null, docLoc = null, court = null, url = null, syear = null;
 		Date date = null;
 
 		int nli = stoken.indexOf('\n');
@@ -253,53 +174,25 @@ public class DocUtils {
 					url = value;
 				}
 				else if("year".equals(name)) {
-					year = value;
+					syear = value;
 				}
 			}
 		}
 
-		if("casedoc".equals(type))
+		if("casedoc".equals(type)) {
+			int year;
+			try {
+				year = Integer.parseInt(syear);
+			}
+			catch(NumberFormatException e) {
+				year = 0;
+			}
 			return EntityFactory.get().buildCaseDoc(title, date, parties, reftoken, docLoc, court, url, year);
+		}
 		else if("doc".equals(type))
 			return EntityFactory.get().buildDoc(title, date);
 		else
 			throw new IllegalArgumentException("Unhandled doc type: " + type);
-	}
-
-	/**
-	 * "Localizes" doc html content by injecting local css and js blocks needed
-	 * for client-side doc functionality if not already present.
-	 * <p>
-	 * Also, wraps the given html string with html, head, body tags if not present
-	 * @param doc html content string
-	 * @param docId required
-	 * @param docTitle
-	 * @throws IllegalArgumentException When the localization fails due to
-	 *         mal-formed html tags in the given html string
-	 */
-	public static void localizeDoc(StringBuilder doc, String docId, String docTitle) throws IllegalArgumentException {
-		if(doc == null || docId == null) throw new NullPointerException();
-
-		if(doc.indexOf("<html") == -1 && doc.indexOf("<HTML") == -1) {
-			String rpl = docTitle == null ? "" : docTitle;
-			doc.insert(0, htmlPrefixBlock.replace("${title}", rpl));
-			doc.append(htmlSuffixBlock);
-		}
-		// inject js callback hook in window.onload
-		if(doc.indexOf(cssHighightStylesBlock) == -1) {
-			int index = doc.indexOf("</head>");
-			if(index == -1) index = doc.indexOf("</HEAD>");
-			if(index == -1) throw new IllegalArgumentException("No closing html head tag found.");
-			doc.insert(index, cssHighightStylesBlock);
-			index = doc.indexOf("</head>");
-			if(index == -1) index = doc.indexOf("</HEAD>");
-
-			String docFrameLoadedFnName = "onDocFrameLoaded_" + docId;
-			String jsBlock = jsScriptCallbackBlock;
-			jsBlock = jsBlock.replace("${onDocFrameLoaded}", docFrameLoadedFnName);
-
-			doc.insert(index, jsBlock);
-		}
 	}
 
 	/**

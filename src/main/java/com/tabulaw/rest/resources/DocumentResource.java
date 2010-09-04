@@ -3,6 +3,7 @@ package com.tabulaw.rest.resources;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -16,9 +17,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.tabulaw.common.data.dto.CaseDocData;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
@@ -42,6 +45,10 @@ import com.tabulaw.service.scrape.IDocHandler;
 public class DocumentResource extends BaseResource {
 	
 	private DocRef fetchDocument(String remoteUrl) {
+		UserContext userContext = (UserContext) httpRequest.getSession().getAttribute(REST_USER_KEY);
+		// TODO verify this check for a valid user in a valid user context
+		if(userContext == null || userContext.getUser() == null) throw new IllegalStateException();
+		
 		String fcontents;
 		try {
 			fcontents = DocUtils.fetch(new URL(remoteUrl));
@@ -63,30 +70,34 @@ public class DocumentResource extends BaseResource {
 		}
 		
 		// parse fetched doc data
-		DocRef document = handler.parseSingleDocument(fcontents);
-		CaseRef caseRef = document.getCaseRef();
-		caseRef.setUrl(remoteUrl);
+		CaseDocData cdd = handler.parseSingleDocument(fcontents);
 		
+		DocRef doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), cdd.getParties(), cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteUrl, cdd.getYear());
+
 		// persist the doc ref and doc/user binding
-		document = getDataService().saveDoc(document);
+		doc = getDataService().saveDoc(doc);
+		getDataService().addDocUserBinding(userContext.getUser().getId(), doc.getId());
+
+		String htmlContent = cdd.getHtmlContent();
 		
 		// localize doc content
-		String htmlContent = document.getHtmlContent();
-		document.setHtmlContent(null);
-		StringBuilder sb = new StringBuilder(htmlContent.length() + 1024);
-		sb.append(htmlContent);
-		DocUtils.localizeDoc(sb, document.getId(), document.getTitle());
-		htmlContent = sb.toString();
+//		StringBuilder sb = new StringBuilder(htmlContent.length() + 1024);
+//		sb.append(htmlContent);
+//		DocUtils.localizeDoc(sb, doc.getId(), doc.getTitle());
+//		htmlContent = sb.toString();
 
 		// persist doc content
-		DocContent docContent = EntityFactory.get().buildDocContent(document.getId(), htmlContent);
+		DocContent docContent = EntityFactory.get().buildDocContent(doc.getId(), htmlContent);
 		getDataService().saveDocContent(docContent);
-		
-		return document;
+
+		return doc;
 	}
 	
 	@POST
 	public DocRef create(@FormParam("remoteUrl") String remoteUrl) {
+		if (StringUtils.isEmpty(remoteUrl)) {
+			throw new WebApplicationException(Status.BAD_REQUEST);
+		}
 		DocRef document = null;
 		try {
 			document = getDataService().

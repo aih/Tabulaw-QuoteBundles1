@@ -14,7 +14,7 @@ import com.tabulaw.model.User;
 import com.tabulaw.model.UserState;
 
 /**
- * AdminContextPayload - Payload for initializing the client-side admin context.
+ * Payload for initializing the client-side user context.
  * @author jpk
  */
 public class UserContextPayload extends Payload {
