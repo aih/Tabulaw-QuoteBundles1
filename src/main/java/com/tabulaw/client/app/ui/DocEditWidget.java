@@ -14,10 +14,15 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.CustomButton;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -42,7 +47,7 @@ import com.tabulaw.client.ui.toolbar.Toolbar;
  */
 public class DocEditWidget extends Composite implements HasHTML {
 
-	class EditToolBar extends Composite implements ClickHandler, ChangeHandler, KeyUpHandler {
+	class EditToolBar extends Composite implements ClickHandler, ChangeHandler, KeyPressHandler   {
 		private final Toolbar toolbar = new Toolbar();
 		private final FlowPanel pnl = new FlowPanel();
 
@@ -129,20 +134,20 @@ public class DocEditWidget extends Composite implements HasHTML {
 			bold = new ToggleButton(new Image(Resources.INSTANCE.bold()));
 			addImageButton(bold, "Bold", new ClickHandler() {
 				public void onClick(ClickEvent event) {
-					rta.getFormatter().toggleBold();
+					toggleBold();
 				}
 			});
 
 			italic = new ToggleButton(new Image(Resources.INSTANCE.italic()));
 			addImageButton(italic, "Italic", new ClickHandler() {
 				public void onClick(ClickEvent event) {
-					rta.getFormatter().toggleItalic();
+					toggleItalic();
 				}
 			});
 			underline = new ToggleButton(new Image(Resources.INSTANCE.underline()));
 			addImageButton(underline, "Underline", new ClickHandler() {
 				public void onClick(ClickEvent event) {
-					rta.getFormatter().toggleUnderline();
+					toggleUnderline();
 				}
 			});
 
@@ -212,6 +217,7 @@ public class DocEditWidget extends Composite implements HasHTML {
 				handler.onClick(event);
 			}
 			updateStatus();
+			hideMenu();
 		}
 
 		@Override
@@ -224,8 +230,30 @@ public class DocEditWidget extends Composite implements HasHTML {
 		}
 
 		@Override
-		public void onKeyUp(KeyUpEvent event) {
+		public void onKeyPress(KeyPressEvent event) {
 			updateStatus();
+			Character eventChar = event.getCharCode();
+			eventChar = Character.toUpperCase(eventChar);
+			boolean preventDefault = false;
+			if (event.isControlKeyDown()) {
+				switch (eventChar) {
+				case 'B':
+					toggleBold();
+					preventDefault = true;
+					break;
+				case 'I':
+					toggleItalic();
+					preventDefault = true;
+					break;
+				case 'U':
+					toggleUnderline();
+					preventDefault = true;
+					break;
+				}
+				if (preventDefault) {
+					event.preventDefault();
+				}
+			}
 		}
 
 		private void updateStatus() {
@@ -246,6 +274,32 @@ public class DocEditWidget extends Composite implements HasHTML {
 			superscript.setDown(getFormatter().isSuperscript());
 
 		}
+		private void toggleBold() {
+			rta.getFormatter().toggleBold();
+		}
+		private void toggleItalic() {
+			rta.getFormatter().toggleItalic();
+		}
+		private void toggleUnderline() {
+			rta.getFormatter().toggleUnderline();
+		}
+		native void hideMenu() /*-{
+			//fixes gwt menu behaviour over iframe
+//			$wnd.goog.require('goog.ui.PopupBase');
+			var POPUP_CLASS_NAME='gwt-MenuBarPopup';
+			var SELECTED_ITEM_CLASS_NAME='gwt-MenuItem-selected';
+
+			var elements = $wnd.goog.dom.getElementsByTagNameAndClass('.'+POPUP_CLASS_NAME);
+			for (var i=0;i<elements.length;i++) {
+//				var popup = new $wnd.goog.ui.PopupBase(elements[i]);
+//				alert(popup);
+//				popup.setVisible(false);					
+			}
+//			elements = $wnd.goog.dom.getElementsByTagNameAndClass('.'+SELECTED_ITEM_CLASS_NAME);
+//			for (var i=0;i<elements.length;i++) {
+//				elements[i].className = elements[i].className.replace(' '+SELECTED_ITEM_CLASS_NAME, '');
+//			}
+		}-*/;
 
 	}
 
@@ -263,11 +317,13 @@ public class DocEditWidget extends Composite implements HasHTML {
 	public DocEditWidget() {
 		super();
 		pnl.addStyleName("docEdit");
+		pnl.addStyleName("documentContainer");
 		pnl.add(rta);
-		rta.addKeyUpHandler(editBar);
+		rta.addKeyPressHandler(editBar);
 		rta.addClickHandler(editBar);
 		initWidget(pnl);
 	}
+	
 
 	private native void executeCommand(String cmd, String param) /*-{
 		this.@com.tabulaw.client.app.ui.DocEditWidget::elem.contentWindow.document.execCommand(cmd, false, param);

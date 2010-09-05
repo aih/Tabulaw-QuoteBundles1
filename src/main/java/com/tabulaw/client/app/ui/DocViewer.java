@@ -7,6 +7,7 @@ package com.tabulaw.client.app.ui;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -14,13 +15,10 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PushButton;
@@ -28,12 +26,14 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
-import com.tabulaw.client.app.Resources;
+import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.ModelKey;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -87,23 +87,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		}-*/;
 	}
 
-	private class DocToolbar extends Composite {
-		private final FlowPanel toolbarPnl = new FlowPanel();
+	private class DocMenu extends MenuBar {
 
-		public DocToolbar() {
-			initWidget(toolbarPnl);
-		}
-
-		public void insert(Widget w, int beforeIndex) {
-			toolbarPnl.insert(w, 0);
-		}
-
-	}
-
-	private class DocViewHeader extends Composite {
-
-		private final FlowPanel menuPnl = new FlowPanel();
-		private final HTML html = new HTML();
 
 		private DownloadDocCommand rtfDownloadCommand = new DownloadDocCommand(RTF_MIME_TYPE);
 		private DownloadDocCommand docxDownloadCommand = new DownloadDocCommand(DOCX_MIME_TYPE);
@@ -127,24 +112,14 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 		};
 
-		public DocViewHeader() {
+		public DocMenu() {
 			super();
-			menuPnl.setStyleName("docHeader");
-
-			MenuBar topMenu = createMenu();  
-			menuPnl.add(topMenu);
-
-			initWidget(menuPnl);
-		}
-
-		private MenuBar createMenu() {
-			MenuBar topMenu = new MenuBar();
 
 			MenuBar fileMenu = new MenuBar(true);
 
 			// downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>",
 			// true, downloadMenu);
-			topMenu.addItem("File", true, fileMenu);
+			this.addItem("File", true, fileMenu);
 
 			MenuBar downloadMenu = new MenuBar(true);
 			editDoc = new MenuItem("Edit", editCommand);
@@ -161,16 +136,22 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 			downloadMenu.addItem(fireRtf);
 			downloadMenu.addItem(fireDocx);
-			return topMenu;
-			
 		}
 		public void setVisibleEditItem(boolean visible){
 			editDoc.setVisible(visible);
 		}
-
-		public void insert(Widget w, int beforeIndex) {
-			menuPnl.insert(w, 0);
+		public void setId(String id) {
+			rtfDownloadCommand.setId(id);
+			docxDownloadCommand.setId(id);
 		}
+		public void toogleEditItemVisibility(){
+			boolean isViewVisible=viewDoc.isVisible();
+			boolean isEditVisible=editDoc.isVisible();
+			viewDoc.setVisible(!isViewVisible);
+			editDoc.setVisible(!isEditVisible);
+			
+		}
+		
 	}
 
 	static class DocFrame extends ScrollPanel {
@@ -185,13 +166,14 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	/**
 	 * docView
 	 */
-	private final FlowPanel pnl = new FlowPanel();
-
+	 private final DockLayoutPanel pnl = new DockLayoutPanel(Unit.PX);
 	/**
 	 * docHeader
 	 */
-	private final DocViewHeader header = new DocViewHeader();
-	private final DocToolbar toolbar = new DocToolbar();
+	private final DocMenu menu = new DocMenu();
+
+	private final FlowPanel headerPnl = new FlowPanel();
+	private final FlowPanel docPnl = new FlowPanel();
 
 	/**
 	 * The tag in which the doc is loaded.
@@ -217,11 +199,13 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		super();
 
 		pnl.setStylePrimaryName("docView");
-		pnl.add(header);
-		pnl.add(toolbar);
+		headerPnl.add(menu);
+		pnl.addNorth(headerPnl,50);
 
 		frame = new DocFrame();
-		pnl.add(frame);
+		frame.addStyleName("documentContainer");
+		docPnl.add(frame);
+		pnl.add(docPnl);
 
 		initWidget(pnl);
 
@@ -346,7 +330,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	 * NOTE: <code>null</code> model is supported.
 	 * 
 	 * @param doc
-	 * @param docContent optional
+	 * @param docContent
 	 */
 	public void setModel(DocRef doc, DocContent docContent) {
 
@@ -355,14 +339,15 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		}
 
 		this.doc = doc;
-
+		
 		// disallow doc editing for case type docs
-		header.setVisibleEditItem(doc != null && doc.getCaseRef() == null);
+		menu.setVisibleEditItem(doc != null && doc.getCaseRef() == null);
 
 		frame.getElement().setId(getFrameId());
 
 		if(doc != null) {
 			initDocFrame();
+			menu.setId(doc.getId());
 		}
 
 		// set html content directly or via url?
@@ -375,11 +360,6 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		}
 		else {
 			throw new IllegalStateException("No doc content specified");
-		}
-
-		if(doc != null) {
-			header.rtfDownloadCommand.setId(doc.getId());
-			header.docxDownloadCommand.setId(doc.getId());
 		}
 	}
 	
@@ -461,12 +441,17 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 					setDocHtml(docHtml);
 					staticMode();
 
+					// update the cache
+					ClientModelCache.get().remove(new ModelKey(EntityType.DOC_CONTENT.name(), doc.getId()),null);
 					// persist to server
 					Poc.getUserDataService().updateDocContent(doc.getId(), docHtml, new AsyncCallback<Payload>() {
+						
+						
 
 						@Override
 						public void onSuccess(Payload result) {
 							Notifier.get().showFor(result, null);
+							
 						}
 
 						@Override
@@ -474,6 +459,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 							Notifier.get().showFor(caught);
 						}
 					});
+					
 				}
 			});
 			btnSave.setTitle("Save Document");
@@ -488,7 +474,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 			dew = new DocEditWidget();
 			dew.setVisible(false);
-			pnl.add(dew);
+			docPnl.add(dew);
 		}
 
 		if (!dew.isVisible()) {
@@ -512,11 +498,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		frame.setVisible(false);
 		dew.setVisible(true);
 
-		header.html.setTitle("Editing");
-		toolbar.insert(dew.getEditToolBar(), 0);
-		header.viewDoc.setVisible(true);
-		header.editDoc.setVisible(false);
-
+		headerPnl.add(dew.getEditToolBar());
+		menu.toogleEditItemVisibility();
 		Poc.getNavCol().addWidget(btnSave);
 		Poc.getNavCol().addWidget(btnCancel);
 
@@ -533,12 +516,10 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		// so qb doc col can know which doc mode we are in
 		RootPanel.get().addStyleName("doc-static");
 		RootPanel.get().removeStyleName("doc-edit");
-		header.viewDoc.setVisible(false);
-		header.editDoc.setVisible(true);
-
 		frame.setVisible(true);
 		if (dew != null) {
 			dew.setVisible(false);
+			menu.toogleEditItemVisibility();
 			dew.getEditToolBar().removeFromParent();
 			Poc.getNavCol().removeWidget(btnSave);
 			Poc.getNavCol().removeWidget(btnCancel);

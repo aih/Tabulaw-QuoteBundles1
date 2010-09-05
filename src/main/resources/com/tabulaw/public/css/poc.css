@@ -559,15 +559,8 @@ div.ro {
 }
 .docContainer {
 }
-.toolbarHeader {
-	width: 99%;
-	border: 1px solid #EAEAEA;
-}
 .docHeader {
 	width: 100%;
-/*	height: 22px;*/
-/*	position: absolute;*/
-	z-index: 9;
 }
 .docHeader img {
 	float: right;
@@ -647,7 +640,36 @@ docHeaderMenuItem img{
 
 .docEdit {
 }
-	
+
+.documentContainer {
+	font-family: serif;
+	font-size:16;
+}
+.documentContainer p{
+	margin-top: 16px;
+	margin-bottom: 16px;
+}
+
+.documentContainer h1{
+	margin-top: 16px;
+	margin-bottom: 16px;
+	font-size:32;
+	font-weight:bold;
+}
+.documentContainer h2{
+	margin-top: 16px;
+	margin-bottom: 16px;
+	font-size:24;
+	font-weight:bold;
+}
+
+.documentContainer h3{
+	margin-top: 16px;
+	margin-bottom: 16px;
+	font-size:18;
+	font-weight:bold;
+}
+
 .editBar {
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
