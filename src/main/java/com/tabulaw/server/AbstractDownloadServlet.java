@@ -20,7 +20,7 @@ import com.tabulaw.util.StringUtil;
 public abstract class AbstractDownloadServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 842994896967308571L;
-	protected static final String EXPORT_TEMPLATE_PATH = "export-templates/";
+	protected static final String EXPORT_TEMPLATE_PATH = "vtemplates/";
 
 	protected static final Log log = LogFactory.getLog(DocDownloadServlet.class);
 

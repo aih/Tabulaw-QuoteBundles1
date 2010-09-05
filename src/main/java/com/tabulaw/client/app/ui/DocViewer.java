@@ -15,6 +15,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
@@ -30,6 +31,7 @@ import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.rpc.Payload;
+import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityType;
@@ -107,7 +109,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 			@Override
 			public void execute() {
-				staticMode();
+				staticMode(true);
 			}
 
 		};
@@ -210,7 +212,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		initWidget(pnl);
 
 		// set initial styling..
-		staticMode();
+		staticMode(false);
 	}
 
 	/**
@@ -398,6 +400,31 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	public Widget[] getNavColWidgets() {
 		return isEditMode() ? new Widget[] { btnSave, btnCancel } : null;
 	}
+	public void updateDocContent(){
+		//update screen
+		String docHtml = dew.getHTML();
+		setDocHtml(docHtml);
+		// update the cache
+		try {
+			ClientModelCache.get().remove(new ModelKey(EntityType.DOC_CONTENT.name(), doc.getId()),null);
+		} catch(EntityNotFoundException enf) {
+			//do nothing
+		}
+		// persist to server
+		Poc.getUserDataService().updateDocContent(doc.getId(), docHtml, new AsyncCallback<Payload>() {
+			@Override
+			public void onSuccess(Payload result) {
+				Notifier.get().showFor(result, null);
+				
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Notifier.get().showFor(caught);
+			}
+		});
+		
+	}
 
 	@Override
 	protected void onUnload() {
@@ -423,6 +450,11 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		return dew != null && dew.isVisible();
 	}
 
+	private boolean isContentChanged(){
+		String docHtml = getDocHtml(); //html from div
+		return !docHtml.equals(dew.getHTML());
+	}
+
 	private void createDew() {
 		if (dew == null) {
 
@@ -435,31 +467,11 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 				public void onClick(ClickEvent clkEvt) {
 					if (doc == null)
 						return;
+					staticMode(false);
 
 					// save the doc
-					String docHtml = dew.getHTML();
-					setDocHtml(docHtml);
-					staticMode();
-
-					// update the cache
-					ClientModelCache.get().remove(new ModelKey(EntityType.DOC_CONTENT.name(), doc.getId()),null);
-					// persist to server
-					Poc.getUserDataService().updateDocContent(doc.getId(), docHtml, new AsyncCallback<Payload>() {
-						
-						
-
-						@Override
-						public void onSuccess(Payload result) {
-							Notifier.get().showFor(result, null);
-							
-						}
-
-						@Override
-						public void onFailure(Throwable caught) {
-							Notifier.get().showFor(caught);
-						}
-					});
-					
+					updateDocContent();
+		
 				}
 			});
 			btnSave.setTitle("Save Document");
@@ -467,7 +479,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 				@Override
 				public void onClick(ClickEvent clkEvt) {
-					staticMode();
+					staticMode(true);
 				}
 			});
 			btnCancel.setTitle("Revert Document");
@@ -509,7 +521,13 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	/**
 	 * Sets the mode to static.
 	 */
-	private void staticMode() {
+	private void staticMode(boolean showWarning) {
+		final String WARNING_MSG="You have unsaved changes that will be lost. Would you like to save them now?"; 
+		if (showWarning && isContentChanged()) {
+			if (Window.confirm(WARNING_MSG)){
+				updateDocContent();
+			}
+		}
 		pnl.addStyleDependentName("static");
 		pnl.removeStyleDependentName("edit");
 
