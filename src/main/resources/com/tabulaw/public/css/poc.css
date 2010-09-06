@@ -629,7 +629,26 @@ docHeaderMenuItem img{
 	color:gray;
 	padding:0 4px;
 }
-
+.saveWarningDialog-cancel {
+	margin-left: 40px;
+}
+.saveWarningDialog-save{
+	margin-left: 70px;
+}
+.saveWarningDialog-question {
+	font-weight: bold;
+	margin-bottom: 5px;
+	font-family: Georgia;
+}
+.saveWarningDialog-title {
+	font-style: italic;
+	margin-bottom: 15px;
+	font-family: Georgia;
+}
+.saveWarningDialog-warning {
+	margin-bottom: 15px;
+	font-family: Georgia;
+}
 
 
 .docEdit .gwt-RichTextArea {

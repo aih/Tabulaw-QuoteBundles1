@@ -10,19 +10,16 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.CustomButton;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -38,6 +35,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.RichTextArea.Formatter;
 import com.tabulaw.client.app.Resources;
+import com.tabulaw.client.app.ui.event.IframeClickEvent;
+import com.tabulaw.client.app.ui.event.IframeClickedHandler;
 import com.tabulaw.client.ui.toolbar.Toolbar;
 
 /**
@@ -48,8 +47,11 @@ import com.tabulaw.client.ui.toolbar.Toolbar;
 public class DocEditWidget extends Composite implements HasHTML {
 
 	class EditToolBar extends Composite implements ClickHandler, ChangeHandler, KeyPressHandler   {
+		private final int SPECIAL_CHAR_MENU_POSITION=5;
+		
 		private final Toolbar toolbar = new Toolbar();
 		private final FlowPanel pnl = new FlowPanel();
+		final private HandlerManager handlerManager = new HandlerManager(this);		
 
 		private class SpecialCharCommand implements Command {
 			private String html;
@@ -65,13 +67,14 @@ public class DocEditWidget extends Composite implements HasHTML {
 
 		}
 
-		Map<CustomButton, ClickHandler> toolbarButtons = new LinkedHashMap<CustomButton, ClickHandler>();
-		Map<ListBox, ChangeHandler> toolbarListBoxes = new LinkedHashMap<ListBox, ChangeHandler>();
-		Map<String, String> headings = new LinkedHashMap<String, String>();
-		Map<String, FocusWidget> elements = new HashMap<String, FocusWidget>();
+		private Map<CustomButton, ClickHandler> toolbarButtons = new LinkedHashMap<CustomButton, ClickHandler>();
+		private Map<ListBox, ChangeHandler> toolbarListBoxes = new LinkedHashMap<ListBox, ChangeHandler>();
+		private Map<String, String> headings = new LinkedHashMap<String, String>();
+		private Map<String, FocusWidget> elements = new HashMap<String, FocusWidget>();
 
-		ListBox headingListBox;
-		ToggleButton bold, italic, underline, subscript, superscript;
+		private ListBox headingListBox;
+		private ToggleButton bold, italic, underline, subscript, superscript;
+		private MenuBar specialCharsMenuTop;
 
 		public EditToolBar() {
 			super();
@@ -111,21 +114,21 @@ public class DocEditWidget extends Composite implements HasHTML {
 
 		}
 
-		private void addSpecialCharMenu() {
-			MenuBar specialCharsMenuTop = new MenuBar();
+		private MenuBar addSpecialCharMenu() {
+			MenuBar topMenu = new MenuBar();
 
 			MenuBar specialCharsMenu = new MenuBar(true);
 
-			specialCharsMenuTop.addItem("<img src='poc/images/toolbar/specialChars.gif'/>", true, specialCharsMenu);
+			topMenu.addItem("<img src='poc/images/toolbar/specialChars.gif'/>", true, specialCharsMenu);
 			// TODO Rename style. Set proper icon
-			specialCharsMenuTop.setStyleName("quoteBundleMenuItem");
+			topMenu.setStyleName("quoteBundleMenuItem");
 
 			addSpecialCharMenuItem(specialCharsMenu, "&para;");
 			addSpecialCharMenuItem(specialCharsMenu, "&sect;");
 			addSpecialCharMenuItem(specialCharsMenu, "&dagger;");
 			addSpecialCharMenuItem(specialCharsMenu, "&Dagger;");
-
-			toolbar.add(specialCharsMenuTop);
+			
+			return topMenu;
 		}
 
 		private void registerControls() {
@@ -163,9 +166,9 @@ public class DocEditWidget extends Composite implements HasHTML {
 					rta.getFormatter().toggleSuperscript();
 				}
 			});
-
-			addSpecialCharMenu();
-
+			specialCharsMenuTop = addSpecialCharMenu();			
+			toolbar.add(specialCharsMenuTop);
+ 
 			/*------paragraph styles----------*/
 			addImageButton(new PushButton(new Image(Resources.INSTANCE.indent())), "Left Indent", new ClickHandler() {
 				public void onClick(ClickEvent event) {
@@ -228,7 +231,7 @@ public class DocEditWidget extends Composite implements HasHTML {
 			}
 			rta.setFocus(true);
 		}
-
+		
 		@Override
 		public void onKeyPress(KeyPressEvent event) {
 			updateStatus();
@@ -255,15 +258,25 @@ public class DocEditWidget extends Composite implements HasHTML {
 				}
 			}
 		}
+		private void addIframeClickedHandler(IframeClickedHandler handler) {
+			  handlerManager.addHandler(IframeClickEvent.getType(),handler);  
+		}
 
 		private void updateStatus() {
-			String blockTag = queryCommandValueAssumingFocus("FormatBlock");
-
-			Iterator<String> iterator = headings.keySet().iterator();
-			for (int i = 0; iterator.hasNext(); i++) {
-				String key = iterator.next();
-				if (key.equals(blockTag)) {
-					headingListBox.setSelectedIndex(i);
+			String blockTag=null;
+			try {
+				blockTag = queryCommandValueAssumingFocus("FormatBlock");
+			}
+			catch(Exception e){
+				blockTag="p";
+			}
+			if (blockTag!=null) {
+				Iterator<String> iterator = headings.keySet().iterator();
+				for (int i = 0; iterator.hasNext(); i++) {
+					String key = iterator.next();
+					if (key.equals(blockTag)) {
+						headingListBox.setSelectedIndex(i);
+					}
 				}
 			}
 
@@ -283,24 +296,14 @@ public class DocEditWidget extends Composite implements HasHTML {
 		private void toggleUnderline() {
 			rta.getFormatter().toggleUnderline();
 		}
-		native void hideMenu() /*-{
-			//fixes gwt menu behaviour over iframe
-//			$wnd.goog.require('goog.ui.PopupBase');
-			var POPUP_CLASS_NAME='gwt-MenuBarPopup';
-			var SELECTED_ITEM_CLASS_NAME='gwt-MenuItem-selected';
-
-			var elements = $wnd.goog.dom.getElementsByTagNameAndClass('.'+POPUP_CLASS_NAME);
-			for (var i=0;i<elements.length;i++) {
-//				var popup = new $wnd.goog.ui.PopupBase(elements[i]);
-//				alert(popup);
-//				popup.setVisible(false);					
-			}
-//			elements = $wnd.goog.dom.getElementsByTagNameAndClass('.'+SELECTED_ITEM_CLASS_NAME);
-//			for (var i=0;i<elements.length;i++) {
-//				elements[i].className = elements[i].className.replace(' '+SELECTED_ITEM_CLASS_NAME, '');
-//			}
-		}-*/;
-
+		private void resetSpecialCharsMenu(){
+			specialCharsMenuTop.removeFromParent();
+			toolbar.insert(specialCharsMenuTop, SPECIAL_CHAR_MENU_POSITION);
+		}
+		private void hideMenu() {
+			resetSpecialCharsMenu();
+			handlerManager.fireEvent(new IframeClickEvent());
+		}
 	}
 
 	private final EditToolBar editBar = new EditToolBar();
@@ -359,5 +362,8 @@ public class DocEditWidget extends Composite implements HasHTML {
 
 	public Formatter getFormatter() {
 		return rta.getFormatter();
+	}
+	public void addIframeClickedHandler(IframeClickedHandler handler) {
+		editBar.addIframeClickedHandler(handler);  
 	}
 }
