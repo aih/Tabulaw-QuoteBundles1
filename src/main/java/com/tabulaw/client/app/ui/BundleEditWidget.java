@@ -92,7 +92,7 @@ public class BundleEditWidget extends
 				delete = new Image(Resources.INSTANCE.trash());
 				delete.setTitle("Remove Quote Bundle..");
 				delete.setStyleName(Styles.DELETE);
-				delete.setStyleName("quoteBundleMenuItem");
+				delete.setStyleName("tabulawMenuItem");
 				delete.addClickHandler(new ClickHandler() {
 
 					@Override
@@ -127,7 +127,7 @@ public class BundleEditWidget extends
 				current = new Image(Resources.INSTANCE.documentIcon());
 				current.setTitle("Set as current");
 				current.setStyleName(Styles.CURRENT);
-				current.setStyleName("quoteBundleMenuItem");
+				current.setStyleName("tabulawMenuItem");
 				current.addClickHandler(new ClickHandler() {
 
 					@Override
@@ -154,7 +154,7 @@ public class BundleEditWidget extends
 				MenuBar downloadMenu = new MenuBar(true);
 
 				downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/>", true, downloadMenu);
-				downloadMenuTop.setStyleName("quoteBundleMenuItem");
+				downloadMenuTop.setStyleName("tabulawMenuItem");
 
 				MenuItem fireRtf = new MenuItem("rtf format", new DownloadBundleCommand(RTF_MIME_TYPE));
 				MenuItem fireDocx = new MenuItem("docx format",new DownloadBundleCommand(DOCX_MIME_TYPE));
@@ -167,7 +167,7 @@ public class BundleEditWidget extends
 			close = new Image(Resources.INSTANCE.XButton());
 			close.setTitle("Close");
 			close.setStyleName(Styles.X);
-			close.setStyleName("quoteBundleMenuItem");
+			close.setStyleName("tabulawMenuItem");
 			buttons.add(close);
                         if (delete!=null) {
                             buttons.add(delete);

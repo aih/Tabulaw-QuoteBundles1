@@ -17,6 +17,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Element;
@@ -46,12 +48,12 @@ import com.tabulaw.client.ui.toolbar.Toolbar;
  */
 public class DocEditWidget extends Composite implements HasHTML {
 
-	class EditToolBar extends Composite implements ClickHandler, ChangeHandler, KeyPressHandler   {
-		private final int SPECIAL_CHAR_MENU_POSITION=5;
-		
+	class EditToolBar extends Composite implements ClickHandler, ChangeHandler, KeyPressHandler, KeyUpHandler {
+		private final int SPECIAL_CHAR_MENU_POSITION = 5;
+
 		private final Toolbar toolbar = new Toolbar();
 		private final FlowPanel pnl = new FlowPanel();
-		final private HandlerManager handlerManager = new HandlerManager(this);		
+		final private HandlerManager handlerManager = new HandlerManager(this);
 
 		private class SpecialCharCommand implements Command {
 			private String html;
@@ -120,14 +122,13 @@ public class DocEditWidget extends Composite implements HasHTML {
 			MenuBar specialCharsMenu = new MenuBar(true);
 
 			topMenu.addItem("<img src='poc/images/toolbar/specialChars.gif'/>", true, specialCharsMenu);
-			// TODO Rename style. Set proper icon
-			topMenu.setStyleName("quoteBundleMenuItem");
+			topMenu.setStyleName("tabulawMenuItem");
 
 			addSpecialCharMenuItem(specialCharsMenu, "&para;");
 			addSpecialCharMenuItem(specialCharsMenu, "&sect;");
 			addSpecialCharMenuItem(specialCharsMenu, "&dagger;");
 			addSpecialCharMenuItem(specialCharsMenu, "&Dagger;");
-			
+
 			return topMenu;
 		}
 
@@ -166,9 +167,9 @@ public class DocEditWidget extends Composite implements HasHTML {
 					rta.getFormatter().toggleSuperscript();
 				}
 			});
-			specialCharsMenuTop = addSpecialCharMenu();			
+			specialCharsMenuTop = addSpecialCharMenu();
 			toolbar.add(specialCharsMenuTop);
- 
+
 			/*------paragraph styles----------*/
 			addImageButton(new PushButton(new Image(Resources.INSTANCE.indent())), "Left Indent", new ClickHandler() {
 				public void onClick(ClickEvent event) {
@@ -231,10 +232,13 @@ public class DocEditWidget extends Composite implements HasHTML {
 			}
 			rta.setFocus(true);
 		}
-		
+		@Override
+		public void onKeyUp(KeyUpEvent event) {
+			updateStatus();
+		}
+
 		@Override
 		public void onKeyPress(KeyPressEvent event) {
-			updateStatus();
 			Character eventChar = event.getCharCode();
 			eventChar = Character.toUpperCase(eventChar);
 			boolean preventDefault = false;
@@ -258,27 +262,19 @@ public class DocEditWidget extends Composite implements HasHTML {
 				}
 			}
 		}
+
 		private void addIframeClickedHandler(IframeClickedHandler handler) {
-			  handlerManager.addHandler(IframeClickEvent.getType(),handler);  
+			handlerManager.addHandler(IframeClickEvent.getType(), handler);
 		}
 
 		private void updateStatus() {
-			String blockTag=null;
-			try {
-				blockTag = queryCommandValueAssumingFocus("FormatBlock");
+			String blockTag = getSelectionTag();
+			int headingIndex = getHeadingIndex(blockTag);
+			// if heading style not found
+			if (headingIndex == -1) {
+				headingIndex = getHeadingIndex("p");
 			}
-			catch(Exception e){
-				blockTag="p";
-			}
-			if (blockTag!=null) {
-				Iterator<String> iterator = headings.keySet().iterator();
-				for (int i = 0; iterator.hasNext(); i++) {
-					String key = iterator.next();
-					if (key.equals(blockTag)) {
-						headingListBox.setSelectedIndex(i);
-					}
-				}
-			}
+			headingListBox.setSelectedIndex(headingIndex);
 
 			bold.setDown(getFormatter().isBold());
 			italic.setDown(getFormatter().isItalic());
@@ -287,23 +283,45 @@ public class DocEditWidget extends Composite implements HasHTML {
 			superscript.setDown(getFormatter().isSuperscript());
 
 		}
+
+		private int getHeadingIndex(String tagName) {
+			int result = -1;
+			if (tagName != null) {
+				tagName = tagName.toLowerCase();
+				Iterator<String> iterator = headings.keySet().iterator();
+				for (int i = 0; iterator.hasNext(); i++) {
+					String key = iterator.next();
+					if (key.equals(tagName)) {
+						result = i;
+						break;
+					}
+				}
+			}
+			return result;
+		}
+
 		private void toggleBold() {
 			rta.getFormatter().toggleBold();
 		}
+
 		private void toggleItalic() {
 			rta.getFormatter().toggleItalic();
 		}
+
 		private void toggleUnderline() {
 			rta.getFormatter().toggleUnderline();
 		}
-		private void resetSpecialCharsMenu(){
+
+		private void resetSpecialCharsMenu() {
 			specialCharsMenuTop.removeFromParent();
 			toolbar.insert(specialCharsMenuTop, SPECIAL_CHAR_MENU_POSITION);
 		}
+
 		private void hideMenu() {
 			resetSpecialCharsMenu();
 			handlerManager.fireEvent(new IframeClickEvent());
 		}
+
 	}
 
 	private final EditToolBar editBar = new EditToolBar();
@@ -323,17 +341,21 @@ public class DocEditWidget extends Composite implements HasHTML {
 		pnl.addStyleName("documentContainer");
 		pnl.add(rta);
 		rta.addKeyPressHandler(editBar);
+		rta.addKeyUpHandler(editBar);
 		rta.addClickHandler(editBar);
 		initWidget(pnl);
 	}
-	
 
 	private native void executeCommand(String cmd, String param) /*-{
 		this.@com.tabulaw.client.app.ui.DocEditWidget::elem.contentWindow.document.execCommand(cmd, false, param);
 	}-*/;
 
-	private native String queryCommandValueAssumingFocus(String cmd) /*-{
-		return this.@com.tabulaw.client.app.ui.DocEditWidget::elem.contentWindow.document.queryCommandValue(cmd);
+//	private native String queryCommandValueAssumingFocus(String cmd) /*-{
+//		return this.@com.tabulaw.client.app.ui.DocEditWidget::elem.contentWindow.document.queryCommandValue(cmd);
+//	}-*/;
+
+	private native String getSelectionTag() /*-{
+		return this.@com.tabulaw.client.app.ui.DocEditWidget::elem.contentWindow.getSelection().anchorNode.parentNode.tagName
 	}-*/;
 
 	public EditToolBar getEditToolBar() {
@@ -363,7 +385,8 @@ public class DocEditWidget extends Composite implements HasHTML {
 	public Formatter getFormatter() {
 		return rta.getFormatter();
 	}
+
 	public void addIframeClickedHandler(IframeClickedHandler handler) {
-		editBar.addIframeClickedHandler(handler);  
+		editBar.addIframeClickedHandler(handler);
 	}
 }
