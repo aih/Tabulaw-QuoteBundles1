@@ -143,13 +143,15 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 			// parse fetched doc data
 			CaseDocData cdd = handler.parseSingleDocument(fcontents);
 			
-			doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), cdd.getParties(), cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteDocUrl, cdd.getYear(), cdd.getFirstPageNumber(), cdd.getLastPageNumber());
+			int lastPageNumber = cdd.getContent().getFirstPageNumber() + cdd.getContent().getPagesXPath().size();
+			doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), cdd.getParties(), cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteDocUrl, cdd.getYear(), 
+					cdd.getContent().getFirstPageNumber(), lastPageNumber);
 
 			// persist the doc ref and doc/user binding
 			doc = uds.saveDoc(doc);
 			uds.addDocUserBinding(user.getId(), doc.getId());
 
-			String htmlContent = cdd.getHtmlContent();
+			String htmlContent = cdd.getContent().getHtmlContent();
 			
 			// localize doc content
 //			StringBuilder sb = new StringBuilder(htmlContent.length() + 1024);
@@ -158,7 +160,7 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 //			htmlContent = sb.toString();
 
 			// persist doc content
-			docContent = EntityFactory.get().buildDocContent(doc.getId(), htmlContent);
+			docContent = EntityFactory.get().buildDocContent(doc.getId(), htmlContent, cdd.getContent().getPagesXPath(), cdd.getContent().getFirstPageNumber());
 			uds.saveDocContent(docContent);
 		}
 

@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+	 * The Logic Lab
  * @author jpk
  * @since Feb 14, 2010
  */
@@ -288,10 +288,11 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 				return;
 
 			var mark;
+			var root = tsapi.@com.tabulaw.client.app.ui.DocViewer::getDocBody()();
 			try {
 				//if(framedoc !== rng.getDocument()) alert('range.document != framedoc!');
 				//alert('framedoc: ' + framedoc + ', rng.getDocument(): ' + rng.getDocument());
-				mark  = new $wnd.Mark(rng);
+				mark  = new $wnd.Mark(root, rng);
 				tsapi.@com.tabulaw.client.app.ui.DocViewer::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
 			}
 			catch(e) {
@@ -335,13 +336,17 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	/**
 	 * @return the DOM body element ref of the contained document.
 	 */
-	public native JavaScriptObject getDocBody() /*-{
+	public JavaScriptObject getDocBody() {
+		return frame.getElement();
+	}
+	
+//	/*-{
 		//var frameId = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
 		//var frame = $wnd.goog.dom.$(frameId);
 		//var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 		//return fbody;
-		return $wnd.body;
-	}-*/;
+//		return $wnd.body;
+//	}-*/;
 
 	public DocRef getModel() {
 		return doc;

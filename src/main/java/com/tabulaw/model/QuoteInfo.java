@@ -28,7 +28,18 @@ public class QuoteInfo {
 		if(caseRef != null) {
 			String parties = caseRef.getParties();
 			if(!StringUtil.isEmpty(parties)) title = parties;
-			subTitle = caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag());
+			if (quote.getStartPage() != 0) {
+				subTitle = caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag() |
+						CitationFormatFlag.EXCLUDE_YEAR.flag());
+				subTitle += ", " + quote.getStartPage();
+				if (quote.getStartPage() != quote.getEndPage()) {
+					subTitle += "-" + quote.getEndPage();
+				}
+				subTitle += " (" + caseRef.getYear() + ").";
+			} else {
+				subTitle = caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag());
+			}
+			
 		}
 		quoteString=quote.getQuote();
 		

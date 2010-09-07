@@ -5,7 +5,9 @@
  */
 package com.tabulaw.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Provides the mocked data backing the application.
@@ -50,6 +52,8 @@ import java.util.Date;
  *   quote (text selection)
  *   tags (set of keywords)
  *   serializedMark (serialized MarkOverlay)
+ *   start page
+ *   end page
  *   mark (MarkOverlay) [transient]
  *   
  * QUOTE_BUNDLE props
@@ -161,9 +165,15 @@ public class EntityFactory {
 	 * @return newly created model
 	 */
 	public DocContent buildDocContent(String docId, String htmlContent) {
+		return buildDocContent(docId, htmlContent, new ArrayList<int[]>(), 1);
+	}
+	
+	public DocContent buildDocContent(String docId, String htmlContent, List<int[]> pagesXPath, int firstPageNumber) {
 		DocContent doc = (DocContent) create(EntityType.DOC_CONTENT);
 		doc.setId(docId);
 		doc.setHtmlContent(htmlContent);
+		doc.setPagesXPath(pagesXPath);
+		doc.setFirstPageNumber(firstPageNumber);
 		return doc;
 	}
 
@@ -204,13 +214,17 @@ public class EntityFactory {
 	 * @param quoteText the quote text
 	 * @param document optional referenced doc model
 	 * @param serializedMark optional serialized highlight token
+	 * @param startPage
+	 * @param endPage
 	 * @return newly created model
 	 */
-	public Quote buildQuote(String quoteText, DocRef document, String serializedMark) {
+	public Quote buildQuote(String quoteText, DocRef document, String serializedMark, int startPage, int endPage) {
 		Quote m = (Quote) create(EntityType.QUOTE);
 		m.setQuote(quoteText);
 		if(document != null) m.setDocument(document);
 		m.setSerializedMark(serializedMark);
+		m.setStartPage(startPage);
+		m.setEndPage(endPage);
 		return m;
 	}
 }

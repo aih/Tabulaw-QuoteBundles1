@@ -70,13 +70,15 @@ public class DocumentResource extends BaseResource {
 		// parse fetched doc data
 		CaseDocData cdd = handler.parseSingleDocument(fcontents);
 		
-		DocRef doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), cdd.getParties(), cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteUrl, cdd.getYear(), cdd.getFirstPageNumber(), cdd.getLastPageNumber());
+		int lastPageNumber = cdd.getContent().getFirstPageNumber() + cdd.getContent().getPagesXPath().size();
+		DocRef doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), cdd.getParties(), cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteUrl, cdd.getYear(), 
+					cdd.getContent().getFirstPageNumber(), lastPageNumber);
 
 		// persist the doc ref and doc/user binding
 		doc = getDataService().saveDoc(doc);
 		getDataService().addDocUserBinding(userContext.getUser().getId(), doc.getId());
 
-		String htmlContent = cdd.getHtmlContent();
+		String htmlContent = cdd.getContent().getHtmlContent();
 		
 		// localize doc content
 //		StringBuilder sb = new StringBuilder(htmlContent.length() + 1024);
@@ -85,7 +87,7 @@ public class DocumentResource extends BaseResource {
 //		htmlContent = sb.toString();
 
 		// persist doc content
-		DocContent docContent = EntityFactory.get().buildDocContent(doc.getId(), htmlContent);
+		DocContent docContent = EntityFactory.get().buildDocContent(doc.getId(), htmlContent, cdd.getContent().getPagesXPath(), cdd.getContent().getFirstPageNumber());
 		getDataService().saveDocContent(docContent);
 
 		return doc;

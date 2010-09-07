@@ -6,6 +6,9 @@
  */
 package com.tabulaw.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -37,6 +40,16 @@ public class DocContent extends EntityBase {
 	 * The HTML content of the doc.
 	 */
 	private String htmlContent;
+	
+	/**
+	 * positions of page elements from the root element of the htmlContent 
+	 */
+	private List<int[]> pagesXPath;
+	
+	/**
+	 * number of the first page
+	 */
+	private int firstPageNumber;
 
 	/**
 	 * Constructor
@@ -70,6 +83,21 @@ public class DocContent extends EntityBase {
 		DocContent dr = (DocContent) cln;
 		dr.id = id;
 		dr.htmlContent = htmlContent;
+		dr.firstPageNumber = firstPageNumber;
+		if (pagesXPath != null) {
+			dr.pagesXPath = new ArrayList<int[]>(pagesXPath.size());
+			for (int[] pageNode : pagesXPath) {
+				if (pageNode != null) {
+					int[] newNode = new int[pageNode.length];
+					for (int i = 0; i < pageNode.length; i++) {
+						newNode[i] = pageNode[i];
+					}
+					dr.pagesXPath.add(newNode);
+				} else {
+					dr.pagesXPath.add(null);
+				}
+			}
+		} 
 	}
 
 	@Override
@@ -87,5 +115,23 @@ public class DocContent extends EntityBase {
 
 	public void setHtmlContent(String htmlContent) {
 		this.htmlContent = htmlContent;
+	}
+	
+	@XmlTransient
+	public List<int[]> getPagesXPath() {
+		return pagesXPath;
+	}
+
+	public void setPagesXPath(List<int[]> pagesXPath) {
+		this.pagesXPath = pagesXPath;
+	}
+	
+	@XmlTransient
+	public int getFirstPageNumber() {
+		return firstPageNumber;
+	}
+	
+	public void setFirstPageNumber(int firstPageNumber) {
+		this.firstPageNumber = firstPageNumber;
 	}
 }

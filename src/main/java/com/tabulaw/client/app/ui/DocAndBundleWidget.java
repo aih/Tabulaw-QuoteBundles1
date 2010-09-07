@@ -41,6 +41,7 @@ import com.tabulaw.model.IEntity;
 import com.tabulaw.model.ModelKey;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.CaseRef.CitationFormatFlag;
 
 /**
  * Displays a document on the left and quote bundle on the right separated by a
@@ -207,7 +208,8 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 				// create the quote
 				String serializedMark = mark.serialize();
-				Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
+				// we will fill startPage and endPage fields on the server by data from serializedMark
+				Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark, 0, 0);
 				quote.setMark(mark);
 				// eagerly set id since EntityBase.equals() depends on it
 				quote.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
@@ -297,8 +299,19 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				String htmlQuote = "\"" + q.getQuote() + "\"";
 
 				// append citation in italics if a case doc
-				if(docRef.isCaseDoc()) {
-					htmlQuote += "<i> - " + docRef.getCitation() + "</i>";
+				if(docRef.isCaseDoc()) {					
+					String caseRef = null;
+					if (q.getStartPage() != 0) {
+						caseRef = docRef.getCaseRef().format(CitationFormatFlag.EXCLUDE_YEAR.flag());
+						caseRef += ", " + q.getStartPage();
+						if (q.getStartPage() != q.getEndPage()) {
+							caseRef += "-" + q.getEndPage();
+						} 
+						caseRef += " (" + docRef.getCaseRef().getYear() + ").";
+					} else {
+						caseRef = docRef.getCitation();						
+					}					 
+					htmlQuote += " " + caseRef;
 				}
 				dew.getFormatter().insertHTML(htmlQuote);
 			}

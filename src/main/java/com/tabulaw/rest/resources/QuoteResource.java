@@ -133,6 +133,35 @@ public class QuoteResource extends BaseResource {
 		return builder.toString();
 	}
 	
+	private int findPage(DocContent document, int[] position) {
+		if (document == null) {
+			return 1;
+		}
+		if (document.getPagesXPath() == null || document.getPagesXPath().isEmpty()) {
+			return document.getFirstPageNumber();
+		}
+		int pageNumber = document.getFirstPageNumber();
+		for (int[] page : document.getPagesXPath()) {
+			int comparsionLenght = Math.min(position.length, page.length);
+			int element = -1;
+			for (int i = 0; i < comparsionLenght; i++) {
+				if (position[i] < page[i]) {
+					element = i;
+					break;
+				}
+				if (position[i] > page[i]) {
+					element = -2;
+					break;
+				}
+			}
+			if (element >= 0 || (element == -1 && position.length < page.length)) {
+				break;
+			}			
+			pageNumber++;
+		}
+		return pageNumber;
+	}
+	
 	public List<Quote> createList(String docRefId, String bundleId,	String... quotes) {
 		if (docRefId == null || quotes == null || quotes.length == 0) {
 			throw new WebApplicationException(Status.BAD_REQUEST);
@@ -158,10 +187,11 @@ public class QuoteResource extends BaseResource {
 			// create serialized mark for the specified quote
 			String serializedMark = "mark_1|" + quoteText + "|";
 			DocRef docRef = service.getDoc(docRefId);
+			QuotePosition position = null;
 			try {
 				// find quote in the documents html
 
-				QuotePosition position = HtmlUtils.findQuoteInHtml(quoteText, content.getHtmlContent());
+				position = HtmlUtils.findQuoteInHtml(quoteText, content.getHtmlContent());
 				if (position == null) {
 					throw new WebApplicationException();
 				}
@@ -174,7 +204,8 @@ public class QuoteResource extends BaseResource {
 				throw new WebApplicationException(ex);
 			}
 			// create quote 
-			Quote quote = EntityFactory.get().buildQuote(quoteText, docRef, serializedMark);
+			Quote quote = EntityFactory.get().buildQuote(quoteText, docRef, serializedMark,
+					findPage(content, position.startPosition), findPage(content, position.endPosition));
 			result.add(quote);
 		}
 		for (int i = 0; i < result.size(); i++) {
