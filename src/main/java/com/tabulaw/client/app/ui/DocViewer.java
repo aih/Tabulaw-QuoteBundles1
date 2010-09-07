@@ -196,7 +196,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			docTitleLabel.setStyleName("saveWarningDialog-title");
 
 			questionLabel.setStyleName("saveWarningDialog-question");
-			Label warningLabel = new Label("You changes will be lost if you don't change them", true);
+			Label warningLabel = new Label("Your changes will be lost if you don't save them.", true);
 			warningLabel.setStyleName("saveWarningDialog-warning");
 			HorizontalPanel buttonsPanel = new HorizontalPanel();
 
