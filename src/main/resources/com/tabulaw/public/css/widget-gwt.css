@@ -558,7 +558,7 @@ a, a:visited, a:hover {
 .gwt-RichTextToolbar {
   background: #e3e8f3 url(images/hborder.png) repeat-x 0px -2003px;
   border-bottom: 1px solid #BBBBBB;
-  padding: 3px;
+/*  padding: 3px;*/
   margin: 0px;
 }
 .gwt-RichTextToolbar .gwt-PushButton-up {

@@ -87,7 +87,7 @@ a:active {
 .imgBtn-quoteBundle .text {
 	font-size: 12px;
 }
-.quoteBundleMenuItem{
+.tabulawMenuItem{
 	width: 16px;
 	float:left;
 }
@@ -561,9 +561,6 @@ div.ro {
 }
 .docHeader {
 	width: 100%;
-	height: 22px;
-	position: absolute;
-	z-index: 9;
 }
 .docHeader img {
 	float: right;
@@ -595,9 +592,10 @@ div.ro {
 	float: left;
 	background-color: #fff;
 	padding: 0 4px 4px 0;
+	
 }
 
-.docHeaderMenuItem img{
+docHeaderMenuItem img{
 	float: left;
 }
 
@@ -606,31 +604,51 @@ div.ro {
 	height: 100%;
 	border: 0;
 }
-	.docFrame .highlight {
-		background-color:yellow;
-	}
-		/* google scholar case doc specific styling */
-		.docFrame .googlescholar {
-			margin-left: 40px;
-			margin-right: 5px;
-		}
-		.docFrame .googlescholar {
-			margin-left: 40px;
-		}
-		.docFrame .googlescholar a.gsl_pagenum,
-		.docFrame .googlescholar a.gsl_pagenum2 {
-			font-family: Arial, Helvetica, sans-serif;
-			font-size:10px;
-		}
-		.docFrame .googlescholar a.gsl_pagenum {
-			position:absolute;
-			left:0px;
-			color:gray;
-		}
-		.docFrame .googlescholar a.gsl_pagenum2 {
-			color:gray;
-			padding:0 4px;
-		}
+.docFrame .highlight {
+	background-color:yellow;
+}
+/* google scholar case doc specific styling */
+.docFrame .googlescholar {
+	margin-left: 40px;
+	margin-right: 5px;
+}
+.docFrame .googlescholar {
+	margin-left: 40px;
+}
+.docFrame .googlescholar a.gsl_pagenum,
+.docFrame .googlescholar a.gsl_pagenum2 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:10px;
+}
+.docFrame .googlescholar a.gsl_pagenum {
+	position:absolute;
+	left:0px;
+	color:gray;
+}
+.docFrame .googlescholar a.gsl_pagenum2 {
+	color:gray;
+	padding:0 4px;
+}
+.saveWarningDialog-cancel {
+	margin-left: 40px;
+}
+.saveWarningDialog-save{
+	margin-left: 70px;
+}
+.saveWarningDialog-question {
+	font-weight: bold;
+	margin-bottom: 5px;
+	font-family: Georgia;
+}
+.saveWarningDialog-title {
+	font-style: italic;
+	margin-bottom: 15px;
+	font-family: Georgia;
+}
+.saveWarningDialog-warning {
+	margin-bottom: 15px;
+	font-family: Georgia;
+}
 
 
 .docEdit .gwt-RichTextArea {
@@ -641,7 +659,36 @@ div.ro {
 
 .docEdit {
 }
-	
+
+.documentContainer {
+	font-family: serif;
+	font-size:16;
+}
+.documentContainer p{
+	margin-top: 16px;
+	margin-bottom: 16px;
+}
+
+.documentContainer h1{
+	margin-top: 16px;
+	margin-bottom: 16px;
+	font-size:32;
+	font-weight:bold;
+}
+.documentContainer h2{
+	margin-top: 16px;
+	margin-bottom: 16px;
+	font-size:24;
+	font-weight:bold;
+}
+
+.documentContainer h3{
+	margin-top: 16px;
+	margin-bottom: 16px;
+	font-size:18;
+	font-weight:bold;
+}
+
 .editBar {
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
