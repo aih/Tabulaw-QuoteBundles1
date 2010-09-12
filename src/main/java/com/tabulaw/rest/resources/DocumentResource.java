@@ -199,6 +199,7 @@ public class DocumentResource extends BaseResource {
 		}
 		if (! "upload".equals(source.toLowerCase())) {
 			String htmlContent = downloadDocument(source);
+			document.getCaseRef().setUrl(source);
 			document = getDataService().saveDoc(document);
 			
 			DocContent content = EntityFactory.get().buildDocContent(document.getId(), htmlContent);
