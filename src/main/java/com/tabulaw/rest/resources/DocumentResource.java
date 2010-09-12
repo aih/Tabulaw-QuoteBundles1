@@ -1,10 +1,14 @@
 package com.tabulaw.rest.resources;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -17,6 +21,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 
 import com.tabulaw.common.data.dto.CaseDocData;
@@ -29,6 +38,7 @@ import com.tabulaw.rest.AuthorizationRequired;
 import com.tabulaw.rest.dto.DocDetails;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.DocUtils;
+import com.tabulaw.service.convert.DataConverterDelegate;
 import com.tabulaw.service.scrape.DocHandlerResolver;
 import com.tabulaw.service.scrape.IDocHandler;
 
@@ -95,8 +105,7 @@ public class DocumentResource extends BaseResource {
 		return doc;
 	}
 	
-	@POST
-	public DocRef create(@FormParam("remoteUrl") String remoteUrl) {
+	private DocRef scrapeDocument(String remoteUrl) {
 		if (StringUtils.isEmpty(remoteUrl)) {
 			throw new WebApplicationException(Status.BAD_REQUEST);
 		}
@@ -113,7 +122,163 @@ public class DocumentResource extends BaseResource {
 		} catch (EntityExistsException ex) {
 			// it's ok
 		}
+		return document;		
+	}
+	
+	private String downloadDocument(String url) {
+		try {
+			HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+			conn.setRequestProperty("User-agent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US)");
+			
+			return createHtmlContent(conn.getInputStream(), conn.getContentType());
+		} catch (Exception ex) {
+			throw new WebApplicationException(ex);			 
+		}		
+	}
+	
+	private String createHtmlContent(InputStream inpust, String contentType) throws Exception {
+		if (contentType == null) {
+			contentType = "text/html";
+		}
+		int separatorIndex = contentType.indexOf(";");
+		if (separatorIndex != -1) {
+			contentType = contentType.substring(0, separatorIndex);
+		}
+		
+		DataConverterDelegate converterDelegate =
+			(DataConverterDelegate) servletContext.getAttribute(DataConverterDelegate.KEY);			
+		ByteArrayOutputStream output = new ByteArrayOutputStream();			
+		converterDelegate.convert(inpust, contentType, output, "text/html");
+		
+		return output.toString("utf-8");
+	}
+	
+	private DocRef createGenericDocument(String title, String parties, String docLoc, 
+			String court, String year, String source) {
+		if (source == null || title == null) {
+			throw new WebApplicationException(Status.BAD_REQUEST);
+		}
+		
+		int yearNum = 0;
+		if (! StringUtils.isEmpty(year)) {
+			yearNum = Integer.parseInt(year);
+		}
+		
+		StringBuilder refToken = new StringBuilder();
+		if (! StringUtils.isEmpty(title)) {
+			refToken.append(title);
+		}
+		if (! StringUtils.isEmpty(docLoc)) {
+			if (refToken.length() != 0) {
+				refToken.append(", ");				
+			}
+			refToken.append(docLoc);			
+		}
+		if (yearNum != 0 || ! StringUtils.isEmpty(court)) {
+			if (refToken.length() != 0) {
+				refToken.append(" ");
+			}
+			refToken.append("(");
+			if (! StringUtils.isEmpty(court)) {
+				refToken.append(court);
+				if (yearNum != 0) {
+					refToken.append(" ");
+					refToken.append(year);
+				}				
+			} else {
+				refToken.append(year);
+			}
+			refToken.append(")");
+		}
+		DocRef document;
+		if (refToken.length() == 0) {
+			document = EntityFactory.get().buildDoc(title, new Date());
+		} else {
+			document = EntityFactory.get().buildCaseDoc(title, new Date(), parties, refToken.toString(), 
+							docLoc, court, null, yearNum, 0, 0);
+		}
+		if (! "upload".equals(source.toLowerCase())) {
+			String htmlContent = downloadDocument(source);
+			document = getDataService().saveDoc(document);
+			
+			DocContent content = EntityFactory.get().buildDocContent(document.getId(), htmlContent);
+			getDataService().saveDocContent(content);
+			getDataService().addDocUserBinding(getUserId(), document.getId());
+		} else {
+			httpRequest.getSession().setAttribute("documentToUpload", document);
+			return null;
+		}
 		return document;
+	}
+	
+	@POST
+	public DocRef create(
+			@FormParam("remoteUrl") String remoteUrl,
+			@FormParam("title") String title,
+			@FormParam("parties") String parties,
+			@FormParam("docLoc") String docLoc,
+			@FormParam("court") String court,
+			@FormParam("year") String year,
+			@FormParam("source") String source) {
+		if (remoteUrl != null) {
+			return scrapeDocument(remoteUrl);
+		}
+		return createGenericDocument(title, parties, docLoc, court, year, source);
+	}
+	
+	@POST
+	@Path("/upload")
+	public DocRef upload() {
+		DocRef document = (DocRef) httpRequest.getSession().getAttribute("documentToUpload");
+		InputStream input = null;
+		String contentType = null;
+		try {
+			if (ServletFileUpload.isMultipartContent(httpRequest)) {
+				FileItemFactory factory = new DiskFileItemFactory();
+				ServletFileUpload upload = new ServletFileUpload(factory);
+				
+				List<FileItem> items = upload.parseRequest(httpRequest);
+				Map<String, String> parameters = new HashMap<String, String>();
+				for (FileItem item : items) {
+					if (! item.isFormField()) {
+						input = item.getInputStream();
+						contentType = item.getContentType();
+					} else {
+						parameters.put(item.getFieldName(), item.getString());
+					}
+				}
+				if (document == null && parameters.get("title") != null) {
+					createGenericDocument(
+							parameters.get("title"),
+							parameters.get("parties"),
+							parameters.get("docLoc"),
+							parameters.get("court"),
+							parameters.get("year"),
+							"upload"
+					);					
+					document = (DocRef) httpRequest.getSession().getAttribute("documentToUpload");
+				}
+			} else {
+				input = httpRequest.getInputStream();
+				contentType = httpRequest.getContentType();
+			}
+			if (input == null || document == null) {
+				throw new WebApplicationException(Status.BAD_REQUEST);
+			}
+			String htmlContent = createHtmlContent(input, contentType);
+			document = getDataService().saveDoc(document);
+			
+			DocContent content = EntityFactory.get().buildDocContent(document.getId(), htmlContent);
+			getDataService().saveDocContent(content);
+			getDataService().addDocUserBinding(getUserId(), document.getId());
+			httpRequest.getSession().setAttribute("documentToUpload", null);
+			return document;
+		} catch (Exception ex) {
+			if (ex instanceof WebApplicationException) {
+				throw (WebApplicationException) ex;
+			}
+			throw new WebApplicationException(ex);
+		}
 	}
 	
 	@GET
