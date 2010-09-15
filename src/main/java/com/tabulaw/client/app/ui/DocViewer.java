@@ -127,7 +127,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			// downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>",
 			// true, downloadMenu);
 			this.addItem("File", true, fileMenu);
-
+			this.addItem("Quote Bundles", true, BundleQuotesMenuBar.getBundleQuotesMenuBar());
+			
 			MenuBar downloadMenu = new MenuBar(true);
 			editDoc = new MenuItem("Edit", editCommand);
 			viewDoc = new MenuItem("View", viewCommand);
