@@ -62,7 +62,9 @@ public class DocUtils {
 			fileExt = "." + fileExt;
 		}
 		fileExt = fileExt.trim().toLowerCase();
-		if(".doc".equals(fileExt) || ".docx".equals(fileExt)) return "application/msword";
+		if(".rtf".equals(fileExt)) return "text/rtf";
+		if(".docx".equals(fileExt)) return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+		if(".doc".equals(fileExt)) return "application/msword";
 		if(".txt".equals(fileExt) || ".text".equals(fileExt)) return "text/html";
 		if(".htm".equals(fileExt) || ".html".equals(fileExt)) return "text/html";
 		throw new IllegalArgumentException("No mime-type mapped for file extension: " + fileExt);

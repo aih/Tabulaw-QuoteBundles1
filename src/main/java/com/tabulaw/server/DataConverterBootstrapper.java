@@ -13,12 +13,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.inject.Injector;
+import com.tabulaw.service.convert.ConverterHttpClient;
 import com.tabulaw.service.convert.DataConverterDelegate;
+import com.tabulaw.service.convert.ExternalConverter;
+import com.tabulaw.service.convert.HtmlPassThroughConverter;
 import com.tabulaw.service.convert.IDataConverter;
 import com.tabulaw.service.convert.SimpleHtmlToDocxFileConverter;
 import com.tabulaw.service.convert.SimpleHtmlToRtfFileConverter;
 import com.tabulaw.service.convert.TextToHtmlManualConverter;
-import com.tabulaw.service.convert.HtmlPassThroughConverter;
 
 /**
  * Bootstraps file converter impls.
@@ -32,7 +34,7 @@ public class DataConverterBootstrapper implements IBootstrapHandler {
 	@Override
 	public void startup(Injector injector, ServletContext servletContext) {
 		log.debug("Starting up file converter bootstrapping..");
-		
+
 		ArrayList<IDataConverter> converters = new ArrayList<IDataConverter>();
 
 		// html pass through converter
@@ -41,27 +43,38 @@ public class DataConverterBootstrapper implements IBootstrapHandler {
 		// text to html converter
 		converters.add(new TextToHtmlManualConverter());
 
-		// out of commission due to removal of open office api
-		// TODO fix or just support *.docx ???
-		// doc to html converter
-		//DocToHtmlConverter oofc = new DocToHtmlConverter();
-		//converters.add(oofc);
+		ConverterHttpClient httpclient = injector.getInstance(ConverterHttpClient.class);
+
+		// doc to html 
+		converters.add(new ExternalConverter("application/msword", "html", httpclient));
 		
+		// docx to html 
+		converters.add(new ExternalConverter("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "html", httpclient));
+
 		// html to docx
 		converters.add(new SimpleHtmlToDocxFileConverter());
+		//converters.add(new ExternalConverter("text/html", "docx", httpclient));  //until buying of Aspose license
+
+		// html to doc
+		converters.add(new ExternalConverter("text/html", "doc", httpclient));
 
 		// html to rtf
 		converters.add(new SimpleHtmlToRtfFileConverter());
+		//converters.add(new ExternalConverter("text/html", "rtf", httpclient)); //until buying of Aspose license
 
 		DataConverterDelegate converterDelegate = converters.size() == 0 ? null : new DataConverterDelegate(converters
 				.toArray(new IDataConverter[converters.size()]));
 		servletContext.setAttribute(DataConverterDelegate.KEY, converterDelegate);
-		
+
+		servletContext.setAttribute(ConverterHttpClient.KEY, httpclient);
+
 		log.debug("File converter bootstrapping complete");
 	}
 
 	@Override
 	public void shutdown(ServletContext servletContext) {
 		servletContext.removeAttribute(DataConverterDelegate.KEY);
+		ConverterHttpClient httpclient = (ConverterHttpClient) servletContext.getAttribute(ConverterHttpClient.KEY);
+		httpclient.shutdown();
 	}
 }

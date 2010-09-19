@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -17,7 +16,7 @@ import com.tabulaw.model.User;
 import com.tabulaw.service.convert.DataConverterDelegate;
 import com.tabulaw.util.StringUtil;
 
-public abstract class AbstractDownloadServlet extends HttpServlet {
+public abstract class AbstractDownloadServlet extends AbstractConverterAwareServlet {
 
 	private static final long serialVersionUID = 842994896967308571L;
 	protected static final String EXPORT_TEMPLATE_PATH = "vtemplates/";

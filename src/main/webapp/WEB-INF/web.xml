@@ -17,6 +17,7 @@
     	com.tabulaw.di.ModelModule
     	com.tabulaw.di.Db4oDaoModule
     	com.tabulaw.di.PersistContextModule
+	com.tabulaw.di.DataConverterModule
     </param-value>
 	</context-param>
 

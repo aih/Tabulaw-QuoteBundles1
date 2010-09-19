@@ -718,6 +718,18 @@
 			<classifier>jdk15</classifier>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.0.1</version>
+		    <scope>compile</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpmime</artifactId>
+		    <version>4.0.1</version>
+		    <scope>compile</scope>
+		</dependency>
 
 	</dependencies>
 

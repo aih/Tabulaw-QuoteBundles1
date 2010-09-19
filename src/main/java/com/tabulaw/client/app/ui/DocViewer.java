@@ -67,6 +67,7 @@ import com.tabulaw.util.StringUtil;
 public class DocViewer extends Composite implements IHasDocHandlers, HasValueChangeHandlers<DocViewer.ViewMode> {
 
 	public static final String DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+	public static final String DOC_MIME_TYPE = "application/msword";
 	public static final String RTF_MIME_TYPE = "text/rtf";
 
 	public static enum ViewMode {
@@ -100,6 +101,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 		private DownloadDocCommand rtfDownloadCommand = new DownloadDocCommand(RTF_MIME_TYPE);
 		private DownloadDocCommand docxDownloadCommand = new DownloadDocCommand(DOCX_MIME_TYPE);
+		private DownloadDocCommand docDownloadCommand = new DownloadDocCommand(DOC_MIME_TYPE);
 		private MenuItem editDoc;
 		private MenuItem viewDoc;
 
@@ -140,10 +142,12 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 			MenuItem fireRtf = new MenuItem("rtf format", rtfDownloadCommand);
 			MenuItem fireDocx = new MenuItem("docx format", docxDownloadCommand);
+			MenuItem fireDoc = new MenuItem("doc format", docDownloadCommand);
 			// fireDocx.addStyleName("docHeaderMenuItem"); some troubles here
 
 			downloadMenu.addItem(fireRtf);
 			downloadMenu.addItem(fireDocx);
+			downloadMenu.addItem(fireDoc);
 		}
 
 		public void setVisibleEditItem(boolean visible) {
@@ -153,6 +157,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		public void setId(String id) {
 			rtfDownloadCommand.setId(id);
 			docxDownloadCommand.setId(id);
+			docDownloadCommand.setId(id);
 		}
 
 		public void toogleEditItemVisibility() {
