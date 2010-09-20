@@ -127,6 +127,7 @@ public final class BusinessKeyFactory {
 	 * @throws BusinessKeyNotDefinedException Whe no business keys are defined for
 	 *         the given entity type.
 	 */
+	@SuppressWarnings("rawtypes")
 	public <E> IBusinessKeyDefinition<E>[] definitions(Class<E> entityClass)
 			throws BusinessKeyNotDefinedException {
 
@@ -134,12 +135,12 @@ public final class BusinessKeyFactory {
 			map.put(entityClass, (Set) discoverBusinessKeys(entityClass));
 		}
 
-		final Set set = map.get(entityClass);
+		final Set<?> set = map.get(entityClass);
 		if(set == null) {
 			throw new BusinessKeyNotDefinedException(entityClass);
 		}
 		
-		return (IBusinessKeyDefinition<E>[]) set.toArray(new IBusinessKeyDefinition[set.size()]);
+		return set.toArray(new IBusinessKeyDefinition[set.size()]);
 	}
 
 	/**
@@ -270,7 +271,7 @@ public final class BusinessKeyFactory {
 	public <E> BusinessKey<E> create(E entity, String businessKeyName)
 			throws BusinessKeyNotDefinedException, BusinessKeyPropertyException {
 		final IBusinessKeyDefinition<E> theDef = getDefinition((Class<E>) entityMetadata.getEntityClass(entity), businessKeyName);
-		final BusinessKey<E>[] bks = new BusinessKey[] { new BusinessKey(theDef) };
+		final BusinessKey<E>[] bks = new BusinessKey[] { new BusinessKey<E>(theDef) };
 		fill(entity, bks);
 		return bks[0];
 	}

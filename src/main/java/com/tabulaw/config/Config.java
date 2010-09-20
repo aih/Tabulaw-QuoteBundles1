@@ -211,7 +211,7 @@ public final class Config implements Configuration {
 		return root.getKeys(prefix);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public List<?> getList(String key, List defaultValue) {
 		return root.getList(key, defaultValue);
 	}
