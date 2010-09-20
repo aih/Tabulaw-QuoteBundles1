@@ -44,13 +44,11 @@ public class DocumentsMenuBar extends MenuBar {
 			addItem(doc.getName(), new Command() {
 				@Override
 				public void execute() {
-					if (ClientModelCache.get().getUserState()
-							.setCurrentQuoteBundleId(doc.getId())) {
-						Notifier.get().info("Current Document set.");
-						final DocKey docKey = doc.getModelKey();
-						final DocViewInitializer dvi = new DocViewInitializer(docKey);
-						ViewManager.get().dispatch(new ShowViewRequest(dvi));
-					}
+					Notifier.get().info("Current Document set.");
+					DocKey docKey = doc.getModelKey();
+					DocViewInitializer dvi = new DocViewInitializer(
+							docKey);
+					ViewManager.get().dispatch(new ShowViewRequest(dvi));
 				}
 			});
 		}
