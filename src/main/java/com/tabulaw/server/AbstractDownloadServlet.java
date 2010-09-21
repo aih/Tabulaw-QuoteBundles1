@@ -22,7 +22,7 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 	private static final long serialVersionUID = 842994896967308571L;
 	protected static final String EXPORT_TEMPLATE_PATH = "vtemplates/";
 
-	protected static final Log log = LogFactory.getLog(DocDownloadServlet.class);
+	protected final Log log = LogFactory.getLog(getClass());
 
 	public static final String defaultMimeType = "text/html";
 

@@ -732,7 +732,7 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 	/**
 	 * Fields are considered if their property names match.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public final boolean equals(Object obj) {
 		if(this == obj) return true;

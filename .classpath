@@ -1,59 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" output="target/war/WEB-INF/classes" path="src/main/java"/>
+	<classpathentry excluding="**" kind="src" output="target/war/WEB-INF/classes" path="src/main/resources"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
-	<classpathentry excluding="**/*.java" kind="src" output="target/test-classes" path="src/test/resources"/>
-	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
-	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/xml/bind/jaxb-api/2.1/jaxb-api-2.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/ws/rs/jsr311-api/1.1.1/jsr311-api-1.1.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4.1/mail-1.4.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/validation/validation-api/1.0.0.GA/validation-api-1.0.0.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/asm/asm/3.1/asm-3.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/aspectj/aspectjrt/1.6.9/aspectjrt-1.6.9.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.3/commons-codec-1.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-configuration/commons-configuration/1.6/commons-configuration-1.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-fileupload/commons-fileupload/1.2.1/commons-fileupload-1.2.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-io/commons-io/1.4/commons-io-1.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/db4o/db4o-full-java5/8.0-SNAPSHOT/db4o-full-java5-8.0-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/docx4j/docx4j/2.5.0/docx4j-2.5.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/net/sf/ehcache/ehcache-core/1.7.2/ehcache-core-1.7.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/code/guice/guice/2.0/guice-2.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-dev/2.0.3/gwt-dev-2.0.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/allen_sauer/gwt/dnd/gwt-dnd/3.0.1/gwt-dnd-3.0.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/allen_sauer/gwt/log/gwt-log/3.0.1/gwt-log-3.0.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-servlet/2.0.3/gwt-servlet-2.0.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-user/2.0.3/gwt-user-2.0.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-validator/4.0.2.GA/hibernate-validator-4.0.2.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/htmlcleaner/htmlcleaner/2.1/htmlcleaner-2.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/poi/hwpf/3.4.0/hwpf-3.4.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/lowagie/itext/2.1.7/itext-2.1.7.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/lowagie/itext-rtf/2.1.7/itext-rtf-2.1.7.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/sun/xml/bind/jaxb-impl/2.1.3/jaxb-impl-2.1.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-core/1.3/jersey-core-1.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-server/1.3/jersey-server-1.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springextensions/db4o/org.springextensions.db4o/1.0.0e/org.springextensions.db4o-1.0.0e.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jvnet/jaxb2_commons/ppp/parent-pointer-plugin/1.0/parent-pointer-plugin-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-aspects/2.5.6.SEC01/spring-aspects-2.5.6.SEC01.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.6.SEC01/spring-beans-2.5.6.SEC01.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.6.SEC01/spring-context-2.5.6.SEC01.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context-support/2.5.6.SEC01/spring-context-support-2.5.6.SEC01.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.6.SEC01/spring-core-2.5.6.SEC01.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-tx/2.5.6.SEC01/spring-tx-2.5.6.SEC01.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/testng/testng/5.11/testng-5.11-jdk15.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/velocity/velocity/1.6.4/velocity-1.6.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/net/arnx/wmf2svg/0.8.3/wmf2svg-0.8.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/xmlgraphics/xmlgraphics-commons/1.3.757686/xmlgraphics-commons-1.3.757686.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry kind="output" path="target/war/WEB-INF/classes"/>
 </classpath>

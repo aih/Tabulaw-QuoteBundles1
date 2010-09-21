@@ -31,8 +31,6 @@ public class NavColPanel extends AbstractNavPanel {
 		public static final String WIDGET = "widget";
 	}
 	
-	private ViewKey currentViewKey;
-	
 	private final VerticalPanel vp = new VerticalPanel();
 
 	/**

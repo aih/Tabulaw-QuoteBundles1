@@ -18,7 +18,7 @@ import com.tabulaw.INameValueProvider;
  */
 public class EnumToDataMapConverter<E extends Enum<E>> implements IConverter<Map<E, String>, Class<E>> {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public static final EnumToDataMapConverter INSTANCE = new EnumToDataMapConverter();
 
 	/**

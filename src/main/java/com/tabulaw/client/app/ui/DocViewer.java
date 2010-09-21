@@ -33,8 +33,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
-import com.tabulaw.client.app.ui.event.IframeClickEvent;
-import com.tabulaw.client.app.ui.event.IframeClickedHandler;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.dao.EntityNotFoundException;
@@ -128,7 +126,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			// true, downloadMenu);
 			this.addItem("File", true, fileMenu);
 			this.addItem("Quote Bundles", true, BundleQuotesMenuBar.getBundleQuotesMenuBar());
-			this.addItem("Documents", true, DocumentsMenuBar.getDocumentsMenuBar());
+			//this.addItem("Documents", true, DocumentsMenuBar.getDocumentsMenuBar());
 			
 			MenuBar downloadMenu = new MenuBar(true);
 			editDoc = new MenuItem("Edit", editCommand);
@@ -175,10 +173,10 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		}
 	}
 
-	private IframeClickedHandler iframeClickedHandler = new IframeClickedHandler() {
+	private ClickHandler docClickHandler = new ClickHandler() {
 
 		@Override
-		public void onIframeClicked(IframeClickEvent event) {
+		public void onClick(ClickEvent event) {
 			menu.removeFromParent();
 			headerPnl.insert(menu, 0);
 			menu.selectItem(null);
@@ -577,7 +575,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			dew = new DocEditWidget();
 			dew.setVisible(false);
 			docPnl.add(dew);
-			dew.addIframeClickedHandler(iframeClickedHandler);
+			dew.addClickHandler(docClickHandler);
 		}
 
 		if (!dew.isVisible()) {
