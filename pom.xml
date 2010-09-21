@@ -54,7 +54,7 @@
 		</repository>
 		<repository>
 			<id>htmlcleaner</id>
-			<url>http://dist.wso2.org/maven2</url>
+			<url>http://maven.xwiki.org/externals</url>
 		</repository>
 		<repository>
 			<id>jboss</id>
@@ -544,7 +544,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.htmlcleaner</groupId>
+			<groupId>net.sourceforge.htmlcleaner</groupId>
 			<artifactId>htmlcleaner</artifactId>
 			<version>2.1</version>
 		</dependency>
