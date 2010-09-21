@@ -20,6 +20,8 @@ public class DocumentsMenuBar extends MenuBar {
 
 	private final static DocumentsMenuBar MENU_BAR = new DocumentsMenuBar();
 
+	private DocCreateDialog dlg;
+
 	public DocumentsMenuBar() {
 		super(true);
 		update();
@@ -34,6 +36,7 @@ public class DocumentsMenuBar extends MenuBar {
 	@SuppressWarnings("unchecked")
 	public void update() {
 		clearItems();
+		addNewDocumentMenuItem();
 		List<DocRef> docs = (List<DocRef>) ClientModelCache.get().getAll(
 				EntityType.DOCUMENT);
 		int count = 0;
@@ -54,6 +57,19 @@ public class DocumentsMenuBar extends MenuBar {
 		}
 	}
 
+	private void addNewDocumentMenuItem(){
+		addItem("New Document ...", new Command(){
+			@Override
+			public void execute() {
+				if(dlg == null) {
+					dlg = new DocCreateDialog();
+					dlg.setGlassEnabled(true);
+				}
+				dlg.center();
+			}			
+		});
+		addSeparator();
+	}
 	public static MenuBar getDocumentsMenuBar() {
 		return MENU_BAR;
 	}

@@ -17,6 +17,8 @@ public class BundleQuotesMenuBar extends MenuBar {
 
 	private final static BundleQuotesMenuBar MENU_BAR = new BundleQuotesMenuBar();
 
+	private AddBundleDialog dlg;
+
 	public BundleQuotesMenuBar() {
 		super(true);
 		update();
@@ -31,6 +33,7 @@ public class BundleQuotesMenuBar extends MenuBar {
 	@SuppressWarnings("unchecked")
 	public void update() {
 		clearItems();
+		addNewBundleQuoteMenuItem();
 		List<QuoteBundle> qbs = (List<QuoteBundle>) ClientModelCache.get()
 				.getAll(EntityType.QUOTE_BUNDLE);
 		for (final QuoteBundle qb : qbs) {
@@ -49,8 +52,21 @@ public class BundleQuotesMenuBar extends MenuBar {
 		}
 	}
 
+	private void addNewBundleQuoteMenuItem() {
+		addItem("New Quote Bundle ...", new Command() {
+			@Override
+			public void execute() {
+				if (dlg == null) {
+					dlg = new AddBundleDialog();
+					dlg.setGlassEnabled(true);
+				}
+				dlg.center();
+			}
+		});
+		addSeparator();
+	}
+
 	public static MenuBar getBundleQuotesMenuBar() {
 		return MENU_BAR;
 	}
 }
- 
