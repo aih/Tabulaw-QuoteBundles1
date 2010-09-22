@@ -36,6 +36,7 @@ public class BundleEditWidget extends
 
         public static final String DOCX_MIME_TYPE="application/vnd.openxmlformats-officedocument.wordprocessingml.document";
         public static final String RTF_MIME_TYPE="text/rtf";
+        public static final String DOC_MIME_TYPE="application/msword";
 
         static class Styles {
 
@@ -158,9 +159,11 @@ public class BundleEditWidget extends
 
 				MenuItem fireRtf = new MenuItem("rtf format", new DownloadBundleCommand(RTF_MIME_TYPE));
 				MenuItem fireDocx = new MenuItem("docx format",new DownloadBundleCommand(DOCX_MIME_TYPE));
+				MenuItem fireDoc = new MenuItem("doc format",new DownloadBundleCommand(DOC_MIME_TYPE));
 
 				downloadMenu.addItem(fireRtf);
 				downloadMenu.addItem(fireDocx);
+				downloadMenu.addItem(fireDoc);
 
 				buttons.add(downloadMenuTop);
 
