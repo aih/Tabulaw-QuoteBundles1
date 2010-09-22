@@ -361,8 +361,8 @@ function Mark() {
 	/**
 	 * Applies the given range re-setting this Mark's state
 	 */
-	this.applyRange = function(range) {
-		var root, urange;
+	this.applyRange = function(root, range) {
+		var urange;
 		
 		try {
 			this.validateRange(range);
@@ -373,7 +373,6 @@ function Mark() {
 		
 		urange = range;
 		
-		var root = urange.getDocument().body;
 		this.text = urange.getText();
 		this.startNodePath = nodeGetNodePath(urange.getStartNode(), root);
 		this.endNodePath = nodeGetNodePath(urange.getEndNode(), root);
@@ -637,15 +636,14 @@ function Mark() {
 	}
 	
 	if(arguments) {
-		if(arguments.length == 1) {
-			// from range
-			var arg0 = arguments[0];
-			this.applyRange(arg0);
-		} else if(arguments.length == 2) {
+		var arg0 = arguments[0];
+		var arg1 = arguments[1];		
+		if(typeof(arg1) == "string" || arg1 instanceof String) {
 			// from serialized token
-			var arg0 = arguments[0];
-			var arg1 = arguments[1];
 			this.deserialize(arg0, arg1);
+		} else {
+			// from range
+			this.applyRange(arg0, arg1);		
 		}
 	}
 } // Mark constructor

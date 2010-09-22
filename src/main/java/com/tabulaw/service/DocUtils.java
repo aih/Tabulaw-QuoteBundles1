@@ -19,6 +19,7 @@ import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.util.IOUtils;
+import com.tabulaw.util.StringUtil;
 
 /**
  * @author jpk
@@ -103,6 +104,10 @@ public class DocUtils {
 			sb.append(caseRef.getUrl());
 			sb.append("|year::");
 			sb.append(caseRef.getYear());
+			sb.append("|firstPageNumber::");
+			sb.append(caseRef.getFirstPageNumber());
+			sb.append("|lastPageNumber::");
+			sb.append(caseRef.getLastPageNuber());			
 		}
 		else {
 			// throw new IllegalStateException("Un-handled document model type");
@@ -130,6 +135,7 @@ public class DocUtils {
 
 		// case related
 		String parties = null, reftoken = null, docLoc = null, court = null, url = null, syear = null;
+		String sFirstPageNumber = null, sLastPageNumber = null;
 		Date date = null;
 
 		int nli = stoken.indexOf('\n');
@@ -177,19 +183,22 @@ public class DocUtils {
 				}
 				else if("year".equals(name)) {
 					syear = value;
+				} 
+				else if ("firstPageNumber".equals(name)) {
+					sFirstPageNumber = value;
 				}
+				else if ("lastPageNumber".equals(name)) {
+					sLastPageNumber = value;
+				}				
 			}
 		}
 
 		if("casedoc".equals(type)) {
-			int year;
-			try {
-				year = Integer.parseInt(syear);
-			}
-			catch(NumberFormatException e) {
-				year = 0;
-			}
-			return EntityFactory.get().buildCaseDoc(title, date, parties, reftoken, docLoc, court, url, year);
+			int year, firstPageNumber, lastPageNumber;
+			year = StringUtil.parseInt(syear, 0);
+			firstPageNumber = StringUtil.parseInt(sFirstPageNumber, 0);
+			lastPageNumber = StringUtil.parseInt(sLastPageNumber, 0);
+			return EntityFactory.get().buildCaseDoc(title, date, parties, reftoken, docLoc, court, url, year, firstPageNumber, lastPageNumber);
 		}
 		else if("doc".equals(type))
 			return EntityFactory.get().buildDoc(title, date);

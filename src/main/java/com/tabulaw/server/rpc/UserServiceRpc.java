@@ -564,6 +564,40 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 
 		return payload;
 	}
+	
+	private int findPage(DocContent document, String position) {
+		String[] parts = position.substring(1, position.length() - 1).split(",");
+		int[] positionArray = new int[parts.length];
+		for (int i = 0; i < parts.length; i++) {
+			positionArray[i] = Integer.parseInt(parts[i]);
+		}
+		if (document == null) {
+			return 1;
+		}
+		if (document.getPagesXPath() == null || document.getPagesXPath().isEmpty()) {
+			return document.getFirstPageNumber();
+		}
+		int pageNumber = document.getFirstPageNumber();
+		for (int[] page : document.getPagesXPath()) {
+			int comparsionLenght = Math.min(positionArray.length, page.length);
+			int element = -1;
+			for (int i = 0; i < comparsionLenght; i++) {
+				if (positionArray[i] < page[i]) {
+					element = i;
+					break;
+				}
+				if (positionArray[i] > page[i]) {
+					element = -2;
+					break;
+				}
+			}
+			if (element >= 0 || (element == -1 && positionArray.length < page.length)) {
+				break;
+			}			
+			pageNumber++;
+		}
+		return pageNumber;
+	}
 
 	@Override
 	public ModelPayload<Quote> addQuoteToBundle(String userId, String bundleId, Quote quote) {
@@ -573,6 +607,11 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		Status status = new Status();
 		ModelPayload<Quote> payload = new ModelPayload<Quote>(status);
 
+		DocContent content = userDataService.getDocContent(quote.getDocument().getId());
+		String[] elements = quote.getSerializedMark().split("\\|");
+		quote.setStartPage(findPage(content, elements[2]));
+		quote.setEndPage(findPage(content, elements[4]));
+		
 		try {
 			quote = userDataService.addQuoteToBundle(userId, bundleId, quote);
 			payload.setModel(quote);

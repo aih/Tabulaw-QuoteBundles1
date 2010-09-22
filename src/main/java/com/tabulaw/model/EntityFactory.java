@@ -5,7 +5,9 @@
  */
 package com.tabulaw.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Provides the mocked data backing the application.
@@ -30,6 +32,8 @@ import java.util.Date;
  *  citation
  *  url
  *  year
+ *  firstPageNumber
+ *  lastPageNumber
  * 
  * DOCUMENT props
  * --------------
@@ -48,6 +52,8 @@ import java.util.Date;
  *   quote (text selection)
  *   tags (set of keywords)
  *   serializedMark (serialized MarkOverlay)
+ *   start page
+ *   end page
  *   mark (MarkOverlay) [transient]
  *   
  * QUOTE_BUNDLE props
@@ -126,7 +132,7 @@ public class EntityFactory {
 	 * @param year
 	 * @return
 	 */
-	public CaseRef buildCase(String parties, String reftoken, String docLoc, String court, String url, int year) {
+	public CaseRef buildCase(String parties, String reftoken, String docLoc, String court, String url, int year, int firstPage, int lastPage) {
 		CaseRef e = (CaseRef) create(EntityType.CASE);
 		e.setReftoken(reftoken);
 		e.setParties(parties);
@@ -134,6 +140,8 @@ public class EntityFactory {
 		e.setCourt(court);
 		e.setUrl(url);
 		e.setYear(year);
+		e.setFirstPageNumber(firstPage);
+		e.setLastPageNuber(lastPage);
 		return e;
 	}
 
@@ -157,9 +165,15 @@ public class EntityFactory {
 	 * @return newly created model
 	 */
 	public DocContent buildDocContent(String docId, String htmlContent) {
+		return buildDocContent(docId, htmlContent, new ArrayList<int[]>(), 1);
+	}
+	
+	public DocContent buildDocContent(String docId, String htmlContent, List<int[]> pagesXPath, int firstPageNumber) {
 		DocContent doc = (DocContent) create(EntityType.DOC_CONTENT);
 		doc.setId(docId);
 		doc.setHtmlContent(htmlContent);
+		doc.setPagesXPath(pagesXPath);
+		doc.setFirstPageNumber(firstPageNumber);
 		return doc;
 	}
 
@@ -176,9 +190,9 @@ public class EntityFactory {
 	 * @return newly created model
 	 */
 	public DocRef buildCaseDoc(String docTitle, Date docDate, String parties, String reftoken,
-			String docLoc, String court, String url, int year) {
+			String docLoc, String court, String url, int year, int firstPage, int lastPage) {
 		DocRef doc = buildDoc(docTitle, docDate);
-		doc.setCaseRef(buildCase(parties, reftoken, docLoc, court, url, year));
+		doc.setCaseRef(buildCase(parties, reftoken, docLoc, court, url, year, firstPage, lastPage));
 		return doc;
 	}
 
@@ -200,13 +214,17 @@ public class EntityFactory {
 	 * @param quoteText the quote text
 	 * @param document optional referenced doc model
 	 * @param serializedMark optional serialized highlight token
+	 * @param startPage
+	 * @param endPage
 	 * @return newly created model
 	 */
-	public Quote buildQuote(String quoteText, DocRef document, String serializedMark) {
+	public Quote buildQuote(String quoteText, DocRef document, String serializedMark, int startPage, int endPage) {
 		Quote m = (Quote) create(EntityType.QUOTE);
 		m.setQuote(quoteText);
 		if(document != null) m.setDocument(document);
 		m.setSerializedMark(serializedMark);
+		m.setStartPage(startPage);
+		m.setEndPage(endPage);
 		return m;
 	}
 }

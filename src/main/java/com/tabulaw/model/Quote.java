@@ -34,6 +34,8 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 
 	private String id;
 
+	private int startPage, endPage;
+	
 	private String quote, serializedMark;
 
 	/**
@@ -80,6 +82,8 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 		q.serializedMark = serializedMark;
 		q.mark = null;	// don't transfer over the js mark
 		q.document = document;	// NOTE: keep the doc ref
+		q.startPage = startPage;
+		q.endPage = endPage;
 	}
 
 	@Override
@@ -130,6 +134,22 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 
 	public void setDocument(DocRef doc) {
 		this.document = doc;
+	}
+	
+	public int getStartPage() {
+		return startPage;
+	}
+
+	public void setStartPage(int startPage) {
+		this.startPage = startPage;
+	}
+
+	public int getEndPage() {
+		return endPage;
+	}
+
+	public void setEndPage(int endPage) {
+		this.endPage = endPage;
 	}
 
 	@Override

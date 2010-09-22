@@ -13,12 +13,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.htmlcleaner.ContentToken;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
 import com.tabulaw.common.data.dto.CaseDocData;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
+import com.tabulaw.model.DocContent;
+import com.tabulaw.util.ObjectUtil;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -230,10 +233,47 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 
 		return results;
 	}
+	
+	private void findPageNodes(TagNode current, List<Integer> currentNode, DocContent pages, int level) {
+		boolean first = true;
+		for (Object child : current.getChildren()) {
+			if (child instanceof TagNode || child instanceof ContentToken) {
+				while (currentNode.size() <= level) {
+					currentNode.add(0);
+				}			
+				if (first) {
+					currentNode.set(level, 0);
+					first = false;
+				} else {
+					currentNode.set(level, currentNode.get(level) + 1);
+				}
+			}
+			if (! (child instanceof TagNode)) {
+				continue;
+			}
+			TagNode tag = (TagNode) child;
+			String tagClass = tag.getAttributeByName("class");
+			if (ObjectUtil.equals(tagClass, "gsl_pagenum")) {
+				int[] node = new int[level + 1];
+				for (int i = 0; i < level + 1; i++) {
+					node[i] = currentNode.get(i);
+				}
+				if (pages.getPagesXPath() == null) {
+					pages.setPagesXPath(new ArrayList<int[]>());
+					pages.setFirstPageNumber(Integer.valueOf(tag.getText().toString()) - 1);
+				}
+				pages.getPagesXPath().add(node);
+				continue;
+			}
+			findPageNodes(tag, currentNode, pages, level + 1);
+		}
+	}
+	
 
 	@Override
 	public CaseDocData parseSingleDocument(String rawHtml) {
 		String reftoken = "", dlcy = "", parties = "", docLoc = "", court = "", syear = "", docTitle = "", htmlContent = "";
+		DocContent docContent = null;
 
 		try {
 			HtmlCleaner cleaner = new HtmlCleaner();
@@ -324,10 +364,13 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 			root = tags[0];
 			root.getChildTags()[0].addAttribute("class", "googlescholar");
 
+			docContent = new DocContent();
+			findPageNodes(root, new ArrayList<Integer>(), docContent, 0);
+			
 			htmlContent = cleaner.getInnerHtml(root);
-
-			// absolutize local hrefs
-			htmlContent = htmlContent.replace("/scholar_case", "http://scholar.google.com/scholar_case");
+			// absolutize local hrefs			
+			htmlContent = htmlContent.replace("/scholar_case", "http://scholar.google.com/scholar_case");			
+			docContent.setHtmlContent(htmlContent);
 		}
 		catch(IOException e) {
 			throw new IllegalArgumentException(e);
@@ -335,7 +378,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 
 		int year = Integer.parseInt(syear);
 		
-		CaseDocData doc = new CaseDocData(docTitle, reftoken, parties, docLoc, court, null, year, htmlContent);
+		CaseDocData doc = new CaseDocData(docTitle, reftoken, parties, docLoc, court, null, year, docContent);
 		
 		return doc;
 	}

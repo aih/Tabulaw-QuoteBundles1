@@ -11,7 +11,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.HasHTML;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -20,7 +19,7 @@ import com.google.gwt.user.client.ui.Widget;
  * history mechanism which is what we want to avoid.
  * @author jpk
  */
-public class SimpleHyperLink extends Widget implements HasText, HasHTML, HasClickHandlers {
+public class SimpleHyperLink extends Widget implements HasHTML, HasClickHandlers {
 
 	/**
 	 * Styles - (widget-tll.css)

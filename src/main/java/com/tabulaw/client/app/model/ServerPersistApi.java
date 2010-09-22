@@ -134,7 +134,13 @@ public class ServerPersistApi {
 		});
 	}
 
-	public void addQuoteToBundle(String bundleId, Quote quote) {
+	/**
+	 * add quote to bundle and notify about this
+	 * @param bundleId
+	 * @param quote
+	 * @param callback
+	 */
+	public void addQuoteToBundle(String bundleId, Quote quote, final AsyncCallback<Quote> callback) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
 		Poc.getUserDataService().addQuoteToBundle(userId, bundleId, quote, new AsyncCallback<ModelPayload<Quote>>() {
@@ -142,11 +148,17 @@ public class ServerPersistApi {
 			@Override
 			public void onFailure(Throwable caught) {
 				Notifier.get().showFor(caught);
+				if (callback != null) {
+					callback.onFailure(caught);
+				}
 			}
 
 			@Override
 			public void onSuccess(ModelPayload<Quote> result) {
 				handlePersistResponse(result);
+				if (callback != null) {
+					callback.onSuccess(result.getModel());
+				}
 			}
 		});
 	}

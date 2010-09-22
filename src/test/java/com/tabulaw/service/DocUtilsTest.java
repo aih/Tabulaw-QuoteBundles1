@@ -31,13 +31,13 @@ public class DocUtilsTest {
 	
 	@Test(enabled = true)
 	public void testSerializeCaseDocModel() throws Exception {
-		DocRef m = EntityFactory.get().buildCaseDoc("docTitle", new Date(), "parties", "reftoken", "docLoc", "court", "url", 1975);
+		DocRef m = EntityFactory.get().buildCaseDoc("docTitle", new Date(), "parties", "reftoken", "docLoc", "court", "url", 1975, 1, 20);
 		String s = DocUtils.serializeDocument(m);
 		
 		Calendar c = Calendar.getInstance();
 		String snow = c.get(Calendar.MONTH) + 1 + "/" + c.get(Calendar.DATE) + "/" + c.get(Calendar.YEAR);  
 		
-		String expected = "[casedoc]id::|title::docTitle|date::" + snow + "|parties::parties|reftoken::reftoken|docLoc::docLoc|court::court|url::url|year::1975\n";
+		String expected = "[casedoc]id::|title::docTitle|date::" + snow + "|parties::parties|reftoken::reftoken|docLoc::docLoc|court::court|url::url|year::1975|firstPageNumber::1|lastPageNumber::20\n";
 		Assert.assertEquals(s, expected);
 	}
 
@@ -53,7 +53,7 @@ public class DocUtilsTest {
 		Date date = c.getTime();
 		
 		String snow = c.get(Calendar.MONTH) + 1 + "/" + c.get(Calendar.DATE) + "/" + c.get(Calendar.YEAR);  
-		String sized = "[casedoc]id::|title::docTitle|date::" + snow + "|parties::parties|reftoken::reftoken|docLoc::docLoc|court::court|url::url|year::1975\n";
+		String sized = "[casedoc]id::|title::docTitle|date::" + snow + "|parties::parties|reftoken::reftoken|docLoc::docLoc|court::court|url::url|year::1975|firstPageNumber::1|lastPageNumber::20\n";
 		
 		DocRef m = DocUtils.deserializeDocToken(sized);
 		
@@ -68,6 +68,8 @@ public class DocUtilsTest {
 		Assert.assertEquals(caseRef.getCourt(), "court");
 		Assert.assertEquals(caseRef.getUrl(), "url");
 		Assert.assertEquals(caseRef.getYear(), 1975);
+		Assert.assertEquals(caseRef.getFirstPageNumber(), 1);
+		Assert.assertEquals(caseRef.getLastPageNuber(), 20);
 	}
 	
 	/**

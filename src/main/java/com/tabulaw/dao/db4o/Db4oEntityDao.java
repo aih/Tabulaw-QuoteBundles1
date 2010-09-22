@@ -90,7 +90,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	 * Timestamper
 	 * @author jpk
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	static class Timestamper implements EventListener4 {
 
 		static final Log log = LogFactory.getLog(Timestamper.class);
@@ -120,7 +120,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	 * Versioner
 	 * @author jpk
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	static class Versioner implements EventListener4 {
 
 		static final Log log = LogFactory.getLog(Versioner.class);
@@ -146,7 +146,6 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 	 * @param clc
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	static <E> List<E> naturalize(Collection<E> clc) {
 		if(clc instanceof ArrayList) return (ArrayList<E>) clc;
 		ArrayList<E> list = new ArrayList<E>(clc == null ? 0 : clc.size());
@@ -269,7 +268,7 @@ public class Db4oEntityDao extends Db4oDaoSupport implements IEntityDao {
 							arr = (Object[]) checkValue;
 						}
 						else if(checkValue instanceof Collection<?>) {
-							arr = ((Collection) checkValue).toArray();
+							arr = ((Collection<?>) checkValue).toArray();
 						}
 						else if(checkValue instanceof String) {
 							// assume comma-delimited string
