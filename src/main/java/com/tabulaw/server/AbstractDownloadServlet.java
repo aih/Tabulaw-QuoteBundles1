@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -16,7 +17,7 @@ import com.tabulaw.model.User;
 import com.tabulaw.service.convert.DataConverterDelegate;
 import com.tabulaw.util.StringUtil;
 
-public abstract class AbstractDownloadServlet extends AbstractConverterAwareServlet {
+public abstract class AbstractDownloadServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 842994896967308571L;
 	protected static final String EXPORT_TEMPLATE_PATH = "vtemplates/";
@@ -32,7 +33,7 @@ public abstract class AbstractDownloadServlet extends AbstractConverterAwareServ
 
 	protected abstract String getDownloadSource(HttpServletRequest req) throws ServletException, IOException;
 	
-	protected abstract String getSourceName(HttpServletRequest req); 
+	protected abstract String getSourceName(HttpServletRequest req) throws ServletException; 
 
 	@Override
 	public void init() throws ServletException {
@@ -67,7 +68,7 @@ public abstract class AbstractDownloadServlet extends AbstractConverterAwareServ
 			String extension = fcd.convert(new ByteArrayInputStream(sourceBytes), "text/html", output, mimeType);
 
 			resp.setContentType(mimeType);
-			resp.setHeader("Content-disposition", "attachment; filename=" + getSourceName(req) + "." + extension);
+			resp.setHeader("Content-disposition", "attachment; filename =\"" + getSourceName(req) + "." + extension+"\"");
 			output.writeTo(resp.getOutputStream());
 			responseWritten = true;
 		}

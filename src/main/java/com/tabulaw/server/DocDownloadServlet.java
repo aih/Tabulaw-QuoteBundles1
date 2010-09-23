@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.model.DocContent;
+import com.tabulaw.model.DocRef;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -40,7 +41,10 @@ public class DocDownloadServlet extends AbstractDownloadServlet {
 	}
 
 	@Override
-	protected String getSourceName(HttpServletRequest req) {
-		return req.getParameter("docId");
+	protected String getSourceName(HttpServletRequest req) throws ServletException {
+		String docId = req.getParameter("docId");
+		if(StringUtil.isEmpty(docId)) throw new ServletException("No doc id specified");
+		DocRef doc = pc.getUserDataService().getDoc(docId);
+		return doc.getTitle();
 	}	
 }
