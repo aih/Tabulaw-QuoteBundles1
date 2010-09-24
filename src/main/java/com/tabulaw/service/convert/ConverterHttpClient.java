@@ -31,20 +31,25 @@ public class ConverterHttpClient {
 		return this.converterUrl;
 	}
 
-	public void init() throws URISyntaxException {
-		if (httpClient == null) {
-			converterURI = new URI(converterUrl);
+	private void init() throws URISyntaxException {
+		converterURI = new URI(converterUrl);
 
-			HttpParams params = new BasicHttpParams();
-			SchemeRegistry schemeRegistry = new SchemeRegistry();
-			schemeRegistry.register(new Scheme(converterURI.getScheme(), PlainSocketFactory.getSocketFactory(),
-					converterURI.getPort()));
-			ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
-			httpClient = new DefaultHttpClient(cm, params);
-		}
+		HttpParams params = new BasicHttpParams();
+		SchemeRegistry schemeRegistry = new SchemeRegistry();
+		schemeRegistry.register(new Scheme(converterURI.getScheme(), PlainSocketFactory.getSocketFactory(),
+				converterURI.getPort()));
+		ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+		httpClient = new DefaultHttpClient(cm, params);
 	}
 
-	public HttpResponse execute(HttpPost httppost) throws ClientProtocolException, IOException {
+	public HttpResponse execute(HttpPost httppost) throws ClientProtocolException, IOException, URISyntaxException {
+		if (httpClient == null) {
+			synchronized (this) {
+				if (httpClient == null) {
+					init();
+				}
+			}
+		}
 		httppost.setURI(converterURI);
 		return httpClient.execute(httppost);
 	}

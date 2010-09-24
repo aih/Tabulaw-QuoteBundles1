@@ -3,8 +3,11 @@ package com.tabulaw.service.convert;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.servlet.ServletException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.InputStreamBody;
@@ -35,6 +38,9 @@ public class ExternalConverter extends AbstractDataConverter {
 		httppost.addHeader("accept-type", this.getTargetMimeType());
 
 		HttpResponse response = httpClient.execute(httppost);
+		if (response.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
+			throw new ServletException("Converter communication error:" + response.getStatusLine().getReasonPhrase());
+		}
 		HttpEntity resEntity = response.getEntity();
 
 		if (resEntity != null) {
