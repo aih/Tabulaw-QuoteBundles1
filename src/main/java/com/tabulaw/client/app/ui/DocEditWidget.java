@@ -5,7 +5,6 @@
  */
 package com.tabulaw.client.app.ui;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,17 +13,18 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.CustomButton;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HasHTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ListBox;
@@ -32,12 +32,10 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RichTextArea;
+import com.google.gwt.user.client.ui.RichTextArea.Formatter;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.ToggleButton;
-import com.google.gwt.user.client.ui.RichTextArea.Formatter;
 import com.tabulaw.client.app.Resources;
-import com.tabulaw.client.app.ui.event.IframeClickEvent;
-import com.tabulaw.client.app.ui.event.IframeClickedHandler;
 import com.tabulaw.client.ui.toolbar.Toolbar;
 
 /**
@@ -45,13 +43,13 @@ import com.tabulaw.client.ui.toolbar.Toolbar;
  * 
  * @author jpk
  */
-public class DocEditWidget extends Composite implements HasHTML {
+public class DocEditWidget extends Composite implements HasHTML, HasClickHandlers {
 
-	class EditToolBar extends Composite implements ClickHandler, ChangeHandler, KeyPressHandler, KeyUpHandler {
+	class EditToolBar extends Composite implements HasClickHandlers, ClickHandler, ChangeHandler, KeyPressHandler, KeyUpHandler {
 		private final int SPECIAL_CHAR_MENU_POSITION = 5;
 
 		private final Toolbar toolbar = new Toolbar();
-		private final FlowPanel pnl = new FlowPanel();
+		private final FlowPanel flwpnl = new FlowPanel();
 		final private HandlerManager handlerManager = new HandlerManager(this);
 
 		private class SpecialCharCommand implements Command {
@@ -71,7 +69,7 @@ public class DocEditWidget extends Composite implements HasHTML {
 		private Map<CustomButton, ClickHandler> toolbarButtons = new LinkedHashMap<CustomButton, ClickHandler>();
 		private Map<ListBox, ChangeHandler> toolbarListBoxes = new LinkedHashMap<ListBox, ChangeHandler>();
 		private Map<String, String> headings = new LinkedHashMap<String, String>();
-		private Map<String, FocusWidget> elements = new HashMap<String, FocusWidget>();
+		//private Map<String, FocusWidget> elements = new HashMap<String, FocusWidget>();
 
 		private ListBox headingListBox;
 		private ToggleButton bold, italic, underline, subscript, superscript;
@@ -86,8 +84,8 @@ public class DocEditWidget extends Composite implements HasHTML {
 
 			registerControls();
 
-			pnl.add(toolbar);
-			initWidget(pnl);
+			flwpnl.add(toolbar);
+			initWidget(flwpnl);
 			setStyleName("gwt-RichTextToolbar");
 
 		}
@@ -262,8 +260,8 @@ public class DocEditWidget extends Composite implements HasHTML {
 			}
 		}
 
-		private void addIframeClickedHandler(IframeClickedHandler handler) {
-			handlerManager.addHandler(IframeClickEvent.getType(), handler);
+		public HandlerRegistration addClickHandler(ClickHandler handler) {
+			return handlerManager.addHandler(ClickEvent.getType(), handler);
 		}
 
 		private void updateStatus() {
@@ -318,9 +316,8 @@ public class DocEditWidget extends Composite implements HasHTML {
 
 		private void hideMenu() {
 			resetSpecialCharsMenu();
-			handlerManager.fireEvent(new IframeClickEvent());
+			handlerManager.fireEvent(new ClickEvent() {});
 		}
-
 	}
 
 	private final EditToolBar editBar = new EditToolBar();
@@ -385,7 +382,7 @@ public class DocEditWidget extends Composite implements HasHTML {
 		return rta.getFormatter();
 	}
 
-	public void addIframeClickedHandler(IframeClickedHandler handler) {
-		editBar.addIframeClickedHandler(handler);
+	public HandlerRegistration addClickHandler(ClickHandler handler) {
+		return editBar.addClickHandler(handler);
 	}
 }

@@ -70,7 +70,7 @@ public final class ListingEvent<R> extends GwtEvent<IListingHandler<R>> {
 		handler.onListingEvent(this);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Type<IListingHandler<R>> getAssociatedType() {
 		return (Type) TYPE;
