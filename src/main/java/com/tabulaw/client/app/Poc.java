@@ -15,6 +15,7 @@ import com.tabulaw.client.app.ui.LoginTopPanel;
 import com.tabulaw.client.app.ui.Portal;
 import com.tabulaw.client.app.ui.nav.NavColPanel;
 import com.tabulaw.client.app.ui.nav.NavRowPanel;
+import com.tabulaw.client.app.ui.nav.NavTabsPanel;
 import com.tabulaw.client.app.view.BundlesView;
 import com.tabulaw.client.app.view.DocView;
 import com.tabulaw.client.app.view.DocsView;
@@ -150,6 +151,10 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		return (NavColPanel) RootPanel.get("navCol").getWidget(0);
 	}
 
+	public static NavTabsPanel getNavTabs() {
+		return (NavTabsPanel) RootPanel.get("navTabs").getWidget(0);
+	}
+
 	public static Portal getPortal() {
 		return (Portal) RootPanel.get("portal").getWidget(0);
 	}
@@ -239,6 +244,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		}
 		getNavRow().setVisible(false);
 		getNavCol().setVisible(false);
+		getNavTabs().setVisible(false);
 		getPortal().setVisible(false);
 		RootPanel.get("portal").add(loginPanel);
 	}
@@ -250,6 +256,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		}
 		getPortal().setVisible(true);
 		getNavRow().setVisible(true);
+		getNavTabs().setVisible(true);
 		getNavCol().setVisible(true);
 	}
 
@@ -282,6 +289,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	private void clear() {
 		ViewManager.get().clear();
 		getNavRow().clear();
+		getNavTabs().clear();
 		getNavCol().clear();
 		ClientModelCache.get().clear();
 	}
@@ -300,6 +308,11 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		NavRowPanel navRowPanel = new NavRowPanel(this);
 		navRowPanel.setVisible(false);
 		RootPanel.get("navRow").add(navRowPanel);
+
+		// add the nav row panel
+		NavTabsPanel navTabsPanel = new NavTabsPanel(this);
+		navTabsPanel.setVisible(false);
+		RootPanel.get("navTabs").add(navTabsPanel);
 
 		// add the nav col panel
 		NavColPanel navColPanel = new NavColPanel();

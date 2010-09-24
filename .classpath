@@ -27,7 +27,7 @@
 	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-dev/2.0.3/gwt-dev-2.0.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/allen_sauer/gwt/dnd/gwt-dnd/3.0.1/gwt-dnd-3.0.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/allen_sauer/gwt/log/gwt-log/3.0.1/gwt-log-3.0.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-servlet/2.0.3/gwt-servlet-2.0.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-servlet/2.0.3/gwt-servlet-2.0.3.jar" sourcepath="/M2_REPO/com/google/gwt/gwt-user/2.0.3/gwt-user-2.0.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-user/2.0.3/gwt-user-2.0.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-validator/4.0.2.GA/hibernate-validator-4.0.2.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/htmlcleaner/htmlcleaner/2.1/htmlcleaner-2.1.jar"/>
