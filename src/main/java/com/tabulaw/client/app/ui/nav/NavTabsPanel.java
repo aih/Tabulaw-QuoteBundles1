@@ -2,9 +2,10 @@ package com.tabulaw.client.app.ui.nav;
 
 import java.util.ArrayList;
 
+import org.cobogw.gwt.user.client.ui.VerticalTabBar;
+
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.ui.TabBar;
 import com.tabulaw.client.app.view.DocView;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -19,7 +20,8 @@ import com.tabulaw.model.User;
 public class NavTabsPanel extends AbstractNavPanel {
 
 	private final ArrayList<IViewInitializerProvider> mainViewButtons = new ArrayList<IViewInitializerProvider>();
-	private final TabBar mainViewTabs = new TabBar();
+	// private final TabBar mainViewTabs = new TabBar();
+	private final VerticalTabBar mainViewTabs = new VerticalTabBar();
 
 	private boolean handlingViewChange;
 
