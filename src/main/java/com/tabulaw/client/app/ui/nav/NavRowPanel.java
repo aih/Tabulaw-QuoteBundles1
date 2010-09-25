@@ -18,6 +18,8 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -25,8 +27,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabBar;
 import com.google.gwt.user.client.ui.UIObject;
-import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
-import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.UserPasswordSetDialog;
@@ -238,11 +238,7 @@ public class NavRowPanel extends AbstractNavPanel {
 
 	private static final int maxNumOpenDocs = 6;
 
-	private final ArrayList<IViewInitializerProvider> mainViewButtons = new ArrayList<IViewInitializerProvider>();
-
 	private final ArrayList<DocViewNavButton> openDocNavButtons = new ArrayList<DocViewNavButton>();
-
-	private final TabBar mainViewTabs = new TabBar();
 
 	private final TabBar openDocTabs = new TabBar();
 
@@ -267,13 +263,6 @@ public class NavRowPanel extends AbstractNavPanel {
 		DocsNavButton nbDocListing = new DocsNavButton();
 		QuoteBundlesNavButton nbQuoteBundles = new QuoteBundlesNavButton();
 
-		mainViewButtons.add(nbDocListing);
-		mainViewButtons.add(nbQuoteBundles);
-
-		mainViewTabs.addStyleName(Styles.MAIN_VIEWS);
-		mainViewTabs.addTab(nbDocListing);
-		mainViewTabs.addTab(nbQuoteBundles);
-
 		openDocTabs.addStyleName(Styles.OPEN_DOCS);
 
 		crntQuoteBudleWidget.setStyleName(Styles.CRNT_QB);
@@ -290,7 +279,6 @@ public class NavRowPanel extends AbstractNavPanel {
 		});
 
 		hp.setStyleName(Styles.NAV_ROW_TBL);
-		hp.add(mainViewTabs);
 		hp.add(openDocTabs);
 
 		hpWrapper.setStyleName(Styles.NAV_ROW_TABS);
@@ -302,16 +290,6 @@ public class NavRowPanel extends AbstractNavPanel {
 		panel.add(hpWrapper);
 		panel.add(crntQuoteBudleWidget);
 
-		mainViewTabs.addSelectionHandler(new SelectionHandler<Integer>() {
-
-			@Override
-			public void onSelection(SelectionEvent<Integer> event) {
-				if(!handlingViewChange) {
-					// TODO don't act if this is the current view ??
-					showView(mainViewButtons, event.getSelectedItem().intValue());
-				}
-			}
-		});
 		openDocTabs.addSelectionHandler(new SelectionHandler<Integer>() {
 
 			@Override
@@ -333,12 +311,6 @@ public class NavRowPanel extends AbstractNavPanel {
 			openDocTabs.removeTab(0);
 		openDocNavButtons.clear();
 
-		// remove tail admin users nav button if present
-		if(mainViewButtons.size() == 3) {
-			mainViewButtons.remove(2);
-			mainViewTabs.removeTab(2);
-		}
-
 		crntQuoteBudleWidget.clear();
 		liuWidget.clear();
 	}
@@ -346,7 +318,7 @@ public class NavRowPanel extends AbstractNavPanel {
 	@Override
 	protected void handleViewLoad(ViewKey key) {
 		handlingViewChange = true;
-		int i = 0;
+
 		ViewKey crntViewKey = ViewManager.get().getCurrentViewKey();
 
 		if(crntViewKey.getViewClass() == DocView.klas) {
@@ -362,7 +334,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			}
 			openDocTabs.selectTab(index);
 			// unselect main view tabs
-			mainViewTabs.selectTab(-1);
+			//mainViewTabs.selectTab(-1);
 
 			// unload oldest view if at capacity
 			if(openDocNavButtons.size() > maxNumOpenDocs) {
@@ -372,16 +344,6 @@ public class NavRowPanel extends AbstractNavPanel {
 			}
 		}
 		else {
-			for(IViewInitializerProvider navBtn : mainViewButtons) {
-				// mainViewTabs.setTabEnabled(i, true);
-				ViewKey aViewKey = navBtn.getViewInitializer().getViewKey();
-				if(crntViewKey.equals(aViewKey)) {
-					mainViewTabs.selectTab(i);
-					// mainViewTabs.setTabEnabled(i, false);
-					break;
-				}
-				i++;
-			}
 			// unselect open docs tabs
 			openDocTabs.selectTab(-1);
 		}
@@ -402,11 +364,12 @@ public class NavRowPanel extends AbstractNavPanel {
 	}
 
 	private int getTabIndexFromViewKey(ViewKey viewKey, boolean mainView) {
-		List<? extends IViewInitializerProvider> navBtnList = mainView ? mainViewButtons : openDocNavButtons;
+		if(!mainView){
+		List<? extends IViewInitializerProvider> navBtnList = openDocNavButtons;
 		for(int i = 0; i < navBtnList.size(); i++) {
 			ViewKey vk = navBtnList.get(i).getViewInitializer().getViewKey();
 			if(vk.equals(viewKey)) return i;
-		}
+		}}
 		return -1;
 	}
 
@@ -418,20 +381,8 @@ public class NavRowPanel extends AbstractNavPanel {
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
 
-		// user loaded
-		if(event.getChangeOp() == ModelChangeOp.LOADED
-				&& EntityType.USER.name().equals(event.getModelKey().getEntityType())) {
-			
-			User liu = (User) event.getModel();
-			if(liu.inRole(User.Role.ADMINISTRATOR)) {
-				UsersNavButton nbUsers = new UsersNavButton();
-				mainViewButtons.add(nbUsers);
-				mainViewTabs.addTab(nbUsers);
-			}
-		}
-
 		// document deleted
-		else if(event.getChangeOp() == ModelChangeOp.DELETED
+		if(event.getChangeOp() == ModelChangeOp.DELETED
 				&& EntityType.DOCUMENT.name().equals(event.getModelKey().getEntityType())) {
 			// remove open doc tab
 			boolean found = false;

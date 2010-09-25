@@ -16,7 +16,8 @@
 	<extend-configuration-property name="rpc.blacklist" value="com.google.gwt.user.client.ui.*Collection"/>
 
 	<inherits name="com.allen_sauer.gwt.dnd.gwt-dnd" />
-
+	<inherits name="org.cobogw.gwt.user.User" />
+	
 	<source path="">
 		<include name="IPropertyValueProvider.java" />
     <include name="IPropertyNameProvider.java" />
