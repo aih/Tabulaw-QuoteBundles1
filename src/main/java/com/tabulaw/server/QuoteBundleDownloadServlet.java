@@ -45,6 +45,8 @@ public class QuoteBundleDownloadServlet extends AbstractDownloadServlet {
 
 	@Override
 	protected String getSourceName(HttpServletRequest req) {
-		return req.getParameter("bundleid");
+		String bundleId = req.getParameter("bundleid");
+		QuoteBundle quoteBundle = pc.getUserDataService().getQuoteBundle(bundleId);
+		return quoteBundle.getName();
 	}
 }

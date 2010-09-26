@@ -29,6 +29,8 @@ public class QuoteInfo {
 			String parties = caseRef.getParties();
 			if(!StringUtil.isEmpty(parties)) title = parties;
 			subTitle = caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag());
+		} else {
+			subTitle = "";
 		}
 		quoteString=quote.getQuote();
 		
