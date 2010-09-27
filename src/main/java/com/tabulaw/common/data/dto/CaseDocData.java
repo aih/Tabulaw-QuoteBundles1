@@ -1,6 +1,7 @@
 package com.tabulaw.common.data.dto;
 
 import com.tabulaw.IMarshalable;
+import com.tabulaw.model.DocContent;
 
 /**
  * Encapsulates a single case type document's key attributes.
@@ -8,8 +9,9 @@ import com.tabulaw.IMarshalable;
  */
 public class CaseDocData implements IMarshalable {
 
-	private String title, reftoken, parties, docLoc, court, url, htmlContent;
+	private String title, reftoken, parties, docLoc, court, url;
 	private int year;
+	private DocContent content;
 
 	/**
 	 * Constructor
@@ -29,7 +31,7 @@ public class CaseDocData implements IMarshalable {
 	 * @param year
 	 * @param htmlContent
 	 */
-	public CaseDocData(String title, String reftoken, String parties, String docLoc, String court, String url, int year, String htmlContent) {
+	public CaseDocData(String title, String reftoken, String parties, String docLoc, String court, String url, int year, DocContent content) {
 		super();
 		this.title = title;
 		this.reftoken = reftoken;
@@ -38,7 +40,7 @@ public class CaseDocData implements IMarshalable {
 		this.court = court;
 		this.url = url;
 		this.year = year;
-		this.htmlContent = htmlContent;
+		this.content = content;
 	}
 
 	public String getTitle() {
@@ -97,11 +99,11 @@ public class CaseDocData implements IMarshalable {
 		this.year = year;
 	}
 
-	public String getHtmlContent() {
-		return htmlContent;
+	public DocContent getContent() {
+		return content;
 	}
 
-	public void setHtmlContent(String htmlContent) {
-		this.htmlContent = htmlContent;
+	public void setContent(DocContent content) {
+		this.content = content;
 	}
 }

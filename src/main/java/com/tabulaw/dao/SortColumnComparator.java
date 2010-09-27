@@ -66,7 +66,7 @@ public final class SortColumnComparator<T> implements Comparator<T>, Serializabl
 			}
 		}
 		else if(v1 instanceof Comparable) {
-			rval = ((Comparable) v1).compareTo(v2);
+			rval = ((Comparable<Object>) v1).compareTo(v2);
 		}
 		else if(v1 instanceof Number) {
 			final Double d1 = new Double(((Number) v1).doubleValue());

@@ -31,6 +31,7 @@ import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.QuoteInfo;
+import com.tabulaw.model.UserState;
 import com.tabulaw.rest.AuthorizationRequired;
 import com.tabulaw.rest.dto.DocRefWithQuotes;
 import com.tabulaw.rest.dto.QuoteBundleWithDocRefs;
@@ -103,8 +104,13 @@ public class QuoteBundleResource extends BaseResource {
 	@GET
 	@Path("/{id}")
 	public QuoteBundle byId(@PathParam("id") String id) {
-		if (! getDataService().isBundleAvailableForUser(getUserId(), id)) {
-			throw new WebApplicationException(Status.FORBIDDEN);
+		if ("current".equals(id.toLowerCase())) {
+			UserState state = getDataService().getUserState(getUserId());
+			id = state.getCurrentQuoteBundleId();
+		} else {
+			if (! getDataService().isBundleAvailableForUser(getUserId(), id)) {
+				throw new WebApplicationException(Status.FORBIDDEN);
+			}
 		}
 		return getDataService().getQuoteBundle(id);
 	}	

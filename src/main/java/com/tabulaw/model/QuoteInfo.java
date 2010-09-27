@@ -28,9 +28,28 @@ public class QuoteInfo {
 		if(caseRef != null) {
 			String parties = caseRef.getParties();
 			if(!StringUtil.isEmpty(parties)) title = parties;
-			subTitle = caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag());
-		} else {
-			subTitle = "";
+			if (quote.getStartPage() != 0) {
+				StringBuilder subtitleBuilder = new StringBuilder();
+				subtitleBuilder.append(caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag() |
+						CitationFormatFlag.EXCLUDE_YEAR.flag()));
+				subtitleBuilder.append(", ");
+				subtitleBuilder.append(quote.getStartPage());
+				if (quote.getStartPage() != quote.getEndPage()) {
+					subtitleBuilder.append("-");
+					subtitleBuilder.append(quote.getEndPage());
+				}
+				subtitleBuilder.append(" (");
+				if (! caseRef.isSupremeCourt() && caseRef.getCourt() != null && ! caseRef.getCourt().isEmpty()) {
+					subtitleBuilder.append(caseRef.getCourt());
+					subtitleBuilder.append(" ");
+				}
+				subtitleBuilder.append(caseRef.getYear());
+				subtitleBuilder.append(").");
+				subTitle = subtitleBuilder.toString();
+			} else {
+				subTitle = caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag());
+			}
+			
 		}
 		quoteString=quote.getQuote();
 		

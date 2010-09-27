@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+	 * The Logic Lab
  * @author jpk
  * @since Feb 14, 2010
  */
@@ -15,7 +15,6 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -34,8 +33,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
-import com.tabulaw.client.app.ui.event.IframeClickEvent;
-import com.tabulaw.client.app.ui.event.IframeClickedHandler;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.dao.EntityNotFoundException;
@@ -130,7 +127,9 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			// downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/><u>Download</u>",
 			// true, downloadMenu);
 			this.addItem("File", true, fileMenu);
-
+			this.addItem("Quote Bundles", true, BundleQuotesMenuBar.getBundleQuotesMenuBar());
+			this.addItem("Documents", true, DocumentsMenuBar.getDocumentsMenuBar());
+			
 			MenuBar downloadMenu = new MenuBar(true);
 			editDoc = new MenuItem("Edit", editCommand);
 			viewDoc = new MenuItem("View", viewCommand);
@@ -179,10 +178,10 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		}
 	}
 
-	private IframeClickedHandler iframeClickedHandler = new IframeClickedHandler() {
+	private ClickHandler docClickHandler = new ClickHandler() {
 
 		@Override
-		public void onIframeClicked(IframeClickEvent event) {
+		public void onClick(ClickEvent event) {
 			menu.removeFromParent();
 			headerPnl.insert(menu, 0);
 			menu.selectItem(null);
@@ -351,17 +350,18 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		if(rng.getStartNode().nodeType != 3 || rng.getEndNode().nodeType != 3)
 		return;
 
-		var mark;
-		try {
-		//if(framedoc !== rng.getDocument()) alert('range.document != framedoc!');
-		//alert('framedoc: ' + framedoc + ', rng.getDocument(): ' + rng.getDocument());
-		mark  = new $wnd.Mark(rng);
-		tsapi.@com.tabulaw.client.app.ui.DocViewer::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
-		}
-		catch(e) {
-		alert('Unable to select this portion of text\n(' + e + ')');
-		//alert('Unable to select this portion of text');
-		}
+			var mark;
+			var root = tsapi.@com.tabulaw.client.app.ui.DocViewer::getDocBody()();
+			try {
+				//if(framedoc !== rng.getDocument()) alert('range.document != framedoc!');
+				//alert('framedoc: ' + framedoc + ', rng.getDocument(): ' + rng.getDocument());
+				mark  = new $wnd.Mark(root, rng);
+				tsapi.@com.tabulaw.client.app.ui.DocViewer::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
+			}
+			catch(e) {
+				alert('Unable to select this portion of text\n(' + e + ')');
+				//alert('Unable to select this portion of text');
+			}
 		};
 
 		// capture user selections w/in the doc frame
@@ -401,13 +401,17 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	/**
 	 * @return the DOM body element ref of the contained document.
 	 */
-	public native JavaScriptObject getDocBody() /*-{
+	public JavaScriptObject getDocBody() {
+		return frame.getElement();
+	}
+	
+//	/*-{
 		//var frameId = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
 		//var frame = $wnd.goog.dom.$(frameId);
 		//var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
 		//return fbody;
-		return $wnd.body;
-	}-*/;
+//		return $wnd.body;
+//	}-*/;
 
 	public DocRef getModel() {
 		return doc;
@@ -576,7 +580,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			dew = new DocEditWidget();
 			dew.setVisible(false);
 			docPnl.add(dew);
-			dew.addIframeClickedHandler(iframeClickedHandler);
+			dew.addClickHandler(docClickHandler);
 		}
 
 		if (!dew.isVisible()) {

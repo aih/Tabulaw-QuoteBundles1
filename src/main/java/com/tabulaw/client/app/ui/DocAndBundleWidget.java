@@ -32,6 +32,7 @@ import com.tabulaw.client.ui.LoggingDragHandler;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocKey;
 import com.tabulaw.model.DocRef;
@@ -41,6 +42,7 @@ import com.tabulaw.model.IEntity;
 import com.tabulaw.model.ModelKey;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.util.StringUtil;
 
 /**
  * Displays a document on the left and quote bundle on the right separated by a
@@ -68,8 +70,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 			// insert the quote text at the cursor location of the doc being edited
 			try {
 				QuoteDocWidget qw = (QuoteDocWidget) event.getContext().draggable;
-				String quoteText = qw.getModel().getQuote();
-				wDocViewer.getDocEditWidget().getFormatter().insertHTML(quoteText);
+				qw.fireEvent(new QuoteEvent(QuoteType.CURRENT_PASTE));
 			}
 			catch(Throwable t) {
 				// for robustification purposes in web mode
@@ -207,7 +208,8 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 				// create the quote
 				String serializedMark = mark.serialize();
-				Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark);
+				// we will fill startPage and endPage fields on the server by data from serializedMark
+				Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark, 0, 0);
 				quote.setMark(mark);
 				// eagerly set id since EntityBase.equals() depends on it
 				quote.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
@@ -298,7 +300,32 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 				// append citation in italics if a case doc
 				if(docRef.isCaseDoc()) {
-					htmlQuote += "<i> - " + docRef.getCitation() + "</i>";
+					CaseRef caseRef = docRef.getCaseRef();
+					StringBuilder caseRefBuilder = new StringBuilder(" ");
+					
+					if (! StringUtil.isEmpty(caseRef.getParties())) {
+						caseRefBuilder.append("<i>");
+						caseRefBuilder.append(caseRef.getParties());
+						caseRefBuilder.append(", ");
+						caseRefBuilder.append("</i>");						
+					}
+					caseRefBuilder.append(caseRef.getDocLoc());
+					if (q.getStartPage() != 0) {
+						caseRefBuilder.append(", ");
+						caseRefBuilder.append(q.getStartPage());
+						if (q.getStartPage() != q.getEndPage()) {
+							caseRefBuilder.append("-");
+							caseRefBuilder.append(q.getEndPage());
+						}
+					}
+					caseRefBuilder.append(" (");
+					if (! caseRef.isSupremeCourt() && ! StringUtil.isEmpty(caseRef.getCourt())) {
+						caseRefBuilder.append(caseRef.getCourt());
+						caseRefBuilder.append(" ");
+					}
+					caseRefBuilder.append(caseRef.getYear());
+					caseRefBuilder.append(").");
+					htmlQuote += caseRefBuilder.toString();
 				}
 				dew.getFormatter().insertHTML(htmlQuote);
 			}

@@ -46,7 +46,8 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 	 */
 	public static enum CitationFormatFlag {
 		ALL(0),
-		EXCLUDE_PARTIES(1);
+		EXCLUDE_PARTIES(1),
+		EXCLUDE_YEAR(2);
 
 		private final int flag;
 
@@ -77,6 +78,10 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 	private String reftoken, parties, docLoc, court, url;
 	
 	private int year;
+	
+	private int firstPageNumber;
+	
+	private int lastPageNuber;
 
 	/**
 	 * Constructor
@@ -109,9 +114,11 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 				sb.append(", ");
 			}
 			sb.append(getDocLoc());
-			sb.append(" (");
-			sb.append(getYear());
-			sb.append(").");
+			if (! CitationFormatFlag.hasFormat(formatFlags, CitationFormatFlag.EXCLUDE_YEAR)) {
+				sb.append(" (");
+				sb.append(getYear());
+				sb.append(").");
+			}
 		}
 		else {
 			// FORMAT: Curtis Publishing Company v. Butts, 351 F. 2d 702 (5th Cir.
@@ -121,14 +128,16 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 				sb.append(", ");
 			}
 			sb.append(getDocLoc());
-			sb.append(" (");
-			String theCourt = getCourt();
-			if(!StringUtil.isEmpty(theCourt)) {
-				sb.append(theCourt);
-				sb.append(" ");
+			if (! CitationFormatFlag.hasFormat(formatFlags, CitationFormatFlag.EXCLUDE_YEAR)) {
+				sb.append(" (");
+				String theCourt = getCourt();
+				if(!StringUtil.isEmpty(theCourt)) {
+					sb.append(theCourt);
+					sb.append(" ");
+				}
+				sb.append(getYear());
+				sb.append(")");
 			}
-			sb.append(getYear());
-			sb.append(")");
 		}
 
 		return sb.toString();
@@ -162,6 +171,8 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		cr.court = court;
 		cr.url = url;
 		cr.year = year;
+		cr.firstPageNumber = firstPageNumber;
+		cr.lastPageNuber = lastPageNuber;
 	}
 
 	@Override
@@ -240,6 +251,22 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 
 	public void setCourt(String court) {
 		this.court = court;
+	}
+	
+	public int getFirstPageNumber() {
+		return firstPageNumber;
+	}
+
+	public void setFirstPageNumber(int firstPageNumber) {
+		this.firstPageNumber = firstPageNumber;
+	}
+
+	public int getLastPageNuber() {
+		return lastPageNuber;
+	}
+
+	public void setLastPageNuber(int lastPageNuber) {
+		this.lastPageNuber = lastPageNuber;
 	}
 
 	@Override

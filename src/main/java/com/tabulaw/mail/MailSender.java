@@ -56,7 +56,7 @@ public class MailSender {
 		this.composers = composers;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private <C extends IMailContext> IComposer<C> getComposerFromContext(C context) {
 		for(final IComposer c : composers) {
 			if(c.supports(context.getClass())) {

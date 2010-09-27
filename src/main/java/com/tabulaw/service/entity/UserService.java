@@ -10,8 +10,6 @@ import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
@@ -31,8 +29,6 @@ import com.tabulaw.util.StringUtil;
  * @author jpk
  */
 public class UserService extends AbstractEntityService implements IForgotPasswordHandler {
-
-	private static final Log log = LogFactory.getLog(UserService.class);
 
 	// private static PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
 

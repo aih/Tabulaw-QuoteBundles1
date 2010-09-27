@@ -382,7 +382,7 @@ public class ClientModelCache {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<Quote> getQuotesByDoc(String docId) {
 		List<Quote> quotes = (List) entities.get(EntityType.QUOTE.name());
 		ArrayList<Quote> rlist = new ArrayList<Quote>();

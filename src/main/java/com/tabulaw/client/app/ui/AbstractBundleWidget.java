@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
@@ -130,22 +131,36 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle> {
 	 *        instance?
 	 * @return the added quote widget
 	 */
-	public Q addQuote(Quote mQuote, boolean persist, boolean addToModel) {
+	public Q addQuote(final Quote mQuote, boolean persist, final boolean addToModel) {
 		if(mQuote == null) throw new NullPointerException();
 
 		// add to the ui
-		Q qw = getNewQuoteWidget(mQuote);
+		final Q qw = getNewQuoteWidget(mQuote);
 		addQuoteWidget(qw, true, addToModel);
-
 		if(persist) {
-			// add the quote updating the bundle quote refs too
-			ClientModelCache.get().persist(mQuote, this);
-			ClientModelCache.get().persist(bundle, this);
-
 			// server side persist
-			ServerPersistApi.get().addQuoteToBundle(bundle.getId(), mQuote);
-		}
-
+			ServerPersistApi.get().addQuoteToBundle(bundle.getId(), mQuote, new AsyncCallback<Quote>() {
+				
+				@Override
+				public void onSuccess(Quote newQuote) {
+					newQuote.setMark(mQuote.getMark());
+					qw.setModel(newQuote);
+					if (addToModel) {
+						int index = bundle.getQuotes().indexOf(mQuote);
+						bundle.removeQuote(index);
+						bundle.insertQuote(newQuote, index);
+					}
+					// add the quote updating the bundle quote refs too
+					ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
+					ClientModelCache.get().persist(newQuote, AbstractBundleWidget.this);
+				}
+				
+				@Override
+				public void onFailure(Throwable paramThrowable) {
+					// do nothing
+				}
+			});
+		} 
 		return qw;
 	}
 

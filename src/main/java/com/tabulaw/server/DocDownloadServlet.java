@@ -10,9 +10,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.util.StringUtil;
@@ -26,8 +23,6 @@ import com.tabulaw.util.StringUtil;
 public class DocDownloadServlet extends AbstractDownloadServlet {
 
 	private static final long serialVersionUID = 7225115223788909217L;
-
-	private static final Log log = LogFactory.getLog(DocDownloadServlet.class);
 
 	@Override
 	protected String getDownloadSource(HttpServletRequest req) throws ServletException, IOException {
