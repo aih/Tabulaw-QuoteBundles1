@@ -19,14 +19,19 @@ import com.tabulaw.model.User;
 
 public class NavTabsPanel extends AbstractNavPanel {
 
+	public static class Style {
+		public final static String NAV_TABS_PANEL = "navTabsPanel";
+	}
+
 	private final ArrayList<IViewInitializerProvider> mainViewButtons = new ArrayList<IViewInitializerProvider>();
-	// private final TabBar mainViewTabs = new TabBar();
+
 	private final VerticalTabBar mainViewTabs = new VerticalTabBar();
 
 	private boolean handlingViewChange;
 
 	public NavTabsPanel(final IUserSessionHandler userSessionHandler) {
-		super();
+		initWidget(mainViewTabs);
+		addStyleName(Style.NAV_TABS_PANEL);
 
 		DocsNavButton nbDocListing = new DocsNavButton();
 		QuoteBundlesNavButton nbQuoteBundles = new QuoteBundlesNavButton();
@@ -46,7 +51,6 @@ public class NavTabsPanel extends AbstractNavPanel {
 				}
 			}
 		});
-		initWidget(mainViewTabs);
 	}
 
 	public void clear() {

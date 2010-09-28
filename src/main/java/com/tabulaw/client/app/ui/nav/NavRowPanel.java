@@ -260,9 +260,6 @@ public class NavRowPanel extends AbstractNavPanel {
 	public NavRowPanel(final IUserSessionHandler userSessionHandler) {
 		super();
 
-		DocsNavButton nbDocListing = new DocsNavButton();
-		QuoteBundlesNavButton nbQuoteBundles = new QuoteBundlesNavButton();
-
 		openDocTabs.addStyleName(Styles.OPEN_DOCS);
 
 		crntQuoteBudleWidget.setStyleName(Styles.CRNT_QB);
