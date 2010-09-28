@@ -796,7 +796,7 @@ a, a:visited, a:hover {
 }
 .gwt-TabBar .gwt-TabBarRest {
 }
-.gwt-TabBar .gwt-TabBarItem {
+.navRowTbl .gwt-TabBar .gwt-TabBarItem {
   margin-left: 6px;
   padding: 3px 6px 3px 6px;
   cursor: pointer;
@@ -804,11 +804,9 @@ a, a:visited, a:hover {
   color: black;
   font-weight: bold;
   text-align: center;
-  background: #d0e4f6;
 }
-.gwt-TabBar .gwt-TabBarItem-selected {
+.navRowTbl .gwt-TabBar .gwt-TabBarItem-selected {
   cursor: default;
-  background: #92c1f0;
 } 
 .gwt-TabBar .gwt-TabBarItem-disabled {
   cursor: default;
