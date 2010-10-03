@@ -150,7 +150,7 @@ div.ro {
 	white-space: nowrap;
 }
 */
-.navButton {
+.navRowTbl .navButton {
 	white-space: nowrap;
 	font-family: Arial, Helvetica, sans-serif;
 	cursor: pointer;
@@ -160,13 +160,13 @@ div.ro {
 	text-align: center;
 	padding: 0 3px 0 3px;
 }
-	.navButton img {
+.navRowTbl 	.navButton img {
 		vertical-align: middle;
 	}
-	.navButton .text {
+.navRowTbl 	.navButton .text {
 		vertical-align: middle;
 	}
-	.gwt-TabBarItem .navButton-doc img {
+.navRowTbl 	.gwt-TabBarItem .navButton-doc img {
 		margin: 1px 0 0 10px;
 	}
 
@@ -204,9 +204,20 @@ div.ro {
 		text-align: center;
 		font-weight: bold;
 	}
-	#navCol .navButton {
+	.navRowTbl #navCol .navButton {
 		background-color: #BFBFBF;
 		height: 20px;
+	}
+	.navTabsPanel .navButton {
+		cursor: default;
+		width:150px;
+		background-color: #EFEFEF;
+		margin: 3px;
+		padding: 3px 10px 3px 15px;
+	}
+	.navTabsPanel .gwt-TabBarItem-selected .navButton {
+		background-color: #dde5ff;
+		font-weight: bold;
 	}
 	#navCol .navButton .text {
 		line-height: 1.49;
