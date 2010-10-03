@@ -91,4 +91,10 @@ public interface Resources extends ClientBundle {
 	ImageResource superscript();
 	@Source("../../public/images/toolbar/underline.gif")
 	ImageResource underline();
+	@Source("../../public/images/toolbar/ul.gif")
+	ImageResource ul();
+	@Source("../../public/images/toolbar/ol.gif")
+	ImageResource ol();
+	@Source("../../public/images/toolbar/removeFormat.gif")
+	ImageResource removeFormat();
 }
