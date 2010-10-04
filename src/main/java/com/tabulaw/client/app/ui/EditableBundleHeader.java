@@ -5,6 +5,8 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
@@ -39,7 +41,10 @@ public class EditableBundleHeader extends Composite {
 
 	protected final FlowPanel header = new FlowPanel();
 
-	protected final Label lblQb;
+//	protected final Label lblQb;
+	
+	protected final MenuBar menuBar = new MenuBar(false);	
+	protected final MenuItem quoteBundlesMenuItem = new MenuItem("Quote Bundles", true, BundleQuotesMenuBar.getBundleQuotesMenuBar());
 	
 	protected final EditableTextWidget pName, pDesc;
 	
@@ -51,14 +56,18 @@ public class EditableBundleHeader extends Composite {
 	 * Constructor
 	 */
 	public EditableBundleHeader() {
-		lblQb = new Label("Quote Bundle");
-		lblQb.setStyleName("echo");
+		//lblQb = new Label("Quote Bundle");
+		//lblQb = new Label();
+		//lblQb.setStyleName("echo");
+		menuBar.addStyleName("echo");
+		menuBar.addItem(quoteBundlesMenuItem);
 
 		buttons.setStyleName(Styles.BUTTONS);
 		header.insert(buttons, 0);
 		
 		header.setStyleName("qbheader");
-		header.add(lblQb);
+		//header.add(lblQb);
+		header.add(menuBar);
 		
 		initWidget(header);
 
@@ -147,7 +156,11 @@ public class EditableBundleHeader extends Composite {
 	}
 
 	public final Widget getDraggable() {
-		return lblQb;
+		return menuBar;
+	}
+	
+	protected void setLabelText(String text){
+		quoteBundlesMenuItem.setText(text);
 	}
 
 }
