@@ -5,6 +5,8 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
@@ -15,35 +17,41 @@ import com.tabulaw.model.QuoteBundle;
 
 /**
  * Bundle header widget with editable name/desc fields.
+ * 
  * @author jpk
  */
 public class EditableBundleHeader extends Composite {
 
 	static final IConverter<String, String> headerDescTextExtractor = new IConverter<String, String>() {
-		
+
 		@Override
 		public String convert(String in) throws IllegalArgumentException {
 			int index = in.indexOf("</span>");
-			if(index == -1) index = in.indexOf("</SPAN>");
+			if (index == -1)
+				index = in.indexOf("</SPAN>");
 			return in.substring(index + 7);
 		}
 	};
 
 	static final IConverter<String, String> headerDescInnerHtmlSetter = new IConverter<String, String>() {
-		
+
 		@Override
 		public String convert(String in) throws IllegalArgumentException {
-			return "<span class=\"" + "echo" + "\">DESCRIPTION: </span>" + (in == null ? "" : in);
+			return "<span class=\"" + "echo" + "\">DESCRIPTION: </span>"
+					+ (in == null ? "" : in);
 		}
 	};
 
 	protected final FlowPanel header = new FlowPanel();
 
 	protected final Label lblQb;
-	
+	protected final MenuBar menuBar = new MenuBar(false);
+	protected final MenuItem quoteBundlesMenuItem = new MenuItem("", true,
+			BundleQuotesMenuBar.getBundleQuotesMenuBar());
+
 	protected final EditableTextWidget pName, pDesc;
-	
-	protected final FlowPanel buttons = new FlowPanel(); 
+
+	protected final FlowPanel buttons = new FlowPanel();
 
 	protected QuoteBundle bundle;
 
@@ -53,13 +61,17 @@ public class EditableBundleHeader extends Composite {
 	public EditableBundleHeader() {
 		lblQb = new Label("Quote Bundle");
 		lblQb.setStyleName("echo");
+		menuBar.addStyleName("echo");
+		menuBar.addItem(quoteBundlesMenuItem);
+		setMenuBarText("Quote Bundles");
 
 		buttons.setStyleName(Styles.BUTTONS);
 		header.insert(buttons, 0);
-		
+
 		header.setStyleName("qbheader");
 		header.add(lblQb);
-		
+		header.add(menuBar);
+
 		initWidget(header);
 
 		pName = new EditableTextWidget();
@@ -70,14 +82,16 @@ public class EditableBundleHeader extends Composite {
 			public void onValueChange(ValueChangeEvent<String> event) {
 				bundle.setName(event.getValue());
 				// save the quote bundle
-				ClientModelCache.get().persist(bundle, EditableBundleHeader.this);
+				ClientModelCache.get().persist(bundle,
+						EditableBundleHeader.this);
 				// server side
 				ServerPersistApi.get().updateBundleProps(bundle);
 			}
 		});
 		header.add(pName);
 
-		pDesc = new EditableTextWidget(headerDescTextExtractor, headerDescInnerHtmlSetter);
+		pDesc = new EditableTextWidget(headerDescTextExtractor,
+				headerDescInnerHtmlSetter);
 		pDesc.addStyleName("desc");
 		pDesc.addValueChangeHandler(new ValueChangeHandler<String>() {
 
@@ -85,62 +99,51 @@ public class EditableBundleHeader extends Composite {
 			public void onValueChange(ValueChangeEvent<String> event) {
 				bundle.setDescription(event.getValue());
 				// save the quote bundle
-				ClientModelCache.get().persist(bundle, EditableBundleHeader.this);
+				ClientModelCache.get().persist(bundle,
+						EditableBundleHeader.this);
 				// server side
 				ServerPersistApi.get().updateBundleProps(bundle);
 			}
 		});
 		header.add(pDesc);
-		
+
 		/*
-		save = new Image(Resources.INSTANCE.save());
-		save.setStyleName(Styles.SAVE);
-		save.setTitle("Save Name and Description");
-		save.setVisible(false);
-		save.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				// save the quote bundle
-				ClientModelCache.get().persist(bundle, EditHeader.this);
-				// server side
-				ClientModelCache.get().updateBundleProps(bundle);
-
-				save.setVisible(false);
-				undo.setVisible(false);
-			}
-		});
-
-		undo = new Image(Resources.INSTANCE.undo());
-		undo.setStyleName(Styles.UNDO);
-		undo.setTitle("Revert Name and Description");
-		undo.setVisible(false);
-		undo.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				// revert
-				pName.revert();
-				pDesc.revert(); 
-				save.setVisible(false);
-				undo.setVisible(false);
-			}
-		});
-		*/
+		 * save = new Image(Resources.INSTANCE.save());
+		 * save.setStyleName(Styles.SAVE);
+		 * save.setTitle("Save Name and Description"); save.setVisible(false);
+		 * save.addClickHandler(new ClickHandler() {
+		 * 
+		 * @Override public void onClick(ClickEvent event) { // save the quote
+		 * bundle ClientModelCache.get().persist(bundle, EditHeader.this); //
+		 * server side ClientModelCache.get().updateBundleProps(bundle);
+		 * 
+		 * save.setVisible(false); undo.setVisible(false); } });
+		 * 
+		 * undo = new Image(Resources.INSTANCE.undo());
+		 * undo.setStyleName(Styles.UNDO);
+		 * undo.setTitle("Revert Name and Description"); undo.setVisible(false);
+		 * undo.addClickHandler(new ClickHandler() {
+		 * 
+		 * @Override public void onClick(ClickEvent event) { // revert
+		 * pName.revert(); pDesc.revert(); save.setVisible(false);
+		 * undo.setVisible(false); } });
+		 */
 	}
 
 	/**
 	 * Sets the quote bundle model updating the UI.
-	 * @param bundle the quote bundle model data
+	 * 
+	 * @param bundle
+	 *            the quote bundle model data
 	 */
 	public void setModel(QuoteBundle bundle) {
 		String name = bundle.getName();
-		
+
 		String desc = bundle.getDescription();
-		
+
 		// TODO debug
-		//desc = bundle.toString();
-		
+		// desc = bundle.toString();
+
 		pName.setText(name == null ? "" : name);
 		pDesc.setHTML(headerDescInnerHtmlSetter.convert(desc));
 		this.bundle = bundle;
@@ -150,4 +153,15 @@ public class EditableBundleHeader extends Composite {
 		return lblQb;
 	}
 
+	protected void setLabelText(String text) {
+		lblQb.setText(text);
+		lblQb.setVisible(true);
+		quoteBundlesMenuItem.setVisible(false);
+	}
+
+	protected void setMenuBarText(String text) {
+		quoteBundlesMenuItem.setText(text);
+		quoteBundlesMenuItem.setVisible(true);
+		lblQb.setVisible(false);
+	}
 }

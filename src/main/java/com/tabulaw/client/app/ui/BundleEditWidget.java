@@ -191,10 +191,10 @@ public class BundleEditWidget extends
 			boolean isCurrent = cqb != null && cqb.equals(bundle);
 			// close.setVisible(!isCurrent);
 			if (isCurrent) {
-				lblQb.setText("Current Quote Bundle");
+				setLabelText("Current Quote Bundle");
 				addStyleName(Styles.QB_CURRENT);
 			} else {
-				lblQb.setText("Quote Bundle");
+				setLabelText("Quote Bundle");
 				removeStyleName(Styles.QB_CURRENT);
 			}
 			if (current != null)
