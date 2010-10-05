@@ -15,6 +15,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -568,7 +569,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 				}
 			});
 			btnSave.setTitle("Save Document");
-			btnCancel = new PushButton("Cancel", new ClickHandler() {
+			btnCancel = new PushButton("View", new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent clkEvt) {
 					tryToCloseEditor();
@@ -617,6 +618,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		Poc.getNavCol().addWidget(btnSave);
 		Poc.getNavCol().addWidget(btnCancel);
 
+		autosave.scheduleRepeating(5 * 60 * 1000);
+		
 		ValueChangeEvent.fire(this, ViewMode.EDIT);
 	}
 
@@ -624,6 +627,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	 * Sets the mode to static.
 	 */
 	private void staticMode() {
+		autosave.cancel();
 		pnl.addStyleDependentName("static");
 		pnl.removeStyleDependentName("edit");
 
@@ -640,5 +644,14 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			ValueChangeEvent.fire(this, ViewMode.STATIC);
 		}
 	}
-
+	
+	private final Timer autosave = new Timer(){
+		@Override
+		public void run() {
+			if (doc != null) {
+				Notifier.get().info("Document autosave");
+				updateDocContent();
+			}
+		}
+	};
 }
