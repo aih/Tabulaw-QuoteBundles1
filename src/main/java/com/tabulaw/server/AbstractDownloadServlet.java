@@ -33,7 +33,7 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 
 	protected abstract String getDownloadSource(HttpServletRequest req) throws ServletException, IOException;
 	
-	protected abstract String getSourceName(HttpServletRequest req); 
+	protected abstract String getSourceName(HttpServletRequest req) throws ServletException; 
 
 	@Override
 	public void init() throws ServletException {
@@ -68,7 +68,7 @@ public abstract class AbstractDownloadServlet extends HttpServlet {
 			String extension = fcd.convert(new ByteArrayInputStream(sourceBytes), "text/html", output, mimeType);
 
 			resp.setContentType(mimeType);
-			resp.setHeader("Content-disposition", "attachment; filename=" + getSourceName(req) + "." + extension);
+			resp.setHeader("Content-disposition", "attachment; filename =\"" + getSourceName(req) + "." + extension+"\"");
 			output.writeTo(resp.getOutputStream());
 			responseWritten = true;
 		}

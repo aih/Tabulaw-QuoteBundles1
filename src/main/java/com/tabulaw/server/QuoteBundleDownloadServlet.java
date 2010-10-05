@@ -2,6 +2,7 @@ package com.tabulaw.server;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class QuoteBundleDownloadServlet extends AbstractDownloadServlet {
 		for(Quote quote : quoteBundle.getQuotes()) {
 			quoteList.add(new QuoteInfo(quote));
 		}
-
+		Collections.reverse(quoteList);
 		Map<String, Object> parameters = new HashMap<String, Object>(2);
 		parameters.put(QUOTE_BUNDLE_KEY, quoteBundle);
 		parameters.put(QUOTE_LIST_KEY, quoteList);
@@ -45,6 +46,8 @@ public class QuoteBundleDownloadServlet extends AbstractDownloadServlet {
 
 	@Override
 	protected String getSourceName(HttpServletRequest req) {
-		return req.getParameter("bundleid");
+		String bundleId = req.getParameter("bundleid");
+		QuoteBundle quoteBundle = pc.getUserDataService().getQuoteBundle(bundleId);
+		return quoteBundle.getName();
 	}
 }
