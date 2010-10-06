@@ -171,6 +171,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>GoogleDocsServiceRpc</servlet-name>
+		<servlet-class>com.tabulaw.server.rpc.GoogleDocsServiceRpc</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GoogleDocsServiceRpc</servlet-name>
+		<url-pattern>/poc/googledoc</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>RESTServlet</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>
