@@ -44,7 +44,7 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 	
 	static class ImportDocButton extends ImageButton {
 		
-		private DocCreateDialog dlg;
+		private DocImportDialog dlg;
 
 		private ImportDocButton() {
 			super(Resources.INSTANCE.importButton(), "Import Document");
@@ -54,8 +54,7 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 				@Override
 				public void onClick(ClickEvent event) {
 					if(dlg == null) {
-						// TODO change to new DocImportDialog();
-						dlg = new DocCreateDialog();
+						dlg = new DocImportDialog();
 						dlg.setGlassEnabled(true);
 					}
 					dlg.center();
