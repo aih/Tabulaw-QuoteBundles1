@@ -31,6 +31,8 @@ import com.tabulaw.client.view.ShowViewRequest;
 import com.tabulaw.client.view.StaticViewInitializer;
 import com.tabulaw.client.view.ViewClass;
 import com.tabulaw.client.view.ViewManager;
+import com.tabulaw.common.data.rpc.IGoogleDocsService;
+import com.tabulaw.common.data.rpc.IGoogleDocsServiceAsync;
 import com.tabulaw.common.data.rpc.IRemoteDocService;
 import com.tabulaw.common.data.rpc.IRemoteDocServiceAsync;
 import com.tabulaw.common.data.rpc.IUserAdminService;
@@ -61,6 +63,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	private static final IUserDataServiceAsync userDataService;
 	
 	private static final IRemoteDocServiceAsync docService;
+	
+	private static final IGoogleDocsServiceAsync googleDocsService;
 
 	/**
 	 * Use this token to initialize GWT history tracking.
@@ -73,6 +77,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		userContextService = (IUserContextServiceAsync) GWT.create(IUserContextService.class);
 		userDataService = (IUserDataServiceAsync) GWT.create(IUserDataService.class);
 		docService = (IRemoteDocServiceAsync) GWT.create(IRemoteDocService.class);
+		googleDocsService = (IGoogleDocsServiceAsync) GWT.create(IGoogleDocsService.class);
 
 		msgPanel = new GlobalMsgPanel();
 	}
@@ -336,5 +341,9 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		ViewClass.addClass(DocView.klas);
 		ViewClass.addClass(BundlesView.klas);
 		ViewClass.addClass(UsersView.klas);
+	}
+
+	public static IGoogleDocsServiceAsync getGoogledocsService() {
+		return googleDocsService;
 	}
 }
