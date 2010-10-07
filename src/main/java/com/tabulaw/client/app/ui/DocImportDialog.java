@@ -5,15 +5,48 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.ui.Dialog;
+import com.tabulaw.client.ui.edit.EditEvent;
+import com.tabulaw.client.ui.edit.EditEvent.EditOp;
+import com.tabulaw.client.ui.edit.IEditHandler;
+import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.common.data.GoogleDocument;
 
-public class DocImportDialog extends Dialog {
+public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> {
 
 	// https://www.google.com/accounts/ClientLogin?Email=gtabulaw@olesiak.biz&Passwd=tabulaw&accountType=HOSTED_OR_GOOGLE&service=cl
 	// https://www.google.com/accounts/AuthSubRequest?scope=https%3A%2F%2Fdocs.google.com%2Ffeeds%2F&session=1&secure=0&next=http://127.0.0.1:8888/subauth.jsp
 
+	private final DocImportEditPanel importPanel = new DocImportEditPanel();
+
 	public DocImportDialog() {
 		super(null, false);
+		setText("Import Document");
+		setAnimationEnabled(true);
+		importPanel.addEditHandler(this);
+		add(importPanel);
+	}
+
+	public void setGoogleDocs(List<GoogleDocument> list) {
+		importPanel.setGoogleDocs(list);
+	}
+
+	@Override
+	public void onEdit(EditEvent<FieldGroup> event) {
+		if (event.getOp() == EditOp.SAVE) {
+			FieldGroup fg = event.getContent();
+		} else if (event.getOp() == EditOp.CANCEL) {
+			hide();
+		}
+	}
+
+	@Override
+	public void show() {
+		super.show();
+		setGoogleDocs(null);
+		loadDocuments();
+	}
+
+	private void loadDocuments() {
 		Poc.getGoogledocsService().getAuthKey(new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -43,6 +76,6 @@ public class DocImportDialog extends Dialog {
 	}
 
 	private void showDocuments(List<GoogleDocument> documents) {
-		System.out.println(documents);
+		setGoogleDocs(documents);
 	}
 }
