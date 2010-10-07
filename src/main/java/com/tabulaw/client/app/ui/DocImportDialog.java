@@ -33,7 +33,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	@Override
 	public void onEdit(EditEvent<FieldGroup> event) {
 		if (event.getOp() == EditOp.SAVE) {
-			FieldGroup fg = event.getContent();
+			doImport(importPanel.getResourceId());
 		} else if (event.getOp() == EditOp.CANCEL) {
 			hide();
 		}
@@ -77,5 +77,9 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 
 	private void showDocuments(List<GoogleDocument> documents) {
 		setGoogleDocs(documents);
+	}
+
+	private void doImport(String resourceId) {
+		System.out.println("IMPORTING: " + resourceId);
 	}
 }

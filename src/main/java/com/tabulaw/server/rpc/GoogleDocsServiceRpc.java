@@ -82,6 +82,8 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 				Vector<IXMLElement> resourceId = entry
 						.getChildrenNamed("gd:resourceId");
 				Vector<IXMLElement> title = entry.getChildrenNamed("title");
+				Vector<IXMLElement> updated = entry.getChildrenNamed("updated");
+				Vector<IXMLElement> author = entry.getChildrenNamed("author");
 				if (resourceId == null || resourceId.isEmpty()
 						|| resourceId.get(0) == null) {
 					continue;
@@ -92,6 +94,21 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 				GoogleDocument doc = new GoogleDocument();
 				doc.setResourceId(resourceId.get(0).getContent());
 				doc.setTitle(title.get(0).getContent());
+				if (updated != null && !updated.isEmpty()
+						&& updated.get(0) != null) {
+					String date = updated.get(0).getContent();
+					int i = date.indexOf("T");
+					if (i > 0) {
+						date = date.substring(0, i);
+					}
+					doc.setDate(date);
+				}
+				if (author != null && !author.isEmpty()
+						&& author.get(0) != null) {
+					IXMLElement name = author.get(0).getChildAtIndex(0);
+					//IXMLElement email = author.get(0).getChildAtIndex(1);
+					doc.setAuthor(name.getContent());
+				}
 				list.add(doc);
 			}
 		} catch (Exception e) {

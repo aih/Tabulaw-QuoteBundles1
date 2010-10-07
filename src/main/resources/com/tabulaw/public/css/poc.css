@@ -1090,3 +1090,6 @@ docHeaderMenuItem img{
 		float: right;
 	}
 	
+.doc-import-edit-panel td {
+	padding: 5px;
+}

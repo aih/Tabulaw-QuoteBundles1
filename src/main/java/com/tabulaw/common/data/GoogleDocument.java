@@ -6,6 +6,8 @@ public class GoogleDocument implements IsSerializable {
 
 	private String resourceId;
 	private String title;
+	private String date;
+	private String author;
 
 	public GoogleDocument() {
 	}
@@ -31,8 +33,25 @@ public class GoogleDocument implements IsSerializable {
 		return title;
 	}
 
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
 	@Override
 	public String toString() {
-		return "[title=" + getTitle() + " resourceId=" + getResourceId() + "]";
+		return "[title=" + getTitle() + " resourceId=" + getResourceId()
+				+ " date=" + getDate() + " author=" + getAuthor() + "]";
 	}
 }
