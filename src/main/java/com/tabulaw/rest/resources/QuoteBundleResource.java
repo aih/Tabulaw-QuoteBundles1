@@ -177,7 +177,7 @@ public class QuoteBundleResource extends BaseResource {
 	
 	@POST
 	@Path("/{id}/send_by_email")
-	public void sendByEmail(@PathParam("id") String id) {
+	public String sendByEmail(@PathParam("id") String id) {
 		QuoteBundle bundle = byId(id);
 		
 		List<QuoteInfo> quotes = new ArrayList<QuoteInfo>();
@@ -206,6 +206,7 @@ public class QuoteBundleResource extends BaseResource {
 		} catch (InterruptedException ex) {
 			throw new WebApplicationException(ex);
 		}
+		return "<success />";
 	}
 	
 	@XmlRootElement(name = "quoteBundles")

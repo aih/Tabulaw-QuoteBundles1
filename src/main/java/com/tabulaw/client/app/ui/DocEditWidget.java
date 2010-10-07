@@ -166,6 +166,17 @@ public class DocEditWidget extends Composite implements HasHTML, HasClickHandler
 			});
 			specialCharsMenuTop = addSpecialCharMenu();
 			toolbar.add(specialCharsMenuTop);
+			/*------Lists----------*/
+			addImageButton(new PushButton(new Image(Resources.INSTANCE.ul())), "Insert unordered list", new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					toggleUnordedList();
+				}
+			});
+			addImageButton(new PushButton(new Image(Resources.INSTANCE.ol())), "Insert ordered list", new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					toggleOrderedList();
+				}
+			});
 
 			/*------paragraph styles----------*/
 			addImageButton(new PushButton(new Image(Resources.INSTANCE.indent())), "Left Indent", new ClickHandler() {
@@ -210,6 +221,12 @@ public class DocEditWidget extends Composite implements HasHTML, HasClickHandler
 					executeCommand("FormatBlock", tag);
 				}
 			});
+			addImageButton(new PushButton(new Image(Resources.INSTANCE.removeFormat())), "Remove format", new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					removeFormat();
+				}
+			});
+			
 		}
 
 		public void onClick(ClickEvent event) {
@@ -308,6 +325,16 @@ public class DocEditWidget extends Composite implements HasHTML, HasClickHandler
 		private void toggleUnderline() {
 			rta.getFormatter().toggleUnderline();
 		}
+		private void toggleOrderedList() {
+			rta.getFormatter().insertOrderedList();
+		}
+		private void toggleUnordedList() {
+			rta.getFormatter().insertUnorderedList();
+		}
+		private void removeFormat() {
+			rta.getFormatter().removeFormat();
+		}
+
 
 		private void resetSpecialCharsMenu() {
 			specialCharsMenuTop.removeFromParent();
