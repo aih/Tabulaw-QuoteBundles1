@@ -20,7 +20,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 
 	public DocImportDialog() {
 		super(null, false);
-		setText("Import Document");
+		setText("Import from Google Docs");
 		setAnimationEnabled(true);
 		importPanel.addEditHandler(this);
 		add(importPanel);

@@ -8,13 +8,9 @@ public class GoogleDocument implements IsSerializable {
 	private String title;
 	private String date;
 	private String author;
+	private String type;
 
 	public GoogleDocument() {
-	}
-
-	public GoogleDocument(String resourceId, String title) {
-		setResourceId(resourceId);
-		setTitle(title);
 	}
 
 	public void setResourceId(String resourceId) {
@@ -53,5 +49,13 @@ public class GoogleDocument implements IsSerializable {
 	public String toString() {
 		return "[title=" + getTitle() + " resourceId=" + getResourceId()
 				+ " date=" + getDate() + " author=" + getAuthor() + "]";
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getType() {
+		return type;
 	}
 }
