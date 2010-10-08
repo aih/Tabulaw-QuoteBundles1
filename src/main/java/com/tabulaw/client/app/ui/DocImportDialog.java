@@ -18,6 +18,8 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 
 	private final DocImportEditPanel importPanel = new DocImportEditPanel();
 
+	private String authKey;
+
 	public DocImportDialog() {
 		super(null, false);
 		setText("Import from Google Docs");
@@ -33,7 +35,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	@Override
 	public void onEdit(EditEvent<FieldGroup> event) {
 		if (event.getOp() == EditOp.SAVE) {
-			doImport(importPanel.getResourceId());
+			doImport(authKey, importPanel.getResourceId());
 		} else if (event.getOp() == EditOp.CANCEL) {
 			hide();
 		}
@@ -50,6 +52,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 		Poc.getGoogledocsService().getAuthKey(new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
+				DocImportDialog.this.authKey = result;
 				getDocuments(result);
 			}
 
@@ -79,7 +82,18 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 		setGoogleDocs(documents);
 	}
 
-	private void doImport(String resourceId) {
-		System.out.println("IMPORTING: " + resourceId);
+	private void doImport(String authKey, String resourceId) {
+		Poc.getGoogledocsService().download(authKey, resourceId,
+				new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						caught.printStackTrace();
+					}
+
+					@Override
+					public void onSuccess(Void result) {
+						System.out.println("CLIENT-DOWNLOADED");
+					}
+				});
 	}
 }

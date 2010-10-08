@@ -10,4 +10,6 @@ public interface IGoogleDocsServiceAsync {
 	void getAuthKey(AsyncCallback<String> callback);
 
 	void getDocuments(String authKey, AsyncCallback<List<GoogleDocument>> callback);
+
+	void download(String authKey, String resourceId, AsyncCallback<Void> callback);
 }

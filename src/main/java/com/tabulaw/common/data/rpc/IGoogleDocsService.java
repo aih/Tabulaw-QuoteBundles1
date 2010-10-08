@@ -12,4 +12,6 @@ public interface IGoogleDocsService extends RemoteService {
 	String getAuthKey();
 
 	List<GoogleDocument> getDocuments(String authKey);
+	
+	void download(String authKey, String resourceId);
 }

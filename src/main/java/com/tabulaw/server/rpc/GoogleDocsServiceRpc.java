@@ -44,10 +44,8 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 
 	@Override
 	public List<GoogleDocument> getDocuments(String authKey) {
-		GetMethod get = new GetMethod(
-				"https://docs.google.com/feeds/default/private/full/-/document");
-		get.addRequestHeader("Authorization", "GoogleLogin auth=" + authKey);
-		get.addRequestHeader("GData-Version", "3.0");
+		GetMethod get = createGetMethod(
+				"/feeds/default/private/full/-/document", authKey);
 		try {
 			client.executeMethod(get);
 			if (get.getStatusCode() == 200) {
@@ -57,6 +55,26 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 			log.error("", e);
 		}
 		return null;
+	}
+
+	@Override
+	public void download(String authKey, String resourceId) {
+		String pattern = "document:";
+		int k = resourceId.indexOf(pattern);
+		if (k >= 0) {
+			resourceId = resourceId.substring(pattern.length());
+		}
+		GetMethod get = createGetMethod(
+				"/feeds/download/documents/Export?docID=" + resourceId
+						+ "&exportFormat=html", authKey);
+		try {
+			client.executeMethod(get);
+			if (get.getStatusCode() == 200) {
+				System.out.println("DOWNLOADED");
+			}
+		} catch (Exception e) {
+			log.error("", e);
+		}
 	}
 
 	private String parseAuthKey(String s) {
@@ -106,7 +124,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 				if (author != null && !author.isEmpty()
 						&& author.get(0) != null) {
 					IXMLElement name = author.get(0).getChildAtIndex(0);
-					//IXMLElement email = author.get(0).getChildAtIndex(1);
+					// IXMLElement email = author.get(0).getChildAtIndex(1);
 					doc.setAuthor(name.getContent());
 				}
 				list.add(doc);
@@ -115,5 +133,13 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 			log.error("", e);
 		}
 		return list;
+	}
+
+	private GetMethod createGetMethod(String path, String authKey) {
+		GetMethod get = new GetMethod("https://docs.google.com" + path);
+		get.addRequestHeader("Authorization", "GoogleLogin auth=" + authKey);
+		get.addRequestHeader("GData-Version", "3.0");
+		return get;
+
 	}
 }
