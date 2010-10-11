@@ -2,7 +2,9 @@ package com.tabulaw.client.app.ui;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.ui.Dialog;
@@ -36,7 +38,15 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	@Override
 	public void onEdit(EditEvent<FieldGroup> event) {
 		if (event.getOp() == EditOp.SAVE) {
-			doImport(authKey, importPanel.getValue());
+			Set<String> docs = importPanel.getValue();
+			if (!docs.isEmpty()
+					&& Window
+							.confirm("Importing will take some time. Do you want to continue?")) {
+				importPanel.setEnabled(false);
+				doImport(authKey, docs);
+			} else {
+				hide();
+			}
 		} else if (event.getOp() == EditOp.CANCEL) {
 			hide();
 		}
@@ -45,6 +55,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	@Override
 	public void show() {
 		super.show();
+		importPanel.setEnabled(true);
 		setGoogleDocs(null);
 		loadDocuments();
 	}

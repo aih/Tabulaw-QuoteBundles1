@@ -1,5 +1,6 @@
 package com.tabulaw.client.app.ui;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,12 +45,61 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 
 	}
 
-	class FieldPanel extends AbstractFieldPanel {
+	class Renderer implements IFieldRenderer<FlowPanel> {
 
 		private final List<GoogleDocument> list;
+		private final List<CheckBox> cbs = new ArrayList<CheckBox>();
+
+		public Renderer(List<GoogleDocument> list) {
+			this.list = list;
+		}
+
+		@Override
+		public void render(FlowPanel widget, FieldGroup fg) {
+			FlexTable table = new FlexTable();
+			widget.add(table);
+			table.setHTML(0, 0, "<b>Document</b>");
+			table.setHTML(0, 1, "<b>Date</b>");
+			table.setHTML(0, 2, "<b>Author</b>");
+			for (int row = 0; row < list.size(); row++) {
+				final GoogleDocument doc = list.get(row);
+				final CheckBox cb = new CheckBox(doc.getTitle());
+				cbs.add(cb);
+				cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+					@Override
+					public void onValueChange(ValueChangeEvent<Boolean> event) {
+						setResourceId(doc.getResourceId(), event.getValue());
+					}
+				});
+				ClickHandler ch = new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						cb.setValue(!cb.getValue(), true);
+					}
+				};
+				Label date = new Label(doc.getDate());
+				Label author = new Label(doc.getAuthor());
+				date.addClickHandler(ch);
+				author.addClickHandler(ch);
+				table.setWidget(row + 1, 0, cb);
+				table.setWidget(row + 1, 1, date);
+				table.setWidget(row + 1, 2, author);
+			}
+		}
+
+		public void setEnabled(boolean enabled) {
+			for (CheckBox cb : cbs) {
+				cb.setEnabled(enabled);
+			}
+		}
+	}
+
+	class FieldPanel extends AbstractFieldPanel {
+
+		private final Renderer renderer;
 
 		public FieldPanel(List<GoogleDocument> list) {
-			this.list = list;
+			this.renderer = new Renderer(list);
 		}
 
 		@Override
@@ -59,41 +109,11 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 
 		@Override
 		protected IFieldRenderer<FlowPanel> getRenderer() {
-			return new IFieldRenderer<FlowPanel>() {
-				@Override
-				public void render(FlowPanel widget, FieldGroup fg) {
-					FlexTable table = new FlexTable();
-					widget.add(table);
-					table.setHTML(0, 0, "<b>Document</b>");
-					table.setHTML(0, 1, "<b>Date</b>");
-					table.setHTML(0, 2, "<b>Author</b>");
-					for (int row = 0; row < list.size(); row++) {
-						final GoogleDocument doc = list.get(row);
-						final CheckBox cb = new CheckBox(doc.getTitle());
-						cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-							@Override
-							public void onValueChange(
-									ValueChangeEvent<Boolean> event) {
-								setResourceId(doc.getResourceId(),
-										event.getValue());
-							}
-						});
-						ClickHandler ch = new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								cb.setValue(!cb.getValue(), true);
-							}
-						};
-						Label date = new Label(doc.getDate());
-						Label author = new Label(doc.getAuthor());
-						date.addClickHandler(ch);
-						author.addClickHandler(ch);
-						table.setWidget(row + 1, 0, cb);
-						table.setWidget(row + 1, 1, date);
-						table.setWidget(row + 1, 2, author);
-					}
-				}
-			};
+			return renderer;
+		}
+
+		public void setEnabled(boolean enabled) {
+			renderer.setEnabled(enabled);
 		}
 	}
 
@@ -122,8 +142,17 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 		return value;
 	}
 
-	private void setResourceId(String resourceId, boolean enabled) {
-		if (enabled) {
+	@Override
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		AbstractFieldPanel panel = getFieldPanel();
+		if (panel instanceof FieldPanel) {
+			((FieldPanel) panel).setEnabled(enabled);
+		}
+	}
+
+	private void setResourceId(String resourceId, boolean checked) {
+		if (checked) {
 			value.add(resourceId);
 		} else {
 			value.remove(resourceId);
