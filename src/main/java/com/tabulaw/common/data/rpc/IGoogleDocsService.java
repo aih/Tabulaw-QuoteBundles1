@@ -1,5 +1,6 @@
 package com.tabulaw.common.data.rpc;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -13,5 +14,5 @@ public interface IGoogleDocsService extends RemoteService {
 
 	List<GoogleDocument> getDocuments(String authKey);
 	
-	void download(String authKey, String resourceId);
+	void download(String authKey, Collection<String> resourceId);
 }

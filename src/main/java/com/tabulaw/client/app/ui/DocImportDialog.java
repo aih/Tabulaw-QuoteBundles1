@@ -1,5 +1,6 @@
 package com.tabulaw.client.app.ui;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,7 +36,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	@Override
 	public void onEdit(EditEvent<FieldGroup> event) {
 		if (event.getOp() == EditOp.SAVE) {
-			doImport(authKey, importPanel.getResourceId());
+			doImport(authKey, importPanel.getValue());
 		} else if (event.getOp() == EditOp.CANCEL) {
 			hide();
 		}
@@ -82,7 +83,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 		setGoogleDocs(documents);
 	}
 
-	private void doImport(String authKey, String resourceId) {
+	private void doImport(String authKey, Collection<String> resourceId) {
 		Poc.getGoogledocsService().download(authKey, resourceId,
 				new AsyncCallback<Void>() {
 					@Override

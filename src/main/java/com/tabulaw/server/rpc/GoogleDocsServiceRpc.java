@@ -1,6 +1,7 @@
 package com.tabulaw.server.rpc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
@@ -58,7 +59,13 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	}
 
 	@Override
-	public void download(String authKey, String resourceId) {
+	public void download(String authKey, Collection<String> resourceId) {
+		for (String id : resourceId) {
+			download(authKey, id);
+		}
+	}
+
+	private void download(String authKey, String resourceId) {
 		String pattern = "document:";
 		int k = resourceId.indexOf(pattern);
 		if (k >= 0) {
@@ -71,6 +78,8 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 			client.executeMethod(get);
 			if (get.getStatusCode() == 200) {
 				System.out.println("DOWNLOADED");
+			} else {
+				System.out.println("PROBLEM WITH DOWNLOADING: " + resourceId);
 			}
 		} catch (Exception e) {
 			log.error("", e);

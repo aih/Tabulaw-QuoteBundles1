@@ -1,5 +1,6 @@
 package com.tabulaw.common.data.rpc;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -11,5 +12,5 @@ public interface IGoogleDocsServiceAsync {
 
 	void getDocuments(String authKey, AsyncCallback<List<GoogleDocument>> callback);
 
-	void download(String authKey, String resourceId, AsyncCallback<Void> callback);
+	void download(String authKey, Collection<String> resourceId, AsyncCallback<Void> callback);
 }
