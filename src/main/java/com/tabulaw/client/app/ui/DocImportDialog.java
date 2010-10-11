@@ -22,6 +22,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	private final DocImportEditPanel importPanel = new DocImportEditPanel();
 
 	private String authKey;
+	private int importId = 0;
 
 	public DocImportDialog() {
 		super(null, false);
@@ -95,6 +96,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	}
 
 	private void doImport(String authKey, Collection<String> resourceId) {
+		final int currentImportId = ++importId;
 		Poc.getGoogledocsService().download(authKey, resourceId,
 				new AsyncCallback<Void>() {
 					@Override
@@ -104,7 +106,10 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 
 					@Override
 					public void onSuccess(Void result) {
-						System.out.println("CLIENT-DOWNLOADED");
+						if (currentImportId == importId) {
+							hide();
+							System.out.println("Continue importing");
+						}
 					}
 				});
 	}
