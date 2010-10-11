@@ -59,14 +59,15 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	}
 
 	@Override
-	public void download(String authKey, Collection<String> resourceId) {
-		for (String id : resourceId) {
-			download(authKey, id);
+	public void download(String authKey, Collection<GoogleDocument> documents) {
+		for (GoogleDocument document : documents) {
+			download(authKey, document);
 		}
 	}
 
-	private void download(String authKey, String resourceId) {
+	private void download(String authKey, GoogleDocument document) {
 		String pattern = "document:";
+		String resourceId = document.getResourceId();
 		int k = resourceId.indexOf(pattern);
 		if (k >= 0) {
 			resourceId = resourceId.substring(pattern.length());
@@ -77,9 +78,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		try {
 			client.executeMethod(get);
 			if (get.getStatusCode() == 200) {
-				System.out.println("DOWNLOADED");
-			} else {
-				System.out.println("PROBLEM WITH DOWNLOADING: " + resourceId);
+				saveDocument(get.getResponseBodyAsString());
 			}
 		} catch (Exception e) {
 			log.error("", e);
@@ -149,6 +148,13 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		get.addRequestHeader("Authorization", "GoogleLogin auth=" + authKey);
 		get.addRequestHeader("GData-Version", "3.0");
 		return get;
+	}
+
+	private void saveDocument(String html) {
+		System.out.println(html);
+	}
+
+	private void saveDocument(String title, String date, String content) {
 
 	}
 }

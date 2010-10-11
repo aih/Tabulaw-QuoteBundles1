@@ -39,7 +39,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	@Override
 	public void onEdit(EditEvent<FieldGroup> event) {
 		if (event.getOp() == EditOp.SAVE) {
-			Set<String> docs = importPanel.getValue();
+			Set<GoogleDocument> docs = importPanel.getValue();
 			if (!docs.isEmpty()
 					&& Window
 							.confirm("Importing will take some time. Do you want to continue?")) {
@@ -95,7 +95,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 		setGoogleDocs(documents);
 	}
 
-	private void doImport(String authKey, Collection<String> resourceId) {
+	private void doImport(String authKey, Collection<GoogleDocument> resourceId) {
 		final int currentImportId = ++importId;
 		Poc.getGoogledocsService().download(authKey, resourceId,
 				new AsyncCallback<Void>() {
@@ -108,7 +108,6 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 					public void onSuccess(Void result) {
 						if (currentImportId == importId) {
 							hide();
-							System.out.println("Continue importing");
 						}
 					}
 				});

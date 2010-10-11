@@ -45,17 +45,26 @@ public class GoogleDocument implements IsSerializable {
 		return author;
 	}
 
-	@Override
-	public String toString() {
-		return "[title=" + getTitle() + " resourceId=" + getResourceId()
-				+ " date=" + getDate() + " author=" + getAuthor() + "]";
-	}
-
 	public void setType(String type) {
 		this.type = type;
 	}
 
 	public String getType() {
 		return type;
+	}
+
+	@Override
+	public String toString() {
+		return "[title=" + getTitle() + " resourceId=" + getResourceId()
+				+ " date=" + getDate() + " author=" + getAuthor() + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		if (resourceId == null) {
+			return super.hashCode();
+		} else {
+			return resourceId.hashCode();
+		}
 	}
 }

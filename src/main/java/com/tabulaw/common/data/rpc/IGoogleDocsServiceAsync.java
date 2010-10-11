@@ -12,5 +12,5 @@ public interface IGoogleDocsServiceAsync {
 
 	void getDocuments(String authKey, AsyncCallback<List<GoogleDocument>> callback);
 
-	void download(String authKey, Collection<String> resourceId, AsyncCallback<Void> callback);
+	void download(String authKey, Collection<GoogleDocument> documents, AsyncCallback<Void> callback);
 }

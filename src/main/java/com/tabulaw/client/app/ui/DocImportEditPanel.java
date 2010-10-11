@@ -68,7 +68,7 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 				cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 					@Override
 					public void onValueChange(ValueChangeEvent<Boolean> event) {
-						setResourceId(doc.getResourceId(), event.getValue());
+						setResourceId(doc, event.getValue());
 					}
 				});
 				ClickHandler ch = new ClickHandler() {
@@ -117,7 +117,7 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 		}
 	}
 
-	private Set<String> value = new HashSet<String>();
+	private Set<GoogleDocument> value = new HashSet<GoogleDocument>();
 
 	public DocImportEditPanel() {
 		super("Import from Google Docs", null, null, null);
@@ -130,7 +130,7 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 	}
 
 	public void setGoogleDocs(List<GoogleDocument> list) {
-		value = new HashSet<String>();
+		value = new HashSet<GoogleDocument>();
 		if (list != null) {
 			setFieldPanel(new FieldPanel(list));
 		} else {
@@ -138,7 +138,7 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 		}
 	}
 
-	public Set<String> getValue() {
+	public Set<GoogleDocument> getValue() {
 		return value;
 	}
 
@@ -151,11 +151,11 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 		}
 	}
 
-	private void setResourceId(String resourceId, boolean checked) {
+	private void setResourceId(GoogleDocument document, boolean checked) {
 		if (checked) {
-			value.add(resourceId);
+			value.add(document);
 		} else {
-			value.remove(resourceId);
+			value.remove(document);
 		}
 	}
 }
