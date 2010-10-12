@@ -174,11 +174,5 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 				mDoc.getId(), htmlContent);
 		uds.addDocUserBinding(user.getId(), mDoc.getId());
 		uds.saveDocContent(docContent);
-
-		System.out.println(htmlContent);
-	}
-
-	private void saveDocument(String title, String date, String content) {
-
 	}
 }
