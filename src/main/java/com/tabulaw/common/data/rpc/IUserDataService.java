@@ -193,6 +193,16 @@ public interface IUserDataService extends RemoteService {
 	 * @return the created doc wrapped in a doc payload
 	 */
 	DocPayload createDoc(DocRef docRef, String htmlContent);
+
+	/**
+	 * Adds new quote to specified bundle and creates appropriate doc   
+	 * @param userId
+	 * @param title title for doc
+	 * @param quote quote to add
+	 * @param quoteBundleId quote bundle id
+	 * @return the persisted quote
+	 */
+	ModelPayload<QuoteBundle> addUserQuote(String userId, String title, String quoteText, String quoteBundleId);
 	
 	/**
 	 * Creates a new contract doc on the server given a new contract doc entity with all required
