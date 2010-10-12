@@ -154,7 +154,7 @@ public class DocumentResource extends BaseResource {
 	}
 	
 	private DocRef createGenericDocument(String title, String parties, String docLoc, 
-			String court, String year, String source) {
+			String court, String year, String source, String docContent) {
 		if (source == null || title == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST);
 		}
@@ -197,8 +197,9 @@ public class DocumentResource extends BaseResource {
 			document = EntityFactory.get().buildCaseDoc(title, new Date(), parties, refToken.toString(), 
 							docLoc, court, null, yearNum, 0, 0);
 		}
-		if (! "upload".equals(source.toLowerCase())) {
-			String htmlContent = downloadDocument(source);
+		source = source.toLowerCase();
+		if (! "upload".equals(source)) {
+			String htmlContent = "html".equals(source) ? docContent : downloadDocument(source);
 			document.getCaseRef().setUrl(source);
 			document = getDataService().saveDoc(document);
 			
@@ -220,11 +221,12 @@ public class DocumentResource extends BaseResource {
 			@FormParam("docLoc") String docLoc,
 			@FormParam("court") String court,
 			@FormParam("year") String year,
-			@FormParam("source") String source) {
+			@FormParam("source") String source,
+			@FormParam("docContent") String docContent) {
 		if (remoteUrl != null) {
 			return scrapeDocument(remoteUrl);
 		}
-		return createGenericDocument(title, parties, docLoc, court, year, source);
+		return createGenericDocument(title, parties, docLoc, court, year, source, docContent);
 	}
 	
 	@POST
@@ -255,7 +257,8 @@ public class DocumentResource extends BaseResource {
 							parameters.get("docLoc"),
 							parameters.get("court"),
 							parameters.get("year"),
-							"upload"
+							"upload",
+							null
 					);					
 					document = (DocRef) httpRequest.getSession().getAttribute("documentToUpload");
 				}
