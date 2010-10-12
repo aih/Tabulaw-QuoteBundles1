@@ -2,6 +2,7 @@ package com.tabulaw.server.rpc;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
@@ -18,6 +19,13 @@ import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.common.data.GoogleDocument;
 import com.tabulaw.common.data.rpc.IGoogleDocsService;
+import com.tabulaw.model.DocContent;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityFactory;
+import com.tabulaw.model.User;
+import com.tabulaw.server.PersistContext;
+import com.tabulaw.server.UserContext;
+import com.tabulaw.service.entity.UserDataService;
 
 @SuppressWarnings("serial")
 public class GoogleDocsServiceRpc extends RpcServlet implements
@@ -78,7 +86,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		try {
 			client.executeMethod(get);
 			if (get.getStatusCode() == 200) {
-				saveDocument(get.getResponseBodyAsString());
+				saveDocument(document, get.getResponseBodyAsString());
 			}
 		} catch (Exception e) {
 			log.error("", e);
@@ -150,8 +158,24 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		return get;
 	}
 
-	private void saveDocument(String html) {
-		System.out.println(html);
+	private void saveDocument(GoogleDocument document, String htmlContent) {
+		final PersistContext pc = (PersistContext) getThreadLocalRequest()
+				.getSession(false).getServletContext()
+				.getAttribute(PersistContext.KEY);
+		final UserContext uc = (UserContext) getThreadLocalRequest()
+				.getSession(false).getAttribute(UserContext.KEY);
+		UserDataService uds = pc.getUserDataService();
+		User user = uc.getUser();
+		Date docDate = new Date();
+		DocRef mDoc = EntityFactory.get().buildDoc(
+				"GDocs " + document.getTitle(), docDate);
+		mDoc = uds.saveDoc(mDoc);
+		DocContent docContent = EntityFactory.get().buildDocContent(
+				mDoc.getId(), htmlContent);
+		uds.addDocUserBinding(user.getId(), mDoc.getId());
+		uds.saveDocContent(docContent);
+
+		System.out.println(htmlContent);
 	}
 
 	private void saveDocument(String title, String date, String content) {
