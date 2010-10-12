@@ -1,18 +1,26 @@
 package com.tabulaw.client.app.ui;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.client.app.Poc;
+import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.ui.Dialog;
+import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.edit.EditEvent;
 import com.tabulaw.client.ui.edit.EditEvent.EditOp;
 import com.tabulaw.client.ui.edit.IEditHandler;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.common.data.GoogleDocument;
+import com.tabulaw.common.msg.Msg;
+import com.tabulaw.common.msg.Msg.MsgLevel;
+import com.tabulaw.model.DocRef;
 
 public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> {
 
@@ -98,18 +106,35 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	private void doImport(String authKey, Collection<GoogleDocument> resourceId) {
 		final int currentImportId = ++importId;
 		Poc.getGoogledocsService().download(authKey, resourceId,
-				new AsyncCallback<Void>() {
+				new AsyncCallback<List<DocRef>>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						caught.printStackTrace();
 					}
 
 					@Override
-					public void onSuccess(Void result) {
+					public void onSuccess(List<DocRef> downloaded) {
 						if (currentImportId == importId) {
+							refreshList(downloaded);
 							hide();
 						}
 					}
 				});
+	}
+
+	private void refreshList(List<DocRef> downloaded) {
+		final ArrayList<Msg> msgs = new ArrayList<Msg>(downloaded.size());
+		for (DocRef doc : downloaded) {
+			msgs.add(new Msg("Document: '" + doc.getTitle() + "' uploaded.",
+					MsgLevel.INFO));
+		}
+		// persist and propagate
+		ClientModelCache.get().persistAll(downloaded, this);
+		DeferredCommand.addCommand(new Command() {
+			@Override
+			public void execute() {
+				Notifier.get().post(msgs);
+			}
+		});
 	}
 }

@@ -67,13 +67,20 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	}
 
 	@Override
-	public void download(String authKey, Collection<GoogleDocument> documents) {
+	public List<DocRef> download(String authKey,
+			Collection<GoogleDocument> documents) {
+		List<DocRef> downloaded = new ArrayList<DocRef>();
 		for (GoogleDocument document : documents) {
-			download(authKey, document);
+			try {
+				DocRef doc = download(authKey, document);
+				downloaded.add(doc);
+			} catch (Exception e) {
+			}
 		}
+		return downloaded;
 	}
 
-	private void download(String authKey, GoogleDocument document) {
+	private DocRef download(String authKey, GoogleDocument document) {
 		String pattern = "document:";
 		String resourceId = document.getResourceId();
 		int k = resourceId.indexOf(pattern);
@@ -86,11 +93,12 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		try {
 			client.executeMethod(get);
 			if (get.getStatusCode() == 200) {
-				saveDocument(document, get.getResponseBodyAsString());
+				return saveDocument(document, get.getResponseBodyAsString());
 			}
 		} catch (Exception e) {
 			log.error("", e);
 		}
+		return null;
 	}
 
 	private String parseAuthKey(String s) {
@@ -158,7 +166,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		return get;
 	}
 
-	private void saveDocument(GoogleDocument document, String htmlContent) {
+	private DocRef saveDocument(GoogleDocument document, String htmlContent) {
 		final PersistContext pc = (PersistContext) getThreadLocalRequest()
 				.getSession(false).getServletContext()
 				.getAttribute(PersistContext.KEY);
@@ -174,5 +182,6 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 				mDoc.getId(), htmlContent);
 		uds.addDocUserBinding(user.getId(), mDoc.getId());
 		uds.saveDocContent(docContent);
+		return mDoc;
 	}
 }

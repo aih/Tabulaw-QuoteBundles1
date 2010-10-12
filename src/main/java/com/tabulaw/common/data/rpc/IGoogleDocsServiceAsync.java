@@ -5,12 +5,15 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.common.data.GoogleDocument;
+import com.tabulaw.model.DocRef;
 
 public interface IGoogleDocsServiceAsync {
-	
+
 	void getAuthKey(AsyncCallback<String> callback);
 
-	void getDocuments(String authKey, AsyncCallback<List<GoogleDocument>> callback);
+	void getDocuments(String authKey,
+			AsyncCallback<List<GoogleDocument>> callback);
 
-	void download(String authKey, Collection<GoogleDocument> documents, AsyncCallback<Void> callback);
+	void download(String authKey, Collection<GoogleDocument> documents,
+			AsyncCallback<List<DocRef>> callback);
 }
