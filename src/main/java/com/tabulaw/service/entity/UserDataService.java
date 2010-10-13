@@ -33,6 +33,7 @@ import com.tabulaw.model.ContractDocUserBinding;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.DocUserBinding;
+import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
@@ -658,7 +659,7 @@ public class UserDataService extends AbstractEntityService {
 		return quote;
 	}
 	@Transactional
-	public QuoteBundle addUserQuote(String userId, String title, String quoteText, String quoteBundleId) throws ConstraintViolationException,EntityNotFoundException {
+	public List<EntityBase> addUserQuote(String userId, String title, String quoteText, String quoteBundleId) throws ConstraintViolationException,EntityNotFoundException {
 		DocRef document = EntityFactory.get().buildDoc(title, new Date());
 		saveDoc(document);
 
@@ -668,7 +669,10 @@ public class UserDataService extends AbstractEntityService {
 		Quote quote = EntityFactory.get().buildQuote(quoteText, document, null, 1, 1);
 		quote = addQuoteToBundle(userId, quoteBundleId, quote);
 		//returns changed quote bundle
-		return getQuoteBundle(quoteBundleId); 
+		List<EntityBase> result = new ArrayList<EntityBase>();
+		result.add(getQuoteBundle(quoteBundleId));
+		result.add(document);
+		return result; 
 	}
 	
 

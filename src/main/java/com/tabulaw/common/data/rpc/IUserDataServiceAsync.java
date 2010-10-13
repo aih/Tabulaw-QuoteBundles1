@@ -9,6 +9,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.tabulaw.model.ClauseBundle;
 import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.UserState;
@@ -73,5 +74,5 @@ public interface IUserDataServiceAsync {
 	
 	void deleteClauseBundle(String id, AsyncCallback<Payload> callback);
 
-	void addUserQuote(String userId, String title, String quoteText, String quoteBundleId, AsyncCallback<ModelPayload<QuoteBundle>> callback);
+	void addUserQuote(String userId, String title, String quoteText, String quoteBundleId, AsyncCallback<ModelListPayload<EntityBase>> callback);
 }

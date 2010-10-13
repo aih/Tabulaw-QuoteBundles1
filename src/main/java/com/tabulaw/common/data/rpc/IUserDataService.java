@@ -10,6 +10,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.tabulaw.model.ClauseBundle;
 import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.UserState;
@@ -202,7 +203,7 @@ public interface IUserDataService extends RemoteService {
 	 * @param quoteBundleId quote bundle id
 	 * @return the persisted quote
 	 */
-	ModelPayload<QuoteBundle> addUserQuote(String userId, String title, String quoteText, String quoteBundleId);
+	ModelListPayload<EntityBase> addUserQuote(String userId, String title, String quoteText, String quoteBundleId);
 	
 	/**
 	 * Creates a new contract doc on the server given a new contract doc entity with all required

@@ -19,7 +19,9 @@ import com.tabulaw.client.ui.field.FieldFactory;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.ui.field.IFieldWidget;
-import com.tabulaw.common.data.rpc.ModelPayload;
+import com.tabulaw.common.data.rpc.ModelListPayload;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.schema.PropertyMetadata;
 import com.tabulaw.schema.PropertyType;
@@ -138,17 +140,21 @@ public class UserQuoteDialog extends Dialog implements IEditHandler<FieldGroup>{
 			String bundleId = ClientModelCache.get().getUserState().getCurrentQuoteBundleId();
 			String userId = ClientModelCache.get().getUserState().getUserId();
 			
-			Poc.getUserDataService().addUserQuote(userId, docTitle, quoteText, bundleId,  new AsyncCallback<ModelPayload<QuoteBundle>>(){
+			Poc.getUserDataService().addUserQuote(userId, docTitle, quoteText, bundleId,  new AsyncCallback<ModelListPayload<EntityBase>>(){
 
 				@Override
 				public void onFailure(Throwable arg0) {
 					hide();
-			
 				}
 
 				@Override
-				public void onSuccess(ModelPayload<QuoteBundle> arg0) {
-					Poc.fireModelChangeEvent(new ModelChangeEvent(null, ModelChangeOp.ADDED, arg0.getModel(), null));
+				public void onSuccess(ModelListPayload<EntityBase> arg0) {
+					QuoteBundle quoteBundle = (QuoteBundle) arg0.getModelList().get(0);
+					DocRef doc = (DocRef) arg0.getModelList().get(1);
+
+					ClientModelCache.get().persist(doc, UserQuoteDialog.this);
+					ClientModelCache.get().persist(quoteBundle, UserQuoteDialog.this);
+					
 					hide();
 				}}
 			);

@@ -39,6 +39,7 @@ import com.tabulaw.model.ClauseBundle;
 import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IUserRef;
@@ -1203,17 +1204,17 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	}
 
 	@Override
-	public ModelPayload<QuoteBundle> addUserQuote(String userId, String title, String quoteText, String quoteBundleId) {
+	public ModelListPayload<EntityBase> addUserQuote(String userId, String title, String quoteText, String quoteBundleId) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
 		Status status = new Status();
-		ModelPayload<QuoteBundle> payload = new ModelPayload<QuoteBundle>(status);
+		ModelListPayload<EntityBase> payload = new ModelListPayload<EntityBase>(status);
 
-		QuoteBundle quoteBundle = null; 
+		List<EntityBase> documentAndBundle = null; 
 		try {
-			quoteBundle = userDataService.addUserQuote(userId, title, quoteText, quoteBundleId);
-			payload.setModel(quoteBundle);
+			documentAndBundle = userDataService.addUserQuote(userId, title, quoteText, quoteBundleId);
+			payload.setModelList(documentAndBundle);
 			status.addMsg("User quote added.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}
 		catch(final EntityExistsException e) {
