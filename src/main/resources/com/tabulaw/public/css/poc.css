@@ -477,6 +477,15 @@ div.ro {
 		-webkit-border-radius: 6px;
 		padding: 4px;
 	}
+	
+.requiredNote {
+	margin-top	: 10px;
+	padding-top	: 5px;
+	border-top	: solid 1px black;
+}	
+.requiredNote sup{
+	color	: red;
+}	
 
 .orphaned .qbheader, .orphaned .qheader {
 	opacity: 0.8;

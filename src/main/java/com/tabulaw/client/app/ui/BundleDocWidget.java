@@ -37,15 +37,6 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 	public BundleDocWidget(IQuoteHandler aQuoteEventHandler) {
 		super(new EditableBundleHeader());
 		this.quoteEventHandler = aQuoteEventHandler;
-		Poc.getPortal().addModelChangeHandler(new IModelChangeHandler() {
-			@Override
-			public void onModelChangeEvent(ModelChangeEvent event) {
-				if (event.getModel() instanceof QuoteBundle) {
-					QuoteBundle quoteBundle = (QuoteBundle)event.getModel();
-					setModel(quoteBundle);
-				}
-			}
-		});
 		
 	}
 

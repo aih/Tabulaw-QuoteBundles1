@@ -3,10 +3,9 @@ package com.tabulaw.client.app.ui;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Focusable;
+import com.google.gwt.user.client.ui.HTML;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.model.ModelChangeEvent;
-import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Dialog;
 import com.tabulaw.client.ui.edit.EditEvent;
 import com.tabulaw.client.ui.edit.FieldGroupEditPanel;
@@ -19,6 +18,7 @@ import com.tabulaw.client.ui.field.FieldFactory;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.ui.field.IFieldWidget;
+import com.tabulaw.client.validate.ErrorHandlerBuilder;
 import com.tabulaw.common.data.rpc.ModelListPayload;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityBase;
@@ -30,7 +30,7 @@ public class UserQuoteDialog extends Dialog implements IEditHandler<FieldGroup>{
 
 	static class FieldProvider extends AbstractFieldGroupProvider {
 		static final PropertyMetadata quoteTitleMetadata = new PropertyMetadata(PropertyType.STRING, false, true, 50);
-		static final PropertyMetadata quoteTextMetadata = new PropertyMetadata(PropertyType.STRING, false, false, 255);
+		static final PropertyMetadata quoteTextMetadata = new PropertyMetadata(PropertyType.STRING, false, true, 255);
 		static final PropertyMetadata quoteReferenceMetadata = new PropertyMetadata(PropertyType.STRING, false, false, 50);
 
 		@Override
@@ -59,6 +59,7 @@ public class UserQuoteDialog extends Dialog implements IEditHandler<FieldGroup>{
 			fw.setPropertyMetadata(quoteReferenceMetadata);
 			fw.setEnabled(false);
 			fg.addField(fw);
+			
 
 			fg.validateIncrementally(false);
 		}
@@ -81,12 +82,17 @@ public class UserQuoteDialog extends Dialog implements IEditHandler<FieldGroup>{
 			cmpsr.addField(fg.getFieldWidget("quoteReference"));
 			cmpsr.newRow();
 			cmpsr.addField(fg.getFieldWidget("quoteReferenceUrl"));
+			cmpsr.newRow();
+			HTML requiredNote= new HTML ("<div class='requiredNote'><sup>*</sup> required field</div>", true);
+			cmpsr.addWidget(requiredNote);
 		}
 	}
 	
 	
 
 	private class UserQuotePanel extends AbstractFieldPanel {
+		
+		
 		@Override
 		protected FieldGroup generateFieldGroup() {
 			return new FieldProvider().getFieldGroup();
@@ -116,9 +122,8 @@ public class UserQuoteDialog extends Dialog implements IEditHandler<FieldGroup>{
 		setText("Add Quote");
 		setAnimationEnabled(true);
 
-		// set error hander for edit panel
-		// editPanel.setErrorHandler(ErrorHandlerBuilder.build(false, true,
-		// null), true);
+//		 set error hander for edit panel
+		 editPanel.setErrorHandler(ErrorHandlerBuilder.build(false, true, null), true);
 
 		editPanel.addEditHandler(this);
 
@@ -126,6 +131,7 @@ public class UserQuoteDialog extends Dialog implements IEditHandler<FieldGroup>{
 		this.add(editPanel);
 		
 	}
+	
 	@Override
 	public void onEdit(EditEvent<FieldGroup> event) {
 		// persist the quote bundle
