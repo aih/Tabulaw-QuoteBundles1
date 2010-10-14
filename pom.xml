@@ -747,5 +747,8 @@
 		</dependency>
 
 	</dependencies>
+<modules>
+		<module>sso</module>
+</modules>
 
 </project>
