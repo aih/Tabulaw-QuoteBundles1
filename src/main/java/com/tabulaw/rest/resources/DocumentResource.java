@@ -154,7 +154,7 @@ public class DocumentResource extends BaseResource {
 	}
 	
 	private DocRef createGenericDocument(String title, String parties, String docLoc, 
-			String court, String year, String source, String docContent) {
+			String court, String year, String source, String docContent, String url) {
 		if (source == null || title == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST);
 		}
@@ -200,13 +200,20 @@ public class DocumentResource extends BaseResource {
 		source = source.toLowerCase();
 		if (! "upload".equals(source)) {
 			String htmlContent = "html".equals(source) ? docContent : downloadDocument(source);
-			document.getCaseRef().setUrl(source);
+			if (! StringUtils.isEmpty(url)) {
+				document.getCaseRef().setUrl(url);
+			} else {
+				document.getCaseRef().setUrl(source);
+			}
 			document = getDataService().saveDoc(document);
 			
 			DocContent content = EntityFactory.get().buildDocContent(document.getId(), htmlContent);
 			getDataService().saveDocContent(content);
 			getDataService().addDocUserBinding(getUserId(), document.getId());
 		} else {
+			if (! StringUtils.isEmpty(url)) {
+				document.getCaseRef().setUrl(url);
+			}
 			httpRequest.getSession().setAttribute("documentToUpload", document);
 			return null;
 		}
@@ -222,11 +229,12 @@ public class DocumentResource extends BaseResource {
 			@FormParam("court") String court,
 			@FormParam("year") String year,
 			@FormParam("source") String source,
-			@FormParam("docContent") String docContent) {
+			@FormParam("docContent") String docContent,
+			@FormParam("url") String url) {
 		if (remoteUrl != null) {
 			return scrapeDocument(remoteUrl);
 		}
-		return createGenericDocument(title, parties, docLoc, court, year, source, docContent);
+		return createGenericDocument(title, parties, docLoc, court, year, source, docContent, url);
 	}
 	
 	@POST
@@ -258,7 +266,8 @@ public class DocumentResource extends BaseResource {
 							parameters.get("court"),
 							parameters.get("year"),
 							"upload",
-							null
+							null,
+							parameters.get("url")
 					);					
 					document = (DocRef) httpRequest.getSession().getAttribute("documentToUpload");
 				}
