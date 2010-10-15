@@ -59,6 +59,7 @@ import javax.servlet.http.HttpSession;
  * @author Dirk Balfanz (dirk.balfanz@gmail.com)
  * @author Breno de Medeiros (breno.demedeiros@gmail.com)
  */
+@SuppressWarnings("serial")
 public class CheckAuthServlet extends InjectableServlet {
   private ConsumerHelper helper;
   private OAuthProviderInfoStore providerStore;
@@ -91,7 +92,8 @@ public class CheckAuthServlet extends InjectableServlet {
     doGet(req, resp);
   }
 
-  @Override
+  @SuppressWarnings("unchecked")
+@Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 

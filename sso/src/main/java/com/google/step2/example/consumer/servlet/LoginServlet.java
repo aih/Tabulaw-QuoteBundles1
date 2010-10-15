@@ -54,6 +54,7 @@ import javax.servlet.http.HttpSession;
  * @author Dirk Balfanz (dirk.balfanz@gmail.com)
  * @author Breno de Medeiros (breno.demedeiros@gmail.com)
  */
+@SuppressWarnings("serial")
 public class LoginServlet extends InjectableServlet {
   private Log log = LogFactory.getLog(LoginServlet.class);
   private static final String TEMPLATE_FILE = "/WEB-INF/login.jsp";
