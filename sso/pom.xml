@@ -11,8 +11,10 @@
 
 	<properties>
 		<!-- dependencies -->
-		<gwt.version>2.0.4</gwt.version>
-		<com.google.gwt.version>2.0.4</com.google.gwt.version>
+		<gwt.version>2.0.3</gwt.version>
+		<com.google.gwt.version>2.0.3</com.google.gwt.version>
+		<guice.version>2.0</guice.version>
+		<gdata.version>1.0-1.26</gdata.version>
 		<commons.lang.version>2.4</commons.lang.version>
 		<commons.httpclient.version>3.0.1</commons.httpclient.version>
 		<commons.logging.version>1.0</commons.logging.version>
@@ -36,7 +38,6 @@
 		<javac.target.version>1.6</javac.target.version>
 	</properties>
 
-
 	<developers>
 		<developer>
 			<id>rolesiak</id>
@@ -47,6 +48,55 @@
 			</roles>
 		</developer>
 	</developers>
+
+	<repositories>
+		<repository>
+			<id>atlassian</id>
+			<url>http://maven.atlassian.com/repository/public</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.step2</groupId>
+			<artifactId>step2-consumer</artifactId>
+			<version>1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>${guice.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-user</artifactId>
+			<version>${gwt.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-servlet</artifactId>
+			<version>${gwt.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gdata</groupId>
+			<artifactId>gdata-contacts</artifactId>
+			<version>${gdata.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gdata</groupId>
+			<artifactId>gdata-core</artifactId>
+			<version>${gdata.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.2.3</version>
+			<classifier>jdk15</classifier>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<resources>
 			<resource>
