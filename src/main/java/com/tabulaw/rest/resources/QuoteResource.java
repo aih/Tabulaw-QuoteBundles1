@@ -186,29 +186,34 @@ public class QuoteResource extends BaseResource {
 		DocContent content = service.getDocContent(docRefId);
 		
 		List<Quote> result = new ArrayList<Quote>(quotes.length);
+		DocRef docRef = service.getDoc(docRefId);
 		for (String quoteText : quotes) {
 			// create serialized mark for the specified quote
-			String serializedMark = "mark_1|" + quoteText + "|";
-			DocRef docRef = service.getDoc(docRefId);
-			QuotePosition position = null;
-			try {
-				// find quote in the documents html
+			Quote quote;
+			if (! docRef.isReferenceDoc()) {
+				String serializedMark = "mark_1|" + quoteText + "|";			
+				QuotePosition position = null;
+				try {
+					// find quote in the documents html
 
-				position = HtmlUtils.findQuoteInHtml(quoteText, content.getHtmlContent());
-				if (position == null) {
-					throw new WebApplicationException();
+					position = HtmlUtils.findQuoteInHtml(quoteText, content.getHtmlContent());
+					if (position == null) {
+						throw new WebApplicationException();
+					}
+					// if it exists in the doc add position into mark
+					serializedMark += positionToMark(position.startPosition);
+					serializedMark += "|" + position.startOffset + "|";
+					serializedMark += positionToMark(position.endPosition);
+					serializedMark += "|" + position.endOffset;
+				} catch (IOException ex) {
+					throw new WebApplicationException(ex);
 				}
-				// if it exists in the doc add position into mark
-				serializedMark += positionToMark(position.startPosition);
-				serializedMark += "|" + position.startOffset + "|";
-				serializedMark += positionToMark(position.endPosition);
-				serializedMark += "|" + position.endOffset;
-			} catch (IOException ex) {
-				throw new WebApplicationException(ex);
+				// create quote 
+				quote = EntityFactory.get().buildQuote(quoteText, docRef, serializedMark,
+						findPage(content, position.startPosition), findPage(content, position.endPosition));
+			} else {
+				quote = EntityFactory.get().buildQuote(quoteText, docRef, null, 0, 0);
 			}
-			// create quote 
-			Quote quote = EntityFactory.get().buildQuote(quoteText, docRef, serializedMark,
-					findPage(content, position.startPosition), findPage(content, position.endPosition));
 			result.add(quote);
 		}
 		for (int i = 0; i < result.size(); i++) {
@@ -216,15 +221,6 @@ public class QuoteResource extends BaseResource {
 			result.set(i, quote);
 		}
 		return result;		
-	}
-	
-	@POST
-	@Consumes("text/plain")
-	public Quote create(
-			@QueryParam("docRefId") String docRefId,
-			@QueryParam("quoteBundleId") String bundleId,			
-			String quoteText) {
-		return createList(docRefId, bundleId, quoteText).get(0);
 	}
 	
 	@POST
@@ -250,7 +246,7 @@ public class QuoteResource extends BaseResource {
 			String[] quotesArray = quotes.toArray(new String[quotes.size()]); 
 			return new QuotesList(createList(docRefId, bundleId, quotesArray));
 		} 
-		return create(docRefId, bundleId, quotes.get(0));
+		return createList(docRefId, bundleId, quotes.get(0)).get(0);
 	}
 	
 	

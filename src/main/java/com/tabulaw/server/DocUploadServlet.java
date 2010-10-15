@@ -104,7 +104,7 @@ public class DocUploadServlet extends HttpServlet {
 
 						// create doc ref
 						Date docDate = new Date();
-						DocRef mDoc = EntityFactory.get().buildDoc(docTitle, docDate);
+						DocRef mDoc = EntityFactory.get().buildDoc(docTitle, docDate, false);
 
 						// save doc ref
 						mDoc = uds.saveDoc(mDoc);

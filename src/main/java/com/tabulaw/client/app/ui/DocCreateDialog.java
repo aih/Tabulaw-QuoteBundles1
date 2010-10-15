@@ -101,7 +101,7 @@ public class DocCreateDialog extends Dialog implements IEditHandler<FieldGroup> 
 			else {
 				String docTitle = fg.getFieldWidget("docTitle").getValue().toString();
 				Date docDate = (Date) fg.getFieldWidget("docDate").getValue();
-				final DocRef newDoc = EntityFactory.get().buildDoc(docTitle, docDate);
+				final DocRef newDoc = EntityFactory.get().buildDoc(docTitle, docDate, false);
 
 				new RpcCommand<DocPayload>() {
 

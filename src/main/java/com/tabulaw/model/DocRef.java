@@ -36,6 +36,8 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	private String title;
 	private Date date;
 	private CaseRef caseRef;
+	
+	private boolean referenceDoc;
 
 	/**
 	 * Constructor
@@ -72,6 +74,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 		DocRef dr = (DocRef) cln;
 		dr.id = id;
 		dr.title = title;
+		dr.referenceDoc = referenceDoc;
 		dr.date = date == null ? null : new Date(date.getTime());
 		dr.caseRef = (CaseRef) (caseRef == null ? null : caseRef.clone());
 	}
@@ -141,6 +144,14 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	public void setCaseRef(CaseRef caseRef) {
 		this.caseRef = caseRef;
 	}
+	
+	public boolean isReferenceDoc() {
+		return referenceDoc;
+	}
+
+	public void setReferenceDoc(boolean referenceDoc) {
+		this.referenceDoc = referenceDoc;
+	}
 
 	@Override
 	public int compareTo(DocRef o) {
@@ -161,10 +172,14 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 		if("date".equals(propertyPath)) {
 			return getDate();
 		}
+		
+		if("referenceDoc".equals(propertyPath)) {
+			return isReferenceDoc();
+		}
 
 		return null;
 	}
-
+	
 	@Override
 	public String descriptor() {
 		return typeDesc() + " (" + getTitle() + ")";

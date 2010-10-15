@@ -5,6 +5,7 @@
  */
 package com.tabulaw.client.app.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -220,9 +221,17 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		@SuppressWarnings("unchecked")
 		@Override
 		public void refresh() {
-			getDataProvider().setList((List<DocRef>) ClientModelCache.get().getAll(EntityType.DOCUMENT));
+			List<DocRef> model = new ArrayList<DocRef>();
+			for (DocRef doc : (List<DocRef>) ClientModelCache.get().getAll(EntityType.DOCUMENT)) {
+				if (! doc.isReferenceDoc()) {
+					model.add(doc);
+				}
+			}
+			getDataProvider().setList(model);
 			super.refresh();
 		}
+		
+		
 	}
 
 	static final IListingConfig config = new ListingConfig();

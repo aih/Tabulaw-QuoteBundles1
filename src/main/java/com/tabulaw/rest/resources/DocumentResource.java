@@ -54,20 +54,21 @@ import com.tabulaw.service.scrape.IDocHandler;
 @Produces({MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
 public class DocumentResource extends BaseResource {
 	
-	private DocRef fetchDocument(String remoteUrl) {
+	private DocRef fetchDocument(String remoteUrl, String docContent) {
 		UserContext userContext = (UserContext) httpRequest.getSession().getAttribute(REST_USER_KEY);
 		// TODO verify this check for a valid user in a valid user context
 		if(userContext == null || userContext.getUser() == null) throw new IllegalStateException();
 		
-		String fcontents;
-		try {
-			fcontents = DocUtils.fetch(new URL(remoteUrl));
-		}
-		catch(MalformedURLException ex) {
-			throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
-		}
-		catch(IOException ex) {
-			throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
+		if (StringUtils.isEmpty(docContent)) {
+			try {
+				docContent = DocUtils.fetch(new URL(remoteUrl));
+			}
+			catch(MalformedURLException ex) {
+				throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
+			}
+			catch(IOException ex) {
+				throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
+			}
 		}
 
 		// resolve the doc handler
@@ -80,11 +81,12 @@ public class DocumentResource extends BaseResource {
 		}
 		
 		// parse fetched doc data
-		CaseDocData cdd = handler.parseSingleDocument(fcontents);
+		CaseDocData cdd = handler.parseSingleDocument(docContent);
 		
 		int lastPageNumber = cdd.getContent().getFirstPageNumber() + cdd.getContent().getPagesXPath().size();
-		DocRef doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), cdd.getParties(), cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteUrl, cdd.getYear(), 
-					cdd.getContent().getFirstPageNumber(), lastPageNumber);
+		DocRef doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), false, cdd.getParties(),
+				cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteUrl, cdd.getYear(), 
+				cdd.getContent().getFirstPageNumber(), lastPageNumber);
 
 		// persist the doc ref and doc/user binding
 		doc = getDataService().saveDoc(doc);
@@ -99,13 +101,13 @@ public class DocumentResource extends BaseResource {
 //		htmlContent = sb.toString();
 
 		// persist doc content
-		DocContent docContent = EntityFactory.get().buildDocContent(doc.getId(), htmlContent, cdd.getContent().getPagesXPath(), cdd.getContent().getFirstPageNumber());
-		getDataService().saveDocContent(docContent);
+		DocContent content = EntityFactory.get().buildDocContent(doc.getId(), htmlContent, cdd.getContent().getPagesXPath(), cdd.getContent().getFirstPageNumber());
+		getDataService().saveDocContent(content);
 
 		return doc;
 	}
 	
-	private DocRef scrapeDocument(String remoteUrl) {
+	private DocRef scrapeDocument(String remoteUrl, String docContent) {
 		if (StringUtils.isEmpty(remoteUrl)) {
 			throw new WebApplicationException(Status.BAD_REQUEST);
 		}
@@ -114,7 +116,7 @@ public class DocumentResource extends BaseResource {
 			document = getDataService().
 						findCaseDocByRemoteUrl(remoteUrl);
 		} catch (EntityNotFoundException ex) {
-			document = fetchDocument(remoteUrl);
+			document = fetchDocument(remoteUrl, docContent);
 		}
 		UserContext user = (UserContext) httpRequest.getSession().getAttribute(REST_USER_KEY);
 		try {
@@ -153,16 +155,16 @@ public class DocumentResource extends BaseResource {
 		return output.toString("utf-8");
 	}
 	
-	private DocRef createGenericDocument(String title, String parties, String docLoc, 
+	private DocRef createGenericDocument(String title, String referenceDoc, String parties, String docLoc,
 			String court, String year, String source, String docContent, String url) {
 		if (source == null || title == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST);
 		}
-		
+		boolean isReferenceDoc = "true".equals(referenceDoc);
 		int yearNum = 0;
 		if (! StringUtils.isEmpty(year)) {
 			yearNum = Integer.parseInt(year);
-		}
+		}	
 		
 		StringBuilder refToken = new StringBuilder();
 		if (! StringUtils.isEmpty(title)) {
@@ -192,18 +194,18 @@ public class DocumentResource extends BaseResource {
 		}
 		DocRef document;
 		if (refToken.length() == 0) {
-			document = EntityFactory.get().buildDoc(title, new Date());
+			document = EntityFactory.get().buildDoc(title, new Date(), isReferenceDoc);
 		} else {
-			document = EntityFactory.get().buildCaseDoc(title, new Date(), parties, refToken.toString(), 
-							docLoc, court, null, yearNum, 0, 0);
+			document = EntityFactory.get().buildCaseDoc(title, new Date(), isReferenceDoc, parties, 
+					refToken.toString(), docLoc, court, null, yearNum, 0, 0);
 		}
 		source = source.toLowerCase();
 		if (! "upload".equals(source)) {
-			String htmlContent = "html".equals(source) ? docContent : downloadDocument(source);
-			if (! StringUtils.isEmpty(url)) {
-				document.getCaseRef().setUrl(url);
-			} else {
+			String htmlContent = StringUtils.isNotEmpty(docContent) ? docContent : downloadDocument(source);
+			if (StringUtils.isEmpty(url)) {
 				document.getCaseRef().setUrl(source);
+			} else {
+				document.getCaseRef().setUrl(url);
 			}
 			document = getDataService().saveDoc(document);
 			
@@ -224,6 +226,7 @@ public class DocumentResource extends BaseResource {
 	public DocRef create(
 			@FormParam("remoteUrl") String remoteUrl,
 			@FormParam("title") String title,
+			@FormParam("referenceDoc") String referenceDoc,
 			@FormParam("parties") String parties,
 			@FormParam("docLoc") String docLoc,
 			@FormParam("court") String court,
@@ -232,9 +235,9 @@ public class DocumentResource extends BaseResource {
 			@FormParam("docContent") String docContent,
 			@FormParam("url") String url) {
 		if (remoteUrl != null) {
-			return scrapeDocument(remoteUrl);
+			return scrapeDocument(remoteUrl, docContent);
 		}
-		return createGenericDocument(title, parties, docLoc, court, year, source, docContent, url);
+		return createGenericDocument(title, referenceDoc, parties, docLoc, court, year, source, docContent, url);
 	}
 	
 	@POST
@@ -261,6 +264,7 @@ public class DocumentResource extends BaseResource {
 				if (document == null && parameters.get("title") != null) {
 					createGenericDocument(
 							parameters.get("title"),
+							parameters.get("referenceDoc"),
 							parameters.get("parties"),
 							parameters.get("docLoc"),
 							parameters.get("court"),
