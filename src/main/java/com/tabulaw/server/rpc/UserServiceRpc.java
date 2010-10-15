@@ -1204,16 +1204,18 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 	}
 
 	@Override
-	public ModelListPayload<EntityBase> addUserQuote(String userId, String title, String quoteText, String quoteBundleId) {
+	public ModelListPayload<EntityBase> addOrphanQuote(String userId, String title, String quoteText, String quoteBundleId) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
 		Status status = new Status();
 		ModelListPayload<EntityBase> payload = new ModelListPayload<EntityBase>(status);
 
-		List<EntityBase> documentAndBundle = null; 
+		List<EntityBase> documentAndBundle = new ArrayList<EntityBase>(); 
 		try {
-			documentAndBundle = userDataService.addUserQuote(userId, title, quoteText, quoteBundleId);
+			Quote quote = userDataService.addOrphanQuote(userId, title, quoteText, quoteBundleId);
+			documentAndBundle.add(userDataService.getQuoteBundle(quoteBundleId));
+			documentAndBundle.add(quote.getDocument());
 			payload.setModelList(documentAndBundle);
 			status.addMsg("User quote added.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		}

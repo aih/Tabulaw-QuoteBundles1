@@ -74,5 +74,5 @@ public interface IUserDataServiceAsync {
 	
 	void deleteClauseBundle(String id, AsyncCallback<Payload> callback);
 
-	void addUserQuote(String userId, String title, String quoteText, String quoteBundleId, AsyncCallback<ModelListPayload<EntityBase>> callback);
+	void addOrphanQuote(String userId, String title, String quoteText, String quoteBundleId, AsyncCallback<ModelListPayload<EntityBase>> callback);
 }

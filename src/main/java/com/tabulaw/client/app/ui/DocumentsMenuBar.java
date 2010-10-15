@@ -41,6 +41,9 @@ public class DocumentsMenuBar extends MenuBar {
 				EntityType.DOCUMENT);
 		int count = 0;
 		for (final DocRef doc : docs) {
+			if (doc.isReferenceDoc()) {
+				continue;
+			}
 			if (count++ >= 10) {
 				break;
 			}

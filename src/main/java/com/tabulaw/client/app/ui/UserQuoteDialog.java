@@ -88,10 +88,7 @@ public class UserQuoteDialog extends Dialog implements IEditHandler<FieldGroup>{
 		}
 	}
 	
-	
-
-	private class UserQuotePanel extends AbstractFieldPanel {
-		
+	class UserQuotePanel extends AbstractFieldPanel {		
 		
 		@Override
 		protected FieldGroup generateFieldGroup() {
@@ -105,8 +102,7 @@ public class UserQuoteDialog extends Dialog implements IEditHandler<FieldGroup>{
 
 		public Focusable getFocusable() {
 			return getFieldGroup().getFieldWidget("quoteText");
-		}
-		
+		}		
 	}
 
 	private final UserQuotePanel fieldPanel = new UserQuotePanel();
@@ -146,7 +142,7 @@ public class UserQuoteDialog extends Dialog implements IEditHandler<FieldGroup>{
 			String bundleId = ClientModelCache.get().getUserState().getCurrentQuoteBundleId();
 			String userId = ClientModelCache.get().getUserState().getUserId();
 			
-			Poc.getUserDataService().addUserQuote(userId, docTitle, quoteText, bundleId,  new AsyncCallback<ModelListPayload<EntityBase>>(){
+			Poc.getUserDataService().addOrphanQuote(userId, docTitle, quoteText, bundleId,  new AsyncCallback<ModelListPayload<EntityBase>>(){
 
 				@Override
 				public void onFailure(Throwable arg0) {
