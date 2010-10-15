@@ -9,8 +9,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.MarkOverlay;
+import com.tabulaw.client.model.IModelChangeHandler;
+import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
 
 /**
  * Quote bundle widget intended for use side by side with a document in view.
@@ -33,6 +37,7 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 	public BundleDocWidget(IQuoteHandler aQuoteEventHandler) {
 		super(new EditableBundleHeader());
 		this.quoteEventHandler = aQuoteEventHandler;
+		
 	}
 
 	/*

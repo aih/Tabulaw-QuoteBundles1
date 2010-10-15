@@ -34,6 +34,7 @@ public class BundleQuotesMenuBar extends MenuBar {
 	public void update() {
 		clearItems();
 		addNewBundleQuoteMenuItem();
+		addNewQuoteMenuItem();
 		List<QuoteBundle> qbs = (List<QuoteBundle>) ClientModelCache.get()
 				.getAll(EntityType.QUOTE_BUNDLE);
 		for (final QuoteBundle qb : qbs) {
@@ -61,6 +62,18 @@ public class BundleQuotesMenuBar extends MenuBar {
 					dlg.setGlassEnabled(true);
 				}
 				dlg.center();
+			}
+		});
+		addSeparator();
+	}
+
+	private void addNewQuoteMenuItem() {
+		addItem("New Quote ...", new Command() {
+			@Override
+			public void execute() {
+				UserQuoteDialog userQuoteDialog = new UserQuoteDialog();
+				userQuoteDialog.setGlassEnabled(true);
+				userQuoteDialog.center();
 			}
 		});
 		addSeparator();
