@@ -12,6 +12,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.model.Quote;
 
+
 /**
  * Quote bundle widget intended for use side by side with a document in view.
  * @author jpk
@@ -33,6 +34,7 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 	public BundleDocWidget(IQuoteHandler aQuoteEventHandler) {
 		super(new EditableBundleHeader());
 		this.quoteEventHandler = aQuoteEventHandler;
+		
 	}
 
 	/*

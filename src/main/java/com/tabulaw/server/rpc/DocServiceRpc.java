@@ -144,7 +144,8 @@ public class DocServiceRpc extends RpcServlet implements IRemoteDocService {
 			CaseDocData cdd = handler.parseSingleDocument(fcontents);
 			
 			int lastPageNumber = cdd.getContent().getFirstPageNumber() + cdd.getContent().getPagesXPath().size();
-			doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), cdd.getParties(), cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteDocUrl, cdd.getYear(), 
+			doc = EntityFactory.get().buildCaseDoc(cdd.getTitle(), new Date(), false, cdd.getParties(), 
+					cdd.getReftoken(), cdd.getDocLoc(), cdd.getCourt(), remoteDocUrl, cdd.getYear(), 
 					cdd.getContent().getFirstPageNumber(), lastPageNumber);
 
 			// persist the doc ref and doc/user binding

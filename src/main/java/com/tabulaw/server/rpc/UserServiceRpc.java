@@ -39,6 +39,7 @@ import com.tabulaw.model.ClauseBundle;
 import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IUserRef;
@@ -1189,6 +1190,40 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 		catch(final ConstraintViolationException cve) {
 			PersistHelper.handleValidationException(pc, cve, payload);
+		}
+		catch(final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		}
+		catch(Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	@Override
+	public ModelListPayload<EntityBase> addOrphanQuote(String userId, String title, String quoteText, String quoteBundleId) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		ModelListPayload<EntityBase> payload = new ModelListPayload<EntityBase>(status);
+
+		List<EntityBase> documentAndBundle = new ArrayList<EntityBase>(); 
+		try {
+			Quote quote = userDataService.addOrphanQuote(userId, title, quoteText, quoteBundleId);
+			documentAndBundle.add(userDataService.getQuoteBundle(quoteBundleId));
+			documentAndBundle.add(quote.getDocument());
+			payload.setModelList(documentAndBundle);
+			status.addMsg("User quote added.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		}
+		catch(final EntityExistsException e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+		catch(final ConstraintViolationException ise) {
+			PersistHelper.handleValidationException(context, ise, payload);
 		}
 		catch(final RuntimeException e) {
 			exceptionToStatus(e, payload.getStatus());

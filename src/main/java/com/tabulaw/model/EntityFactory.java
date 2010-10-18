@@ -151,10 +151,11 @@ public class EntityFactory {
 	 * @param docDate
 	 * @return newly created model
 	 */
-	public DocRef buildDoc(String docTitle, Date docDate) {
+	public DocRef buildDoc(String docTitle, Date docDate, boolean referenceDoc) {
 		DocRef doc = (DocRef) create(EntityType.DOCUMENT);
 		doc.setTitle(docTitle);
 		doc.setDate(docDate);
+		doc.setReferenceDoc(referenceDoc);
 		return doc;
 	}
 	
@@ -189,9 +190,9 @@ public class EntityFactory {
 	 * @param year
 	 * @return newly created model
 	 */
-	public DocRef buildCaseDoc(String docTitle, Date docDate, String parties, String reftoken,
+	public DocRef buildCaseDoc(String docTitle, Date docDate, boolean referenceDoc, String parties, String reftoken,
 			String docLoc, String court, String url, int year, int firstPage, int lastPage) {
-		DocRef doc = buildDoc(docTitle, docDate);
+		DocRef doc = buildDoc(docTitle, docDate, referenceDoc);
 		doc.setCaseRef(buildCase(parties, reftoken, docLoc, court, url, year, firstPage, lastPage));
 		return doc;
 	}

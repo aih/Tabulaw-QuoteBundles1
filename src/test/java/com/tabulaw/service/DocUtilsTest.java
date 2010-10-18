@@ -31,7 +31,7 @@ public class DocUtilsTest {
 	
 	@Test(enabled = true)
 	public void testSerializeCaseDocModel() throws Exception {
-		DocRef m = EntityFactory.get().buildCaseDoc("docTitle", new Date(), "parties", "reftoken", "docLoc", "court", "url", 1975, 1, 20);
+		DocRef m = EntityFactory.get().buildCaseDoc("docTitle", new Date(), false, "parties", "reftoken", "docLoc", "court", "url", 1975, 1, 20);
 		String s = DocUtils.serializeDocument(m);
 		
 		Calendar c = Calendar.getInstance();

@@ -87,6 +87,8 @@ public class DocUtils {
 		sb.append(doc.getTitle());
 		sb.append("|date::");
 		sb.append(dateFormat.format(doc.getDate()));
+		sb.append("|referenceDoc::");
+		sb.append(doc.isReferenceDoc());
 
 		CaseRef caseRef = doc.getCaseRef();
 		if(caseRef != null) {
@@ -136,6 +138,7 @@ public class DocUtils {
 		// case related
 		String parties = null, reftoken = null, docLoc = null, court = null, url = null, syear = null;
 		String sFirstPageNumber = null, sLastPageNumber = null;
+		boolean referenceDoc = false;
 		Date date = null;
 
 		int nli = stoken.indexOf('\n');
@@ -154,7 +157,7 @@ public class DocUtils {
 			// doc related
 			if("title".equals(name)) {
 				title = value;
-			}
+			}			
 			else if("date".equals(name)) {
 				try {
 					date = dateFormat.parse(value);
@@ -163,7 +166,9 @@ public class DocUtils {
 					throw new IllegalArgumentException("Un-parseable date string: " + value);
 				}
 			}
-
+			else if("referenceDoc".equals(name)) {
+				referenceDoc = "true".equals(value);
+			}
 			else if("casedoc".equals(type)) {
 				// case related
 				if("parties".equals(name)) {
@@ -198,10 +203,11 @@ public class DocUtils {
 			year = StringUtil.parseInt(syear, 0);
 			firstPageNumber = StringUtil.parseInt(sFirstPageNumber, 0);
 			lastPageNumber = StringUtil.parseInt(sLastPageNumber, 0);
-			return EntityFactory.get().buildCaseDoc(title, date, parties, reftoken, docLoc, court, url, year, firstPageNumber, lastPageNumber);
+			return EntityFactory.get().buildCaseDoc(title, date, referenceDoc, parties, reftoken, docLoc, 
+					court, url, year, firstPageNumber, lastPageNumber);
 		}
 		else if("doc".equals(type))
-			return EntityFactory.get().buildDoc(title, date);
+			return EntityFactory.get().buildDoc(title, date, referenceDoc);
 		else
 			throw new IllegalArgumentException("Unhandled doc type: " + type);
 	}
