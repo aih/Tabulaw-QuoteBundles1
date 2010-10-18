@@ -2,5 +2,5 @@
 <module rename-to="sso">
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="com.google.gwt.http.HTTP" />
-	<entry-point class="com.tabulaw.sso.client.SSOEntryPoint" />
+	<entry-point class="com.tabulaw.sso.client.Step2EntryPoint" />
 </module>
