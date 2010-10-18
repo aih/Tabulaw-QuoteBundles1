@@ -31,11 +31,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>LsoLoginServlet</servlet-name>
-    <servlet-class>com.google.step2.example.consumer.servlet.LsoLoginServlet</servlet-class>
-  </servlet>
-
-  <servlet>
     <servlet-name>Lso2LoginServlet</servlet-name>
     <servlet-class>com.google.step2.example.consumer.servlet.Lso2LoginServlet</servlet-class>
   </servlet>
@@ -65,19 +60,10 @@
     <url-pattern>/</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping>
-    <servlet-name>LsoLoginServlet</servlet-name>
-    <url-pattern>/lso</url-pattern>
-  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>Lso2LoginServlet</servlet-name>
     <url-pattern>/lso2</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>LoginViaPopupServlet</servlet-name>
-    <url-pattern>/popup</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
