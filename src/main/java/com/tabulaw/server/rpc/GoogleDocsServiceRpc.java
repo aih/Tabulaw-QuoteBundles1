@@ -176,7 +176,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		User user = uc.getUser();
 		Date docDate = new Date();
 		DocRef mDoc = EntityFactory.get().buildDoc(
-				"GDocs " + document.getTitle(), docDate);
+				"GDocs " + document.getTitle(), docDate, false);
 		mDoc = uds.saveDoc(mDoc);
 		DocContent docContent = EntityFactory.get().buildDocContent(
 				mDoc.getId(), htmlContent);
