@@ -20,8 +20,7 @@ This example form will authenticate a user though an identity provider and
 optionally request user email and country attributes.
 </p>
 <p>
-<b>There is also a <a href="/popup">popup-style</a>, an <a href="/lso">"LSO"-style</a>,
-and another <a href="/lso2">email-based</a> login screen available for testing.</b>
+<b>There is <a href="/lso2">email-based</a> login screen available for testing.</b>
 </p>
 
 <%
