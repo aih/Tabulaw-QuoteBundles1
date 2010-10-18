@@ -11,6 +11,6 @@
 
 	<context-param>
 		<param-name>guice-modules</param-name>
-		<param-value>com.tabulaw.sso.oauth.server.GuiceModule</param-value>
+		<param-value>com.tabulaw.sso.oauth.server.OAuthModule</param-value>
 	</context-param>
 </web-app>

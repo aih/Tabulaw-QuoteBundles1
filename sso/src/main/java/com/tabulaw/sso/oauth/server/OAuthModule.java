@@ -15,7 +15,7 @@
  *
  */
 
-package com.google.step2.example.consumer;
+package com.tabulaw.sso.oauth.server;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,7 +48,7 @@ import com.google.step2.xmlsimplesign.DisjunctiveCertValidator;
  * @author Dirk Balfanz (dirk.balfanz@gmail.com)
  * @author Breno de Medeiros (breno.demedeiros@gmail.com)
  */
-public class GuiceModule extends AbstractModule {
+public class OAuthModule extends AbstractModule {
 	@Override
 	protected void configure() {
 

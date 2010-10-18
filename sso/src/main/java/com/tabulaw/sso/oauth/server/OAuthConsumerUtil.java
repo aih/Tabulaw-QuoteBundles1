@@ -1,4 +1,4 @@
-package com.google.step2.example.consumer;
+package com.tabulaw.sso.oauth.server;
 
 import com.google.inject.Inject;
 import com.google.step2.Step2OAuthClient;

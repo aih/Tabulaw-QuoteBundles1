@@ -15,9 +15,7 @@
   <!-- If you have your own Guice module(s), put them here as a comma-separated list. -->
   <context-param>
     <param-name>guice-modules</param-name>
-    <param-value>
-      com.google.step2.example.consumer.GuiceModule
-    </param-value>
+	<param-value>com.tabulaw.sso.oauth.server.OAuthModule</param-value>
   </context-param>
 
   <servlet>
