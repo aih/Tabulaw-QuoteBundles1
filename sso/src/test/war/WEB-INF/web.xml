@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+  <display-name>Archetype Created Web Application</display-name>
+
+  <listener>
+    <listener-class>com.google.step2.servlet.GuiceServletContextListener</listener-class>
+  </listener>
+
+  <!-- configuration -->
+  <!-- If you have your own Guice module(s), put them here as a comma-separated list. -->
+  <context-param>
+    <param-name>guice-modules</param-name>
+    <param-value>
+      com.google.step2.example.consumer.GuiceModule
+    </param-value>
+  </context-param>
+
+  <servlet>
+    <servlet-name>default</servlet-name>
+    <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>com.google.step2.example.consumer.servlet.LoginServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>LsoLoginServlet</servlet-name>
+    <servlet-class>com.google.step2.example.consumer.servlet.LsoLoginServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>Lso2LoginServlet</servlet-name>
+    <servlet-class>com.google.step2.example.consumer.servlet.Lso2LoginServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>HelloServlet</servlet-name>
+    <servlet-class>com.google.step2.example.consumer.servlet.HelloWorldServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>LoginViaPopupServlet</servlet-name>
+    <servlet-class>com.google.step2.example.consumer.servlet.LoginViaPopupServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>CheckAuth</servlet-name>
+    <servlet-class>com.google.step2.example.consumer.servlet.CheckAuthServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>Css</servlet-name>
+    <jsp-file>/WEB-INF/css.jsp</jsp-file>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>LsoLoginServlet</servlet-name>
+    <url-pattern>/lso</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>Lso2LoginServlet</servlet-name>
+    <url-pattern>/lso2</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>LoginViaPopupServlet</servlet-name>
+    <url-pattern>/popup</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>CheckAuth</servlet-name>
+    <url-pattern>/checkauth</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>HelloServlet</servlet-name>
+    <url-pattern>/hello</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>Css</servlet-name>
+    <url-pattern>/style.css</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>*.js</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>*.gif</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/favicon.ico</url-pattern>
+  </servlet-mapping>
+
+</web-app>
