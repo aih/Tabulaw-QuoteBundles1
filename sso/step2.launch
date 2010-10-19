@@ -16,7 +16,7 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.google.gwt.dev.DevMode"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gen target/.generated -war src/test/war-oauth com.tabulaw.sso.OAuthTest -startupUrl /"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gen target/.generated -war src/test/war-step2 com.tabulaw.sso.step2.Step2Test -startupUrl /"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="sso"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1024M"/>
 </launchConfiguration>
