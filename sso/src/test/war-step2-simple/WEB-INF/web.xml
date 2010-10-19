@@ -6,7 +6,7 @@
 	<display-name>Archetype Created Web Application</display-name>
 
 	<listener>
-		<listener-class>com.tabulaw.sso.step2.servlet.TestConfig</listener-class>
+		<listener-class>com.tabulaw.sso.step2.simple.servlet.TestConfig</listener-class>
 	</listener>
 	
 	<filter>
