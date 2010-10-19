@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +45,6 @@ public class CheckAuthServlet extends HttpServlet {
 	private Step2OAuthClient oauthClient;
 	private static final String NO_TOKEN = "None";
 	private static final String UNKNOWN = "Unknown";
-	private static final String TEMPLATE_FILE = "/WEB-INF/checkauth.jsp";
 
 	private static final List<Step2.AxSchema> SUPPORTED_AX_SCHEMAS = Arrays
 			.asList(Step2.AxSchema.values());
@@ -72,144 +70,130 @@ public class CheckAuthServlet extends HttpServlet {
 		doGet(req, resp);
 	}
 
-	 @SuppressWarnings("unchecked")
-	 @Override
-	   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-	       throws ServletException, IOException {
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
 
-		 System.out.println("CHECKAUTH SERVLET");
-		 
-	     HttpSession session = req.getSession();
-	     ParameterList openidResp = Step2.getParameterList(req);
-	     String receivingUrl = Step2.getUrlWithQueryString(req);
-	     DiscoveryInformation discovered =
-	       (DiscoveryInformation) session.getAttribute("discovered");
+		System.out.println("CHECKAUTH SERVLET");
 
-	     String requestToken = NO_TOKEN;
+		HttpSession session = req.getSession();
+		ParameterList openidResp = Step2.getParameterList(req);
+		String receivingUrl = Step2.getUrlWithQueryString(req);
+		DiscoveryInformation discovered = (DiscoveryInformation) session
+				.getAttribute("discovered");
 
-	     // Try to get the OpenId, AX, and OAuth values from the auth response
-	     try {
-	       AuthResponseHelper authResponse =
-	         helper.verify(receivingUrl, openidResp, discovered);
+		String requestToken = NO_TOKEN;
 
-	       // Clean up stale session state if any
-	       for (Step2.AxSchema schema : SUPPORTED_AX_SCHEMAS) {
-	         session.removeAttribute(schema.getShortName());
-	       }
-	       session.removeAttribute("request_token");
-	       session.removeAttribute("access_token");
-	       session.removeAttribute("access_token_secret");
-	       session.removeAttribute("accessor");
-	       session.removeAttribute("user");
+		// Try to get the OpenId, AX, and OAuth values from the auth response
+		try {
+			AuthResponseHelper authResponse = helper.verify(receivingUrl,
+					openidResp, discovered);
 
-	       // Get Claimed Identifier
-	       Identifier claimedId = authResponse.getClaimedId();
-	       session.setAttribute("user",
-	           (claimedId == null) ? UNKNOWN : claimedId.getIdentifier());
+			// Clean up stale session state if any
+			for (Step2.AxSchema schema : SUPPORTED_AX_SCHEMAS) {
+				session.removeAttribute(schema.getShortName());
+			}
+			session.removeAttribute("request_token");
+			session.removeAttribute("access_token");
+			session.removeAttribute("access_token_secret");
+			session.removeAttribute("accessor");
+			session.removeAttribute("user");
 
+			// Get Claimed Identifier
+			Identifier claimedId = authResponse.getClaimedId();
+			session.setAttribute("user", (claimedId == null) ? UNKNOWN
+					: claimedId.getIdentifier());
 
-	       if (authResponse.getAuthResultType() == ResultType.SETUP_NEEDED) {
-	         throw new ServletException("setup needed");
-	       }
+			if (authResponse.getAuthResultType() == ResultType.SETUP_NEEDED) {
+				throw new ServletException("setup needed");
+			}
 
-	       if (authResponse.getAuthResultType() == ResultType.AUTH_FAILURE) {
-	         throw new ServletException("auth failure");
-	       }
+			if (authResponse.getAuthResultType() == ResultType.AUTH_FAILURE) {
+				throw new ServletException("auth failure");
+			}
 
-	       if (authResponse.getAuthResultType() == ResultType.AUTH_SUCCESS) {
-	         Class<? extends AxMessage> axExtensionType =
-	             authResponse.getAxExtensionType();
-	         if (axExtensionType != null) {
-	           if (axExtensionType.equals(FetchResponse.class)) {
-	             FetchResponse fetchResponse = authResponse.getAxFetchResponse();
-	             List<String> aliases = fetchResponse.getAttributeAliases();
-	             for (String alias : aliases) {
-	               String typeUri = fetchResponse.getAttributeTypeUri(alias);
-	               String value = fetchResponse.getAttributeValueByTypeUri(typeUri);
+			if (authResponse.getAuthResultType() == ResultType.AUTH_SUCCESS) {
+				Class<? extends AxMessage> axExtensionType = authResponse
+						.getAxExtensionType();
+				if (axExtensionType != null) {
+					if (axExtensionType.equals(FetchResponse.class)) {
+						FetchResponse fetchResponse = authResponse
+								.getAxFetchResponse();
+						List<String> aliases = fetchResponse
+								.getAttributeAliases();
+						for (String alias : aliases) {
+							String typeUri = fetchResponse
+									.getAttributeTypeUri(alias);
+							String value = fetchResponse
+									.getAttributeValueByTypeUri(typeUri);
 
-	               // check if it's a known type
-	               Step2.AxSchema schema = Step2.AxSchema.ofTypeUri(typeUri);
-	               if (null != schema) {
-	                 session.setAttribute(schema.getShortName(), value);
-	               } else {
-	                 session.setAttribute(alias + " (" + typeUri + ")", value);
-	               }
-	             }
-	           }
-	         }
-	         if (authResponse.hasHybridOauthExtension()) {
-	           requestToken = authResponse.getHybridOauthResponse().getRequestToken();
-	           session.setAttribute("request_token", "yes (" + requestToken + ")");
-	         }
-	       }
-	     } catch (MessageException e) {
-	       throw new ServletException(e);
-	     } catch (DiscoveryException e) {
-	       throw new ServletException(e);
-	     } catch (AssociationException e) {
-	       throw new ServletException(e);
-	     } catch (VerificationException e) {
-	       throw new ServletException(e);
-	     }
+							// check if it's a known type
+							Step2.AxSchema schema = Step2.AxSchema
+									.ofTypeUri(typeUri);
+							if (null != schema) {
+								session.setAttribute(schema.getShortName(),
+										value);
+							} else {
+								session.setAttribute(alias + " (" + typeUri
+										+ ")", value);
+							}
+						}
+					}
+				}
+				if (authResponse.hasHybridOauthExtension()) {
+					requestToken = authResponse.getHybridOauthResponse()
+							.getRequestToken();
+					session.setAttribute("request_token", "yes ("
+							+ requestToken + ")");
+				}
+			}
+		} catch (MessageException e) {
+			throw new ServletException(e);
+		} catch (DiscoveryException e) {
+			throw new ServletException(e);
+		} catch (AssociationException e) {
+			throw new ServletException(e);
+		} catch (VerificationException e) {
+			throw new ServletException(e);
+		}
 
-	     String accessToken = NO_TOKEN;
-	     String accessTokenSecret = NO_TOKEN;
-	     if (!NO_TOKEN.equals(requestToken)) {
-	       // Try getting an acess token from this request token.
-	       try {
-	         OAuthAccessor accessor = providerStore.getOAuthAccessor("google");
+		String accessToken = NO_TOKEN;
+		String accessTokenSecret = NO_TOKEN;
+		if (!NO_TOKEN.equals(requestToken)) {
+			// Try getting an acess token from this request token.
+			try {
+				OAuthAccessor accessor = providerStore
+						.getOAuthAccessor("google");
 
-	         OAuthMessage response = oauthClient.invoke(accessor,
-	             accessor.consumer.serviceProvider.accessTokenURL,
-	             OAuth.newList(OAuth.OAUTH_TOKEN, requestToken));
+				OAuthMessage response = oauthClient.invoke(accessor,
+						accessor.consumer.serviceProvider.accessTokenURL,
+						OAuth.newList(OAuth.OAUTH_TOKEN, requestToken));
 
-	         if (response != null) {
-	           accessToken = response.getParameter(OAuth.OAUTH_TOKEN);
-	           accessTokenSecret = response.getParameter(OAuth.OAUTH_TOKEN_SECRET);
+				if (response != null) {
+					accessToken = response.getParameter(OAuth.OAUTH_TOKEN);
+					accessTokenSecret = response
+							.getParameter(OAuth.OAUTH_TOKEN_SECRET);
 
-	           session.setAttribute("access_token", "yes (" + accessToken + ")");
-	           session.setAttribute("access_token_secret",
-	               "yes (" + accessTokenSecret + ")");
+					session.setAttribute("access_token", "yes (" + accessToken
+							+ ")");
+					session.setAttribute("access_token_secret", "yes ("
+							+ accessTokenSecret + ")");
 
-	           // store the whole OAuth accessor in the session
-	           accessor.accessToken = accessToken;
-	           accessor.tokenSecret = accessTokenSecret;
-	           session.setAttribute("accessor", accessor);
-	         }
-	       } catch (ProviderInfoNotFoundException e) {
-	         e.printStackTrace();
-	       } catch (OAuthException e) {
-	         e.printStackTrace();
-	       } catch (URISyntaxException e) {
-	         e.printStackTrace();
-	       }
-	     }
-
-	     String type = req.getParameter(LOGIN_TYPE.getParameterName());
-	     if (LOGIN_TYPE.POPUP.getType().equals(type)) {
-	       RequestDispatcher d = req.getRequestDispatcher(TEMPLATE_FILE);
-	       d.forward(req, resp);
-	     } else {
-	       resp.sendRedirect(req.getRequestURI()
-	           .replaceAll("/checkauth$", "/hello"));
-	     }
-	   }
-
-	   private static enum LOGIN_TYPE {
-	     POPUP("popup"),
-	     UNKNOWN("");
-
-	     private final String type;
-
-	     private LOGIN_TYPE(String type) {
-	       this.type = type;
-	     }
-
-	     public String getType() {
-	       return type;
-	     }
-
-	     public static final String getParameterName() {
-	       return "login_type";
-	     }
-	   }}
+					// store the whole OAuth accessor in the session
+					accessor.accessToken = accessToken;
+					accessor.tokenSecret = accessTokenSecret;
+					session.setAttribute("accessor", accessor);
+				}
+			} catch (ProviderInfoNotFoundException e) {
+				e.printStackTrace();
+			} catch (OAuthException e) {
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+		}
+		resp.sendRedirect(req.getRequestURI()
+				.replaceAll("/checkauth$", "/docs"));
+	}
+}

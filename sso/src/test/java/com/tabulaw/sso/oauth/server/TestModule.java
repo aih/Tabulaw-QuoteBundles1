@@ -13,5 +13,6 @@ public class TestModule extends ServletModule {
 	private void servlets() {
 		serve("/login").with(LoginServlet.class);
 		serve("/checkauth").with(CheckAuthServlet.class);
+		serve("/docs").with(DocsServlet.class);
 	}
 }

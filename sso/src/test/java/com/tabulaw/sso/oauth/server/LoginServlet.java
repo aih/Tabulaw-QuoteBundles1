@@ -49,7 +49,7 @@ public class LoginServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		 System.out.println("LOGIN SERVLET");
+		System.out.println("LOGIN SERVLET");
 		handleDiscovery(request, response);
 	}
 
@@ -116,6 +116,8 @@ public class LoginServlet extends HttpServlet {
 		} catch (ConsumerException e) {
 			throw new ServletException(e);
 		}
-
+		//req.setAttribute("message", authReq);
+		String url = authReq.getDestinationUrl(true);
+		resp.sendRedirect(url);
 	}
 }
