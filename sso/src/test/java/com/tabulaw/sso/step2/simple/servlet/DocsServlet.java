@@ -1,4 +1,4 @@
-package com.tabulaw.sso.step2.servlet;
+package com.tabulaw.sso.step2.simple.servlet;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

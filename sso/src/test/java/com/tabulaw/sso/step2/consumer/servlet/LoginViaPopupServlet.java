@@ -15,7 +15,7 @@
  *
  */
 
-package com.google.step2.example.consumer.servlet;
+package com.tabulaw.sso.step2.consumer.servlet;
 
 import java.io.IOException;
 import java.util.List;

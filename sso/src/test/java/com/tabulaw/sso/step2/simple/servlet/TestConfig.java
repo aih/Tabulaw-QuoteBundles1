@@ -1,4 +1,4 @@
-package com.tabulaw.sso.step2.servlet;
+package com.tabulaw.sso.step2.simple.servlet;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

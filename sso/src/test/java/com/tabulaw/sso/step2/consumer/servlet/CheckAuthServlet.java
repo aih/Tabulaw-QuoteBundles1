@@ -15,18 +15,18 @@
  *
  */
 
-package com.google.step2.example.consumer.servlet;
+package com.tabulaw.sso.step2.consumer.servlet;
 
-import com.google.inject.Inject;
-import com.google.step2.AuthResponseHelper;
-import com.google.step2.ConsumerHelper;
-import com.google.step2.Step2;
-import com.google.step2.Step2OAuthClient;
-import com.google.step2.VerificationException;
-import com.google.step2.AuthResponseHelper.ResultType;
-import com.google.step2.consumer.OAuthProviderInfoStore;
-import com.google.step2.consumer.ProviderInfoNotFoundException;
-import com.google.step2.servlet.InjectableServlet;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
@@ -42,16 +42,16 @@ import org.openid4java.message.ParameterList;
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchResponse;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import com.google.inject.Inject;
+import com.google.step2.AuthResponseHelper;
+import com.google.step2.AuthResponseHelper.ResultType;
+import com.google.step2.ConsumerHelper;
+import com.google.step2.Step2;
+import com.google.step2.Step2OAuthClient;
+import com.google.step2.VerificationException;
+import com.google.step2.consumer.OAuthProviderInfoStore;
+import com.google.step2.consumer.ProviderInfoNotFoundException;
+import com.google.step2.servlet.InjectableServlet;
 
 /**
  * Example Servlet to handle and check the response from IDP authentication

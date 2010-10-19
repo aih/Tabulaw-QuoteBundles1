@@ -18,7 +18,7 @@ package com.tabulaw.sso.step2;
 
 import com.google.step2.consumer.OAuthProviderInfoStore;
 import com.google.step2.consumer.ProviderInfoNotFoundException;
-import com.google.step2.example.consumer.servlet.LoginServlet;
+import com.tabulaw.sso.step2.consumer.servlet.LoginServlet;
 
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;

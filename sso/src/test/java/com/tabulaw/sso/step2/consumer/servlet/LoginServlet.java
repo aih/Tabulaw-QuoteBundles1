@@ -15,7 +15,7 @@
  *
  */
 
-package com.google.step2.example.consumer.servlet;
+package com.tabulaw.sso.step2.consumer.servlet;
 
 import com.google.inject.Inject;
 import com.google.step2.AuthRequestHelper;
