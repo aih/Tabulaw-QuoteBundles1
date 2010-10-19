@@ -1,6 +1,6 @@
 <%@ page session="true" %>
 <%@ page import="org.openid4java.message.ParameterList,
-                 com.tabulaw.sso.oauth.server.OAuthConsumerUtil" %>
+                 com.tabulaw.sso.step2.OAuthConsumerUtil" %>
 
 <html>
 

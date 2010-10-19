@@ -15,7 +15,7 @@
   <!-- If you have your own Guice module(s), put them here as a comma-separated list. -->
   <context-param>
     <param-name>guice-modules</param-name>
-	<param-value>com.tabulaw.sso.oauth.server.OAuthModule</param-value>
+	<param-value>com.tabulaw.sso.step2.OAuthModule</param-value>
   </context-param>
 
   <servlet>
@@ -25,27 +25,27 @@
 
   <servlet>
     <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>com.google.step2.example.consumer.servlet.LoginServlet</servlet-class>
+    <servlet-class>com.tabulaw.sso.step2.consumer.servlet.LoginServlet</servlet-class>
   </servlet>
 
   <servlet>
     <servlet-name>Lso2LoginServlet</servlet-name>
-    <servlet-class>com.google.step2.example.consumer.servlet.Lso2LoginServlet</servlet-class>
+    <servlet-class>com.tabulaw.sso.step2.consumer.servlet.Lso2LoginServlet</servlet-class>
   </servlet>
 
   <servlet>
     <servlet-name>HelloServlet</servlet-name>
-    <servlet-class>com.google.step2.example.consumer.servlet.HelloWorldServlet</servlet-class>
+    <servlet-class>com.tabulaw.sso.step2.consumer.servlet.HelloWorldServlet</servlet-class>
   </servlet>
 
   <servlet>
     <servlet-name>LoginViaPopupServlet</servlet-name>
-    <servlet-class>com.google.step2.example.consumer.servlet.LoginViaPopupServlet</servlet-class>
+    <servlet-class>com.tabulaw.sso.step2.consumer.servlet.LoginViaPopupServlet</servlet-class>
   </servlet>
 
   <servlet>
     <servlet-name>CheckAuth</servlet-name>
-    <servlet-class>com.google.step2.example.consumer.servlet.CheckAuthServlet</servlet-class>
+    <servlet-class>com.tabulaw.sso.step2.consumer.servlet.CheckAuthServlet</servlet-class>
   </servlet>
 
   <servlet>
