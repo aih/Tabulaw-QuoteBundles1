@@ -1,6 +1,7 @@
-package com.tabulaw.sso.oauth.server;
+package com.tabulaw.sso.step2.servlet;
 
 import com.google.inject.servlet.ServletModule;
+import com.tabulaw.sso.step2.OAuthModule;
 
 public class TestModule extends ServletModule {
 	@Override

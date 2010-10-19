@@ -1,4 +1,4 @@
-package com.tabulaw.sso.oauth.server;
+package com.tabulaw.sso.step2.servlet;
 
 import java.io.IOException;
 

@@ -25,7 +25,7 @@ import com.google.step2.consumer.OAuthProviderInfoStore;
 import com.google.step2.consumer.ProviderInfoNotFoundException;
 import com.google.step2.discovery.IdpIdentifier;
 import com.google.step2.servlet.InjectableServlet;
-import com.tabulaw.sso.oauth.server.OAuthConsumerUtil;
+import com.tabulaw.sso.step2.OAuthConsumerUtil;
 
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthException;

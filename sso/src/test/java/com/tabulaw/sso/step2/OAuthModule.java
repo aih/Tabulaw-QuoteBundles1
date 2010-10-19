@@ -15,7 +15,7 @@
  *
  */
 
-package com.tabulaw.sso.oauth.server;
+package com.tabulaw.sso.step2;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
