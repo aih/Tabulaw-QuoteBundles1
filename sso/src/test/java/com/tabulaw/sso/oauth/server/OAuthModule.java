@@ -1,6 +1,7 @@
 package com.tabulaw.sso.oauth.server;
 
 import com.google.inject.servlet.ServletModule;
+import com.tabulaw.sso.oauth.server.servlet.LoginServlet;
 
 public class OAuthModule extends ServletModule {
 	@Override
@@ -10,7 +11,7 @@ public class OAuthModule extends ServletModule {
 	}
 
 	private void servlets() {
-//		serve("/login").with(LoginServlet.class);
+		serve("/login").with(LoginServlet.class);
 //		serve("/checkauth").with(CheckAuthServlet.class);
 //		serve("/docs").with(DocsServlet.class);
 	}
