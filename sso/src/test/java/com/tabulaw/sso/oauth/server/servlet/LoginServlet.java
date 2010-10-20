@@ -28,8 +28,10 @@ public class LoginServlet extends HttpServlet {
 		oauthParameters.setOAuthConsumerKey(CONSUMER_KEY);
 		oauthParameters.setOAuthConsumerSecret(CONSUMER_SECRET);
 		oauthParameters.setScope("https://docs.google.com/feeds/");
-		oauthParameters.setOAuthCallback("http://127.0.0.1:8888/docs.jsp");
+		oauthParameters.setOAuthCallback("http://127.0.0.1:8888/docs");
 
+		request.getSession().setAttribute("oauth-parameters", oauthParameters);
+		
 		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 				new OAuthHmacSha1Signer());
 		try {
