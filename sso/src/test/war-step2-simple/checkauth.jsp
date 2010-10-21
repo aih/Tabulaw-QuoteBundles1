@@ -1,1 +1,0 @@
-checkauth.jsp

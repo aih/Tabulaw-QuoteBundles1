@@ -59,11 +59,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.google.step2</groupId>
-			<artifactId>step2-consumer</artifactId>
-			<version>1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 			<version>${guice.version}</version>
@@ -85,39 +80,16 @@
 			<version>${gwt.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- <dependency> <groupId>com.google.gdata</groupId> <artifactId>gdata-contacts</artifactId> 
-			<version>${gdata.version}</version> </dependency> <dependency> <groupId>com.google.gdata</groupId> 
-			<artifactId>gdata-core</artifactId> <version>${gdata.version}</version> </dependency> -->
-		<dependency>
-			<groupId>net.sf.json-lib</groupId>
-			<artifactId>json-lib</artifactId>
-			<version>2.2.3</version>
-			<classifier>jdk15</classifier>
-		</dependency>
 		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
 			<version>${commons.httpclient.version}</version>
 		</dependency>
-		<!-- 
 		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4.3</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons.io.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-			<dependency>
-			<groupId>com.google.appengine</groupId>
-			<artifactId>appengine-tools-sdk</artifactId>
-			<version>${gae.version}</version>
-		</dependency>
-		 -->
-		<!-- <dependency> <groupId>com.google.api.client</groupId> <artifactId>google-api-client-auth-oauth</artifactId> 
-			<version>1.1.1-alpha</version> </dependency> -->
 	</dependencies>
 
 	<build>
