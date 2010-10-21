@@ -51,7 +51,8 @@ public class DocsServlet extends HttpServlet {
 	}
 
 	private void getDocuments(GoogleOAuthParameters oauthParameters,
-			GoogleOAuthHelper oauthHelper, HttpServletResponse response) throws HttpException, IOException {
+			GoogleOAuthHelper oauthHelper, HttpServletResponse response)
+			throws HttpException, IOException {
 
 		try {
 			String url = "https://docs.google.com/feeds/default/private/full/-/document";

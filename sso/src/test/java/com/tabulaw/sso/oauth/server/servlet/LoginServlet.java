@@ -21,7 +21,7 @@ public class LoginServlet extends HttpServlet {
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		String CONSUMER_KEY = "anonymous";
+		String CONSUMER_KEY = "anonymous"; 
 		String CONSUMER_SECRET = "anonymous";
 
 		GoogleOAuthParameters oauthParameters = new GoogleOAuthParameters();
