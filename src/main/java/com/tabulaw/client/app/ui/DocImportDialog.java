@@ -35,6 +35,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	private int importId = 0;
 
 	private PopupWindow popup;
+	private boolean hasAccessToken = false;
 
 	public DocImportDialog() {
 		super(null, false);
@@ -77,14 +78,19 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 		super.show();
 		importPanel.setEnabled(true);
 		setGoogleDocs(null);
-		PopupWindow.setCloseHandler(new PopupWindowCloseHandler() {
-			@Override
-			public void onClose() {
-				setWidget(importPanel);
-			}
-		});
-		popup = PopupWindow.open("/oauthauthorize", "mywindow", null);
-		loadDocuments();
+		if (!hasAccessToken) {
+			PopupWindow.setCloseHandler(new PopupWindowCloseHandler() {
+				@Override
+				public void onClose() {
+					hasAccessToken = true;
+					showContent();
+				}
+			});
+			popup = PopupWindow.open("/oauthauthorize", "mywindow", null);
+		} else {
+			showContent();
+		}
+
 	}
 
 	@Override
@@ -101,23 +107,13 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 		popup = null;
 	}
 
-	private void loadDocuments() {
-		Poc.getGoogledocsService().getAuthKey(new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				DocImportDialog.this.authKey = result;
-				getDocuments(result);
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				caught.printStackTrace();
-			}
-		});
+	private void showContent() {
+		setWidget(importPanel);
+		loadDocuments();
 	}
 
-	private void getDocuments(String authKey) {
-		Poc.getGoogledocsService().getDocuments(authKey,
+	private void loadDocuments() {
+		Poc.getGoogledocsService().getDocuments(
 				new AsyncCallback<List<GoogleDocument>>() {
 					@Override
 					public void onSuccess(List<GoogleDocument> result) {
@@ -137,7 +133,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 
 	private void doImport(String authKey, Collection<GoogleDocument> resourceId) {
 		final int currentImportId = ++importId;
-		Poc.getGoogledocsService().download(authKey, resourceId,
+		Poc.getGoogledocsService().download(resourceId,
 				new AsyncCallback<List<DocRef>>() {
 					@Override
 					public void onFailure(Throwable caught) {

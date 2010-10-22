@@ -9,11 +9,8 @@ import com.tabulaw.model.DocRef;
 
 public interface IGoogleDocsServiceAsync {
 
-	void getAuthKey(AsyncCallback<String> callback);
+	void getDocuments(AsyncCallback<List<GoogleDocument>> callback);
 
-	void getDocuments(String authKey,
-			AsyncCallback<List<GoogleDocument>> callback);
-
-	void download(String authKey, Collection<GoogleDocument> documents,
+	void download(Collection<GoogleDocument> documents,
 			AsyncCallback<List<DocRef>> callback);
 }

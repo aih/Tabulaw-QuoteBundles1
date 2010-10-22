@@ -17,6 +17,10 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.gdata.client.authn.oauth.GoogleOAuthHelper;
+import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
+import com.google.gdata.client.authn.oauth.OAuthException;
+import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
 import com.tabulaw.common.data.GoogleDocument;
 import com.tabulaw.common.data.rpc.IGoogleDocsService;
 import com.tabulaw.model.DocContent;
@@ -37,25 +41,10 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	private final HttpClient client = new HttpClient();
 
 	@Override
-	public String getAuthKey() {
-		GetMethod get = new GetMethod(
-				"https://www.google.com/accounts/ClientLogin?Email=gtabulaw@olesiak.biz&Passwd=tabulaw&accountType=HOSTED_OR_GOOGLE&service=writely");
+	public List<GoogleDocument> getDocuments() {
+		String path = "/feeds/default/private/full/-/document";
 		try {
-			client.executeMethod(get);
-			if (get.getStatusCode() == 200) {
-				return parseAuthKey(get.getResponseBodyAsString());
-			}
-		} catch (Exception e) {
-			log.error("", e);
-		}
-		return null;
-	}
-
-	@Override
-	public List<GoogleDocument> getDocuments(String authKey) {
-		GetMethod get = createGetMethod(
-				"/feeds/default/private/full/-/document", authKey);
-		try {
+			GetMethod get = createGetMethod(path);
 			client.executeMethod(get);
 			if (get.getStatusCode() == 200) {
 				return parseDocuments(get.getResponseBodyAsString());
@@ -67,48 +56,42 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	}
 
 	@Override
-	public List<DocRef> download(String authKey,
-			Collection<GoogleDocument> documents) {
+	public List<DocRef> download(Collection<GoogleDocument> documents) {
 		List<DocRef> downloaded = new ArrayList<DocRef>();
 		for (GoogleDocument document : documents) {
 			try {
-				DocRef doc = download(authKey, document);
-				downloaded.add(doc);
+				DocRef doc = download(document);
+				if (doc != null) {
+					downloaded.add(doc);
+				}
 			} catch (Exception e) {
+				log.error("", e);
 			}
 		}
 		return downloaded;
 	}
 
-	private DocRef download(String authKey, GoogleDocument document) {
+	private DocRef download(GoogleDocument document) {
 		String pattern = "document:";
 		String resourceId = document.getResourceId();
 		int k = resourceId.indexOf(pattern);
 		if (k >= 0) {
 			resourceId = resourceId.substring(pattern.length());
 		}
-		GetMethod get = createGetMethod(
-				"/feeds/download/documents/Export?docID=" + resourceId
-						+ "&exportFormat=html", authKey);
 		try {
+			GetMethod get = createGetMethod("/feeds/download/documents/Export?docID="
+					+ resourceId + "&exportFormat=html");
 			client.executeMethod(get);
 			if (get.getStatusCode() == 200) {
 				return saveDocument(document, get.getResponseBodyAsString());
+			} else {
+				log.error("Unable to download google document: "
+						+ get.getStatusText());
 			}
 		} catch (Exception e) {
 			log.error("", e);
 		}
 		return null;
-	}
-
-	private String parseAuthKey(String s) {
-		String p = "Auth=";
-		int i = s.indexOf(p);
-		if (i >= 0) {
-			return s.substring(i + p.length()).replace("\n", "");
-		} else {
-			return null;
-		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -159,9 +142,15 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		return list;
 	}
 
-	private GetMethod createGetMethod(String path, String authKey) {
-		GetMethod get = new GetMethod("https://docs.google.com" + path);
-		get.addRequestHeader("Authorization", "GoogleLogin auth=" + authKey);
+	private GetMethod createGetMethod(String path) throws OAuthException {
+		GoogleOAuthParameters oauthParameters = (GoogleOAuthParameters) getThreadLocalRequest()
+				.getSession().getAttribute("oauth-parameters");
+		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
+				new OAuthHmacSha1Signer());
+		String header = oauthHelper.getAuthorizationHeader(getUrl(path), "GET",
+				oauthParameters);
+		GetMethod get = new GetMethod(getUrl(path));
+		get.addRequestHeader("Authorization", header);
 		get.addRequestHeader("GData-Version", "3.0");
 		return get;
 	}
@@ -183,5 +172,9 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		uds.addDocUserBinding(user.getId(), mDoc.getId());
 		uds.saveDocContent(docContent);
 		return mDoc;
+	}
+
+	private String getUrl(String path) {
+		return "https://docs.google.com" + path;
 	}
 }

@@ -22,11 +22,14 @@ public class OAuthAuthorize extends HttpServlet {
 		String CONSUMER_KEY = "anonymous";
 		String CONSUMER_SECRET = "anonymous";
 
+		String host = request.getScheme() + "://" + request.getServerName()
+				+ ":" + request.getServerPort();
+
 		GoogleOAuthParameters oauthParameters = new GoogleOAuthParameters();
 		oauthParameters.setOAuthConsumerKey(CONSUMER_KEY);
 		oauthParameters.setOAuthConsumerSecret(CONSUMER_SECRET);
 		oauthParameters.setScope("https://docs.google.com/feeds/");
-		oauthParameters.setOAuthCallback("http://127.0.0.1:8888/oauthdocuments");
+		oauthParameters.setOAuthCallback(host + "/oauthdocuments");
 		request.getSession().setAttribute("oauth-parameters", oauthParameters);
 
 		String accessToken = (String) request.getSession().getAttribute(

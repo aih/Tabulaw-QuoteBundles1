@@ -11,9 +11,7 @@ import com.tabulaw.model.DocRef;
 @RemoteServiceRelativePath(value = "googledoc")
 public interface IGoogleDocsService extends RemoteService {
 
-	String getAuthKey();
+	List<GoogleDocument> getDocuments();
 
-	List<GoogleDocument> getDocuments(String authKey);
-
-	List<DocRef> download(String authKey, Collection<GoogleDocument> resourceId);
+	List<DocRef> download(Collection<GoogleDocument> resourceId);
 }
