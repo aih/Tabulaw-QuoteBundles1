@@ -28,8 +28,13 @@ public class DocsServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		IOUtils.write("<a href=\"/login\">Login</a></br>",
+		IOUtils.write("<a href=\"/\">Main page</a></br>",
 				response.getOutputStream());
+
+		String accessToken = (String) request.getSession().getAttribute(
+				"access-token");
+		String accessTokenSecret = (String) request.getSession().getAttribute(
+				"access-token-secret");
 
 		GoogleOAuthParameters oauthParameters = (GoogleOAuthParameters) request
 				.getSession().getAttribute("oauth-parameters");
@@ -38,13 +43,26 @@ public class DocsServlet extends HttpServlet {
 
 		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 				new OAuthHmacSha1Signer());
-		oauthHelper.getOAuthParametersFromCallback(request.getQueryString(),
-				oauthParameters);
 
+		if (accessToken == null || accessTokenSecret == null) {
+			getAccessToken(oauthParameters, oauthHelper, request);
+		} else {
+			oauthParameters.setOAuthToken(accessToken);
+			oauthParameters.setOAuthTokenSecret(accessTokenSecret);
+		}
+		getDocuments(oauthParameters, oauthHelper, response);
+	}
+
+	private void getAccessToken(GoogleOAuthParameters oauthParameters,
+			GoogleOAuthHelper oauthHelper, HttpServletRequest request) {
 		try {
+			oauthHelper.getOAuthParametersFromCallback(
+					request.getQueryString(), oauthParameters);
 			String accessToken = oauthHelper.getAccessToken(oauthParameters);
 			String accessTokenSecret = oauthParameters.getOAuthTokenSecret();
-			getDocuments(oauthParameters, oauthHelper, response);
+			request.getSession().setAttribute("access-token", accessToken);
+			request.getSession().setAttribute("access-token-secret",
+					accessTokenSecret);
 		} catch (OAuthException e) {
 			e.printStackTrace();
 		}

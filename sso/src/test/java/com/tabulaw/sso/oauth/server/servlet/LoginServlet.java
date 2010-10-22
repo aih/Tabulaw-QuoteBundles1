@@ -21,7 +21,7 @@ public class LoginServlet extends HttpServlet {
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		String CONSUMER_KEY = "anonymous"; 
+		String CONSUMER_KEY = "anonymous";
 		String CONSUMER_SECRET = "anonymous";
 
 		GoogleOAuthParameters oauthParameters = new GoogleOAuthParameters();
@@ -29,12 +29,29 @@ public class LoginServlet extends HttpServlet {
 		oauthParameters.setOAuthConsumerSecret(CONSUMER_SECRET);
 		oauthParameters.setScope("https://docs.google.com/feeds/");
 		oauthParameters.setOAuthCallback("http://127.0.0.1:8888/docs");
-
 		request.getSession().setAttribute("oauth-parameters", oauthParameters);
-		
-		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
-				new OAuthHmacSha1Signer());
+
+		String accessToken = (String) request.getSession().getAttribute(
+				"access-token");
+		String accessTokenSecret = (String) request.getSession().getAttribute(
+				"access-token-secret");
+
+		if (accessToken == null || accessTokenSecret == null
+				|| "true".equals(request.getParameter("relogin"))) {
+			authorize(oauthParameters, request, response);
+		} else {
+			forward(response);
+		}
+	}
+
+	private void authorize(GoogleOAuthParameters oauthParameters,
+			HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		try {
+			request.getSession().setAttribute("access-token", null);
+			request.getSession().setAttribute("access-token-secret", null);
+			GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
+					new OAuthHmacSha1Signer());
 			oauthHelper.getUnauthorizedRequestToken(oauthParameters);
 			String approvalPageUrl = oauthHelper
 					.createUserAuthorizationUrl(oauthParameters);
@@ -43,6 +60,10 @@ public class LoginServlet extends HttpServlet {
 		} catch (OAuthException e) {
 			e.printStackTrace();
 		}
+	}
 
+	private void forward(HttpServletResponse response) throws IOException,
+			ServletException {
+		response.sendRedirect("/docs");
 	}
 }
