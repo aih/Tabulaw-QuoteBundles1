@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.Button;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.ui.Dialog;
@@ -18,6 +20,8 @@ import com.tabulaw.client.ui.edit.EditEvent;
 import com.tabulaw.client.ui.edit.EditEvent.EditOp;
 import com.tabulaw.client.ui.edit.IEditHandler;
 import com.tabulaw.client.ui.field.FieldGroup;
+import com.tabulaw.client.util.PopupWindow;
+import com.tabulaw.client.util.PopupWindowCloseHandler;
 import com.tabulaw.common.data.GoogleDocument;
 import com.tabulaw.common.msg.Msg;
 import com.tabulaw.common.msg.Msg.MsgLevel;
@@ -26,17 +30,25 @@ import com.tabulaw.model.DocRef;
 public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> {
 
 	private final DocImportEditPanel importPanel = new DocImportEditPanel();
-	
+
 	private String authKey;
 	private int importId = 0;
+
+	private PopupWindow popup;
 
 	public DocImportDialog() {
 		super(null, false);
 		setText("Import from Google Docs");
 		setAnimationEnabled(true);
 		importPanel.addEditHandler(this);
-		add(importPanel);
-		Window.open("/oauthauthorize", "_blank", null);
+		Button cancel = new Button("Cancel");
+		cancel.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				hide();
+			}
+		});
+		setWidget(cancel);
 	}
 
 	public void setGoogleDocs(List<GoogleDocument> list) {
@@ -65,7 +77,28 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 		super.show();
 		importPanel.setEnabled(true);
 		setGoogleDocs(null);
+		PopupWindow.setCloseHandler(new PopupWindowCloseHandler() {
+			@Override
+			public void onClose() {
+				setWidget(importPanel);
+			}
+		});
+		popup = PopupWindow.open("/oauthauthorize", "mywindow", null);
 		loadDocuments();
+	}
+
+	@Override
+	public void hide() {
+		super.hide();
+		PopupWindow.setCloseHandler(new PopupWindowCloseHandler() {
+			@Override
+			public void onClose() {
+			}
+		});
+		if (popup != null) {
+			popup.close();
+		}
+		popup = null;
 	}
 
 	private void loadDocuments() {

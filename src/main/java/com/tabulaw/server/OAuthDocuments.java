@@ -26,7 +26,10 @@ public class OAuthDocuments extends HttpServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		IOUtils.write("<a href=\"/\">Main page</a></br>",
+		IOUtils.write(
+				"<script> window.opener.eval('onPopupWindowClose();');</script>",
+				response.getOutputStream());
+		IOUtils.write("<script> self.close(); </script>",
 				response.getOutputStream());
 
 		String accessToken = (String) request.getSession().getAttribute(
