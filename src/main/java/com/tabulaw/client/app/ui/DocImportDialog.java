@@ -9,6 +9,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Frame;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.ui.Dialog;
@@ -24,11 +25,8 @@ import com.tabulaw.model.DocRef;
 
 public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> {
 
-	// https://www.google.com/accounts/ClientLogin?Email=gtabulaw@olesiak.biz&Passwd=tabulaw&accountType=HOSTED_OR_GOOGLE&service=cl
-	// https://www.google.com/accounts/AuthSubRequest?scope=https%3A%2F%2Fdocs.google.com%2Ffeeds%2F&session=1&secure=0&next=http://127.0.0.1:8888/subauth.jsp
-
 	private final DocImportEditPanel importPanel = new DocImportEditPanel();
-
+	
 	private String authKey;
 	private int importId = 0;
 
@@ -38,6 +36,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 		setAnimationEnabled(true);
 		importPanel.addEditHandler(this);
 		add(importPanel);
+		Window.open("/oauthauthorize", "_blank", null);
 	}
 
 	public void setGoogleDocs(List<GoogleDocument> list) {

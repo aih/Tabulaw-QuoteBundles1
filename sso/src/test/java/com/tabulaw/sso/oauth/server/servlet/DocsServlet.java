@@ -22,7 +22,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class DocsServlet extends HttpServlet {
 
-	HttpClient client = new HttpClient();
+	private final static HttpClient client = new HttpClient();
 
 	@Override
 	protected void doGet(HttpServletRequest request,

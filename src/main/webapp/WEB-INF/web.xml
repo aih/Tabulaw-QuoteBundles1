@@ -180,6 +180,26 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>OAuthAuthorize</servlet-name>
+		<servlet-class>com.tabulaw.server.OAuthAuthorize</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OAuthAuthorize</servlet-name>
+		<url-pattern>/oauthauthorize</url-pattern>
+		<url-pattern>/poc/oauthauthorize</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>OAuthDocuments</servlet-name>
+		<servlet-class>com.tabulaw.server.OAuthDocuments</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OAuthDocuments</servlet-name>
+		<url-pattern>/oauthdocuments</url-pattern>
+		<url-pattern>/poc/oauthdocuments</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>RESTServlet</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>

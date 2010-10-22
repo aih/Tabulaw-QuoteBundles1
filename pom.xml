@@ -745,10 +745,35 @@
 		    <artifactId>nanoxml</artifactId>
 		    <version>2.2.3</version>
 		</dependency>
-
+		<dependency>
+		    <groupId>com.google.gdata</groupId>
+		    <artifactId>gdata-core</artifactId>
+  			<version>1.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.gdata</groupId>
+		    <artifactId>gdata-base</artifactId>
+  			<version>1.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.gdata</groupId>
+		    <artifactId>gdata-client</artifactId>
+  			<version>1.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.gdata</groupId>
+		    <artifactId>gdata-media</artifactId>
+  			<version>1.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.gdata</groupId>
+		    <artifactId>gdata-docs</artifactId>
+  			<version>3.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.gdata</groupId>
+		    <artifactId>gdata-contacts</artifactId>
+  			<version>3.0</version>
+		</dependency>
 	</dependencies>
-<modules>
-		<module>sso</module>
-</modules>
-
 </project>
