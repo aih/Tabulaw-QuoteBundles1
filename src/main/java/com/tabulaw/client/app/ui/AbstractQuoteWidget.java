@@ -7,6 +7,8 @@ package com.tabulaw.client.app.ui;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
@@ -35,9 +37,10 @@ import com.tabulaw.model.QuoteInfo;
  * @param <B> bundle widget type
  * @author jpk
  */
-public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?>> extends Composite implements IHasModel<Quote>, IHasQuoteHandlers {
+public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?>> extends Composite implements IHasModel<Quote>, IHasQuoteHandlers, ResizeHandler {
 
 	static class Header extends Composite {
+		
 
 		private final FlowPanel panel = new FlowPanel();
 
@@ -55,6 +58,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 			panel.setStyleName("qheader");
 
 			title = new HTML();
+			title.setStyleName("tabulaw-util-elipsis");
 			dragHandle = new FocusPanel(title);
 			dragHandle.setStyleName("title");
 
@@ -84,11 +88,26 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		}
 
 		public void setQuoteTitle(String title) {
-			this.title.setHTML("<p>" + title + "</p>");
+			this.title.setHTML(title);
 		}
 
 		public void setSubTitle(String subTitle) {
 			this.subTitle.setHTML("<p>" + subTitle + "</p>");
+		}
+		
+		@Override
+		protected void onAttach() {
+			super.onAttach();
+			syncElementWidth();
+		}
+		
+		private void syncElementWidth() {
+			if (panel.getOffsetWidth()>0) {
+				title.setWidth(Integer.toString(panel.getOffsetWidth()-buttonsPanel.getOffsetWidth()-10));
+			}
+		}
+		private void onResize(ResizeEvent resize) {
+			syncElementWidth();
 		}
 	}
 
@@ -282,6 +301,9 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 	public final HandlerRegistration addQuoteHandler(IQuoteHandler handler) {
 		return addHandler(handler, QuoteEvent.TYPE);
+	}
+	public void onResize(ResizeEvent resize) {
+		this.header.onResize(resize);
 	}
 
 	protected String getXTitle() {

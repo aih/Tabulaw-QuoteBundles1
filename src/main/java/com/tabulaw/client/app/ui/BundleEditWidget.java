@@ -11,6 +11,7 @@ import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HasResizeHandlers;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Image;
@@ -205,6 +206,7 @@ public class BundleEditWidget extends
 	} // EditHeader
 
 	private final boolean orphanedQuoteContainer;
+	private final HasResizeHandlers resizeHandlerManager;
 
 	/**
 	 * Constructor
@@ -213,12 +215,13 @@ public class BundleEditWidget extends
 	 *            optional
 	 * @param orphanedQuoteContainer
 	 */
-	public BundleEditWidget(PickupDragController dragController, boolean orphanedQuoteContainer) {
+	public BundleEditWidget(PickupDragController dragController, boolean orphanedQuoteContainer, HasResizeHandlers resizeHandlerManager) {
 		super(new EditHeader(orphanedQuoteContainer));
 
 		this.orphanedQuoteContainer = orphanedQuoteContainer;
 		header.pName.setEditable(!orphanedQuoteContainer);
 		header.pDesc.setEditable(!orphanedQuoteContainer);
+		this.resizeHandlerManager = resizeHandlerManager;
 		if (orphanedQuoteContainer) {
 			addStyleName("orphaned");
 		}
@@ -244,7 +247,12 @@ public class BundleEditWidget extends
 
 	@Override
 	protected QuoteEditWidget getNewQuoteWidget(Quote mQuote) {
-		return new QuoteEditWidget(this, mQuote);
+		QuoteEditWidget w = new QuoteEditWidget(this, mQuote);
+
+		if (resizeHandlerManager != null) {
+			resizeHandlerManager.addResizeHandler(w);
+		}
+		return w;
 	}
 
 	@Override

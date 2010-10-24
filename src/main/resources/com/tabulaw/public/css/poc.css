@@ -1099,3 +1099,14 @@ docHeaderMenuItem img{
 		float: right;
 	}
 	
+	.tabulaw-util-elipsis{
+	width: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	-o-text-overflow: ellipsis;
+	-moz-binding: url('../../poc/css/text-overflow.xml#ellipsis');
+	}
+}
+	
+	

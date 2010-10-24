@@ -8,6 +8,7 @@ package com.tabulaw.client.app.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gwt.event.logical.shared.HasResizeHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.model.Quote;
@@ -24,6 +25,7 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 	//private JavaScriptObject domDocBodyRef;
 
 	private final IQuoteHandler quoteEventHandler;
+	private final HasResizeHandlers resizeHandlerManager;
 
 	private Map<QuoteDocWidget, HandlerRegistration> hrQuoteEventBindings;
 
@@ -31,9 +33,10 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 	 * Constructor
 	 * @param aQuoteEventHandler optional quote event handler
 	 */
-	public BundleDocWidget(IQuoteHandler aQuoteEventHandler) {
+	public BundleDocWidget(IQuoteHandler aQuoteEventHandler, HasResizeHandlers resizeHandlerManager) {
 		super(new EditableBundleHeader());
 		this.quoteEventHandler = aQuoteEventHandler;
+		this.resizeHandlerManager=resizeHandlerManager;
 		
 	}
 
@@ -65,6 +68,9 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 				hrQuoteEventBindings = new HashMap<QuoteDocWidget, HandlerRegistration>();
 			}
 			hrQuoteEventBindings.put(w, w.addQuoteHandler(quoteEventHandler));
+		}
+		if (resizeHandlerManager != null) {
+			resizeHandlerManager.addResizeHandler(w);
 		}
 		return w;
 	}
