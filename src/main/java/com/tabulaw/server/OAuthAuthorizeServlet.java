@@ -31,13 +31,12 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		String accessToken = (String) request.getSession().getAttribute(
-				IGoogleOAuthParametersProvider.ACCESS_TOKEN);
-		String accessTokenSecret = (String) request.getSession().getAttribute(
-				IGoogleOAuthParametersProvider.ACCESS_TOKEN_SECRET);
-
-		if (accessToken == null || accessTokenSecret == null
-				|| "true".equals(request.getParameter("relogin"))) {
+		if ("true".equals(request.getParameter("relogin"))) {
+			resetSession(request);
+		}
+		
+		if (request.getSession().getAttribute(
+				IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS) == null) {
 			authorize(request, response);
 		} else {
 			forward(response);
@@ -75,21 +74,15 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 
 	private void persistToken(HttpServletRequest request,
 			GoogleOAuthParameters oauthParameters) {
-		request.getSession().setAttribute(IGoogleOAuthParametersProvider.TOKEN,
-				oauthParameters.getOAuthToken());
 		request.getSession().setAttribute(
-				IGoogleOAuthParametersProvider.TOKEN_SECRET,
-				oauthParameters.getOAuthTokenSecret());
+				IGoogleOAuthParametersProvider.OAUTH_PARAMETERS,
+				oauthParameters);
 	}
 
 	private void resetSession(HttpServletRequest request) {
-		request.getSession().setAttribute(IGoogleOAuthParametersProvider.TOKEN,
-				null);
 		request.getSession().setAttribute(
-				IGoogleOAuthParametersProvider.TOKEN_SECRET, null);
+				IGoogleOAuthParametersProvider.OAUTH_PARAMETERS, null);
 		request.getSession().setAttribute(
-				IGoogleOAuthParametersProvider.ACCESS_TOKEN, null);
-		request.getSession().setAttribute(
-				IGoogleOAuthParametersProvider.ACCESS_TOKEN_SECRET, null);
+				IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS, null);
 	}
 }

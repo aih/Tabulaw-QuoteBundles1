@@ -29,46 +29,33 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-
 		IOUtils.write(
 				"<script> window.opener.eval('onPopupWindowClose();');</script>",
 				response.getOutputStream());
 		IOUtils.write("<script> self.close(); </script>",
 				response.getOutputStream());
 
-		String accessToken = (String) request.getSession().getAttribute(
-				"oauth-access-token");
-		String accessTokenSecret = (String) request.getSession().getAttribute(
-				"oauth-access-token-secret");
-
-		authParametersProvider.setHttpServletRequest(request);
-		GoogleOAuthParameters oauthParameters = authParametersProvider
-				.getGoogleDocumentsOAuthParameters();
-
-		log.debug("Callback: " + request.getQueryString());
-
-		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
-				new OAuthHmacSha1Signer());
-
-		if (accessToken != null && accessTokenSecret != null) {
-			persistAccessToken(oauthParameters, oauthHelper, request);
-		}
+		persistAccessToken(request);
 	}
 
-	private void persistAccessToken(GoogleOAuthParameters oauthParameters,
-			GoogleOAuthHelper oauthHelper, HttpServletRequest request) {
+	private void persistAccessToken(HttpServletRequest request) {
 		try {
+			authParametersProvider.setHttpServletRequest(request);
+			GoogleOAuthParameters oauthParameters = authParametersProvider
+					.getGoogleDocumentsOAuthParameters();
+
+			GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
+					new OAuthHmacSha1Signer());
+
 			oauthHelper.getOAuthParametersFromCallback(
 					request.getQueryString(), oauthParameters);
-			String accessToken = oauthHelper.getAccessToken(oauthParameters);
-			String accessTokenSecret = oauthParameters.getOAuthTokenSecret();
+			oauthHelper.getAccessToken(oauthParameters);
+			oauthParameters.getOAuthTokenSecret();
 			request.getSession().setAttribute(
-					IGoogleOAuthParametersProvider.TOKEN, null);
-			request.getSession().setAttribute(IGoogleOAuthParametersProvider.TOKEN_SECRET, null);
-			request.getSession()
-					.setAttribute(IGoogleOAuthParametersProvider.ACCESS_TOKEN, accessToken);
-			request.getSession().setAttribute(IGoogleOAuthParametersProvider.ACCESS_TOKEN_SECRET,
-					accessTokenSecret);
+					IGoogleOAuthParametersProvider.OAUTH_PARAMETERS, null);
+			request.getSession().setAttribute(
+					IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS,
+					oauthParameters);
 		} catch (OAuthException e) {
 			log.error("OAuth - persist access token error", e);
 		}
