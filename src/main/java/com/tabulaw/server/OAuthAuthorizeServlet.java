@@ -32,7 +32,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 		if ("true".equals(request.getParameter("relogin"))) {
-			resetSession(request);
+			resetTokens(request);
 		}
 		
 		if (request.getSession().getAttribute(
@@ -46,7 +46,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 	private void authorize(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		try {
-			resetSession(request);
+			resetTokens(request);
 
 			authParametersProvider.setHttpServletRequest(request);
 			GoogleOAuthParameters oauthParameters = authParametersProvider
@@ -79,7 +79,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 				oauthParameters);
 	}
 
-	private void resetSession(HttpServletRequest request) {
+	private void resetTokens(HttpServletRequest request) {
 		request.getSession().setAttribute(
 				IGoogleOAuthParametersProvider.OAUTH_PARAMETERS, null);
 		request.getSession().setAttribute(
