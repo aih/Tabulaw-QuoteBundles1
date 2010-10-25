@@ -1,9 +1,0 @@
-*.class
-*.war
-*.log
-/test-output
-/target
-
-.settings
-.project
-.classpath

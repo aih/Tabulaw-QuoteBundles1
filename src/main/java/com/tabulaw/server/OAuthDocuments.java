@@ -11,6 +11,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.google.gdata.client.authn.oauth.GoogleOAuthHelper;
 import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
@@ -20,6 +22,8 @@ import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
 @SuppressWarnings("serial")
 public class OAuthDocuments extends HttpServlet {
 
+	private final static Log log = LogFactory.getLog(OAuthDocuments.class);
+	
 	private final static HttpClient client = new HttpClient();
 
 	@Override
@@ -40,13 +44,13 @@ public class OAuthDocuments extends HttpServlet {
 		GoogleOAuthParameters oauthParameters = (GoogleOAuthParameters) request
 				.getSession().getAttribute("oauth-parameters");
 
-		System.out.println("Callback: " + request.getQueryString());
+		log.debug("Callback: " + request.getQueryString());
 
 		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 				new OAuthHmacSha1Signer());
 
 		if (accessToken == null || accessTokenSecret == null) {
-			getAccessToken(oauthParameters, oauthHelper, request);
+			persistAccessToken(oauthParameters, oauthHelper, request);
 		} else {
 			oauthParameters.setOAuthToken(accessToken);
 			oauthParameters.setOAuthTokenSecret(accessTokenSecret);
@@ -54,7 +58,7 @@ public class OAuthDocuments extends HttpServlet {
 		getDocuments(oauthParameters, oauthHelper, response);
 	}
 
-	private void getAccessToken(GoogleOAuthParameters oauthParameters,
+	private void persistAccessToken(GoogleOAuthParameters oauthParameters,
 			GoogleOAuthHelper oauthHelper, HttpServletRequest request) {
 		try {
 			oauthHelper.getOAuthParametersFromCallback(
@@ -72,7 +76,6 @@ public class OAuthDocuments extends HttpServlet {
 	private void getDocuments(GoogleOAuthParameters oauthParameters,
 			GoogleOAuthHelper oauthHelper, HttpServletResponse response)
 			throws HttpException, IOException {
-
 		try {
 			String url = "https://docs.google.com/feeds/default/private/full/-/document";
 			GetMethod get = new GetMethod(url);
@@ -82,16 +85,15 @@ public class OAuthDocuments extends HttpServlet {
 			get.addRequestHeader("GData-Version", "3.0");
 
 			client.executeMethod(get);
-			System.out.println(header);
-			System.out.println(get.getStatusCode());
-			System.out.println(get.getStatusText());
+			log.debug(header);
+			log.debug(get.getStatusCode());
+			log.debug(get.getStatusText());
 
 			IOUtils.write(get.getResponseBodyAsString(),
 					response.getOutputStream());
 		} catch (OAuthException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("OAuth Google Docs get doocuments error", e);
+
 		}
 	}
-
 }
