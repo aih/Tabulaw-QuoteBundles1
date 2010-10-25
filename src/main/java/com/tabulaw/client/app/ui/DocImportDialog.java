@@ -86,7 +86,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 					showContent();
 				}
 			});
-			popup = PopupWindow.open("/oauthauthorize", "mywindow", null);
+			popup = PopupWindow.open("/poc/oauthauthorize", "mywindow", null);
 		} else {
 			showContent();
 		}

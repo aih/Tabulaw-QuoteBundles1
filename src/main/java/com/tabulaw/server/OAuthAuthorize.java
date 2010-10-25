@@ -20,7 +20,7 @@ public class OAuthAuthorize extends HttpServlet {
 
 	private final static Log log = LogFactory.getLog(OAuthAuthorize.class);
 
-	private final static String REDIRECT_URL = "/oauthpersistaccesstoken";
+	private final static String REDIRECT_URL = "/poc/oauthpersistaccesstoken";
 
 	@Override
 	protected void service(HttpServletRequest request,
