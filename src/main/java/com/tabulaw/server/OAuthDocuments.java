@@ -69,7 +69,7 @@ public class OAuthDocuments extends HttpServlet {
 			request.getSession().setAttribute("access-token-secret",
 					accessTokenSecret);
 		} catch (OAuthException e) {
-			e.printStackTrace();
+			log.error("OAuth - persist access token error", e);
 		}
 	}
 
