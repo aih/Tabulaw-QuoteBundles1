@@ -14,22 +14,27 @@ import com.google.gdata.client.authn.oauth.GoogleOAuthHelper;
 import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
 import com.google.gdata.client.authn.oauth.OAuthException;
 import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
+import com.tabulaw.server.bean.AnonymousGoogleOAuthParametersProvider;
+import com.tabulaw.server.bean.IGoogleOAuthParametersProvider;
 
 @SuppressWarnings("serial")
-public class OAuthAuthorize extends HttpServlet {
+public class OAuthAuthorizeServlet extends HttpServlet {
 
-	private final static Log log = LogFactory.getLog(OAuthAuthorize.class);
+	private final static Log log = LogFactory
+			.getLog(OAuthAuthorizeServlet.class);
 
-	private final static String REDIRECT_URL = "/poc/oauthpersistaccesstoken";
+	public final static String REDIRECT_URL = "/poc/oauthpersistaccesstoken";
+
+	private IGoogleOAuthParametersProvider authParametersProvider = new AnonymousGoogleOAuthParametersProvider();
 
 	@Override
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
 		String accessToken = (String) request.getSession().getAttribute(
-				"access-token");
+				IGoogleOAuthParametersProvider.ACCESS_TOKEN);
 		String accessTokenSecret = (String) request.getSession().getAttribute(
-				"access-token-secret");
+				IGoogleOAuthParametersProvider.ACCESS_TOKEN_SECRET);
 
 		if (accessToken == null || accessTokenSecret == null
 				|| "true".equals(request.getParameter("relogin"))) {
@@ -42,27 +47,20 @@ public class OAuthAuthorize extends HttpServlet {
 	private void authorize(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		try {
-			request.getSession().setAttribute("access-token", null);
-			request.getSession().setAttribute("access-token-secret", null);
+			resetSession(request);
 
-			String CONSUMER_KEY = "anonymous";
-			String CONSUMER_SECRET = "anonymous";
+			authParametersProvider.setHttpServletRequest(request);
+			GoogleOAuthParameters oauthParameters = authParametersProvider
+					.getGoogleDocumentsOAuthParameters();
 
-			String host = request.getScheme() + "://" + request.getServerName()
-					+ ":" + request.getServerPort();
-
-			GoogleOAuthParameters oauthParameters = new GoogleOAuthParameters();
-			oauthParameters.setOAuthConsumerKey(CONSUMER_KEY);
-			oauthParameters.setOAuthConsumerSecret(CONSUMER_SECRET);
-			oauthParameters.setScope("https://docs.google.com/feeds/");
-			oauthParameters.setOAuthCallback(host + REDIRECT_URL);
-			request.getSession().setAttribute("oauth-parameters",
-					oauthParameters);
 			GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 					new OAuthHmacSha1Signer());
 			oauthHelper.getUnauthorizedRequestToken(oauthParameters);
 			String approvalPageUrl = oauthHelper
 					.createUserAuthorizationUrl(oauthParameters);
+
+			persistToken(request, oauthParameters);
+
 			log.debug(approvalPageUrl);
 			response.sendRedirect(approvalPageUrl);
 		} catch (OAuthException e) {
@@ -73,5 +71,25 @@ public class OAuthAuthorize extends HttpServlet {
 	private void forward(HttpServletResponse response) throws IOException,
 			ServletException {
 		response.sendRedirect(REDIRECT_URL);
+	}
+
+	private void persistToken(HttpServletRequest request,
+			GoogleOAuthParameters oauthParameters) {
+		request.getSession().setAttribute(IGoogleOAuthParametersProvider.TOKEN,
+				oauthParameters.getOAuthToken());
+		request.getSession().setAttribute(
+				IGoogleOAuthParametersProvider.TOKEN_SECRET,
+				oauthParameters.getOAuthTokenSecret());
+	}
+
+	private void resetSession(HttpServletRequest request) {
+		request.getSession().setAttribute(IGoogleOAuthParametersProvider.TOKEN,
+				null);
+		request.getSession().setAttribute(
+				IGoogleOAuthParametersProvider.TOKEN_SECRET, null);
+		request.getSession().setAttribute(
+				IGoogleOAuthParametersProvider.ACCESS_TOKEN, null);
+		request.getSession().setAttribute(
+				IGoogleOAuthParametersProvider.ACCESS_TOKEN_SECRET, null);
 	}
 }

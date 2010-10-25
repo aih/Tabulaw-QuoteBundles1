@@ -29,6 +29,8 @@ import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.User;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
+import com.tabulaw.server.bean.AnonymousGoogleOAuthParametersProvider;
+import com.tabulaw.server.bean.IGoogleOAuthParametersProvider;
 import com.tabulaw.service.entity.UserDataService;
 
 @SuppressWarnings("serial")
@@ -40,6 +42,8 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 
 	private final HttpClient client = new HttpClient();
 
+	private IGoogleOAuthParametersProvider authParametersProvider = new AnonymousGoogleOAuthParametersProvider();
+
 	@Override
 	public List<GoogleDocument> getDocuments() {
 		String path = "/feeds/default/private/full/-/document";
@@ -48,6 +52,8 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 			client.executeMethod(get);
 			if (get.getStatusCode() == 200) {
 				return parseDocuments(get.getResponseBodyAsString());
+			} else {
+				log.error(get.getStatusText());
 			}
 		} catch (Exception e) {
 			log.error("", e);
@@ -143,8 +149,9 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	}
 
 	private GetMethod createGetMethod(String path) throws OAuthException {
-		GoogleOAuthParameters oauthParameters = (GoogleOAuthParameters) getThreadLocalRequest()
-				.getSession().getAttribute("oauth-parameters");
+		authParametersProvider.setHttpServletRequest(getThreadLocalRequest());
+		GoogleOAuthParameters oauthParameters = authParametersProvider
+				.getGoogleDocumentsOAuthParameters();
 		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 				new OAuthHmacSha1Signer());
 		String header = oauthHelper.getAuthorizationHeader(getUrl(path), "GET",

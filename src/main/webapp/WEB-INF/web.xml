@@ -181,7 +181,7 @@
 
 	<servlet>
 		<servlet-name>OAuthAuthorize</servlet-name>
-		<servlet-class>com.tabulaw.server.OAuthAuthorize</servlet-class>
+		<servlet-class>com.tabulaw.server.OAuthAuthorizeServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>OAuthAuthorize</servlet-name>
@@ -191,7 +191,7 @@
 
 	<servlet>
 		<servlet-name>OAuthPersistAccessToken</servlet-name>
-		<servlet-class>com.tabulaw.server.OAuthPersistAccessToken</servlet-class>
+		<servlet-class>com.tabulaw.server.OAuthPersistAccessTokenServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>OAuthPersistAccessToken</servlet-name>

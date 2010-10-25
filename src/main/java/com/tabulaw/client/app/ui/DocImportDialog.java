@@ -77,20 +77,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	public void show() {
 		super.show();
 		importPanel.setEnabled(true);
-		setGoogleDocs(null);
-		if (!hasAccessToken) {
-			PopupWindow.setCloseHandler(new PopupWindowCloseHandler() {
-				@Override
-				public void onClose() {
-					hasAccessToken = true;
-					showContent();
-				}
-			});
-			popup = PopupWindow.open("/poc/oauthauthorize", "mywindow", null);
-		} else {
-			showContent();
-		}
-
+		showContent();
 	}
 
 	@Override
@@ -108,11 +95,23 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 	}
 
 	private void showContent() {
-		setWidget(importPanel);
-		loadDocuments();
+		setGoogleDocs(null);
+		if (!hasAccessToken) {
+			PopupWindow.setCloseHandler(new PopupWindowCloseHandler() {
+				@Override
+				public void onClose() {
+					hasAccessToken = true;
+					loadDocuments();
+				}
+			});
+			popup = PopupWindow.open("/poc/oauthauthorize", "mywindow", null);
+		} else {
+			loadDocuments();
+		}
 	}
 
 	private void loadDocuments() {
+		setWidget(importPanel);
 		Poc.getGoogledocsService().getDocuments(
 				new AsyncCallback<List<GoogleDocument>>() {
 					@Override

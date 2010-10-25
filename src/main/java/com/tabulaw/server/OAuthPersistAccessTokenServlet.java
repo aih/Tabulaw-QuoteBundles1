@@ -15,11 +15,16 @@ import com.google.gdata.client.authn.oauth.GoogleOAuthHelper;
 import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
 import com.google.gdata.client.authn.oauth.OAuthException;
 import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
+import com.tabulaw.server.bean.AnonymousGoogleOAuthParametersProvider;
+import com.tabulaw.server.bean.IGoogleOAuthParametersProvider;
 
 @SuppressWarnings("serial")
-public class OAuthPersistAccessToken extends HttpServlet {
+public class OAuthPersistAccessTokenServlet extends HttpServlet {
 
-	private final static Log log = LogFactory.getLog(OAuthPersistAccessToken.class);
+	private final static Log log = LogFactory
+			.getLog(OAuthPersistAccessTokenServlet.class);
+
+	private IGoogleOAuthParametersProvider authParametersProvider = new AnonymousGoogleOAuthParametersProvider();
 
 	@Override
 	protected void doGet(HttpServletRequest request,
@@ -32,23 +37,21 @@ public class OAuthPersistAccessToken extends HttpServlet {
 				response.getOutputStream());
 
 		String accessToken = (String) request.getSession().getAttribute(
-				"access-token");
+				"oauth-access-token");
 		String accessTokenSecret = (String) request.getSession().getAttribute(
-				"access-token-secret");
+				"oauth-access-token-secret");
 
-		GoogleOAuthParameters oauthParameters = (GoogleOAuthParameters) request
-				.getSession().getAttribute("oauth-parameters");
+		authParametersProvider.setHttpServletRequest(request);
+		GoogleOAuthParameters oauthParameters = authParametersProvider
+				.getGoogleDocumentsOAuthParameters();
 
 		log.debug("Callback: " + request.getQueryString());
 
 		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 				new OAuthHmacSha1Signer());
 
-		if (accessToken == null || accessTokenSecret == null) {
+		if (accessToken != null && accessTokenSecret != null) {
 			persistAccessToken(oauthParameters, oauthHelper, request);
-		} else {
-			oauthParameters.setOAuthToken(accessToken);
-			oauthParameters.setOAuthTokenSecret(accessTokenSecret);
 		}
 	}
 
@@ -59,8 +62,12 @@ public class OAuthPersistAccessToken extends HttpServlet {
 					request.getQueryString(), oauthParameters);
 			String accessToken = oauthHelper.getAccessToken(oauthParameters);
 			String accessTokenSecret = oauthParameters.getOAuthTokenSecret();
-			request.getSession().setAttribute("access-token", accessToken);
-			request.getSession().setAttribute("access-token-secret",
+			request.getSession().setAttribute(
+					IGoogleOAuthParametersProvider.TOKEN, null);
+			request.getSession().setAttribute(IGoogleOAuthParametersProvider.TOKEN_SECRET, null);
+			request.getSession()
+					.setAttribute(IGoogleOAuthParametersProvider.ACCESS_TOKEN, accessToken);
+			request.getSession().setAttribute(IGoogleOAuthParametersProvider.ACCESS_TOKEN_SECRET,
 					accessTokenSecret);
 		} catch (OAuthException e) {
 			log.error("OAuth - persist access token error", e);
