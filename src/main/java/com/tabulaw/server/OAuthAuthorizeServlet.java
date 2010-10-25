@@ -34,12 +34,12 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 		if ("true".equals(request.getParameter("relogin"))) {
 			resetTokens(request);
 		}
-		
+
 		if (request.getSession().getAttribute(
 				IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS) == null) {
 			authorize(request, response);
 		} else {
-			forward(response);
+			forward(request, response);
 		}
 	}
 
@@ -67,9 +67,9 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 		}
 	}
 
-	private void forward(HttpServletResponse response) throws IOException,
-			ServletException {
-		response.sendRedirect(REDIRECT_URL);
+	private void forward(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
+		response.sendRedirect(request.getContextPath() + REDIRECT_URL);
 	}
 
 	private void persistToken(HttpServletRequest request,

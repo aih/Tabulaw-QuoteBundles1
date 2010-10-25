@@ -154,6 +154,8 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 				.getGoogleDocumentsOAuthParameters();
 		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 				new OAuthHmacSha1Signer());
+		// TODO if no token then throw RPC exception to redirect user to Google
+		// Authorization page and create token
 		String header = oauthHelper.getAuthorizationHeader(getUrl(path), "GET",
 				oauthParameters);
 		GetMethod get = new GetMethod(getUrl(path));
