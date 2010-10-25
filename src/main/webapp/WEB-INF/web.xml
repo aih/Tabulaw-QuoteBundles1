@@ -190,13 +190,13 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>OAuthDocuments</servlet-name>
-		<servlet-class>com.tabulaw.server.OAuthDocuments</servlet-class>
+		<servlet-name>OAuthPersistAccessToken</servlet-name>
+		<servlet-class>com.tabulaw.server.OAuthPersistAccessToken</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>OAuthDocuments</servlet-name>
-		<url-pattern>/oauthdocuments</url-pattern>
-		<url-pattern>/poc/oauthdocuments</url-pattern>
+		<servlet-name>OAuthPersistAccessToken</servlet-name>
+		<url-pattern>/oauthpersistaccesstoken</url-pattern>
+		<url-pattern>/poc/oauthpersistaccesstoken</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

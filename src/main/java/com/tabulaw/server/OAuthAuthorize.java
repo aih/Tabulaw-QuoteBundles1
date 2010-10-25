@@ -20,6 +20,8 @@ public class OAuthAuthorize extends HttpServlet {
 
 	private final static Log log = LogFactory.getLog(OAuthAuthorize.class);
 
+	private final static String REDIRECT_URL = "/oauthpersistaccesstoken";
+
 	@Override
 	protected void service(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
@@ -53,7 +55,7 @@ public class OAuthAuthorize extends HttpServlet {
 			oauthParameters.setOAuthConsumerKey(CONSUMER_KEY);
 			oauthParameters.setOAuthConsumerSecret(CONSUMER_SECRET);
 			oauthParameters.setScope("https://docs.google.com/feeds/");
-			oauthParameters.setOAuthCallback(host + "/oauthdocuments");
+			oauthParameters.setOAuthCallback(host + REDIRECT_URL);
 			request.getSession().setAttribute("oauth-parameters",
 					oauthParameters);
 			GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
@@ -70,6 +72,6 @@ public class OAuthAuthorize extends HttpServlet {
 
 	private void forward(HttpServletResponse response) throws IOException,
 			ServletException {
-		response.sendRedirect("/oauthdocuments");
+		response.sendRedirect(REDIRECT_URL);
 	}
 }

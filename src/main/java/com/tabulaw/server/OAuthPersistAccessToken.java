@@ -7,9 +7,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,11 +17,9 @@ import com.google.gdata.client.authn.oauth.OAuthException;
 import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
 
 @SuppressWarnings("serial")
-public class OAuthDocuments extends HttpServlet {
+public class OAuthPersistAccessToken extends HttpServlet {
 
-	private final static Log log = LogFactory.getLog(OAuthDocuments.class);
-	
-	private final static HttpClient client = new HttpClient();
+	private final static Log log = LogFactory.getLog(OAuthPersistAccessToken.class);
 
 	@Override
 	protected void doGet(HttpServletRequest request,
@@ -55,7 +50,6 @@ public class OAuthDocuments extends HttpServlet {
 			oauthParameters.setOAuthToken(accessToken);
 			oauthParameters.setOAuthTokenSecret(accessTokenSecret);
 		}
-		getDocuments(oauthParameters, oauthHelper, response);
 	}
 
 	private void persistAccessToken(GoogleOAuthParameters oauthParameters,
@@ -70,30 +64,6 @@ public class OAuthDocuments extends HttpServlet {
 					accessTokenSecret);
 		} catch (OAuthException e) {
 			log.error("OAuth - persist access token error", e);
-		}
-	}
-
-	private void getDocuments(GoogleOAuthParameters oauthParameters,
-			GoogleOAuthHelper oauthHelper, HttpServletResponse response)
-			throws HttpException, IOException {
-		try {
-			String url = "https://docs.google.com/feeds/default/private/full/-/document";
-			GetMethod get = new GetMethod(url);
-			String header = oauthHelper.getAuthorizationHeader(url, "GET",
-					oauthParameters);
-			get.setRequestHeader("Authorization", header);
-			get.addRequestHeader("GData-Version", "3.0");
-
-			client.executeMethod(get);
-			log.debug(header);
-			log.debug(get.getStatusCode());
-			log.debug(get.getStatusText());
-
-			IOUtils.write(get.getResponseBodyAsString(),
-					response.getOutputStream());
-		} catch (OAuthException e) {
-			log.error("OAuth Google Docs get doocuments error", e);
-
 		}
 	}
 }
