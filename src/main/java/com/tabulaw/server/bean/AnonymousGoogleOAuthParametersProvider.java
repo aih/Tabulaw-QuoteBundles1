@@ -2,11 +2,17 @@ package com.tabulaw.server.bean;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
 import com.tabulaw.server.OAuthAuthorizeServlet;
 
 public class AnonymousGoogleOAuthParametersProvider implements
 		IGoogleOAuthParametersProvider {
+
+	private final static Log log = LogFactory
+			.getLog(AnonymousGoogleOAuthParametersProvider.class);
 
 	private HttpServletRequest request;
 
@@ -31,9 +37,10 @@ public class AnonymousGoogleOAuthParametersProvider implements
 			oauthParameters.setOAuthConsumerSecret(CONSUMER_SECRET);
 			oauthParameters.setScope("https://docs.google.com/feeds/");
 			String host = request.getScheme() + "://" + request.getServerName()
-					+ ":" + request.getServerPort();
-			oauthParameters.setOAuthCallback(host
-					+ OAuthAuthorizeServlet.REDIRECT_URL);
+					+ ":" + request.getServerPort() + request.getContextPath();
+			String callbackUrl = host + OAuthAuthorizeServlet.REDIRECT_URL;
+			log.debug("AOUTH Callback URL: " + host);
+			oauthParameters.setOAuthCallback(callbackUrl);
 			return oauthParameters;
 		}
 	}

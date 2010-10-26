@@ -35,10 +35,13 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 		IOUtils.write("<script> self.close(); </script>",
 				response.getOutputStream());
 
-		persistAccessToken(request);
+		if (request.getSession().getAttribute(
+				IGoogleOAuthParametersProvider.OAUTH_PARAMETERS) != null) {
+			getAndPersistAccessToken(request);
+		}
 	}
 
-	private void persistAccessToken(HttpServletRequest request) {
+	private void getAndPersistAccessToken(HttpServletRequest request) {
 		try {
 			authParametersProvider.setHttpServletRequest(request);
 			GoogleOAuthParameters oauthParameters = authParametersProvider

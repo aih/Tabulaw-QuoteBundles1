@@ -102,6 +102,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 
 	@SuppressWarnings("unchecked")
 	private List<GoogleDocument> parseDocuments(String s) {
+		log.debug("Parsing XML response of google documents list");
 		List<GoogleDocument> list = new ArrayList<GoogleDocument>();
 		try {
 			IXMLParser parser = XMLParserFactory.createDefaultXMLParser();
@@ -145,6 +146,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		} catch (Exception e) {
 			log.error("", e);
 		}
+		log.debug("Returning google documents list");
 		return list;
 	}
 

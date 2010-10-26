@@ -23,7 +23,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 	private final static Log log = LogFactory
 			.getLog(OAuthAuthorizeServlet.class);
 
-	public final static String REDIRECT_URL = "/poc/oauthpersistaccesstoken";
+	public final static String REDIRECT_URL = "/oauthpersistaccesstoken";
 
 	private IGoogleOAuthParametersProvider authParametersProvider = new AnonymousGoogleOAuthParametersProvider();
 
@@ -69,7 +69,9 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 
 	private void forward(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		response.sendRedirect(request.getContextPath() + REDIRECT_URL);
+		String path = request.getContextPath() + REDIRECT_URL;
+		log.debug("redirect to:" + path);
+		response.sendRedirect(path);
 	}
 
 	private void persistToken(HttpServletRequest request,

@@ -176,7 +176,8 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>GoogleDocsServiceRpc</servlet-name>
-		<url-pattern>/poc/googledoc</url-pattern>
+		<url-pattern>/googledoc.rpc</url-pattern>
+		<url-pattern>/poc/googledoc.rpc</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

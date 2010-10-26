@@ -9,7 +9,7 @@ import com.tabulaw.common.data.GoogleDocument;
 import com.tabulaw.common.exception.AccessTokenNotFoundException;
 import com.tabulaw.model.DocRef;
 
-@RemoteServiceRelativePath(value = "googledoc")
+@RemoteServiceRelativePath(value = "googledoc.rpc")
 public interface IGoogleDocsService extends RemoteService {
 
 	List<GoogleDocument> getDocuments() throws AccessTokenNotFoundException;
