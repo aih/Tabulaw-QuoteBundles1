@@ -10,12 +10,12 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.ui.Dialog;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.RpcCommand;
 import com.tabulaw.client.ui.edit.EditEvent;
 import com.tabulaw.client.ui.edit.EditEvent.EditOp;
 import com.tabulaw.client.ui.edit.IEditHandler;
@@ -23,6 +23,8 @@ import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.util.PopupWindow;
 import com.tabulaw.client.util.PopupWindowCloseHandler;
 import com.tabulaw.common.data.GoogleDocument;
+import com.tabulaw.common.data.rpc.DocRefListPayload;
+import com.tabulaw.common.data.rpc.GoogleDocumentListPayload;
 import com.tabulaw.common.msg.Msg;
 import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.model.DocRef;
@@ -112,41 +114,44 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 
 	private void loadDocuments() {
 		setWidget(importPanel);
-		Poc.getGoogledocsService().getDocuments(
-				new AsyncCallback<List<GoogleDocument>>() {
-					@Override
-					public void onSuccess(List<GoogleDocument> result) {
-						showDocuments(result);
-					}
+		new RpcCommand<GoogleDocumentListPayload>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						caught.printStackTrace();
-					}
-				});
+			@Override
+			protected void doExecute() {
+				Poc.getGoogledocsService().getDocuments(this);
+			}
+
+			@Override
+			protected void handleSuccess(GoogleDocumentListPayload result) {
+				super.handleSuccess(result);
+				showDocuments(result.getDocuments());
+			}
+		}.execute();
 	}
 
 	private void showDocuments(List<GoogleDocument> documents) {
 		setGoogleDocs(documents);
 	}
 
-	private void doImport(String authKey, Collection<GoogleDocument> resourceId) {
+	private void doImport(String authKey,
+			final Collection<GoogleDocument> resourceId) {
 		final int currentImportId = ++importId;
-		Poc.getGoogledocsService().download(resourceId,
-				new AsyncCallback<List<DocRef>>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						caught.printStackTrace();
-					}
+		new RpcCommand<DocRefListPayload>() {
 
-					@Override
-					public void onSuccess(List<DocRef> downloaded) {
-						if (currentImportId == importId) {
-							refreshList(downloaded);
-							hide();
-						}
-					}
-				});
+			@Override
+			protected void doExecute() {
+				Poc.getGoogledocsService().download(resourceId, this);
+			}
+
+			@Override
+			protected void handleSuccess(DocRefListPayload result) {
+				super.handleSuccess(result);
+				if (currentImportId == importId) {
+					refreshList(result.getDocRefs());
+					hide();
+				}
+			}
+		}.execute();
 	}
 
 	private void refreshList(List<DocRef> downloaded) {

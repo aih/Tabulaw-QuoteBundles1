@@ -22,7 +22,12 @@ import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
 import com.google.gdata.client.authn.oauth.OAuthException;
 import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
 import com.tabulaw.common.data.GoogleDocument;
+import com.tabulaw.common.data.Status;
+import com.tabulaw.common.data.rpc.DocRefListPayload;
+import com.tabulaw.common.data.rpc.GoogleDocumentListPayload;
 import com.tabulaw.common.data.rpc.IGoogleDocsService;
+import com.tabulaw.common.msg.Msg;
+import com.tabulaw.common.msg.Msg.MsgLevel;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
@@ -46,36 +51,58 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	private IGoogleOAuthParametersProvider authParametersProvider = new AnonymousGoogleOAuthParametersProvider();
 
 	@Override
-	public List<GoogleDocument> getDocuments() {
+	public GoogleDocumentListPayload getDocuments() {
+		log.debug("Creating GoogleDocumentListPayload list");
+		GoogleDocumentListPayload list = new GoogleDocumentListPayload();
 		String path = "/feeds/default/private/full/-/document";
 		try {
 			GetMethod get = createGetMethod(path);
+			log.debug("Executing HttpClient GetMethod with URL=" + path);
 			client.executeMethod(get);
+			log.debug("HttpClient execute status code is: "
+					+ get.getStatusCode());
 			if (get.getStatusCode() == 200) {
-				return parseDocuments(get.getResponseBodyAsString());
+				list.setDocuments(parseDocuments(get.getResponseBodyAsString()));
 			} else {
+				log.debug("HttpClient execute status message is: "
+						+ get.getStatusText());
 				log.error(get.getStatusText());
+				return new GoogleDocumentListPayload(new Status(new Msg(
+						"Google Docs rejected request.", MsgLevel.ERROR)));
 			}
 		} catch (Exception e) {
 			log.error("", e);
+			return new GoogleDocumentListPayload(
+					new Status(
+							new Msg(
+									"Problem occured when connecting to the Google Docs server.",
+									MsgLevel.ERROR)));
 		}
-		return null;
+		log.debug("Returning GoogleDocumentListPayload list");
+		return list;
 	}
 
 	@Override
-	public List<DocRef> download(Collection<GoogleDocument> documents) {
-		List<DocRef> downloaded = new ArrayList<DocRef>();
+	public DocRefListPayload download(Collection<GoogleDocument> documents) {
+		DocRefListPayload docs = new DocRefListPayload();
+		log.debug("Iterating google documents to download");
 		for (GoogleDocument document : documents) {
 			try {
 				DocRef doc = download(document);
 				if (doc != null) {
-					downloaded.add(doc);
+					docs.getDocRefs().add(doc);
+					log.debug("Google document has been downloaded: "
+							+ doc.getName() + " / " + doc.getTitle());
+				} else {
+					log.error("Unable to download google document: "
+							+ document.getTitle());
 				}
 			} catch (Exception e) {
 				log.error("", e);
 			}
 		}
-		return downloaded;
+		log.debug("Returning download google documents");
+		return docs;
 	}
 
 	private DocRef download(GoogleDocument document) {
