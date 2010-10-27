@@ -12,9 +12,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.gdata.client.authn.oauth.GoogleOAuthHelper;
-import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
 import com.google.gdata.client.authn.oauth.OAuthException;
 import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
+import com.tabulaw.model.User;
 import com.tabulaw.server.bean.AnonymousGoogleOAuthParametersProvider;
 import com.tabulaw.server.bean.IGoogleOAuthParametersProvider;
 
@@ -44,7 +44,7 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 	private void getAndPersistAccessToken(HttpServletRequest request) {
 		try {
 			authParametersProvider.setHttpServletRequest(request);
-			GoogleOAuthParameters oauthParameters = new OAuthParameters(
+			OAuthParameters oauthParameters = new OAuthParameters(
 					authParametersProvider.getGoogleDocumentsOAuthParameters());
 
 			GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
@@ -56,9 +56,18 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 			oauthParameters.getOAuthTokenSecret();
 			request.getSession().setAttribute(
 					IGoogleOAuthParametersProvider.OAUTH_PARAMETERS, null);
-			request.getSession().setAttribute(
-					IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS,
-					oauthParameters);
+			if (IGoogleOAuthParametersProvider.DATABASE_BASED_ACCESS_TOKEN) {
+				UserContext uc = (UserContext) request.getSession(false)
+						.getAttribute(UserContext.KEY);
+				User user = uc.getUser();
+				user.setOAuthParameters(oauthParameters.getBaseParameters());
+				user.setOAuthParametersExtra(oauthParameters
+						.getExtraParameters());
+			} else {
+				request.getSession().setAttribute(
+						IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS,
+						oauthParameters);
+			}
 		} catch (OAuthException e) {
 			log.error("OAuth - persist access token error", e);
 		}

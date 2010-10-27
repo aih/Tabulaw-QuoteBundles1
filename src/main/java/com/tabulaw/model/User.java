@@ -67,9 +67,9 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 	private HashSet<AppFeature> appFeatures;
 
-	private Map<String,String> oAuthParameters;
+	private Map<String,String> oauthParameters;
 
-	private Map<String,String> oAuthParametersExtra;
+	private Map<String,String> oauthParametersExtra;
 	
 	/**
 	 * Constructor
@@ -330,19 +330,19 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		return null;
 	}
 
-	public void setoAuthParameters(Map<String,String> oAuthParameters) {
-		this.oAuthParameters = oAuthParameters;
+	public void setOAuthParameters(Map<String,String> oauthParameters) {
+		this.oauthParameters = oauthParameters;
 	}
 
-	public Map<String,String> getoAuthParameters() {
-		return oAuthParameters;
+	public Map<String,String> getOAuthParameters() {
+		return oauthParameters;
 	}
 
-	public void setoAuthParametersExtra(Map<String,String> oAuthParametersExtra) {
-		this.oAuthParametersExtra = oAuthParametersExtra;
+	public void setOAuthParametersExtra(Map<String,String> oauthParametersExtra) {
+		this.oauthParametersExtra = oauthParametersExtra;
 	}
 
-	public Map<String,String> getoAuthParametersExtra() {
-		return oAuthParametersExtra;
+	public Map<String,String> getOAuthParametersExtra() {
+		return oauthParametersExtra;
 	}
 }

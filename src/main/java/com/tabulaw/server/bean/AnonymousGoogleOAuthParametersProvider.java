@@ -6,8 +6,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
+import com.tabulaw.model.User;
 import com.tabulaw.server.OAuthAuthorizeServlet;
 import com.tabulaw.server.OAuthParameters;
+import com.tabulaw.server.UserContext;
 
 public class AnonymousGoogleOAuthParametersProvider implements
 		IGoogleOAuthParametersProvider {
@@ -24,10 +26,22 @@ public class AnonymousGoogleOAuthParametersProvider implements
 
 	@Override
 	public GoogleOAuthParameters getGoogleDocumentsOAuthParameters() {
-		if (request.getSession().getAttribute(OAUTH_ACCESS_PARAMETERS) != null) {
-			return (GoogleOAuthParameters) request.getSession().getAttribute(
-					OAUTH_ACCESS_PARAMETERS);
-		} else if (request.getSession().getAttribute(OAUTH_PARAMETERS) != null) {
+		if (IGoogleOAuthParametersProvider.DATABASE_BASED_ACCESS_TOKEN) {
+			UserContext uc = (UserContext) request.getSession(false)
+					.getAttribute(UserContext.KEY);
+			User user = uc.getUser();
+			if (user.getOAuthParameters() != null
+					&& user.getOAuthParametersExtra() != null) {
+				return new OAuthParameters(user.getOAuthParameters(),
+						user.getOAuthParametersExtra());
+			}
+		} else {
+			if (request.getSession().getAttribute(OAUTH_ACCESS_PARAMETERS) != null) {
+				return (GoogleOAuthParameters) request.getSession()
+						.getAttribute(OAUTH_ACCESS_PARAMETERS);
+			}
+		}
+		if (request.getSession().getAttribute(OAUTH_PARAMETERS) != null) {
 			return (GoogleOAuthParameters) request.getSession().getAttribute(
 					OAUTH_PARAMETERS);
 		} else {
