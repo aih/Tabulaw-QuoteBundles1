@@ -49,8 +49,8 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 			resetTokens(request);
 
 			authParametersProvider.setHttpServletRequest(request);
-			GoogleOAuthParameters oauthParameters = authParametersProvider
-					.getGoogleDocumentsOAuthParameters();
+			GoogleOAuthParameters oauthParameters = new OAuthParameters(
+					authParametersProvider.getGoogleDocumentsOAuthParameters());
 
 			GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 					new OAuthHmacSha1Signer());

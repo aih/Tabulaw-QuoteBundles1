@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
 import com.tabulaw.server.OAuthAuthorizeServlet;
+import com.tabulaw.server.OAuthParameters;
 
 public class AnonymousGoogleOAuthParametersProvider implements
 		IGoogleOAuthParametersProvider {
@@ -32,7 +33,7 @@ public class AnonymousGoogleOAuthParametersProvider implements
 		} else {
 			String CONSUMER_KEY = "anonymous";
 			String CONSUMER_SECRET = "anonymous";
-			GoogleOAuthParameters oauthParameters = new GoogleOAuthParameters();
+			GoogleOAuthParameters oauthParameters = new OAuthParameters();
 			oauthParameters.setOAuthConsumerKey(CONSUMER_KEY);
 			oauthParameters.setOAuthConsumerSecret(CONSUMER_SECRET);
 			oauthParameters.setScope("https://docs.google.com/feeds/");

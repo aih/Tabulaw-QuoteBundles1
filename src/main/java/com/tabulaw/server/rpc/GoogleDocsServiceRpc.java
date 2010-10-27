@@ -27,6 +27,7 @@ import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.User;
+import com.tabulaw.server.OAuthParameters;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.server.bean.AnonymousGoogleOAuthParametersProvider;
@@ -152,8 +153,8 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 
 	private GetMethod createGetMethod(String path) throws OAuthException {
 		authParametersProvider.setHttpServletRequest(getThreadLocalRequest());
-		GoogleOAuthParameters oauthParameters = authParametersProvider
-				.getGoogleDocumentsOAuthParameters();
+		GoogleOAuthParameters oauthParameters = new OAuthParameters(
+				authParametersProvider.getGoogleDocumentsOAuthParameters());
 		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 				new OAuthHmacSha1Signer());
 		// TODO if no token then throw RPC exception to redirect user to Google
