@@ -200,6 +200,17 @@
 		<url-pattern>/poc/oauthpersistaccesstoken</url-pattern>
 	</servlet-mapping>
 
+
+	<servlet>
+        <servlet-name>OpenIdServlet</servlet-name>
+        <servlet-class>com.tabulaw.server.OpenIdServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OpenIdServlet</servlet-name>
+        <url-pattern>/openid</url-pattern>
+        <url-pattern>/poc/openid</url-pattern>
+    </servlet-mapping>
+    
 	<servlet>
 		<servlet-name>RESTServlet</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
