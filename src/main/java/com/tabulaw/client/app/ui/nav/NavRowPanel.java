@@ -319,6 +319,10 @@ public class NavRowPanel extends AbstractNavPanel {
 		ViewKey crntViewKey = ViewManager.get().getCurrentViewKey();
 
 		if(crntViewKey.getViewClass() == DocView.klas) {
+
+			DocView newDocView = (DocView) ViewManager.get().resolveView(key);
+			newDocView .doActivate();
+			
 			int index = getTabIndexFromViewKey(crntViewKey, false);
 			if(index == -1) {
 				// create a doc nav button and tab

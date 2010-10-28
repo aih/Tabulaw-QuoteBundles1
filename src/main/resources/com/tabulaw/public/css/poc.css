@@ -17,9 +17,9 @@ a:hover {
 a:active {
 }
 
-.gwt-PopupPanel {
-	border: 0;
-	padding: 0;
+.rpc-message-popup {
+	border: 0!important;
+	padding: 0!important;
 }
 
 .gwt-PopupPanelGlass {
@@ -540,6 +540,8 @@ div.ro {
 .wquote .quoted {
 	padding: 2px 1px 0 2px;
 	font-size: 11px;
+	height: 27px;
+	overflow: hidden;	
 }
 
 /* docUpload widget */
@@ -1027,11 +1029,15 @@ docHeaderMenuItem img{
 		font-size: 12px;
 	}
 	.doc .quoted p {
-		line-height: .93em;
+		line-height: 12px;
 	}
 	.doc .quoted {
-		max-height: 50px;
+/*		max-height: 50px;*/
 		overflow: hidden;
+		height: 25px;
+	}
+	.quote-popup {
+		max-height: 150px;
 	}
 .doc-static .copyQuoteIcon {
 	display: none; /* hide when in doc edit mode */

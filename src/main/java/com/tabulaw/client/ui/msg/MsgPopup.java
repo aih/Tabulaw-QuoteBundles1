@@ -20,6 +20,7 @@ import com.tabulaw.common.msg.Msg;
  */
 public class MsgPopup extends PopupPanel implements IMsgOperator {
 
+	private static final String POPUP_STYLE = "rpc-message-popup";
 	private static final Position DEFAULT_POSITION = Position.BOTTOM;
 
 	/**
@@ -49,6 +50,7 @@ public class MsgPopup extends PopupPanel implements IMsgOperator {
 	 */
 	public MsgPopup() {
 		super(false, false);
+		addStyleName(POPUP_STYLE);
 		setWidget(msgPanel);
 	}
 
@@ -68,8 +70,7 @@ public class MsgPopup extends PopupPanel implements IMsgOperator {
 	 * @param offsetLeft 
 	 */
 	public MsgPopup(Widget refWidget, int offsetTop, int offsetLeft) {
-		this();
-		setRefWidget(refWidget);
+		this(refWidget);
 		setRefWidgetOffset(offsetTop, offsetLeft);
 	}
 
@@ -81,10 +82,8 @@ public class MsgPopup extends PopupPanel implements IMsgOperator {
 	 * @param offsetLeft 
 	 */
 	public MsgPopup(Widget refWidget, Position position, int offsetTop, int offsetLeft) {
-		this();
-		setRefWidget(refWidget);
+		this(refWidget, offsetTop, offsetLeft);
 		setPosition(position);
-		setRefWidgetOffset(offsetTop, offsetLeft);
 	}
 
 	/**

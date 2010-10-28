@@ -140,6 +140,9 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 		initWidget(boundaryPanel);
 	}
+	public void onActivate() {
+		resizeHandlerManager.fireEvent(new QuoteResizeEvent());
+	}
 	public HandlerRegistration addResizeHandler(ResizeHandler handler) {
 		return resizeHandlerManager.addHandler(ResizeEvent.getType(), handler);
 	}

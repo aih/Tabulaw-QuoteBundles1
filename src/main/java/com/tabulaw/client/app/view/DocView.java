@@ -128,4 +128,7 @@ public class DocView extends AbstractPocView<DocViewInitializer> implements IMod
 			return;
 		}
 	}
+	public void doActivate() {
+		docWidget.onActivate();
+	}
 }
