@@ -14,6 +14,7 @@ import com.google.gdata.client.authn.oauth.GoogleOAuthHelper;
 import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
 import com.google.gdata.client.authn.oauth.OAuthException;
 import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
+import com.tabulaw.model.User;
 import com.tabulaw.server.bean.AnonymousGoogleOAuthParametersProvider;
 import com.tabulaw.server.bean.IGoogleOAuthParametersProvider;
 
@@ -34,12 +35,23 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 		if ("true".equals(request.getParameter("relogin"))) {
 			resetTokens(request);
 		}
-
-		if (request.getSession().getAttribute(
-				IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS) == null) {
-			authorize(request, response);
+		if (IGoogleOAuthParametersProvider.DATABASE_BASED_ACCESS_TOKEN) {
+			UserContext uc = (UserContext) request.getSession(false)
+					.getAttribute(UserContext.KEY);
+			User user = uc.getUser();
+			if (user.getOAuthParameters() == null
+					|| user.getOAuthParametersExtra() == null) {
+				authorize(request, response);
+			} else {
+				forward(request, response);
+			}
 		} else {
-			forward(request, response);
+			if (request.getSession().getAttribute(
+					IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS) == null) {
+				authorize(request, response);
+			} else {
+				forward(request, response);
+			}
 		}
 	}
 

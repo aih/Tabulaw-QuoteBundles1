@@ -1,6 +1,7 @@
 package com.tabulaw.server;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -60,9 +61,9 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 				UserContext uc = (UserContext) request.getSession(false)
 						.getAttribute(UserContext.KEY);
 				User user = uc.getUser();
-				user.setOAuthParameters(oauthParameters.getBaseParameters());
-				user.setOAuthParametersExtra(oauthParameters
-						.getExtraParameters());
+				user.setOAuthParameters(new HashMap<String,String>(oauthParameters.getBaseParameters()));
+				user.setOAuthParametersExtra(new HashMap<String,String>(oauthParameters
+						.getExtraParameters()));
 			} else {
 				request.getSession().setAttribute(
 						IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS,
