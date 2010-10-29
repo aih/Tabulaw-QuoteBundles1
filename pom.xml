@@ -725,11 +725,13 @@
 			<version>4.0.1</version>
 			<scope>compile</scope>
 		</dependency>
+		<!-- Google Docs parser -->
 		<dependency>
 			<groupId>be.cyberelf.nanoxml</groupId>
 			<artifactId>nanoxml</artifactId>
 			<version>2.2.3</version>
 		</dependency>
+		<!-- OAuth -->
 		<dependency>
 			<groupId>com.google.gdata</groupId>
 			<artifactId>gdata-core</artifactId>
@@ -770,17 +772,11 @@
 			<artifactId>httpcore</artifactId>
 			<version>4.0.1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.openid4java</groupId>
-			<artifactId>openid4java</artifactId>
-			<version>0.9.3</version>
-		</dependency>
-		<!-- 
+		<!-- OpenID -->
 		<dependency>
 			<groupId>com.google.step2</groupId>
 			<artifactId>step2-consumer</artifactId>
 			<version>1-SNAPSHOT</version>
 		</dependency>
-		 -->
 	</dependencies>
 </project>
