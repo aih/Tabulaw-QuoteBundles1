@@ -5,7 +5,6 @@
  */
 package com.tabulaw.client.app.ui;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
@@ -14,8 +13,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -98,7 +95,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 			this.title.setHTML(title);
 		}
 
-		public void setSubTitle(String subTitle) {
+		public void setShortSubTitle(String subTitle) {
 			this.subTitle.setHTML("<p>" + subTitle + "</p>");
 		}
 
@@ -121,45 +118,54 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 	static class QuotePopupPanel extends PopupPanel{
 		public static final int MAX_HEIGHT = 83; //used to calculate popup position only 
+		private HTML header = new HTML();
 		private HTML contents = new HTML();
+		private FlowPanel panel = new FlowPanel(); 
 		private ScrollPanel scroller;
+		private ClickHandler clickHandler = new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				hide(true);
+			}
+		};
 	    public QuotePopupPanel(){
 	    	super(true);
 			setWidth("400px");
 			contents.setSize("100%", "100%");
+			header.addStyleName("quote-popup-header");
 			scroller = new ScrollPanel(contents);
 			scroller.setWidth("400px");
 			scroller.setStyleName("quote-popup");
 			setAnimationEnabled(true);
-			add(scroller);
+			panel.add(header);
+			panel.add(scroller);
+			add(panel);
+			header.addClickHandler(clickHandler);
+			contents.addClickHandler(clickHandler);
 		}
 	    public void setHTML(String html){
 	    	contents.setHTML(html);
 	    }
+	    public void setHeader(String header){
+	    	this.header.setHTML(header);
+	    }
 	    public void addClickHandler(ClickHandler handler){
 	    	this.contents.addClickHandler(handler);
 	    }
+		
 	}
 	static class QuoteBlock extends Composite {
 		private final HTML html = new HTML();
 
-		private final QuotePopupPanel quotePopup = new QuotePopupPanel();
+		private QuotePopupPanel quotePopup=null;
 
 		public QuoteBlock() {
 			super();
 			html.setStyleName("quoted");
 			initWidget(html);
-
-			quotePopup.addClickHandler(new ClickHandler() {
-				public void onClick(ClickEvent event) {
-					quotePopup.hide();
-				}
-			});
-			
+		
 			html.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
-					if (!quotePopup.isShowing()) {
-					//TODO looks like 'isShowing()' is working incorrectly - it's always return 'false' 
+					if (!quotePopup.isAttached()) {
 	//					int popupLeft = html.getAbsoluteLeft() + html.getOffsetWidth() - quotePopup.getOffsetWidth();
 						int popupLeft = html.getAbsoluteLeft() + html.getOffsetWidth() - 410;
 						int popupTop =  html.getAbsoluteTop();
@@ -169,7 +175,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 						quotePopup.setPopupPosition(popupLeft, popupTop);
 						quotePopup.show();
 					} else {
-						quotePopup.hide();
+						quotePopup.hide(true);
 					}
 				}
 			});
@@ -178,7 +184,10 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		public void setQuotedText(String quoteText) {
 			String htmlString = "<p>" + (quoteText == null ? "" : quoteText) + "</p>";
 			html.setHTML(htmlString);
-			quotePopup.setHTML(htmlString);
+		}
+
+		public void setPopup(QuotePopupPanel quotePopup) {
+			this.quotePopup = quotePopup;
 		}
 
 	} // QuoteBlock
@@ -188,6 +197,8 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 	protected final Header header = new Header();
 
 	protected final QuoteBlock quoteBlock = new QuoteBlock();
+
+	private final QuotePopupPanel quotePopup = new QuotePopupPanel();
 
 	protected B parentQuoteBundleWidget;
 
@@ -205,6 +216,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 	 */
 	public AbstractQuoteWidget(B parentQuoteBundleWidget) {
 		super();
+		quoteBlock.setPopup(quotePopup);
 		setParentQuoteBundleWidget(parentQuoteBundleWidget);
 		panel.setStyleName("wquote");
 		panel.add(header);
@@ -357,8 +369,12 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 		QuoteInfo quoteInfo = new QuoteInfo(quote);
 		header.setQuoteTitle(quoteInfo.getTitle());
-		header.setSubTitle(quoteInfo.getSubTitle());
+		header.setShortSubTitle(quoteInfo.getShortSubTitle());
 		quoteBlock.setQuotedText(quoteInfo.getQuote());
+
+		quotePopup.setHeader(quoteInfo.getSubTitle());
+		quotePopup.setHTML(quoteInfo.getQuote());
+		
 	}
 
 	public final HandlerRegistration addQuoteHandler(IQuoteHandler handler) {
