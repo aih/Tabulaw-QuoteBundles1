@@ -5,6 +5,7 @@
  */
 package com.tabulaw.client.app.ui;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
@@ -119,6 +120,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 	}
 
 	static class QuotePopupPanel extends PopupPanel{
+		public static final int MAX_HEIGHT = 83; //used to calculate popup position only 
 		private HTML contents = new HTML();
 		private ScrollPanel scroller;
 	    public QuotePopupPanel(){
@@ -139,36 +141,38 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 	    }
 	}
 	static class QuoteBlock extends Composite {
-		private final int POPUP_TIMEOUT = 1000;
-		
-
 		private final HTML html = new HTML();
-		private boolean popupScheduled = false;
 
 		private final QuotePopupPanel quotePopup = new QuotePopupPanel();
-		private Timer t;
 
 		public QuoteBlock() {
 			super();
 			html.setStyleName("quoted");
 			initWidget(html);
-			sinkEvents(Event.ONMOUSEMOVE | Event.ONMOUSEOUT);
 
 			quotePopup.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					quotePopup.hide();
-					popupScheduled = false;
 				}
 			});
 			
-			 t = new Timer() {
-					@Override
-					public void run() {
-						
+			html.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if (!quotePopup.isShowing()) {
+					//TODO looks like 'isShowing()' is working incorrectly - it's always return 'false' 
+	//					int popupLeft = html.getAbsoluteLeft() + html.getOffsetWidth() - quotePopup.getOffsetWidth();
+						int popupLeft = html.getAbsoluteLeft() + html.getOffsetWidth() - 410;
+						int popupTop =  html.getAbsoluteTop();
+						if (html.getAbsoluteTop() + QuotePopupPanel.MAX_HEIGHT > Window.getClientHeight()) {
+							popupTop-=QuotePopupPanel.MAX_HEIGHT;
+						}
+						quotePopup.setPopupPosition(popupLeft, popupTop);
 						quotePopup.show();
+					} else {
+						quotePopup.hide();
 					}
-			 };
-					
+				}
+			});
 		}
 
 		public void setQuotedText(String quoteText) {
@@ -177,28 +181,6 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 			quotePopup.setHTML(htmlString);
 		}
 
-		@Override
-		public void onBrowserEvent(com.google.gwt.user.client.Event event) {
-			super.onBrowserEvent(event);
-//			int popupLeft = html.getAbsoluteLeft() + html.getOffsetWidth() - quotePopup.getOffsetWidth();
-			int popupLeft = html.getAbsoluteLeft() + html.getOffsetWidth() - 410;
-//			int popupTop = html.getAbsoluteTop() - quotePopup.getOffsetHeight();
-			int popupTop = html.getAbsoluteTop();
-			quotePopup.setPopupPosition(popupLeft, popupTop);
-
-			if (!popupScheduled) {
-				if (event.getTypeInt() != Event.ONMOUSEOUT) {
-					t.schedule(POPUP_TIMEOUT);
-					popupScheduled = true;
-				}
-			} else {
-				if (event.getTypeInt() == Event.ONMOUSEOUT) {
-					t.cancel();
-					popupScheduled = false;
-				}
-
-			}
-		}
 	} // QuoteBlock
 
 	protected final FlowPanel panel = new FlowPanel();

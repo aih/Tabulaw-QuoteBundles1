@@ -1037,7 +1037,7 @@ docHeaderMenuItem img{
 		height: 25px;
 	}
 	.quote-popup {
-		max-height: 150px;
+		max-height: 83px;
 	}
 .doc-static .copyQuoteIcon {
 	display: none; /* hide when in doc edit mode */

@@ -1,5 +1,7 @@
 package com.tabulaw.model;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.model.CaseRef.CitationFormatFlag;
 import com.tabulaw.util.StringUtil;
 
@@ -25,11 +27,11 @@ public class QuoteInfo {
 
 		// case doc?
 		CaseRef caseRef = doc.getCaseRef();
+		StringBuilder subtitleBuilder = new StringBuilder();
 		if(caseRef != null) {
 			String parties = caseRef.getParties();
 			if(!StringUtil.isEmpty(parties)) title = parties;
 			if (quote.getStartPage() != 0) {
-				StringBuilder subtitleBuilder = new StringBuilder();
 				subtitleBuilder.append(caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag() |
 						CitationFormatFlag.EXCLUDE_YEAR.flag()));
 				subtitleBuilder.append(", ");
@@ -50,6 +52,15 @@ public class QuoteInfo {
 				subTitle = caseRef.format(CitationFormatFlag.EXCLUDE_PARTIES.flag());
 			}
 			
+		} else {
+			DateTimeFormat fmt = DateTimeFormat.getFormat("EEE, d MMM yyyy");
+			User user = ClientModelCache.get().getUser();
+			subtitleBuilder	.append(user.getName())
+							.append(" (")
+							.append(fmt.format(doc.getDate()))
+							.append(")");
+							
+			subTitle = subtitleBuilder.toString();
 		}
 		quoteString=quote.getQuote();
 		
