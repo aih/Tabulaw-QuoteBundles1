@@ -1,4 +1,4 @@
-package com.tabulaw.server;
+package com.tabulaw.oauth;
 
 import java.util.Map;
 

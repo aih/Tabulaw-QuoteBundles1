@@ -1,4 +1,4 @@
-package com.tabulaw.server;
+package com.tabulaw.oauth;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,8 +16,7 @@ import com.google.gdata.client.authn.oauth.GoogleOAuthHelper;
 import com.google.gdata.client.authn.oauth.OAuthException;
 import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
 import com.tabulaw.model.User;
-import com.tabulaw.server.bean.AnonymousGoogleOAuthParametersProvider;
-import com.tabulaw.server.bean.IGoogleOAuthParametersProvider;
+import com.tabulaw.server.UserContext;
 
 @SuppressWarnings("serial")
 public class OAuthPersistAccessTokenServlet extends HttpServlet {
@@ -25,7 +24,7 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 	private final static Log log = LogFactory
 			.getLog(OAuthPersistAccessTokenServlet.class);
 
-	private IGoogleOAuthParametersProvider authParametersProvider = new AnonymousGoogleOAuthParametersProvider();
+	private OAuthParametersProvider authParametersProvider = new GoogleAnonymousOAuthParametersProvider();
 
 	@Override
 	protected void doGet(HttpServletRequest request,
@@ -37,7 +36,7 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 				response.getOutputStream());
 
 		if (request.getSession().getAttribute(
-				IGoogleOAuthParametersProvider.OAUTH_PARAMETERS) != null) {
+				OAuthParametersProvider.OAUTH_PARAMETERS) != null) {
 			getAndPersistAccessToken(request);
 		}
 	}
@@ -56,8 +55,8 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 			oauthHelper.getAccessToken(oauthParameters);
 			oauthParameters.getOAuthTokenSecret();
 			request.getSession().setAttribute(
-					IGoogleOAuthParametersProvider.OAUTH_PARAMETERS, null);
-			if (IGoogleOAuthParametersProvider.DATABASE_BASED_ACCESS_TOKEN) {
+					OAuthParametersProvider.OAUTH_PARAMETERS, null);
+			if (OAuthParametersProvider.DATABASE_BASED_ACCESS_TOKEN) {
 				UserContext uc = (UserContext) request.getSession(false)
 						.getAttribute(UserContext.KEY);
 				User user = uc.getUser();
@@ -66,7 +65,7 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 						.getExtraParameters()));
 			} else {
 				request.getSession().setAttribute(
-						IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS,
+						OAuthParametersProvider.OAUTH_ACCESS_PARAMETERS,
 						oauthParameters);
 			}
 		} catch (OAuthException e) {

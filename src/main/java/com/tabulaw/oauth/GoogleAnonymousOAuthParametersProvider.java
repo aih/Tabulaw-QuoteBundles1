@@ -1,4 +1,4 @@
-package com.tabulaw.server.bean;
+package com.tabulaw.oauth;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -7,15 +7,13 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
 import com.tabulaw.model.User;
-import com.tabulaw.server.OAuthAuthorizeServlet;
-import com.tabulaw.server.OAuthParameters;
 import com.tabulaw.server.UserContext;
 
-public class AnonymousGoogleOAuthParametersProvider implements
-		IGoogleOAuthParametersProvider {
+public class GoogleAnonymousOAuthParametersProvider implements
+		OAuthParametersProvider {
 
 	private final static Log log = LogFactory
-			.getLog(AnonymousGoogleOAuthParametersProvider.class);
+			.getLog(GoogleAnonymousOAuthParametersProvider.class);
 
 	private HttpServletRequest request;
 
@@ -26,7 +24,7 @@ public class AnonymousGoogleOAuthParametersProvider implements
 
 	@Override
 	public GoogleOAuthParameters getGoogleDocumentsOAuthParameters() {
-		if (IGoogleOAuthParametersProvider.DATABASE_BASED_ACCESS_TOKEN) {
+		if (OAuthParametersProvider.DATABASE_BASED_ACCESS_TOKEN) {
 			UserContext uc = (UserContext) request.getSession(false)
 					.getAttribute(UserContext.KEY);
 			User user = uc.getUser();

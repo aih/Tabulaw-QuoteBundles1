@@ -1,4 +1,4 @@
-package com.tabulaw.server;
+package com.tabulaw.oauth;
 
 import java.io.IOException;
 
@@ -15,8 +15,7 @@ import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
 import com.google.gdata.client.authn.oauth.OAuthException;
 import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
 import com.tabulaw.model.User;
-import com.tabulaw.server.bean.AnonymousGoogleOAuthParametersProvider;
-import com.tabulaw.server.bean.IGoogleOAuthParametersProvider;
+import com.tabulaw.server.UserContext;
 
 @SuppressWarnings("serial")
 public class OAuthAuthorizeServlet extends HttpServlet {
@@ -26,7 +25,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 
 	public final static String REDIRECT_URL = "/oauthpersistaccesstoken";
 
-	private IGoogleOAuthParametersProvider authParametersProvider = new AnonymousGoogleOAuthParametersProvider();
+	private OAuthParametersProvider authParametersProvider = new GoogleAnonymousOAuthParametersProvider();
 
 	@Override
 	protected void service(HttpServletRequest request,
@@ -35,7 +34,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 		if ("true".equals(request.getParameter("relogin"))) {
 			resetTokens(request);
 		}
-		if (IGoogleOAuthParametersProvider.DATABASE_BASED_ACCESS_TOKEN) {
+		if (OAuthParametersProvider.DATABASE_BASED_ACCESS_TOKEN) {
 			UserContext uc = (UserContext) request.getSession(false)
 					.getAttribute(UserContext.KEY);
 			User user = uc.getUser();
@@ -47,7 +46,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 			}
 		} else {
 			if (request.getSession().getAttribute(
-					IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS) == null) {
+					OAuthParametersProvider.OAUTH_ACCESS_PARAMETERS) == null) {
 				authorize(request, response);
 			} else {
 				forward(request, response);
@@ -89,14 +88,14 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 	private void persistToken(HttpServletRequest request,
 			GoogleOAuthParameters oauthParameters) {
 		request.getSession().setAttribute(
-				IGoogleOAuthParametersProvider.OAUTH_PARAMETERS,
+				OAuthParametersProvider.OAUTH_PARAMETERS,
 				oauthParameters);
 	}
 
 	private void resetTokens(HttpServletRequest request) {
 		request.getSession().setAttribute(
-				IGoogleOAuthParametersProvider.OAUTH_PARAMETERS, null);
+				OAuthParametersProvider.OAUTH_PARAMETERS, null);
 		request.getSession().setAttribute(
-				IGoogleOAuthParametersProvider.OAUTH_ACCESS_PARAMETERS, null);
+				OAuthParametersProvider.OAUTH_ACCESS_PARAMETERS, null);
 	}
 }

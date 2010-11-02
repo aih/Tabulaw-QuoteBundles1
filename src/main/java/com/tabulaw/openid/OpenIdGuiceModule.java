@@ -26,9 +26,9 @@ import com.google.step2.xmlsimplesign.DisjunctiveCertValidator;
  * Guice module for configuring the Step2 library. Modified from the original
  * example consumer in the Step2 library to be slightly simpler.
  */
-public class GuiceModule extends AbstractModule {
+public class OpenIdGuiceModule extends AbstractModule {
 
-	public GuiceModule() {
+	public OpenIdGuiceModule() {
 	}
 
 	@Override

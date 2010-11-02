@@ -56,7 +56,7 @@
 
 	<context-param>
 		<param-name>guice-modules</param-name>
-		<param-value>com.tabulaw.openid.GuiceModule</param-value>
+		<param-value>com.tabulaw.openid.OpenIdGuiceModule</param-value>
 	</context-param>
 
 	<filter>
@@ -189,7 +189,7 @@
 
 	<servlet>
 		<servlet-name>OAuthAuthorize</servlet-name>
-		<servlet-class>com.tabulaw.server.OAuthAuthorizeServlet</servlet-class>
+		<servlet-class>com.tabulaw.oauth.OAuthAuthorizeServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>OAuthAuthorize</servlet-name>
@@ -199,7 +199,7 @@
 
 	<servlet>
 		<servlet-name>OAuthPersistAccessToken</servlet-name>
-		<servlet-class>com.tabulaw.server.OAuthPersistAccessTokenServlet</servlet-class>
+		<servlet-class>com.tabulaw.oauth.OAuthPersistAccessTokenServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>OAuthPersistAccessToken</servlet-name>
@@ -210,7 +210,7 @@
 
 	<servlet>
         <servlet-name>OpenIdServlet</servlet-name>
-        <servlet-class>com.tabulaw.server.OpenIdServlet</servlet-class>
+        <servlet-class>com.tabulaw.openid.OpenIdServlet</servlet-class>
         <!-- 
 		<init-param>
             <param-name>realm</param-name>

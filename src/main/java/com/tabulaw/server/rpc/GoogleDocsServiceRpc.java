@@ -32,11 +32,11 @@ import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.User;
-import com.tabulaw.server.OAuthParameters;
+import com.tabulaw.oauth.GoogleAnonymousOAuthParametersProvider;
+import com.tabulaw.oauth.OAuthParametersProvider;
+import com.tabulaw.oauth.OAuthParameters;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
-import com.tabulaw.server.bean.AnonymousGoogleOAuthParametersProvider;
-import com.tabulaw.server.bean.IGoogleOAuthParametersProvider;
 import com.tabulaw.service.entity.UserDataService;
 
 @SuppressWarnings("serial")
@@ -48,7 +48,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 
 	private final HttpClient client = new HttpClient();
 
-	private IGoogleOAuthParametersProvider authParametersProvider = new AnonymousGoogleOAuthParametersProvider();
+	private OAuthParametersProvider authParametersProvider = new GoogleAnonymousOAuthParametersProvider();
 
 	@Override
 	public GoogleDocumentListPayload getDocuments() {

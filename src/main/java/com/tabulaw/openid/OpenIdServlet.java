@@ -1,4 +1,4 @@
-package com.tabulaw.server;
+package com.tabulaw.openid;
 
 import java.io.IOException;
 
@@ -29,7 +29,6 @@ import com.google.step2.consumer.ProviderInfoNotFoundException;
 import com.google.step2.discovery.IdpIdentifier;
 import com.google.step2.openid.ui.UiMessageRequest;
 import com.google.step2.servlet.InjectableServlet;
-import com.tabulaw.openid.UserInfo;
 
 @SuppressWarnings("serial")
 public class OpenIdServlet extends InjectableServlet {
