@@ -45,12 +45,19 @@
 	</welcome-file-list>
 
 	<listener>
+		<listener-class>com.google.step2.servlet.GuiceServletContextListener</listener-class>
+	</listener>
+	<listener>
 		<listener-class>com.tabulaw.server.Bootstrapper</listener-class>
 	</listener>
 	<listener>
 		<listener-class>com.tabulaw.rest.RESTSessionManager</listener-class>
 	</listener>
 
+	<context-param>
+		<param-name>guice-modules</param-name>
+		<param-value>com.tabulaw.openid.GuiceModule</param-value>
+	</context-param>
 
 	<filter>
 		<filter-name>AuthenticationProcessingFilter</filter-name>
@@ -204,17 +211,19 @@
 	<servlet>
         <servlet-name>OpenIdServlet</servlet-name>
         <servlet-class>com.tabulaw.server.OpenIdServlet</servlet-class>
+        <!-- 
 		<init-param>
             <param-name>realm</param-name>
             <param-value>http://www.tabulaw.com/</param-value>
         </init-param>
+         -->
         <init-param>
             <param-name>return_to_path</param-name>
             <param-value>/openid</param-value>
         </init-param>
         <init-param>
             <param-name>home_path</param-name>
-            <param-value>/</param-value>
+            <param-value>/?gwt.codesvr=127.0.0.1:9997</param-value>
         </init-param>        
     </servlet>
     <servlet-mapping>
