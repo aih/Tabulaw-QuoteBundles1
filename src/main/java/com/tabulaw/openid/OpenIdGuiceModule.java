@@ -47,7 +47,7 @@ public class OpenIdGuiceModule extends AbstractModule {
 				InMemoryConsumerAssociationStore.class).in(Scopes.SINGLETON);
 		
 		bind(OAuthProviderInfoStore.class)
-        .to(GoogleAnonymousProviderInfoStore.class).in(Scopes.SINGLETON);
+        .to(GoogleDevelopmentProviderInfoStore.class).in(Scopes.SINGLETON);
 	}
 
 	private OAuthClient getOAuthClient() {

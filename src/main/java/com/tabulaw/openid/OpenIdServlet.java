@@ -144,6 +144,7 @@ public class OpenIdServlet extends InjectableServlet {
 			OAuthAccessor accessor = providerStore.getOAuthAccessor("google");
 			helper.requestOauthAuthorization(accessor.consumer.consumerKey,
 			// "http://docs.google.com/feeds/");
+			// "http://www.google.com/docs/feeds/");
 					"http://www.google.com/m8/feeds/");
 		} catch (ProviderInfoNotFoundException e) {
 			log.error("", e);
@@ -156,9 +157,10 @@ public class OpenIdServlet extends InjectableServlet {
 
 		authReq.addExtension(uiExtension);
 		authReq.setRealm(realm);
-		
-		request.getSession().setAttribute("discovered", helper.getDiscoveryInformation());
-		
+
+		request.getSession().setAttribute("discovered",
+				helper.getDiscoveryInformation());
+
 		return authReq;
 	}
 
@@ -275,7 +277,7 @@ public class OpenIdServlet extends InjectableServlet {
 	UserInfo onSuccess(AuthResponseHelper helper, HttpServletRequest request) {
 		for (Object o : request.getParameterMap().entrySet()) {
 			Map.Entry e = (Map.Entry) o;
-			System.out.println(e.getKey() + " -> " + e.getValue());
+			log.debug(e.getKey() + " -> " + e.getValue());
 		}
 		try {
 			if (helper.hasHybridOauthExtension()) {

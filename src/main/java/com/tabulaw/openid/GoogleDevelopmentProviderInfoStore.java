@@ -7,9 +7,9 @@ import net.oauth.OAuthServiceProvider;
 import com.google.step2.consumer.OAuthProviderInfoStore;
 import com.google.step2.consumer.ProviderInfoNotFoundException;
 
-public class GoogleAnonymousProviderInfoStore implements OAuthProviderInfoStore {
+public class GoogleDevelopmentProviderInfoStore implements OAuthProviderInfoStore {
 
-	public GoogleAnonymousProviderInfoStore() {
+	public GoogleDevelopmentProviderInfoStore() {
 	}
 
 	@Override
@@ -24,8 +24,11 @@ public class GoogleAnonymousProviderInfoStore implements OAuthProviderInfoStore 
 
 	private OAuthAccessor createAccessor() {
 		OAuthServiceProvider provider = new OAuthServiceProvider("", "", "");
-		OAuthConsumer consumer = new OAuthConsumer("/", "127.0.0.1:8888",
-				"anonymous", provider);
+		// OAuthConsumer consumer = new OAuthConsumer("/",
+		// "http://127.0.0.1:8888", null, provider);
+		OAuthConsumer consumer = new OAuthConsumer("/",
+				"757542196935.apps.googleusercontent.com",
+				"h95nuWxcDao6lzT+HJ6wcpND", provider);
 		return new OAuthAccessor(consumer);
 	}
 }
