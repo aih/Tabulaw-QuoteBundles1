@@ -80,6 +80,10 @@
 			<id>sonatype</id>
 			<url>http://oss.sonatype.org/content/repositories/openid4java-snapshots</url>
 		</repository>
+		<repository>
+			<id>oauth</id>
+			<url>http://oauth.googlecode.com/svn/code/maven</url>
+		</repository>
 	</repositories>
 
 	<profiles>
