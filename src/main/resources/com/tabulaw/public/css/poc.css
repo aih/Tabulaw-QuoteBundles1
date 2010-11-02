@@ -541,7 +541,9 @@ div.ro {
 	padding: 2px 1px 0 2px;
 	font-size: 11px;
 	height: 27px;
-	overflow: hidden;	
+	overflow: hidden;
+	cursor: pointer;
+	
 }
 
 /* docUpload widget */
@@ -1035,6 +1037,7 @@ docHeaderMenuItem img{
 /*		max-height: 50px;*/
 		overflow: hidden;
 		height: 25px;
+		cursor: pointer;
 	}
 	.quote-popup {
 		max-height: 83px;

@@ -420,6 +420,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	public void onValueChange(ValueChangeEvent<ViewMode> event) {
 		wDocQuoteBundle.setDragController(quoteController);
 		wDocQuoteBundle.makeQuotesDraggable(event.getValue() == ViewMode.EDIT);
+		resizeHandlerManager.fireEvent(new QuoteResizeEvent());
 	}
 
 	@Override
