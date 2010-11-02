@@ -773,17 +773,16 @@
 			<version>4.0.1</version>
 		</dependency>
 		<!-- OpenID -->
-		<!-- <dependency> <groupId>com.google.step2</groupId> <artifactId>step2-consumer</artifactId> 
-			<version>1-SNAPSHOT</version> </dependency> -->
 		<dependency>
-			<groupId>org.openid4java</groupId>
-			<artifactId>openid4java-nodeps</artifactId>
-			<version>0.9.6-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.google-collections</groupId>
-			<artifactId>google-collect</artifactId>
-			<version>snapshot-20080321</version>
+			<groupId>com.google.step2</groupId>
+			<artifactId>step2-consumer</artifactId>
+			<version>1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-jcl</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 </project>

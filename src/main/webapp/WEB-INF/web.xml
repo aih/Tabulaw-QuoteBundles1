@@ -223,7 +223,7 @@
         </init-param>
         <init-param>
             <param-name>home_path</param-name>
-            <param-value>/?gwt.codesvr=127.0.0.1:9997</param-value>
+            <param-value>/Poc.html?gwt.codesvr=127.0.0.1:9997</param-value>
         </init-param>        
     </servlet>
     <servlet-mapping>
