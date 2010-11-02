@@ -12,6 +12,7 @@ import com.google.inject.CreationException;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
+import com.google.step2.consumer.OAuthProviderInfoStore;
 import com.google.step2.discovery.DefaultHostMetaFetcher;
 import com.google.step2.discovery.HostMetaFetcher;
 import com.google.step2.hybrid.HybridOauthMessage;
@@ -48,6 +49,9 @@ public class GuiceModule extends AbstractModule {
 
 		bind(ConsumerAssociationStore.class).to(
 				InMemoryConsumerAssociationStore.class).in(Scopes.SINGLETON);
+		
+		bind(OAuthProviderInfoStore.class)
+        .to(GoogleAnonymousProviderInfoStore.class).in(Scopes.SINGLETON);
 	}
 
 	private OAuthClient getOAuthClient() {

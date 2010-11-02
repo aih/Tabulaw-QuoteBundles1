@@ -8,12 +8,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import net.oauth.OAuthAccessor;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openid4java.OpenIDException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
+import org.openid4java.message.MessageException;
 import org.openid4java.message.ParameterList;
 
 import com.google.inject.Inject;
@@ -21,6 +24,8 @@ import com.google.step2.AuthRequestHelper;
 import com.google.step2.AuthResponseHelper;
 import com.google.step2.ConsumerHelper;
 import com.google.step2.Step2;
+import com.google.step2.consumer.OAuthProviderInfoStore;
+import com.google.step2.consumer.ProviderInfoNotFoundException;
 import com.google.step2.discovery.IdpIdentifier;
 import com.google.step2.openid.ui.UiMessageRequest;
 import com.google.step2.servlet.InjectableServlet;
@@ -33,6 +38,8 @@ public class OpenIdServlet extends InjectableServlet {
 
 	@Inject
 	protected ConsumerHelper consumerHelper;
+	@Inject
+	protected OAuthProviderInfoStore providerStore;
 
 	private String realm;
 	private String returnToPath;
@@ -139,6 +146,15 @@ public class OpenIdServlet extends InjectableServlet {
 
 		UiMessageRequest uiExtension = new UiMessageRequest();
 		uiExtension.setIconRequest(true);
+
+		try {
+			OAuthAccessor accessor = providerStore.getOAuthAccessor("google");
+			helper.requestOauthAuthorization(accessor.consumer.consumerKey,
+					"http://www.google.com/m8/feeds/");
+		} catch (ProviderInfoNotFoundException e) {
+			log.error("", e);
+		}
+
 		authReq.addExtension(uiExtension);
 
 		session.setAttribute("discovered", helper.getDiscoveryInformation());
@@ -256,6 +272,16 @@ public class OpenIdServlet extends InjectableServlet {
 	 * @return User representation
 	 */
 	UserInfo onSuccess(AuthResponseHelper helper, HttpServletRequest request) {
+		try {
+			ParameterList params = helper.getHybridOauthResponse()
+					.getParameters();
+			for (Object param : params.getParameters()) {
+				System.out.println(param + " -> "
+						+ params.getParameterValue(param.toString()));
+			}
+		} catch (MessageException e) {
+			log.error("",e);
+		}
 		return new UserInfo(helper.getClaimedId().toString(),
 				helper.getAxFetchAttributeValue(Step2.AxSchema.EMAIL),
 				helper.getAxFetchAttributeValue(Step2.AxSchema.FIRST_NAME),
