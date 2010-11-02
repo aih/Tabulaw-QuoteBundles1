@@ -17,10 +17,6 @@ import com.google.step2.discovery.DefaultHostMetaFetcher;
 import com.google.step2.discovery.HostMetaFetcher;
 import com.google.step2.hybrid.HybridOauthMessage;
 import com.google.step2.openid.ax2.AxMessage2;
-import com.google.step2.xmlsimplesign.CertValidator;
-import com.google.step2.xmlsimplesign.CnConstraintCertValidator;
-import com.google.step2.xmlsimplesign.DefaultCertValidator;
-import com.google.step2.xmlsimplesign.DisjunctiveCertValidator;
 
 /**
  * Guice module for configuring the Step2 library. Modified from the original
@@ -58,6 +54,7 @@ public class OpenIdGuiceModule extends AbstractModule {
 		return new OAuthClient(new net.oauth.client.httpclient4.HttpClient4());
 	}
 
+	/*-
 	@Provides
 	@Singleton
 	public CertValidator provideCertValidator(
@@ -65,14 +62,13 @@ public class OpenIdGuiceModule extends AbstractModule {
 		CertValidator hardCodedValidator = new CnConstraintCertValidator() {
 			@Override
 			protected String getRequiredCn(String authority) {
-				// Trust Google for signing discovery documents
 				return "hosted-id.google.com";
 			}
 		};
 
 		return new DisjunctiveCertValidator(defaultValidator,
 				hardCodedValidator);
-	}
+	}*/
 
 	@Provides
 	@Singleton

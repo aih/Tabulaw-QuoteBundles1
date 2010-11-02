@@ -1,6 +1,7 @@
 package com.tabulaw.openid;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -139,24 +140,25 @@ public class OpenIdServlet extends InjectableServlet {
 				returnToUrl);
 		addAttributes(helper);
 
-		HttpSession session = request.getSession();
-		AuthRequest authReq = helper.generateRequest();
-		authReq.setRealm(realm);
-
-		UiMessageRequest uiExtension = new UiMessageRequest();
-		uiExtension.setIconRequest(true);
-
 		try {
 			OAuthAccessor accessor = providerStore.getOAuthAccessor("google");
 			helper.requestOauthAuthorization(accessor.consumer.consumerKey,
+			// "http://docs.google.com/feeds/");
 					"http://www.google.com/m8/feeds/");
 		} catch (ProviderInfoNotFoundException e) {
 			log.error("", e);
 		}
 
-		authReq.addExtension(uiExtension);
+		AuthRequest authReq = helper.generateRequest();
 
-		session.setAttribute("discovered", helper.getDiscoveryInformation());
+		UiMessageRequest uiExtension = new UiMessageRequest();
+		uiExtension.setIconRequest(true);
+
+		authReq.addExtension(uiExtension);
+		authReq.setRealm(realm);
+		
+		request.getSession().setAttribute("discovered", helper.getDiscoveryInformation());
+		
 		return authReq;
 	}
 
@@ -271,15 +273,23 @@ public class OpenIdServlet extends InjectableServlet {
 	 * @return User representation
 	 */
 	UserInfo onSuccess(AuthResponseHelper helper, HttpServletRequest request) {
+		for (Object o : request.getParameterMap().entrySet()) {
+			Map.Entry e = (Map.Entry) o;
+			System.out.println(e.getKey() + " -> " + e.getValue());
+		}
 		try {
-			ParameterList params = helper.getHybridOauthResponse()
-					.getParameters();
-			for (Object param : params.getParameters()) {
-				System.out.println(param + " -> "
-						+ params.getParameterValue(param.toString()));
+			if (helper.hasHybridOauthExtension()) {
+				ParameterList params = helper.getHybridOauthResponse()
+						.getParameters();
+				for (Object param : params.getParameters()) {
+					System.out.println(param + " -> "
+							+ params.getParameterValue(param.toString()));
+				}
+			} else {
+				log.warn("No OpenID + OAuth Hybrid !!!");
 			}
 		} catch (MessageException e) {
-			log.error("",e);
+			log.error("", e);
 		}
 		return new UserInfo(helper.getClaimedId().toString(),
 				helper.getAxFetchAttributeValue(Step2.AxSchema.EMAIL),
