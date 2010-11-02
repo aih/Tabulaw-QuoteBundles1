@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import net.oauth.OAuthAccessor;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,7 +111,17 @@ public class OpenIdServlet extends InjectableServlet {
 		try {
 			UserInfo user = completeAuthentication(req);
 			req.getSession().setAttribute("user", user);
-			resp.sendRedirect(homePath);
+			if (user == null) {
+				IOUtils.write("Invalid OpenId authorization.",
+						resp.getOutputStream());
+			} else if (user.isHasOpenIdOAuth()) {
+				IOUtils.write("Success: OpenId+OAuth works.",
+						resp.getOutputStream());
+			} else {
+				IOUtils.write("Failure: OpenId+OAuth is not working.",
+						resp.getOutputStream());
+			}
+			//resp.sendRedirect(homePath);
 		} catch (OpenIDException e) {
 			throw new ServletException("Error processing OpenID response", e);
 		}
@@ -296,7 +307,8 @@ public class OpenIdServlet extends InjectableServlet {
 		return new UserInfo(helper.getClaimedId().toString(),
 				helper.getAxFetchAttributeValue(Step2.AxSchema.EMAIL),
 				helper.getAxFetchAttributeValue(Step2.AxSchema.FIRST_NAME),
-				helper.getAxFetchAttributeValue(Step2.AxSchema.LAST_NAME));
+				helper.getAxFetchAttributeValue(Step2.AxSchema.LAST_NAME),
+				helper.hasHybridOauthExtension());
 	}
 
 	/**
