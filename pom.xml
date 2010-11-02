@@ -76,6 +76,10 @@
 			<name>Cobogw repository at googlecode</name>
 			<url>http://cobogw.googlecode.com/svn/maven2</url>
 		</repository>
+		<repository>
+			<id>sonatype</id>
+			<url>http://oss.sonatype.org/content/repositories/openid4java-snapshots</url>
+		</repository>
 	</repositories>
 
 	<profiles>
@@ -772,17 +776,53 @@
 			<artifactId>httpcore</artifactId>
 			<version>4.0.1</version>
 		</dependency>
-		<!-- OpenID -->
+		<!-- OpenID+OAuth -->
 		<dependency>
-			<groupId>com.google.step2</groupId>
-			<artifactId>step2-consumer</artifactId>
-			<version>1-SNAPSHOT</version>
+			<groupId>org.openid4java</groupId>
+			<artifactId>openid4java-nodeps</artifactId>
+			<version>0.9.6-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openxri</groupId>
+			<artifactId>openxri-syntax</artifactId>
+			<version>1.2.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-jcl</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.openxri</groupId>
+			<artifactId>openxri-client</artifactId>
+			<version>1.2.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-jcl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>net.oauth.core</groupId>
+			<artifactId>oauth-httpclient4</artifactId>
+			<version>20090913</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.google-collections</groupId>
+			<artifactId>google-collect</artifactId>
+			<version>snapshot-20080321</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.step2</groupId>
+			<artifactId>step2-common</artifactId>
+			<version>1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.step2</groupId>
+			<artifactId>step2-consumer</artifactId>
+			<version>1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
