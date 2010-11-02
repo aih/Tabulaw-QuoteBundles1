@@ -3,6 +3,6 @@ call installall.bat
 cd ../..
 cd gdata
 call installall.bat
-cd ../..
+cd ..
 cd step2
 call installall.bat
