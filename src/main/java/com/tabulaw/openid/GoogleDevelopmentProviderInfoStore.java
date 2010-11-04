@@ -7,6 +7,7 @@ import net.oauth.OAuthServiceProvider;
 import com.google.step2.consumer.OAuthProviderInfoStore;
 import com.google.step2.consumer.ProviderInfoNotFoundException;
 
+@Deprecated
 public class GoogleDevelopmentProviderInfoStore implements OAuthProviderInfoStore {
 
 	public GoogleDevelopmentProviderInfoStore() {

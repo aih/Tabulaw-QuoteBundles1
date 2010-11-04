@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import net.oauth.OAuthAccessor;
+import net.oauth.OAuthConsumer;
+import net.oauth.OAuthServiceProvider;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -26,8 +28,6 @@ import com.google.step2.AuthRequestHelper;
 import com.google.step2.AuthResponseHelper;
 import com.google.step2.ConsumerHelper;
 import com.google.step2.Step2;
-import com.google.step2.consumer.OAuthProviderInfoStore;
-import com.google.step2.consumer.ProviderInfoNotFoundException;
 import com.google.step2.discovery.IdpIdentifier;
 import com.google.step2.openid.ui.UiMessageRequest;
 import com.google.step2.servlet.InjectableServlet;
@@ -39,12 +39,14 @@ public class OpenIdServlet extends InjectableServlet {
 
 	@Inject
 	protected ConsumerHelper consumerHelper;
-	@Inject
-	protected OAuthProviderInfoStore providerStore;
+	// @Inject
+	// protected OAuthProviderInfoStore providerStore;
 
 	private String realm;
 	private String returnToPath;
 	private String homePath;
+	private String consumerKey;
+	private String consumerSecret;
 
 	/**
 	 * Init the servlet. For demo purposes, we're just using an in-memory
@@ -61,6 +63,8 @@ public class OpenIdServlet extends InjectableServlet {
 		returnToPath = getInitParameter("return_to_path", "/openid");
 		homePath = getInitParameter("home_path", "/");
 		realm = getInitParameter("realm", null);
+		consumerKey = getInitParameter("consumerKey", "http://127.0.0.1:8888");
+		consumerSecret = getInitParameter("consumerSecret", "");
 	}
 
 	/**
@@ -121,7 +125,7 @@ public class OpenIdServlet extends InjectableServlet {
 				IOUtils.write("Failure: OpenId+OAuth is not working.",
 						resp.getOutputStream());
 			}
-			//resp.sendRedirect(homePath);
+			// resp.sendRedirect(homePath);
 		} catch (OpenIDException e) {
 			throw new ServletException("Error processing OpenID response", e);
 		}
@@ -152,12 +156,14 @@ public class OpenIdServlet extends InjectableServlet {
 		addAttributes(helper);
 
 		try {
-			OAuthAccessor accessor = providerStore.getOAuthAccessor("google");
+			// OAuthAccessor accessor =
+			// providerStore.getOAuthAccessor("google");
+			OAuthAccessor accessor = createOAuthAccessor();
 			helper.requestOauthAuthorization(accessor.consumer.consumerKey,
 			// "http://docs.google.com/feeds/");
 			// "http://www.google.com/docs/feeds/");
 					"http://www.google.com/m8/feeds/");
-		} catch (ProviderInfoNotFoundException e) {
+		} catch (Exception e) {
 			log.error("", e);
 		}
 
@@ -173,6 +179,13 @@ public class OpenIdServlet extends InjectableServlet {
 				helper.getDiscoveryInformation());
 
 		return authReq;
+	}
+
+	private OAuthAccessor createOAuthAccessor() {
+		OAuthServiceProvider provider = new OAuthServiceProvider("", "", "");
+		OAuthConsumer consumer = new OAuthConsumer(homePath, consumerKey,
+				consumerSecret, provider);
+		return new OAuthAccessor(consumer);
 	}
 
 	/**
@@ -285,6 +298,7 @@ public class OpenIdServlet extends InjectableServlet {
 	 *            Current servlet request
 	 * @return User representation
 	 */
+	@SuppressWarnings("rawtypes")
 	UserInfo onSuccess(AuthResponseHelper helper, HttpServletRequest request) {
 		for (Object o : request.getParameterMap().entrySet()) {
 			Map.Entry e = (Map.Entry) o;

@@ -226,6 +226,14 @@
             <!-- <param-value>/Poc.html?gwt.codesvr=127.0.0.1:9997</param-value> -->
             <param-value>/Poc.html</param-value>
         </init-param>        
+        <init-param>
+            <param-name>consumerKey</param-name>
+            <param-value>dev.tabulaw.com</param-value>
+        </init-param>
+        <init-param>
+            <param-name>consumerSecret</param-name>
+            <param-value>c72cJB/WIXJuAtc9Ob8yq4GT</param-value>
+        </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>OpenIdServlet</servlet-name>
