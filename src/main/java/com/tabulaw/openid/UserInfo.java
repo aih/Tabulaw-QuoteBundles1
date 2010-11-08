@@ -6,8 +6,9 @@ import java.io.Serializable;
  * Simple representation of an authenticated user.
  */
 public class UserInfo implements Serializable {
-	private static final long serialVersionUID = 1L;
 
+	private static final long serialVersionUID = -6259021984767685123L;
+	
 	private String claimedId;
 	private String email;
 	private String firstName;

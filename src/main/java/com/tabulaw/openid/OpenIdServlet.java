@@ -31,6 +31,9 @@ import com.google.step2.Step2;
 import com.google.step2.discovery.IdpIdentifier;
 import com.google.step2.openid.ui.UiMessageRequest;
 import com.google.step2.servlet.InjectableServlet;
+import com.tabulaw.model.User;
+import com.tabulaw.server.PersistContext;
+import com.tabulaw.server.UserContext;
 
 @SuppressWarnings("serial")
 public class OpenIdServlet extends InjectableServlet {
@@ -39,8 +42,6 @@ public class OpenIdServlet extends InjectableServlet {
 
 	@Inject
 	protected ConsumerHelper consumerHelper;
-	// @Inject
-	// protected OAuthProviderInfoStore providerStore;
 
 	private String realm;
 	private String returnToPath;
@@ -115,12 +116,14 @@ public class OpenIdServlet extends InjectableServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		try {
-			UserInfo user = completeAuthentication(req);
-			req.getSession().setAttribute("user", user);
-			if (user == null) {
+			UserInfo openIdUser = completeAuthentication(req);
+			User user = doSignInUser(req, resp, openIdUser);
+			doReLoginUser(user, req, resp);
+			// req.getSession().setAttribute("user", openIdUser);
+			if (openIdUser == null) {
 				IOUtils.write("Invalid OpenId authorization.",
 						resp.getOutputStream());
-			} else if (user.isHasOpenIdOAuth()) {
+			} else if (openIdUser.isHasOpenIdOAuth()) {
 				IOUtils.write("Success: OpenId+OAuth works.",
 						resp.getOutputStream());
 			} else {
@@ -132,6 +135,35 @@ public class OpenIdServlet extends InjectableServlet {
 			}
 		} catch (OpenIDException e) {
 			throw new ServletException("Error processing OpenID response", e);
+		}
+	}
+
+	private User doSignInUser(HttpServletRequest req, HttpServletResponse resp,
+			UserInfo openIdUser) {
+		UserSignIn service = new UserSignIn((PersistContext) req
+				.getSession(false).getServletContext()
+				.getAttribute(PersistContext.KEY));
+		return service.doUserSignIn(openIdUser);
+	}
+
+	private void doReLoginUser(User user, HttpServletRequest req,
+			HttpServletResponse resp) throws IOException {
+		logout(req);
+		if (user != null) {
+			HttpSession session = req.getSession();
+			UserContext context = new UserContext();
+			context.setUser(user);
+			session.setAttribute(UserContext.KEY, context);
+		}
+	}
+
+	private void logout(HttpServletRequest req) {
+		try {
+			HttpSession session = req.getSession(false);
+			if (session != null) {
+				session.invalidate();
+			}
+		} catch (IllegalStateException e) {
 		}
 	}
 
@@ -148,8 +180,8 @@ public class OpenIdServlet extends InjectableServlet {
 	 * @throws org.openid4java.OpenIDException
 	 *             if unable to discover the OpenID endpoint
 	 */
-	AuthRequest startAuthentication(String op, HttpServletRequest request)
-			throws OpenIDException {
+	private AuthRequest startAuthentication(String op,
+			HttpServletRequest request) throws OpenIDException {
 		IdpIdentifier openId = new IdpIdentifier(op);
 
 		String realm = realm(request);
@@ -160,8 +192,6 @@ public class OpenIdServlet extends InjectableServlet {
 		addAttributes(helper);
 
 		try {
-			// OAuthAccessor accessor =
-			// providerStore.getOAuthAccessor("google");
 			OAuthAccessor accessor = createOAuthAccessor();
 			helper.requestOauthAuthorization(accessor.consumer.consumerKey,
 			// "http://docs.google.com/feeds/");

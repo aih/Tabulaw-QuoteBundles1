@@ -12,7 +12,6 @@ import com.google.inject.CreationException;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
-import com.google.step2.consumer.OAuthProviderInfoStore;
 import com.google.step2.discovery.DefaultHostMetaFetcher;
 import com.google.step2.discovery.HostMetaFetcher;
 import com.google.step2.hybrid.HybridOauthMessage;
@@ -45,30 +44,11 @@ public class OpenIdGuiceModule extends AbstractModule {
 
 		bind(ConsumerAssociationStore.class).to(
 				InMemoryConsumerAssociationStore.class).in(Scopes.SINGLETON);
-		
-		bind(OAuthProviderInfoStore.class)
-        .to(GoogleDevelopmentProviderInfoStore.class).in(Scopes.SINGLETON);
 	}
 
 	private OAuthClient getOAuthClient() {
 		return new OAuthClient(new net.oauth.client.httpclient4.HttpClient4());
 	}
-
-	/*-
-	@Provides
-	@Singleton
-	public CertValidator provideCertValidator(
-			DefaultCertValidator defaultValidator) {
-		CertValidator hardCodedValidator = new CnConstraintCertValidator() {
-			@Override
-			protected String getRequiredCn(String authority) {
-				return "hosted-id.google.com";
-			}
-		};
-
-		return new DisjunctiveCertValidator(defaultValidator,
-				hardCodedValidator);
-	}*/
 
 	@Provides
 	@Singleton
