@@ -32,8 +32,6 @@ import com.google.step2.discovery.IdpIdentifier;
 import com.google.step2.openid.ui.UiMessageRequest;
 import com.google.step2.servlet.InjectableServlet;
 import com.tabulaw.model.User;
-import com.tabulaw.server.PersistContext;
-import com.tabulaw.server.UserContext;
 
 @SuppressWarnings("serial")
 public class OpenIdServlet extends InjectableServlet {
@@ -117,8 +115,7 @@ public class OpenIdServlet extends InjectableServlet {
 			throws ServletException, IOException {
 		try {
 			UserInfo openIdUser = completeAuthentication(req);
-			User user = doSignInUser(req, resp, openIdUser);
-			doReLoginUser(user, req, resp);
+			signInUser(req, resp, openIdUser);
 			// req.getSession().setAttribute("user", openIdUser);
 			if (openIdUser == null) {
 				IOUtils.write("Invalid OpenId authorization.",
@@ -138,33 +135,9 @@ public class OpenIdServlet extends InjectableServlet {
 		}
 	}
 
-	private User doSignInUser(HttpServletRequest req, HttpServletResponse resp,
-			UserInfo openIdUser) {
-		UserSignIn service = new UserSignIn((PersistContext) req
-				.getSession(false).getServletContext()
-				.getAttribute(PersistContext.KEY));
-		return service.doUserSignIn(openIdUser);
-	}
-
-	private void doReLoginUser(User user, HttpServletRequest req,
-			HttpServletResponse resp) throws IOException {
-		logout(req);
-		if (user != null) {
-			HttpSession session = req.getSession();
-			UserContext context = new UserContext();
-			context.setUser(user);
-			session.setAttribute(UserContext.KEY, context);
-		}
-	}
-
-	private void logout(HttpServletRequest req) {
-		try {
-			HttpSession session = req.getSession(false);
-			if (session != null) {
-				session.invalidate();
-			}
-		} catch (IllegalStateException e) {
-		}
+	private User signInUser(HttpServletRequest req, HttpServletResponse resp,
+			UserInfo openIdUser) throws IOException {
+		return new UserSignIn(req).signInUser(openIdUser);
 	}
 
 	/**
