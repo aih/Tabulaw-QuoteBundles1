@@ -47,6 +47,7 @@ public class OpenIdServlet extends InjectableServlet {
 	private String homePath;
 	private String consumerKey;
 	private String consumerSecret;
+	private String redirectOnSuccess;
 
 	/**
 	 * Init the servlet. For demo purposes, we're just using an in-memory
@@ -65,6 +66,7 @@ public class OpenIdServlet extends InjectableServlet {
 		realm = getInitParameter("realm", null);
 		consumerKey = getInitParameter("consumerKey", "http://127.0.0.1:8888");
 		consumerSecret = getInitParameter("consumerSecret", "");
+		redirectOnSuccess = getInitParameter("redirectOnSuccess", "true");
 	}
 
 	/**
@@ -125,7 +127,9 @@ public class OpenIdServlet extends InjectableServlet {
 				IOUtils.write("Failure: OpenId+OAuth is not working.",
 						resp.getOutputStream());
 			}
-			// resp.sendRedirect(homePath);
+			if ("true".equalsIgnoreCase(redirectOnSuccess)) {
+				resp.sendRedirect(homePath);
+			}
 		} catch (OpenIDException e) {
 			throw new ServletException("Error processing OpenID response", e);
 		}
