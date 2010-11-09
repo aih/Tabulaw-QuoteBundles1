@@ -128,7 +128,7 @@ public class OpenIdServlet extends InjectableServlet {
 						resp.getOutputStream());
 			}
 			if ("true".equalsIgnoreCase(redirectOnSuccess)) {
-				resp.sendRedirect(homePath);
+				resp.sendRedirect(addGWTHosted(req, homePath));
 			}
 		} catch (OpenIDException e) {
 			throw new ServletException("Error processing OpenID response", e);
@@ -270,11 +270,11 @@ public class OpenIdServlet extends InjectableServlet {
 	 *            Current servlet request
 	 * @return Return to URL
 	 */
-	String returnTo(HttpServletRequest request) {
+	private String returnTo(HttpServletRequest request) {
 		String returnTo = new StringBuffer(baseUrl(request))
 				.append(request.getContextPath()).append("/")
 				.append(returnToPath).toString();
-		return returnTo;
+		return addGWTHosted(request, returnTo);
 	}
 
 	/**
@@ -285,7 +285,7 @@ public class OpenIdServlet extends InjectableServlet {
 	 *            Current servlet request
 	 * @return Base URL (path to servlet context)
 	 */
-	String baseUrl(HttpServletRequest request) {
+	private String baseUrl(HttpServletRequest request) {
 		StringBuffer url = new StringBuffer(request.getScheme()).append("://")
 				.append(request.getServerName());
 		if ((request.getScheme().equalsIgnoreCase("http") && request
@@ -295,6 +295,19 @@ public class OpenIdServlet extends InjectableServlet {
 			url.append(":").append(request.getServerPort());
 		}
 		return url.toString();
+	}
+
+	private String addGWTHosted(HttpServletRequest request, String url) {
+		String gwt_codesvr = request.getParameter("gwt.codesvr");
+		if (gwt_codesvr != null) {
+			if (url.contains("?")) {
+				url += "&";
+			} else {
+				url += "?";
+			}
+			url += "&gwt.codesvr=" + gwt_codesvr;
+		}
+		return url;
 	}
 
 	/**

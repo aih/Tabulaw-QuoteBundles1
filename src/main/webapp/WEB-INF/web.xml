@@ -223,8 +223,7 @@
         </init-param>
         <init-param>
             <param-name>home_path</param-name>
-            <param-value>Poc.html?gwt.codesvr=127.0.0.1:9997</param-value>
-            <!-- <param-value>/Poc.html</param-value>  -->
+            <param-value>Poc.html</param-value>
         </init-param>        
         <init-param>
             <param-name>consumerKey</param-name>
