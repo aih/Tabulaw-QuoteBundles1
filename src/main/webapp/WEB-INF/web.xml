@@ -219,7 +219,7 @@
          -->
         <init-param>
             <param-name>return_to_path</param-name>
-            <param-value>/openid</param-value>
+            <param-value>openid</param-value>
         </init-param>
         <init-param>
             <param-name>home_path</param-name>

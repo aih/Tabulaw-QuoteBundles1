@@ -60,7 +60,7 @@ public class OpenIdServlet extends InjectableServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		returnToPath = getInitParameter("return_to_path", "/openid");
+		returnToPath = getInitParameter("return_to_path", "openid");
 		homePath = getInitParameter("home_path", "/");
 		realm = getInitParameter("realm", null);
 		consumerKey = getInitParameter("consumerKey", "http://127.0.0.1:8888");
@@ -271,9 +271,10 @@ public class OpenIdServlet extends InjectableServlet {
 	 * @return Return to URL
 	 */
 	String returnTo(HttpServletRequest request) {
-		return new StringBuffer(baseUrl(request))
-				.append(request.getContextPath()).append(returnToPath)
-				.toString();
+		String returnTo = new StringBuffer(baseUrl(request))
+				.append(request.getContextPath()).append("/")
+				.append(returnToPath).toString();
+		return returnTo;
 	}
 
 	/**
