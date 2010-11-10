@@ -169,6 +169,9 @@ div.ro {
 .navRowTbl 	.gwt-TabBarItem .navButton-doc img {
 		margin: 1px 0 0 10px;
 	}
+.search-widget {
+	margin-bottom	: 5px;
+}	
 
 #navCol {
 	float: left;

@@ -12,6 +12,7 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasResizeHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Image;
@@ -207,6 +208,7 @@ public class BundleEditWidget extends
 
 	private final boolean orphanedQuoteContainer;
 	private final HasResizeHandlers resizeHandlerManager;
+	private HandlerRegistration searchHandlerRegistration;
 
 	/**
 	 * Constructor
@@ -261,6 +263,14 @@ public class BundleEditWidget extends
 		dropAreaCheck();
 		return w;
 	}
+	
+	public void registerSearchHandler() {
+		searchHandlerRegistration = Poc.getPortal().addSearchHandler(this);
+	}
+	public void unRegisterSearchHandler() {
+		searchHandlerRegistration.removeHandler();
+	}
+	
 
 	private void dropAreaCheck() {
 		// maintain a drop area

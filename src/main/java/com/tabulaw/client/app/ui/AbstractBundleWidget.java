@@ -9,6 +9,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
+import com.tabulaw.client.app.search.ISearchHandler;
+import com.tabulaw.client.app.search.SearchEvent;
 import com.tabulaw.client.model.IHasModel;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.model.DocRef;
@@ -24,7 +26,7 @@ import com.tabulaw.util.ObjectUtil;
  * @author jpk
  */
 public abstract class AbstractBundleWidget<B extends AbstractBundleWidget<B, Q, H>, Q extends AbstractQuoteWidget<B>, H extends EditableBundleHeader> 
-extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle> {
+extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearchHandler {
 
 	/**
 	 * Supports drag drop targeting.
@@ -81,6 +83,24 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle> {
 	 * @return A newly created <Q>type.
 	 */
 	protected abstract Q getNewQuoteWidget(Quote mQuote);
+
+	public void onSearchEvent(SearchEvent event) {
+		String criteria = event.getCriteria();
+		
+		clearQuotesFromUi();
+		if(bundle != null) {
+			List<Quote> mQuotes = bundle.getQuotes();
+			if(mQuotes != null) {
+				for(Quote mQuote : mQuotes) {
+					if (criteria==null || criteria.equals("")  
+							|| mQuote.getQuote().toUpperCase().indexOf(criteria.toUpperCase()) > 0 
+							|| mQuote.getDocument().getName().toUpperCase().indexOf(criteria.toUpperCase()) > 0) {
+						addQuote(mQuote, false, false);
+					}
+				}
+			}
+		}
+	}
 
 	public final QuoteBundle getModel() {
 		return bundle;

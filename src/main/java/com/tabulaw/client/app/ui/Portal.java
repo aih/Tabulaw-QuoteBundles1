@@ -8,6 +8,9 @@ package com.tabulaw.client.app.ui;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.tabulaw.client.app.search.IHasSearchHandlers;
+import com.tabulaw.client.app.search.ISearchHandler;
+import com.tabulaw.client.app.search.SearchEvent;
 import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
@@ -20,7 +23,7 @@ import com.tabulaw.client.view.ViewManager;
  * This widget sources {@link ModelChangeEvent}s for the entire app.
  * @author jpk
  */
-public class Portal extends Composite implements IHasModelChangeHandlers {
+public class Portal extends Composite implements IHasModelChangeHandlers ,IHasSearchHandlers {
 
 	private final FlowPanel pnl = new FlowPanel();
 
@@ -42,5 +45,10 @@ public class Portal extends Composite implements IHasModelChangeHandlers {
 	@Override
 	public HandlerRegistration addModelChangeHandler(IModelChangeHandler handler) {
 		return addHandler(handler, ModelChangeEvent.TYPE);
+	}
+
+	@Override
+	public HandlerRegistration addSearchHandler(ISearchHandler handler) {
+		return addHandler(handler, SearchEvent.TYPE);
 	}
 }

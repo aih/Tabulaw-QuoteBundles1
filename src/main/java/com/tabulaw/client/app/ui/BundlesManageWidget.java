@@ -26,6 +26,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.BundleListingWidget.BOption;
@@ -195,6 +196,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 	// main viewing area only)
 	private final PickupDragController quoteController;
 	private final QuoteDragHandler quoteHandler;
+	private final SearchWidget searchWidget = new SearchWidget();
 	
 	private final HandlerManager resizeHandlerManager = new HandlerManager(this);
 	
@@ -232,6 +234,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 		// initialize horizontal panel to hold colums of quote bundle widgets
 		columns.addStyleName(Styles.COLUMNS);
 		columns.setSpacing(4);
+		boundaryPanel.add(searchWidget);
 		boundaryPanel.add(columns);
 	}
 
@@ -395,6 +398,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 				unpinQuoteBundle(qbw);
 			}
 		});
+		qbw.registerSearchHandler();
 		columns.insert(qbw, index);
 
 		int numBundles = numBundlesBeforeInsert + 1;
@@ -449,6 +453,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 			Widget w = columns.getWidget(i);
 			if(w instanceof BundleEditWidget) {
 				BundleEditWidget qbw = (BundleEditWidget) w;
+				
 				if(qbw.getModel().getId().equals(rmId)) {
 
 					// un-make quote widgets draggable
@@ -456,6 +461,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 					for(QuoteEditWidget qw : quoteWidgets) {
 						quoteController.makeNotDraggable(qw);
 					}
+
+					qbw.unRegisterSearchHandler();
 
 					removedQbw = qbw;
 				}
