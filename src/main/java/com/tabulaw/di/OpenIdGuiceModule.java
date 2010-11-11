@@ -1,4 +1,4 @@
-package com.tabulaw.openid;
+package com.tabulaw.di;
 
 import net.oauth.client.OAuthClient;
 
@@ -16,6 +16,7 @@ import com.google.step2.discovery.DefaultHostMetaFetcher;
 import com.google.step2.discovery.HostMetaFetcher;
 import com.google.step2.hybrid.HybridOauthMessage;
 import com.google.step2.openid.ax2.AxMessage2;
+import com.tabulaw.openid.GoogleHostedHostMetaFetcher;
 
 /**
  * Guice module for configuring the Step2 library. Modified from the original

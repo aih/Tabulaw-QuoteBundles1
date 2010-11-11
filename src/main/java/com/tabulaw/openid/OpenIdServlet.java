@@ -168,8 +168,7 @@ public class OpenIdServlet extends InjectableServlet {
 			OAuthAccessor accessor = createOAuthAccessor();
 			helper.requestOauthAuthorization(accessor.consumer.consumerKey,
 			// "http://docs.google.com/feeds/");
-			// "http://www.google.com/docs/feeds/");
-					"http://www.google.com/m8/feeds/");
+				"http://www.google.com/m8/feeds/");
 		} catch (Exception e) {
 			log.error("", e);
 		}
@@ -330,7 +329,7 @@ public class OpenIdServlet extends InjectableServlet {
 				ParameterList params = helper.getHybridOauthResponse()
 						.getParameters();
 				for (Object param : params.getParameters()) {
-					System.out.println(param + " -> "
+					log.debug(param + " -> "
 							+ params.getParameterValue(param.toString()));
 				}
 			} else {

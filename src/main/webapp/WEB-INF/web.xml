@@ -56,7 +56,7 @@
 
 	<context-param>
 		<param-name>guice-modules</param-name>
-		<param-value>com.tabulaw.openid.OpenIdGuiceModule</param-value>
+		<param-value>com.tabulaw.di.OpenIdGuiceModule</param-value>
 	</context-param>
 
 	<filter>
