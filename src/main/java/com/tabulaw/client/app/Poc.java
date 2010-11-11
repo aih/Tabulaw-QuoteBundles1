@@ -5,11 +5,16 @@ import java.util.List;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.LoginTopPanel;
 import com.tabulaw.client.app.ui.Portal;
@@ -233,11 +238,15 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		});
 	}
 
-	private void showLoginPanel() {
+	private void showLoginPanel() {		
+		Widget htmlLogin = RootPanel.get("login");
+		if(htmlLogin != null){
+			htmlLogin.setVisible(true);
+		}
+		
 		if(loginPanel == null) {
 			loginPanel = new LoginTopPanel();
 			loginPanel.addUserSessionHandler(new IUserSessionHandler() {
-
 				@Override
 				public void onUserSessionEvent(UserSessionEvent event) {
 					if(event.isStart()) {
@@ -255,6 +264,10 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	}
 
 	private void hideLoginPanel() {
+		Widget htmlLogin = RootPanel.get("login");
+		if(htmlLogin != null){
+			htmlLogin.setVisible(false);
+		}
 		if(loginPanel != null) {
 			loginPanel.removeFromParent();
 			loginPanel = null;
@@ -265,12 +278,13 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		getNavCol().setVisible(true);
 	}
 
+	@Override
 	public void onModuleLoad() {
 		Log.setUncaughtExceptionHandler();
 		History.newItem(INITIAL_HISTORY_TOKEN);
 
 		DeferredCommand.addCommand(new Command() {
-
+			@Override
 			public void execute() {
 				populateViewClasses();
 				build();
@@ -330,12 +344,21 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		ViewManager.get().addViewChangeHandler(navColPanel);
 		ViewManager.get().addViewChangeHandler(navRowPanel);
 
+		hideStaticLoginPanel();
+		
 		// initialize the ui msg notifier
 		Notifier.init(navColPanel, Position.TOP, -20, 0);
 
 		Log.debug("Building complete.");
 	}
 
+	private void hideStaticLoginPanel() {
+		Element e = DOM.getElementById("staticLoginPanel");
+		if(e != null) {
+			UIObject.setVisible(e, false);
+		}
+	}
+	
 	private void populateViewClasses() {
 		ViewClass.addClass(DocsView.klas);
 		ViewClass.addClass(DocView.klas);

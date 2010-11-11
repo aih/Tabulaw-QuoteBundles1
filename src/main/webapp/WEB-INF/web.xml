@@ -265,10 +265,17 @@
 		<url-pattern>/services/*</url-pattern>
 	</servlet-mapping>
 	
-	<!-- 
-	<login-config>
-	  <auth-method>BASIC</auth-method>
-	  <realm-name>default</realm-name>
-	</login-config>
-	-->
+	<servlet>
+        <servlet-name>jsp</servlet-name>
+        <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
+        <init-param>
+            <param-name>fork</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <load-on-startup>3</load-on-startup>
+    </servlet>
+	<servlet-mapping>
+		<servlet-name>jsp</servlet-name>
+		<url-pattern>*.html</url-pattern>
+	</servlet-mapping>
 </web-app>

@@ -5,11 +5,15 @@
  */
 package com.tabulaw.client.ui.field;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.tabulaw.client.convert.ToStringConverter;
+import com.tabulaw.client.ui.field.IFieldWidget.Styles;
+import com.tabulaw.client.ui.field.TextField.Impl;
 import com.tabulaw.client.validate.StringLengthValidator;
 
 /**
@@ -30,13 +34,21 @@ public final class PasswordField extends AbstractField<String> implements IHasMa
 		 */
 		public Impl(String name) {
 			super();
-			setName(name);
-			addStyleName(Styles.TBOX);
+			init(name);
 		}
 
+		public Impl(String name, Element e) {
+			super(e);
+			init(name);
+		}
+		
+		private void init(String name){
+			addStyleName(Styles.TBOX);
+			setName(name);
+		}
 	}
 
-	private final Impl tb;
+	private Impl tb;
 
 	/**
 	 * Constructor
@@ -48,14 +60,35 @@ public final class PasswordField extends AbstractField<String> implements IHasMa
 	 */
 	PasswordField(String name, String propName, String lblText, String helpText, int visibleLength) {
 		super(name, propName, lblText, helpText);
-		tb = new Impl(name);
+		init(name, visibleLength, null);
+	}
+
+	/**
+	 * Constructor
+	 * @param name
+	 * @param propName
+	 * @param lblText
+	 * @param helpText
+	 * @param visibleLength
+	 * @param id Field to try wrap
+	 */
+	PasswordField(String name, String propName, String lblText, String helpText, int visibleLength, String id) {
+		super(name, propName, lblText, helpText);
+		init(name, visibleLength, DOM.getElementById(id));
+	}
+	
+	private void init(String name, int visibleLength, Element e){
+		if(e != null){
+			tb = new Impl(name, e);
+		}else{
+			tb = new Impl(name);
+		}
 		setVisibleLen(visibleLength);
 		tb.addValueChangeHandler(this);
 		tb.addFocusHandler(this);
 		tb.addBlurHandler(this);
 		setConverter(ToStringConverter.INSTANCE);
 		addHandler(new KeyPressHandler() {
-
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
 				if(event.getCharCode() == KeyCodes.KEY_ENTER) {
@@ -63,7 +96,7 @@ public final class PasswordField extends AbstractField<String> implements IHasMa
 					setFocus(true);
 				}
 			}
-		}, KeyPressEvent.getType());
+		}, KeyPressEvent.getType());		
 	}
 
 	public int getVisibleLen() {

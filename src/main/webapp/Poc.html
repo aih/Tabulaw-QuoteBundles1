@@ -14,6 +14,18 @@
 	<div id="contentwrapper">
 		<div id="mainCol">
       <div id="navRow"></div>
+      		<%java.util.Date date = new java.util.Date();%>
+      		<%=date%>
+      	<div class="login" id="staticLoginPanel">
+   			<div class="heading">Login</div>
+      		<div class="opPanel">
+      			<table class="fgrid">
+	      			<tr><td>Email Address<sup class="rqd">*</sup></td><td><input type="text" id="userEmail"></td></tr> 
+		      		<tr><td>Password<sup class="rqd">*</sup></td><td><input type="password" id="userPassword"></td></tr>
+	      		</table> 
+      		</div> 
+      		<div><button id="submitLogin" onclick="this.disabled=true;">Submit</button></div>
+      	</div>
 	  	<div id="portal"></div>
 		</div>
 	</div>
