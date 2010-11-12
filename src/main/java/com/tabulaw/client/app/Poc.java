@@ -178,53 +178,35 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		userContextService.getClientUserContext(new AsyncCallback<UserContextPayload>() {
 
 			@Override
-			public void onSuccess(UserContextPayload result) {
+			public void onSuccess(final UserContextPayload result) {
 				User liu = result.getUser();
 				if(liu == null) {
 					// not logged in
 					showLoginPanel();
-				}
-				else {
-					hideLoginPanel();
-
-					// attach the global msg panel in its native place
-					parkGlobalMsgPanel();
-
-					// cache initial batch of next ids
-					ClientModelCache.get().setNextIdBatch(result.getNextIds());
-
-					// cache user (i.e. the user context) and notify
-					ClientModelCache.get().persist(liu, null);
-					fireModelChangeEvent(new ModelChangeEvent(null, ModelChangeOp.LOADED, liu, null));
-					
-					// set the orphan bundle id
-					ClientModelCache.get().setOrphanedQuoteBundleId(result.getOrphanQuoteContainerId());
-
-					// load up user bundles
-					List<QuoteBundle> userBundles = result.getBundles();
-
-					// we need to individually add the contained quotes as well but don't
-					// throw model changes events for quotes
-					for(QuoteBundle qb : userBundles) {
-						ClientModelCache.get().persistAll(qb.getQuotes());
-					}
-
-					// cache bundles (w/ no notification)
-					ClientModelCache.get().persistAll(userBundles);
-
-					// load bundles view (this will pull all just stored bundles from cache)
-					ViewManager.get().loadView(new StaticViewInitializer(BundlesView.klas));
-
-					// cache user state
-					UserState userState = result.getUserState();
-					if(userState == null) {
-						Log.debug("Creating new UserState instance");
-						userState = new UserState(liu.getId());
-					}
-					ClientModelCache.get().persist(userState, getPortal());
-
-					// show doc listing view by default
-					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocsView.klas)));
+					/*-
+					GWT.runAsync(new RunAsyncCallback() {
+						@Override
+						public void onSuccess() {
+							showLoginPanel();
+						}
+						@Override
+						public void onFailure(Throwable reason) {
+							showLoginPanel();
+						}
+					});*/
+				} else {
+					showApplication(result);
+					/*-
+					GWT.runAsync(new RunAsyncCallback() {
+						@Override
+						public void onSuccess() {
+							showApplication(result);
+						}
+						@Override
+						public void onFailure(Throwable reason) {
+							showLoginPanel();
+						}
+					});*/
 				}
 			}
 
@@ -236,6 +218,51 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 				showLoginPanel();
 			}
 		});
+	}
+
+	private void showApplication(UserContextPayload result){
+		User liu = result.getUser();
+		
+		hideLoginPanel();
+
+		// attach the global msg panel in its native place
+		parkGlobalMsgPanel();
+
+		// cache initial batch of next ids
+		ClientModelCache.get().setNextIdBatch(result.getNextIds());
+
+		// cache user (i.e. the user context) and notify
+		ClientModelCache.get().persist(liu, null);
+		fireModelChangeEvent(new ModelChangeEvent(null, ModelChangeOp.LOADED, liu, null));
+		
+		// set the orphan bundle id
+		ClientModelCache.get().setOrphanedQuoteBundleId(result.getOrphanQuoteContainerId());
+
+		// load up user bundles
+		List<QuoteBundle> userBundles = result.getBundles();
+
+		// we need to individually add the contained quotes as well but don't
+		// throw model changes events for quotes
+		for(QuoteBundle qb : userBundles) {
+			ClientModelCache.get().persistAll(qb.getQuotes());
+		}
+
+		// cache bundles (w/ no notification)
+		ClientModelCache.get().persistAll(userBundles);
+
+		// load bundles view (this will pull all just stored bundles from cache)
+		ViewManager.get().loadView(new StaticViewInitializer(BundlesView.klas));
+
+		// cache user state
+		UserState userState = result.getUserState();
+		if(userState == null) {
+			Log.debug("Creating new UserState instance");
+			userState = new UserState(liu.getId());
+		}
+		ClientModelCache.get().persist(userState, getPortal());
+
+		// show doc listing view by default
+		ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocsView.klas)));
 	}
 
 	private void showLoginPanel() {		
@@ -283,9 +310,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		Log.setUncaughtExceptionHandler();
 		History.newItem(INITIAL_HISTORY_TOKEN);
 
-		new Timer(){
-	@Override
-	public void run() {
+		//new Timer(){@Override public void run() {
 		DeferredCommand.addCommand(new Command() {
 			@Override
 			public void execute() {
@@ -294,8 +319,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 				getUserContext();
 			}
 		});
-	}	
-}.schedule(3000);
+		//}	}.schedule(3000);
 
 		// TODO temp bypass logins
 		// ViewManager.get().dispatch(new ShowViewRequest(new
