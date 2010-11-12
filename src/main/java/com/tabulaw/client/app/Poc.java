@@ -10,7 +10,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.UIObject;
@@ -183,30 +182,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 				if(liu == null) {
 					// not logged in
 					showLoginPanel();
-					/*-
-					GWT.runAsync(new RunAsyncCallback() {
-						@Override
-						public void onSuccess() {
-							showLoginPanel();
-						}
-						@Override
-						public void onFailure(Throwable reason) {
-							showLoginPanel();
-						}
-					});*/
 				} else {
 					showApplication(result);
-					/*-
-					GWT.runAsync(new RunAsyncCallback() {
-						@Override
-						public void onSuccess() {
-							showApplication(result);
-						}
-						@Override
-						public void onFailure(Throwable reason) {
-							showLoginPanel();
-						}
-					});*/
 				}
 			}
 
@@ -310,7 +287,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		Log.setUncaughtExceptionHandler();
 		History.newItem(INITIAL_HISTORY_TOKEN);
 
-		//new Timer(){@Override public void run() {
 		DeferredCommand.addCommand(new Command() {
 			@Override
 			public void execute() {
@@ -319,7 +295,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 				getUserContext();
 			}
 		});
-		//}	}.schedule(3000);
 
 		// TODO temp bypass logins
 		// ViewManager.get().dispatch(new ShowViewRequest(new
