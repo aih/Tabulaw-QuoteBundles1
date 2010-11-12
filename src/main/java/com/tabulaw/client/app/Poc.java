@@ -10,8 +10,8 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
@@ -283,6 +283,9 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		Log.setUncaughtExceptionHandler();
 		History.newItem(INITIAL_HISTORY_TOKEN);
 
+		new Timer(){
+	@Override
+	public void run() {
 		DeferredCommand.addCommand(new Command() {
 			@Override
 			public void execute() {
@@ -291,6 +294,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 				getUserContext();
 			}
 		});
+	}	
+}.schedule(3000);
 
 		// TODO temp bypass logins
 		// ViewManager.get().dispatch(new ShowViewRequest(new
