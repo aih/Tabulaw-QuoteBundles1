@@ -304,7 +304,7 @@ public class OpenIdServlet extends InjectableServlet {
 			} else {
 				url += "?";
 			}
-			url += "&gwt.codesvr=" + gwt_codesvr;
+			url += "gwt.codesvr=" + gwt_codesvr;
 		}
 		return url;
 	}

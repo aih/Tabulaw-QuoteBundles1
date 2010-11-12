@@ -2,6 +2,14 @@ package com.tabulaw.client.util;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
+/**
+ * 
+ * @author Radek Olesiak
+ * 
+ *         This class is similar to Window.open() but here we can control close
+ *         event and the method open() returns popup window object
+ * 
+ */
 public class PopupWindow extends JavaScriptObject {
 
 	protected PopupWindow() {

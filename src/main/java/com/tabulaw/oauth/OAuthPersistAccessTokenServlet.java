@@ -26,6 +26,15 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 
 	private OAuthParametersProvider authParametersProvider = new GoogleAnonymousOAuthParametersProvider();
 
+	/**
+	 * This method here is also related to the PopupWindow. It does two things
+	 * 
+	 * a) tells web browser to close the authentication popup window.
+	 * 
+	 * b) changes authentication request token (short term token) to access
+	 * token (long term token)
+	 * 
+	 */
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
@@ -60,9 +69,10 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 				UserContext uc = (UserContext) request.getSession(false)
 						.getAttribute(UserContext.KEY);
 				User user = uc.getUser();
-				user.setOAuthParameters(new HashMap<String,String>(oauthParameters.getBaseParameters()));
-				user.setOAuthParametersExtra(new HashMap<String,String>(oauthParameters
-						.getExtraParameters()));
+				user.setOAuthParameters(new HashMap<String, String>(
+						oauthParameters.getBaseParameters()));
+				user.setOAuthParametersExtra(new HashMap<String, String>(
+						oauthParameters.getExtraParameters()));
 			} else {
 				request.getSession().setAttribute(
 						OAuthParametersProvider.OAUTH_ACCESS_PARAMETERS,

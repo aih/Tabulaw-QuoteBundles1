@@ -33,7 +33,6 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 
 	private final DocImportEditPanel importPanel = new DocImportEditPanel();
 
-	private String authKey;
 	private int importId = 0;
 
 	private PopupWindow popup;
@@ -66,7 +65,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 					&& Window
 							.confirm("Importing will take some time. Do you want to continue?")) {
 				importPanel.setEnabled(false);
-				doImport(authKey, docs);
+				doImport(docs);
 			} else {
 				hide();
 			}
@@ -133,8 +132,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 		setGoogleDocs(documents);
 	}
 
-	private void doImport(String authKey,
-			final Collection<GoogleDocument> resourceId) {
+	private void doImport(final Collection<GoogleDocument> resourceId) {
 		final int currentImportId = ++importId;
 		new RpcCommand<DocRefListPayload>() {
 
