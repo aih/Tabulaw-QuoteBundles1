@@ -29,17 +29,11 @@ public abstract class FieldFactory {
 	 * @param labelText
 	 * @param helpText The on hover tool tip text
 	 * @param visibleLength
-	 * @param id Field to try wrap
 	 * @return new field
 	 */
 	public static final TextField ftext(String name, String propName, String labelText, String helpText,
 			int visibleLength) {
 		return new TextField(name, propName, labelText, helpText, visibleLength);
-	}
-
-	public static final TextField ftext(String name, String propName, String labelText, String helpText,
-			int visibleLength, String id) {
-		return new TextField(name, propName, labelText, helpText, visibleLength, id);
 	}
 
 	/**
@@ -55,22 +49,6 @@ public abstract class FieldFactory {
 	public static final PasswordField fpassword(String name, String propName, String labelText, String helpText,
 			int visibleLength) {
 		return new PasswordField(name, propName, labelText, helpText, visibleLength);
-	}
-
-	/**
-	 * Creates a new {@link PasswordField} instance. <br>
-	 * NOTE: the value type is {@link String}.
-	 * @param name
-	 * @param propName
-	 * @param labelText
-	 * @param helpText The on hover tool tip text
-	 * @param visibleLength
-	 * @param id Field to try wrap
-	 * @return new field
-	 */
-	public static final PasswordField fpassword(String name, String propName, String labelText, String helpText,
-			int visibleLength, String id) {
-		return new PasswordField(name, propName, labelText, helpText, visibleLength, id);
 	}
 
 	/**
@@ -224,23 +202,6 @@ public abstract class FieldFactory {
 	public static final TextField femail(String name, String propName, String labelText, String helpText,
 			int visibleLength) {
 		final TextField f = ftext(name, propName, labelText, helpText, visibleLength);
-		f.addValidator(EmailAddressValidator.INSTANCE);
-		return f;
-	}
-
-	/**
-	 * Creates a new {@link TextField} instance with email address validation. <br>
-	 * NOTE: the value type is {@link String}.
-	 * @param name
-	 * @param propName
-	 * @param labelText
-	 * @param helpText The on hover tool tip text
-	 * @param visibleLength
-	 * @return new field
-	 */
-	public static final TextField femail(String name, String propName, String labelText, String helpText,
-			int visibleLength, String id) {
-		final TextField f = ftext(name, propName, labelText, helpText, visibleLength, id);
 		f.addValidator(EmailAddressValidator.INSTANCE);
 		return f;
 	}

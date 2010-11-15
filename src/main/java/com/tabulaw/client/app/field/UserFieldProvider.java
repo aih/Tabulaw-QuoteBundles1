@@ -76,7 +76,7 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 
 		if(useCase != UserUseCase.PASSWORD_SET) {
 			// email
-			TextField femail = femail("userEmail", "emailAddress", "Email Address", "Your email address", visibleLen, "userEmail");
+			TextField femail = femail("userEmail", "emailAddress", "Email Address", "Your email address", visibleLen);
 			femail.setPropertyMetadata(metamap.get("emailAddress"));
 			fg.addField(femail);
 		}
@@ -112,7 +112,7 @@ public class UserFieldProvider extends AbstractFieldGroupProvider {
 
 		// password
 		if(useCase == UserUseCase.PASSWORD_SET || useCase == UserUseCase.LOGIN || useCase == UserUseCase.REGISTER || useCase == UserUseCase.CREATE) {
-			PasswordField password = fpassword("userPswd", "password", "Password", "Specify a password", visibleLen, "userPassword");
+			PasswordField password = fpassword("userPswd", "password", "Password", "Specify a password", visibleLen);
 			password.setPropertyMetadata(metamap.get("password"));
 			fg.addField(password);
 		}

@@ -8,7 +8,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.TextBox;
 import com.tabulaw.client.convert.ToStringConverter;
 import com.tabulaw.client.ui.IHasFormat;
@@ -64,33 +63,11 @@ public class TextField extends AbstractField<String> implements IHasMaxLength, I
 	 */
 	public TextField(String name, String propName, String labelText, String helpText, int visibleLength) {
 		super(name, propName, labelText, helpText);
-		init(name, visibleLength, null);
-	}
-	
-	/**
-	 * Constructor
-	 * @param name
-	 * @param propName
-	 * @param labelText
-	 * @param helpText
-	 * @param visibleLength
-	 * @param id Field to try wrap
-	 */
-	public TextField(String name, String propName, String labelText, String helpText, int visibleLength, String id) {
-		super(name, propName, labelText, helpText);
-		init(name, visibleLength, DOM.getElementById(id));
-	}
-	
-	private void init(String name, int visibleLength, Element e){
-		if(e != null){
-			tb = new Impl(name, e);
-		}else{
-			tb = new Impl(name);
-		}
-		setVisibleLen(visibleLength);
+		tb = new Impl(name);
 		tb.addValueChangeHandler(this);
 		tb.addFocusHandler(this);
 		tb.addBlurHandler(this);
+		setVisibleLen(visibleLength);
 		setConverter(ToStringConverter.INSTANCE);
 		addHandler(new KeyPressHandler() {
 

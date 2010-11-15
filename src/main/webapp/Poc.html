@@ -13,27 +13,8 @@
 <div id="container">
 	<div id="contentwrapper">
 		<div id="mainCol">
-      <div id="navRow"></div>
-      	<%
-      		com.tabulaw.server.jsp.LoginBean loginBean = new com.tabulaw.server.jsp.LoginBean();
-      		loginBean.setRequest(request);
-      		if(!loginBean.isLoggedIn()) {
-      	%>
-	      	<div class="login" id="staticLoginPanel">
-	   			<div class="heading">Login</div>
-	      		<div class="opPanel">
-	      			<table class="fgrid">
-		      			<tr><td>Email Address<sup class="rqd">*</sup></td><td><input type="text" id="userEmail"></td></tr> 
-			      		<tr><td>Password<sup class="rqd">*</sup></td><td><input type="password" id="userPassword"></td></tr>
-		      		</table> 
-	      		</div> 
-	      		<div
-	      			><button id="submitLogin" onclick="this.disabled=true;getElementById('loginindicator').style.display = '';">Submit</button>
-	      			<img id="loginindicator" style="display:none;" src="images/ajax-loader.gif">
-	      		</div>
-	      	</div>
-      	<%	} %>
-	  	<div id="portal"></div>
+      		<div id="navRow"></div>      	
+	  		<div id="portal"></div>
 		</div>
 	</div>
 	<div id="navCol">

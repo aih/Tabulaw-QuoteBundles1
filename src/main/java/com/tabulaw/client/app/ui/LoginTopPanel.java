@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -17,8 +16,6 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -34,7 +31,6 @@ import com.tabulaw.IDescriptorProvider;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.field.UserFieldProvider;
 import com.tabulaw.client.app.field.UserFieldProvider.UserUseCase;
-import com.tabulaw.client.ui.ButtonWrapper;
 import com.tabulaw.client.ui.FocusCommand;
 import com.tabulaw.client.ui.IHasRpcHandlers;
 import com.tabulaw.client.ui.IRpcHandler;
@@ -204,7 +200,7 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 		form.setAction(GWT.getModuleBaseURL() + "login");
 		form.setMethod(FormPanel.METHOD_POST);
 
-		final ClickHandler btnSubmitClickHandler = new ClickHandler() {
+		btnSubmit = new Button("Login", new ClickHandler() {
 			@SuppressWarnings( {
 				"synthetic-access", "unchecked"
 			})
@@ -269,15 +265,7 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 					}
 				}
 			}
-		};
-		Element e = DOM.getElementById("submitLogin");
-		if(e != null){
-			btnSubmit = new ButtonWrapper(e);
-		}else{
-			btnSubmit = new ButtonWrapper();
-		}
-		btnSubmit.addClickHandler(btnSubmitClickHandler);
-//		btnSubmit = new Button("Login", new ClickHandler() {
+		});		
 
 		// cancel user registration
 		btnCancel = new Button("Cancel", new ClickHandler() {
@@ -356,16 +344,6 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 		switchMode(Mode.LOGIN);
 
 		addRpcHandler(new RpcUiHandler(this));
-		
-		if(!btnSubmit.isEnabled()){
-			DeferredCommand.addCommand(new Command(){
-				@Override
-				public void execute() {
-					btnSubmitClickHandler.onClick(null);
-				}				
-			});
-		}
-		btnSubmit.setEnabled(true);
 	}
 
 	@Override
@@ -389,11 +367,6 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 		if(mode == newMode) return;
 		switch(newMode) {
 			case LOGIN: {
-				boolean doWrap = false;
-				Widget htmlLogin = RootPanel.get("login");
-				if(htmlLogin != null) {
-					doWrap = htmlLogin.isVisible();
-				}
 				msgPanel.clear();
 				IFieldWidget<String> fpswd = loginFieldPanel.getFieldGroup().getFieldWidget("userPswd");
 				

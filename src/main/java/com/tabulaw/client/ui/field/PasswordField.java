@@ -9,11 +9,8 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.tabulaw.client.convert.ToStringConverter;
-import com.tabulaw.client.ui.field.IFieldWidget.Styles;
-import com.tabulaw.client.ui.field.TextField.Impl;
 import com.tabulaw.client.validate.StringLengthValidator;
 
 /**
@@ -60,33 +57,11 @@ public final class PasswordField extends AbstractField<String> implements IHasMa
 	 */
 	PasswordField(String name, String propName, String lblText, String helpText, int visibleLength) {
 		super(name, propName, lblText, helpText);
-		init(name, visibleLength, null);
-	}
-
-	/**
-	 * Constructor
-	 * @param name
-	 * @param propName
-	 * @param lblText
-	 * @param helpText
-	 * @param visibleLength
-	 * @param id Field to try wrap
-	 */
-	PasswordField(String name, String propName, String lblText, String helpText, int visibleLength, String id) {
-		super(name, propName, lblText, helpText);
-		init(name, visibleLength, DOM.getElementById(id));
-	}
-	
-	private void init(String name, int visibleLength, Element e){
-		if(e != null){
-			tb = new Impl(name, e);
-		}else{
-			tb = new Impl(name);
-		}
-		setVisibleLen(visibleLength);
+		tb = new Impl(name);
 		tb.addValueChangeHandler(this);
 		tb.addFocusHandler(this);
 		tb.addBlurHandler(this);
+		setVisibleLen(visibleLength);
 		setConverter(ToStringConverter.INSTANCE);
 		addHandler(new KeyPressHandler() {
 			@Override
