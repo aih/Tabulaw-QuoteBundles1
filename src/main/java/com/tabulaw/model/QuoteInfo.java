@@ -72,7 +72,7 @@ public class QuoteInfo {
 			}
 			
 		} else {
-			DateTimeFormat fmt = DateTimeFormat.getFormat("EEE, d MMM yyyy");
+			DateTimeFormat fmt = DateTimeFormat.getFormat("MM/dd/yy");
 			User user = ClientModelCache.get().getUser();
 			subtitleBuilder	.append(user.getName())
 							.append(" (")
