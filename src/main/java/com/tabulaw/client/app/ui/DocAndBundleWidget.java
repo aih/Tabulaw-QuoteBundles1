@@ -12,8 +12,12 @@ import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
 import com.allen_sauer.gwt.dnd.client.drop.SimpleDropController;
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.event.logical.shared.HasResizeHandlers;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
@@ -30,6 +34,7 @@ import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.LoggingDragHandler;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.QuoteResizeEvent;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.model.CaseRef;
@@ -55,7 +60,7 @@ import com.tabulaw.util.StringUtil;
  * existing quotes in the bundle are re-displayed upon widget load.
  * @author jpk
  */
-public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implements IDocHandler, ValueChangeHandler<ViewMode>, IQuoteHandler {
+public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implements IDocHandler, ValueChangeHandler<ViewMode>, IQuoteHandler, HasResizeHandlers {
 
 	class DocQuoteDragHandler extends LoggingDragHandler {
 
@@ -79,14 +84,23 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 			throw new VetoDragException();
 		}
 	} // DocQuoteDragHandler
+	class DocAndBundleSplitLayoutPanel extends SplitLayoutPanel {
+		@Override
+		public void onResize() {
+			super.onResize();
+			resizeHandlerManager.fireEvent(new QuoteResizeEvent());
+		}
+	}
 
 	private final DocViewer wDocViewer = new DocViewer();
 
 	private HandlerRegistration hrViewMode, hrDoc;
+	
+	private HandlerManager resizeHandlerManager = new HandlerManager(this);
 
 	private final BundleDocWidget wDocQuoteBundle;
 
-	private final SplitLayoutPanel splitPanel = new SplitLayoutPanel();
+	private final SplitLayoutPanel splitPanel = new DocAndBundleSplitLayoutPanel();
 
 	/**
 	 * Facilitate drag/drop ops.
@@ -116,7 +130,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		SimpleDropController quoteDropController = new SimpleDropController(wDocViewer);
 		quoteController.registerDropController(quoteDropController);
 
-		wDocQuoteBundle = new BundleDocWidget(this);
+		wDocQuoteBundle = new BundleDocWidget(this,this);
 
 		splitPanel.addEast(wDocQuoteBundle, 200);
 		splitPanel.add(wDocViewer);
@@ -125,6 +139,12 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		boundaryPanel.add(splitPanel);
 
 		initWidget(boundaryPanel);
+	}
+	public void onActivate() {
+		resizeHandlerManager.fireEvent(new QuoteResizeEvent());
+	}
+	public HandlerRegistration addResizeHandler(ResizeHandler handler) {
+		return resizeHandlerManager.addHandler(ResizeEvent.getType(), handler);
 	}
 
 	public Widget[] getNavColWidgets() {
@@ -280,9 +300,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				wDocQuoteBundle.clearQuotesFromUi();
 				wDocQuoteBundle.clearQuoteEventBindings();
 			}
-			if(wDocQuoteBundle.getModel() == null || !wDocQuoteBundle.getModel().getId().equals(crntQb.getId())) {
-				wDocQuoteBundle.setModel(crntQb);
-			}
+			wDocQuoteBundle.setModel(crntQb);
 			crntQbId = crntQb.getId();
 			return true;
 		}
@@ -402,6 +420,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	public void onValueChange(ValueChangeEvent<ViewMode> event) {
 		wDocQuoteBundle.setDragController(quoteController);
 		wDocQuoteBundle.makeQuotesDraggable(event.getValue() == ViewMode.EDIT);
+		resizeHandlerManager.fireEvent(new QuoteResizeEvent());
 	}
 
 	@Override

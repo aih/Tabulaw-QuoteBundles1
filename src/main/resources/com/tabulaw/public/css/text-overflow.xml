@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bindings xmlns="http://www.mozilla.org/xbl" xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<binding id="ellipsis">
+		<content>
+			<xul:label crop="end" style="width: 100%;"><children/></xul:label>
+		</content>
+		<implementation>
+			<method name="setTextContentToValue">
+				<body><![CDATA[
+				var eDescription = document.getAnonymousNodes(this)[0];
+				if (eDescription) eDescription.value = this.textContent;
+				// ]]></body>
+			</method>
+			<constructor>setTextContentToValue();</constructor>
+		</implementation>
+		<handlers>
+			<handler event="DOMSubtreeModified">setTextContentToValue();</handler>
+		</handlers>
+	</binding>
+	<binding id="none">
+		<content><children/></content>
+	</binding>
+</bindings>

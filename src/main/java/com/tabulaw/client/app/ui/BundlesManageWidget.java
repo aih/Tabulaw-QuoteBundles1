@@ -18,6 +18,11 @@ import com.allen_sauer.gwt.dnd.client.drop.HorizontalPanelDropController;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HasResizeHandlers;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,6 +33,7 @@ import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.LoggingDragHandler;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.QuoteResizeEvent;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IEntity;
 import com.tabulaw.model.ModelKey;
@@ -38,7 +44,7 @@ import com.tabulaw.model.QuoteBundle;
  * Manages the editing of quote bundles via drag and drop.
  * @author jpk
  */
-public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
+public class BundlesManageWidget extends AbstractModelChangeAwareWidget implements HasResizeHandlers{
 
 	static class Styles {
 
@@ -189,6 +195,9 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 	// main viewing area only)
 	private final PickupDragController quoteController;
 	private final QuoteDragHandler quoteHandler;
+	
+	private final HandlerManager resizeHandlerManager = new HandlerManager(this);
+	
 
 	private final HashMap<BundleEditWidget, FlowPanelDropController> qbDropBindings =
 			new HashMap<BundleEditWidget, FlowPanelDropController>();
@@ -377,7 +386,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 
 		Log.debug("Inserting quote bundle col widget for: " + bundle);
 		boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteBundleKey().equals(bundle.getModelKey());
-		final BundleEditWidget qbw = new BundleEditWidget(quoteController, isOrphanedBundle);
+		final BundleEditWidget qbw = new BundleEditWidget(quoteController, isOrphanedBundle, this);
 		qbw.setModel(bundle);
 		qbw.setCloseHandler(new ClickHandler() {
 
@@ -386,6 +395,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 				unpinQuoteBundle(qbw);
 			}
 		});
+		qbw.registerSearchHandler();
 		columns.insert(qbw, index);
 
 		int numBundles = numBundlesBeforeInsert + 1;
@@ -424,6 +434,9 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 		for(QuoteEditWidget qw : quoteWidgets) {
 			quoteController.makeDraggable(qw, qw.getDragHandle());
 		}
+
+		resizeHandlerManager.fireEvent(new QuoteResizeEvent());
+		
 	}
 
 	private boolean removeQuoteBundleColumn(QuoteBundle bundle) {
@@ -437,6 +450,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 			Widget w = columns.getWidget(i);
 			if(w instanceof BundleEditWidget) {
 				BundleEditWidget qbw = (BundleEditWidget) w;
+				
 				if(qbw.getModel().getId().equals(rmId)) {
 
 					// un-make quote widgets draggable
@@ -444,6 +458,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 					for(QuoteEditWidget qw : quoteWidgets) {
 						quoteController.makeNotDraggable(qw);
 					}
+
+					qbw.unRegisterSearchHandler();
 
 					removedQbw = qbw;
 				}
@@ -476,6 +492,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 				}
 			}
 		}
+		resizeHandlerManager.fireEvent(new QuoteResizeEvent());
 
 		return removedQbw != null;
 	}
@@ -523,5 +540,10 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget {
 					break;
 			}
 		}
+	}
+
+	@Override
+	public HandlerRegistration addResizeHandler(ResizeHandler handler) {
+		return resizeHandlerManager.addHandler(ResizeEvent.getType(), handler);
 	}
 }

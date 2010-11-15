@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.AddBundleDialog;
 import com.tabulaw.client.app.ui.BundlesManageWidget;
+import com.tabulaw.client.app.ui.SearchWidget;
 import com.tabulaw.client.ui.ImageButton;
 import com.tabulaw.client.view.StaticViewInitializer;
 import com.tabulaw.client.view.ViewClass;
@@ -73,10 +74,13 @@ public class BundlesView extends AbstractPocView<StaticViewInitializer> {
 		HTML viewName = new HTML(getLongViewName());
 		viewName.setStyleName("viewTitle");
 		
+		
+
+		
 		navColWidgets = new Widget[] {
 			viewName,
-			qbPanel.getQuoteBundleListingWidget(),
 			new NewQuoteBundleButton(),
+			qbPanel.getQuoteBundleListingWidget()
 		};
 		
 		addWidget(qbPanel);
@@ -97,6 +101,11 @@ public class BundlesView extends AbstractPocView<StaticViewInitializer> {
 		return navColWidgets;
 	}
 
+	@Override
+	public Widget getSearchWidget() {
+		return new SearchWidget();
+	}
+	
 	@Override
 	protected void doInitialization(StaticViewInitializer initializer) {
 		qbPanel.makeModelChangeAware();

@@ -17,9 +17,9 @@ a:hover {
 a:active {
 }
 
-.gwt-PopupPanel {
-	border: 0;
-	padding: 0;
+.rpc-message-popup {
+	border: 0!important;
+	padding: 0!important;
 }
 
 .gwt-PopupPanelGlass {
@@ -169,6 +169,27 @@ div.ro {
 .navRowTbl 	.gwt-TabBarItem .navButton-doc img {
 		margin: 1px 0 0 10px;
 	}
+.search-panel {
+	margin-bottom	: 10px;
+}
+.search-widget {
+	margin-bottom	: 5px;
+}
+
+.search-widget div {
+	font-family:Georgia,"Times New Roman",Times,serif;
+	font-weight:bold;
+	padding-bottom:10px;
+}
+.search-widget input {
+	margin-bottom:10px;
+	width:145px;
+}	
+.search-widget button {
+	padding-left:7px;
+	text-align:left;
+	width:145px;
+}	
 
 #navCol {
 	float: left;
@@ -540,6 +561,10 @@ div.ro {
 .wquote .quoted {
 	padding: 2px 1px 0 2px;
 	font-size: 11px;
+	height: 27px;
+	overflow: hidden;
+	cursor: pointer;
+	
 }
 
 /* docUpload widget */
@@ -1027,11 +1052,21 @@ docHeaderMenuItem img{
 		font-size: 12px;
 	}
 	.doc .quoted p {
-		line-height: .93em;
+		line-height: 12px;
 	}
 	.doc .quoted {
-		max-height: 50px;
+/*		max-height: 50px;*/
 		overflow: hidden;
+		height: 25px;
+		cursor: pointer;
+	}
+	.quote-popup {
+		max-height: 83px;
+	}
+	.quote-popup-header {
+		font-weight : bold;
+		padding-bottom: 5px;
+		width: 100%;
 	}
 .doc-static .copyQuoteIcon {
 	display: none; /* hide when in doc edit mode */
@@ -1098,6 +1133,7 @@ docHeaderMenuItem img{
 	.users .createUser .btnRow .cancel {
 		float: right;
 	}
+
 		
 .doc-import-edit-panel .fpnl {
 	max-height: 250px;
@@ -1110,4 +1146,15 @@ docHeaderMenuItem img{
 
 .doc-import-edit-panel td {
 	padding: 5px;
+}
+
+	
+	.tabulaw-util-elipsis{
+	width: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	-o-text-overflow: ellipsis;
+	-moz-binding: url('../../poc/css/text-overflow.xml#ellipsis');
+	}
 }

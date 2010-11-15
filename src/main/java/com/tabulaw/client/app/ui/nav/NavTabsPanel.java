@@ -6,7 +6,10 @@ import org.cobogw.gwt.user.client.ui.VerticalTabBar;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.view.DocView;
+import com.tabulaw.client.app.view.IPocView;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
@@ -26,11 +29,17 @@ public class NavTabsPanel extends AbstractNavPanel {
 	private final ArrayList<IViewInitializerProvider> mainViewButtons = new ArrayList<IViewInitializerProvider>();
 
 	private final VerticalTabBar mainViewTabs = new VerticalTabBar();
+	private final FlowPanel searchPanel = new FlowPanel();
+	private final FlowPanel panel = new FlowPanel();
 
 	private boolean handlingViewChange;
 
 	public NavTabsPanel(final IUserSessionHandler userSessionHandler) {
-		initWidget(mainViewTabs);
+		searchPanel.addStyleName("vpanel search-panel");
+		panel.add(searchPanel);
+		panel.add(mainViewTabs);
+		
+		initWidget(panel);
 		addStyleName(Style.NAV_TABS_PANEL);
 
 		DocsNavButton nbDocListing = new DocsNavButton();
@@ -45,6 +54,7 @@ public class NavTabsPanel extends AbstractNavPanel {
 		mainViewTabs.addSelectionHandler(new SelectionHandler<Integer>() {
 			@Override
 			public void onSelection(SelectionEvent<Integer> event) {
+				changeSearchWidget(event.getSelectedItem().intValue()); 
 				if (!handlingViewChange) {
 					showView(mainViewButtons, event.getSelectedItem()
 							.intValue());
@@ -99,6 +109,20 @@ public class NavTabsPanel extends AbstractNavPanel {
 	@Override
 	protected void handleViewUnload(ViewKey key) {
 		handlingViewChange = false;
+	}
+	private void changeSearchWidget(int index) {
+		//clear
+		if (searchPanel.getWidgetCount()>0) {
+			searchPanel.remove(0);
+		}
+		ViewKey key = mainViewButtons.get(index).getViewInitializer().getViewKey();
+		IPocView<?> view = (IPocView<?>) ViewManager.get().resolveView(key);
+		if (view != null) {
+			Widget searchWidget = view.getSearchWidget();
+			if (searchWidget != null) {
+				searchPanel.add(searchWidget);
+			}
+		}
 	}
 
 	private static void showView(

@@ -21,4 +21,10 @@ public interface IPocView<I extends IViewInitializer> extends IView<I> {
 	 *         panel. <code>null</code> indicates no widgets will be displayed.
 	 */
 	Widget[] getNavColWidgets();
+
+	/**
+	 * @return Search widget that implement searching for certain view.
+	 *  <code>null</code> indicates no search widget will be displayed.
+	 */
+	Widget getSearchWidget();
 }

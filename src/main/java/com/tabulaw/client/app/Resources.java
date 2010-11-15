@@ -26,6 +26,9 @@ public interface Resources extends ClientBundle {
 	@Source("../../public/images/magnifying_glass_alt_24x24.png")
 	ImageResource magnifyingGlass();
 
+	@Source("../../public/images/magnifying_glass_alt_16x16.png")
+	ImageResource magnifyingGlassSmall();
+
 	@Source("../../public/images/google-scholar.png")
 	ImageResource googleScholarLogo();
 
