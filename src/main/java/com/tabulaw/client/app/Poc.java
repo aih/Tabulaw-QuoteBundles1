@@ -329,6 +329,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		// create handler for displaying nav row/col content which is view specific
 		ViewManager.get().addViewChangeHandler(navColPanel);
 		ViewManager.get().addViewChangeHandler(navRowPanel);
+		ViewManager.get().addViewChangeHandler(navTabsPanel);
 
 		// initialize the ui msg notifier
 		Notifier.init(navColPanel, Position.TOP, -20, 0);
