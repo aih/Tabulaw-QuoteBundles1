@@ -38,4 +38,11 @@ public abstract class AbstractPocView<I extends IViewInitializer> extends Abstra
 		// base impl none
 		return null;
 	}
+
+	public Widget getSearchWidget() {
+		// base impl none
+		return null;
+		
+	}
+	
 }

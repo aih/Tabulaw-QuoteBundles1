@@ -169,8 +169,26 @@ div.ro {
 .navRowTbl 	.gwt-TabBarItem .navButton-doc img {
 		margin: 1px 0 0 10px;
 	}
+.search-panel {
+	margin-bottom	: 10px;
+}
 .search-widget {
 	margin-bottom	: 5px;
+}
+
+.search-widget div {
+	font-family:Georgia,"Times New Roman",Times,serif;
+	font-weight:bold;
+	padding-bottom:10px;
+}
+.search-widget input {
+	margin-bottom:10px;
+	width:145px;
+}	
+.search-widget button {
+	padding-left:7px;
+	text-align:left;
+	width:145px;
 }	
 
 #navCol {
