@@ -28,7 +28,18 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 	private OAuthParametersProvider authParametersProvider = new GoogleAnonymousOAuthParametersProvider();
 
 	@Override
-	protected void service(HttpServletRequest request,
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		doAuthorizeAndForward(req, resp);
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		doAuthorizeAndForward(req, resp);
+	}
+
+	private void doAuthorizeAndForward(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
 		if ("true".equals(request.getParameter("relogin"))) {
@@ -88,8 +99,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 	private void persistToken(HttpServletRequest request,
 			GoogleOAuthParameters oauthParameters) {
 		request.getSession().setAttribute(
-				OAuthParametersProvider.OAUTH_PARAMETERS,
-				oauthParameters);
+				OAuthParametersProvider.OAUTH_PARAMETERS, oauthParameters);
 	}
 
 	private void resetTokens(HttpServletRequest request) {
