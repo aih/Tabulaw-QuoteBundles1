@@ -1142,6 +1142,16 @@ docHeaderMenuItem img{
 	-o-text-overflow: ellipsis;
 	-moz-binding: url('../../poc/css/text-overflow.xml#ellipsis');
 	}
-}
+	.doc-import-edit-panel .fpnl {
+		max-height: 250px;
+		overflow-y: auto;
+	}
 	
+	* html .doc-import-edit-panel .fpnl {
+		height: expression(this.scrollHeight >= 250 ? "250px" : "auto");
+	}
 	
+	.doc-import-edit-panel td {
+		padding: 5px;
+	}
+

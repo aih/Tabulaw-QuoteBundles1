@@ -300,7 +300,9 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				wDocQuoteBundle.clearQuotesFromUi();
 				wDocQuoteBundle.clearQuoteEventBindings();
 			}
-			wDocQuoteBundle.setModel(crntQb);
+			if(wDocQuoteBundle.getModel() == null || !wDocQuoteBundle.getModel().getId().equals(crntQb.getId())) {
+				wDocQuoteBundle.setModel(crntQb);
+			}
 			crntQbId = crntQb.getId();
 			return true;
 		}

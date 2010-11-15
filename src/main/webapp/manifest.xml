@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ApplicationManifest xmlns="http://schemas.google.com/ApplicationManifest/2009">
+	<Name>Tabulaw</Name>
+	<Description>Software tools for legal work</Description>
+
+	<!-- Administrators and users will be sent to this URL for application support -->
+	<Support>
+		<Link rel="support" href="http://www.tabulaw.com/support.html" />
+	</Support>
+
+	<!-- Show this link in Google's universal navigation for all users -->
+	<Extension id="navLink" type="link">
+		<Name>Hello World</Name>
+		<Url>http://www.tabulaw.com/openid?hd=${DOMAIN_NAME}</Url>
+		<Scope ref="documentsList" />
+		<Scope ref="documentDownload" />
+	</Extension>
+
+	<!-- Declare our OpenID realm so our app is white listed -->
+	<Extension id="realm" type="openIdRealm">
+		<Url>http://www.tabulaw.com/</Url>
+	</Extension>
+
+	<Scope id="documentsList">
+		<Url>https://docs.google.com/feeds/</Url>
+		<Reason>This app displays the user's next upcoming Google Calendar appointment.</Reason>
+	</Scope>
+	<Scope id="documentDownload">
+		<Url>https://docs.googleusercontent.com/feeds/download/</Url>
+		<Reason>This app displays the user's next upcoming Google Calendar appointment.</Reason>
+	</Scope>
+</ApplicationManifest>
+

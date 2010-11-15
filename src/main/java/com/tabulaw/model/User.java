@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -66,6 +68,10 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 	private HashSet<AppFeature> appFeatures;
 
+	private HashMap<String,String> oauthParameters;
+
+	private HashMap<String,String> oauthParametersExtra;
+	
 	/**
 	 * Constructor
 	 */
@@ -323,5 +329,21 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		}
 
 		return null;
+	}
+
+	public void setOAuthParameters(HashMap<String,String> oauthParameters) {
+		this.oauthParameters = oauthParameters;
+	}
+
+	public Map<String,String> getOAuthParameters() {
+		return oauthParameters;
+	}
+
+	public void setOAuthParametersExtra(HashMap<String,String> oauthParametersExtra) {
+		this.oauthParametersExtra = oauthParametersExtra;
+	}
+
+	public Map<String,String> getOAuthParametersExtra() {
+		return oauthParametersExtra;
 	}
 }

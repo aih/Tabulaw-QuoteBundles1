@@ -45,12 +45,19 @@
 	</welcome-file-list>
 
 	<listener>
+		<listener-class>com.google.step2.servlet.GuiceServletContextListener</listener-class>
+	</listener>
+	<listener>
 		<listener-class>com.tabulaw.server.Bootstrapper</listener-class>
 	</listener>
 	<listener>
 		<listener-class>com.tabulaw.rest.RESTSessionManager</listener-class>
 	</listener>
 
+	<context-param>
+		<param-name>guice-modules</param-name>
+		<param-value>com.tabulaw.di.OpenIdGuiceModule</param-value>
+	</context-param>
 
 	<filter>
 		<filter-name>AuthenticationProcessingFilter</filter-name>
@@ -170,6 +177,73 @@
 		<url-pattern>/poc/doc</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>GoogleDocsServiceRpc</servlet-name>
+		<servlet-class>com.tabulaw.server.rpc.GoogleDocsServiceRpc</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GoogleDocsServiceRpc</servlet-name>
+		<url-pattern>/googledoc.rpc</url-pattern>
+		<url-pattern>/poc/googledoc.rpc</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>OAuthAuthorize</servlet-name>
+		<servlet-class>com.tabulaw.oauth.OAuthAuthorizeServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OAuthAuthorize</servlet-name>
+		<url-pattern>/oauthauthorize</url-pattern>
+		<url-pattern>/poc/oauthauthorize</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>OAuthPersistAccessToken</servlet-name>
+		<servlet-class>com.tabulaw.oauth.OAuthPersistAccessTokenServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OAuthPersistAccessToken</servlet-name>
+		<url-pattern>/oauthpersistaccesstoken</url-pattern>
+		<url-pattern>/poc/oauthpersistaccesstoken</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet>
+        <servlet-name>OpenIdServlet</servlet-name>
+        <servlet-class>com.tabulaw.openid.OpenIdServlet</servlet-class>
+        <!-- 
+		<init-param>
+            <param-name>realm</param-name>
+            <param-value>http://757542196935.apps.googleusercontent.com/</param-value>
+        </init-param>
+         -->
+        <init-param>
+            <param-name>return_to_path</param-name>
+            <param-value>openid</param-value>
+        </init-param>
+        <init-param>
+            <param-name>home_path</param-name>
+            <param-value>Poc.html</param-value>
+        </init-param>        
+        <init-param>
+            <param-name>consumerKey</param-name>
+            <param-value>dev.tabulaw.com</param-value>
+        </init-param>
+        <init-param>
+            <param-name>consumerSecret</param-name>
+            <param-value>c72cJB/WIXJuAtc9Ob8yq4GT</param-value>
+        </init-param>
+        <init-param>
+            <param-name>redirectOnSuccess</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OpenIdServlet</servlet-name>
+        <url-pattern>/openid</url-pattern>
+        <url-pattern>/poc/openid</url-pattern>
+    </servlet-mapping>
+    
 	<servlet>
 		<servlet-name>RESTServlet</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>

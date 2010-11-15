@@ -59,6 +59,9 @@ public interface Resources extends ClientBundle {
 	@Source("../../public/images/plus.png")
 	ImageResource plus();
 
+	@Source("../../public/images/import-button.png")
+	ImageResource importButton();
+
 	@Source("../../public/images/upload-button.png")
 	ImageResource uploadButton();
 

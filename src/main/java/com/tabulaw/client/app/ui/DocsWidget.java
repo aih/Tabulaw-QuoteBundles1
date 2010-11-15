@@ -41,7 +41,28 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 			});
 		}
 	}
+	
+	static class ImportDocButton extends ImageButton {
+		
+		private DocImportDialog dlg;
 
+		private ImportDocButton() {
+			super(Resources.INSTANCE.importButton(), "Import Document");
+			setTitle("Import a document...");
+			addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					if(dlg == null) {
+						dlg = new DocImportDialog();
+						dlg.setGlassEnabled(true);
+					}
+					dlg.center();
+				}
+			});
+		}
+	}
+	
 	static class NewDocButton extends ImageButton {
 		
 		private DocCreateDialog dlg;
@@ -70,6 +91,7 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 
 	private final FlowPanel btnPanel = new FlowPanel();
 	private final DocUploadButton btnDocUpload = new DocUploadButton();
+	private final ImportDocButton btnImportDoc = new ImportDocButton();
 	private final NewDocButton btnNewDoc = new NewDocButton();
 
 	private final FlowPanel panel = new FlowPanel();
@@ -90,6 +112,7 @@ public class DocsWidget extends AbstractModelChangeAwareWidget {
 
 		btnPanel.setStyleName("btnRow");
 		btnPanel.add(btnDocUpload);
+		btnPanel.add(btnImportDoc);
 		btnPanel.add(btnNewDoc);
 		docListingHeader.add(btnPanel);
 

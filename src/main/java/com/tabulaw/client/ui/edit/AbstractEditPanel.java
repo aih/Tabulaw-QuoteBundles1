@@ -322,6 +322,13 @@ public abstract class AbstractEditPanel<T> extends Composite implements ClickHan
 		pnlButtonRow.setVisible(editable);
 	}
 
+	public void setEnabled(boolean enabled) {
+		fieldPanel.getFieldGroup().setReadOnly(!enabled);
+		btnReset.setEnabled(enabled);
+		btnSave.setEnabled(enabled);
+		btnDelete.setEnabled(enabled);
+	}
+
 	@Override
 	protected void onLoad() {
 		Log.debug("EditPanel.onLoad()..");
