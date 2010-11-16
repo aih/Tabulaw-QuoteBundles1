@@ -27,8 +27,9 @@ public class LoginBean {
 
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;
-		setEmailAddress(request.getParameter("emailAddress"));
-		setPassword(request.getParameter("password"));
+		setEmailAddress(StringUtils.defaultString(
+				request.getParameter("emailAddress")).trim());
+		setPassword(StringUtils.defaultString(request.getParameter("password")));
 	}
 
 	public HttpServletRequest getRequest() {
@@ -74,10 +75,8 @@ public class LoginBean {
 			log.fatal("No http session exists.");
 			errors.add("No http session exists.");
 		} else {
-			String username = StringUtils.defaultString(
-					request.getParameter("userEmail")).trim();
-			String password = StringUtils.defaultString(request
-					.getParameter("userPswd"));
+			String username = getEmailAddress();
+			String password = getPassword();
 			try {
 				PersistContext persistContext = (PersistContext) session
 						.getServletContext().getAttribute(PersistContext.KEY);

@@ -21,6 +21,17 @@ if(registerBean.isRegistrationValid()) {
 	<body>
 		<form class="register" method="post" action="Register.html">
 			<div>Register</div>
+			<%if(!registerBean.getErrors().isEmpty()) { %>
+				<div class="errors">
+					<%
+						java.util.List errors = registerBean.getErrors(); 
+						for(int i=0; i < errors.size(); i++) {
+							java.lang.Object error = errors.get(i);
+							%><div><%=error%></div><%
+						}
+					%>		
+				</div>
+			<% } %>
 			<div>
 				<table>
 					<tr>
