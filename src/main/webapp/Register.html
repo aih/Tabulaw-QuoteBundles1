@@ -6,11 +6,6 @@ loginSession.setRequest(request);
 if(loginSession.isLoggedIn()) {
 	response.sendRedirect("Poc.html"); 
 }
-com.tabulaw.server.jsp.LoginBean loginBean = new com.tabulaw.server.jsp.LoginBean();
-loginBean.setRequest(request); 
-if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
-	response.sendRedirect("Poc.html"); 
-}
 %>
 <html>
 	<head>
@@ -19,19 +14,8 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 		<title>Tabulaw</title>
 	</head>
 	<body>
-		<form class="login" method="post">
-			<div>Login</div>
-			<%if(!loginBean.getErrors().isEmpty()) { %>
-				<div class="errors">
-					<%
-						java.util.List errors = loginBean.getErrors(); 
-						for(int i=0; i < errors.size(); i++) {
-							java.lang.Object error = errors.get(i);
-							%><%=error%><%
-						}
-					%>		
-				</div>
-			<% } %>
+		<form class="register" method="post">
+			<div>Register</div>
 			<div>
 				<table>
 					<tr>
@@ -50,7 +34,7 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 			</div>
 		</form>
 		<div>
-			<a href="Register.html">Register</a>
+			<a href="Login.html">Login</a>
 		</div>
 	</body>
 </html>
