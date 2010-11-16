@@ -6,6 +6,7 @@ import org.cobogw.gwt.user.client.ui.VerticalTabBar;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.view.DocView;
@@ -54,7 +55,6 @@ public class NavTabsPanel extends AbstractNavPanel {
 		mainViewTabs.addSelectionHandler(new SelectionHandler<Integer>() {
 			@Override
 			public void onSelection(SelectionEvent<Integer> event) {
-				changeSearchWidget(event.getSelectedItem().intValue()); 
 				if (!handlingViewChange) {
 					showView(mainViewButtons, event.getSelectedItem()
 							.intValue());
@@ -89,33 +89,18 @@ public class NavTabsPanel extends AbstractNavPanel {
 
 	@Override
 	protected void handleViewLoad(ViewKey key) {
-		handlingViewChange = true;
-		ViewKey crntViewKey = ViewManager.get().getCurrentViewKey();
-		int i = 0;
-		if (crntViewKey.getViewClass() != DocView.klas) {
-			for (IViewInitializerProvider navBtn : mainViewButtons) {
-				mainViewTabs.setTabEnabled(i, true);
-				ViewKey aViewKey = navBtn.getViewInitializer().getViewKey();
-				if (crntViewKey.equals(aViewKey)) {
-					mainViewTabs.selectTab(i);
-					mainViewTabs.setTabEnabled(i, false);
-					break;
-				}
-				i++;
-			}
-		}
+		changeSearchWidget(key); 
 	}
 
 	@Override
 	protected void handleViewUnload(ViewKey key) {
 		handlingViewChange = false;
 	}
-	private void changeSearchWidget(int index) {
+	private void changeSearchWidget(ViewKey key) {
 		//clear
 		if (searchPanel.getWidgetCount()>0) {
 			searchPanel.remove(0);
 		}
-		ViewKey key = mainViewButtons.get(index).getViewInitializer().getViewKey();
 		IPocView<?> view = (IPocView<?>) ViewManager.get().resolveView(key);
 		if (view != null) {
 			Widget searchWidget = view.getSearchWidget();
