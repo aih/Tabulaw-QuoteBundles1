@@ -6,6 +6,11 @@ loginSession.setRequest(request);
 if(loginSession.isLoggedIn()) {
 	response.sendRedirect("Poc.html"); 
 }
+com.tabulaw.server.jsp.RegisterBean registerBean = new com.tabulaw.server.jsp.RegisterBean();
+registerBean.setRequest(request); 
+if(registerBean.isRegistrationValid()) {
+	response.sendRedirect("Login.html?registration=success"); 
+}
 %>
 <html>
 	<head>
@@ -14,10 +19,14 @@ if(loginSession.isLoggedIn()) {
 		<title>Tabulaw</title>
 	</head>
 	<body>
-		<form class="register" method="post">
+		<form class="register" method="post" action="Register.html">
 			<div>Register</div>
 			<div>
 				<table>
+					<tr>
+						<td>Name<sup class="rqd">*</sup></td>
+						<td><input type="text" id="userName" name="userName"></td>
+					</tr>
 					<tr>
 						<td>Email Address<sup class="rqd">*</sup></td>
 						<td><input type="text" id="userEmail" name="userEmail"></td>
@@ -26,15 +35,18 @@ if(loginSession.isLoggedIn()) {
 						<td>Password<sup class="rqd">*</sup></td>
 						<td><input type="password" id="userPswd" name="userPswd"></td>
 					</tr>
+					<tr>
+						<td>Confirm Password<sup class="rqd">*</sup></td>
+						<td><input type="password" id="userPswdConfirm" name="userPswdConfirm"></td>
+					</tr>
 				</table>
 			</div>
 			<div>
-				<input type="submit" id="submitLogin" name="submitLogin" value="Submit"></input>
-				<img id="loginindicator" style="display: none;" src="images/ajax-loader.gif">
+				<input type="submit" id="submitRegister" name="submitRegister" value="Submit"></input>
 			</div>
 		</form>
 		<div>
-			<a href="Login.html">Login</a>
+			<a href="Login.html">Cancel</a>
 		</div>
 	</body>
 </html>

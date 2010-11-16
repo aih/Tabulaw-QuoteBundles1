@@ -19,7 +19,7 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 		<title>Tabulaw</title>
 	</head>
 	<body>
-		<form class="login" method="post">
+		<form class="login" method="post" action="Login.html">
 			<div>Login</div>
 			<%if(!loginBean.getErrors().isEmpty()) { %>
 				<div class="errors">
@@ -46,7 +46,6 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 			</div>
 			<div>
 				<input type="submit" id="submitLogin" name="submitLogin" value="Submit"></input>
-				<img id="loginindicator" style="display: none;" src="images/ajax-loader.gif">
 			</div>
 		</form>
 		<div>
