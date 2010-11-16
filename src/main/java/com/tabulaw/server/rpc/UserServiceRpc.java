@@ -118,19 +118,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 			
 			// send out email
 			try {
-				final EmailDispatcher emailDispatcher = webContext.getEmailDispatcher();
-				MailManager mailManager = emailDispatcher.getMailManager();
-				final MailRouting mr = mailManager.buildAppSenderMailRouting(newUser.getEmailAddress());
-				Map<String, Object> data = new HashMap<String, Object>(1);
-				data.put("subject", "Tabulaw Registration");
-				data.put("emailAddress", newUser.getEmailAddress());
-				final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, "welcome-user", data);
-				try {
-					emailDispatcher.queueEmail(mailContext);
-				}
-				catch(InterruptedException e) {
-					// TODO anything?
-				}
+				sendEmailConfirmation(newUser, webContext);
 			}
 			catch(Exception e) {
 				// don't penalize for email failure
@@ -150,6 +138,22 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		}
 
 		return payload;
+	}
+	
+	public static void sendEmailConfirmation(User newUser, WebAppContext webContext)throws Exception{
+		final EmailDispatcher emailDispatcher = webContext.getEmailDispatcher();
+		MailManager mailManager = emailDispatcher.getMailManager();
+		final MailRouting mr = mailManager.buildAppSenderMailRouting(newUser.getEmailAddress());
+		Map<String, Object> data = new HashMap<String, Object>(1);
+		data.put("subject", "Tabulaw Registration");
+		data.put("emailAddress", newUser.getEmailAddress());
+		final IMailContext mailContext = mailManager.buildTextTemplateContext(mr, "welcome-user", data);
+		try {
+			emailDispatcher.queueEmail(mailContext);
+		}
+		catch(InterruptedException e) {
+			// TODO anything?
+		}
 	}
 
 	@Override

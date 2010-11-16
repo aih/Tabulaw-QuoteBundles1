@@ -12,7 +12,10 @@ import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.model.User;
 import com.tabulaw.server.PersistContext;
+import com.tabulaw.server.WebAppContext;
+import com.tabulaw.server.rpc.UserServiceRpc;
 import com.tabulaw.service.entity.UserService;
 
 public class RegisterBean {
@@ -105,9 +108,7 @@ public class RegisterBean {
 				log.fatal("No http session exists.");
 				errors.add("No http session exists.");
 			} else {
-				PersistContext persistContext = (PersistContext) session
-						.getServletContext().getAttribute(PersistContext.KEY);
-				userService = persistContext.getUserService();
+				userService = getPersistContext().getUserService();
 				try {
 					// Check if email address already exists
 					userService.findByEmail(getEmailAddress());
@@ -139,12 +140,32 @@ public class RegisterBean {
 
 	private void doUserRegister(UserService userService) {
 		try {
-			userService.create(getName(), getEmailAddress(), getPassword());
+			User user = userService.create(getName(), getEmailAddress(),
+					getPassword());
+			sendEmail(user);
 		} catch (EntityExistsException e) {
 			errors.add("Email already exists");
 		} catch (Exception e) {
 			errors.add("Internal error");
 			log.error("", e);
 		}
+	}
+
+	private void sendEmail(User user) {
+		try {
+			UserServiceRpc.sendEmailConfirmation(user, getWebAppContext());
+		} catch (Exception e) {
+			log.error("Unable to send email confirmation at this time.", e);
+		}
+	}
+
+	private PersistContext getPersistContext() {
+		return (PersistContext) getRequest().getSession().getServletContext()
+				.getAttribute(PersistContext.KEY);
+	}
+
+	private WebAppContext getWebAppContext() {
+		return (WebAppContext) getRequest().getSession().getServletContext()
+				.getAttribute(WebAppContext.KEY);
 	}
 }
