@@ -28,8 +28,8 @@ public class LoginBean {
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;
 		setEmailAddress(StringUtils.defaultString(
-				request.getParameter("emailAddress")).trim());
-		setPassword(StringUtils.defaultString(request.getParameter("password")));
+				request.getParameter("userEmail")).trim());
+		setPassword(StringUtils.defaultString(request.getParameter("userPswd")));
 	}
 
 	public HttpServletRequest getRequest() {
@@ -75,14 +75,12 @@ public class LoginBean {
 			log.fatal("No http session exists.");
 			errors.add("No http session exists.");
 		} else {
-			String username = getEmailAddress();
-			String password = getPassword();
 			try {
 				PersistContext persistContext = (PersistContext) session
 						.getServletContext().getAttribute(PersistContext.KEY);
 				UserService userService = persistContext.getUserService();
 
-				User user = userService.findByEmail(username);
+				User user = userService.findByEmail(getEmailAddress());
 
 				if (!user.isEnabled()) {
 					errors.add("Your account is disabled.");
@@ -92,7 +90,7 @@ public class LoginBean {
 					errors.add("Your account is locked.");
 				} else {
 					try {
-						if (UserService.isPasswordValid(password,
+						if (UserService.isPasswordValid(getPassword(),
 								user.getPassword(), user.getEmailAddress())) {
 							final UserContext context = new UserContext();
 							context.setUser(user);

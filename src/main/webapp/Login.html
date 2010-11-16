@@ -19,6 +19,12 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 		<title>Tabulaw</title>
 	</head>
 	<body>
+		<%if("success".equals(request.getParameter("registration"))){ %>
+			<div>
+			    <div>*Registration successful.</div>
+		    	<div>*Now login!</div>
+	    	</div>
+	    <% } %>
 		<form class="login" method="post" action="Login.html">
 			<div>Login</div>
 			<%if(!loginBean.getErrors().isEmpty()) { %>
