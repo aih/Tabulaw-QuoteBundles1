@@ -18,9 +18,9 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
 		<title>Tabulaw</title>
 	</head>
-	<body id='host-body'>
+	<body>
 		<form class="login" method="post">
-			<div class="heading">Login</div>
+			<div>Login</div>
 			<%if(!loginBean.getErrors().isEmpty()) { %>
 				<div class="errors">
 					<%
@@ -32,8 +32,8 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 					%>		
 				</div>
 			<% } %>
-			<div class="opPanel">
-				<table class="fgrid">
+			<div>
+				<table>
 					<tr>
 						<td>Email Address<sup class="rqd">*</sup></td>
 						<td><input type="text" id="userEmail" name="userEmail"></td>
