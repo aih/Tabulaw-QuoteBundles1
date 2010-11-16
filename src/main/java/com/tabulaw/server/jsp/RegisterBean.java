@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -134,6 +135,8 @@ public class RegisterBean {
 			sendEmail(user);
 		} catch (EntityExistsException e) {
 			errors.add("Email already exists");
+		} catch (ConstraintViolationException e) {
+			errors.add("Invalid email format");
 		} catch (Exception e) {
 			errors.add("Internal error");
 			log.error("", e);

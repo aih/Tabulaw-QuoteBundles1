@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -105,6 +106,8 @@ public class LoginBean {
 						errors.add("Invalid or empty password.");
 					}
 				}
+			} catch (ConstraintViolationException e) {
+				errors.add("Invalid email format");
 			} catch (EntityNotFoundException e) {
 				errors.add("The account has not been found.");
 			}

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -80,8 +81,10 @@ public class PasswordForgottenBean {
 
 					UserServiceRpc.sendPasswordReminderEmail(getEmailAddress(),
 							userService, getWebAppContext());
+				} catch (ConstraintViolationException e) {
+					errors.add("Invalid email format");
 				} catch (EntityNotFoundException e) {
-					errors.add("No user found.");
+					errors.add("The account has not been found.");
 				} catch (Exception e) {
 					errors.add("Internal error.");
 					log.error("", e);
