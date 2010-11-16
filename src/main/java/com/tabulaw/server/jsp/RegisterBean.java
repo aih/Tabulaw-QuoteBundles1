@@ -79,6 +79,7 @@ public class RegisterBean {
 	}
 
 	public boolean isRegistrationValid() {
+		setErrors(new ArrayList<String>());
 
 		if (request == null) {
 			return false;
@@ -87,8 +88,6 @@ public class RegisterBean {
 		}
 
 		UserService userService = null;
-
-		setErrors(new ArrayList<String>());
 
 		if (getPassword().isEmpty()) {
 			errors.add("Empty password.");
