@@ -1,11 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%@ page language="java" import="java.util.*,java.lang.*" %> 
 <%
-com.tabulaw.server.jsp.LoginSessionBean loginSession = new com.tabulaw.server.jsp.LoginSessionBean(); 
-loginSession.setRequest(request);
-if(loginSession.isLoggedIn()) {
-	response.sendRedirect("Poc.html"); 
-}
 com.tabulaw.server.jsp.RegisterBean registerBean = new com.tabulaw.server.jsp.RegisterBean();
 registerBean.setRequest(request); 
 if(registerBean.isRegistrationValid()) {
@@ -34,10 +29,6 @@ if(registerBean.isRegistrationValid()) {
 			<% } %>
 			<div>
 				<table>
-					<tr>
-						<td>Name<sup class="rqd">*</sup></td>
-						<td><input type="text" id="userName" name="userName"></td>
-					</tr>
 					<tr>
 						<td>Email Address<sup class="rqd">*</sup></td>
 						<td><input type="text" id="userEmail" name="userEmail"></td>

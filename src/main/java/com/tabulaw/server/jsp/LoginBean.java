@@ -27,9 +27,12 @@ public class LoginBean {
 
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;
-		setEmailAddress(StringUtils.defaultString(
-				request.getParameter("userEmail")).trim());
-		setPassword(StringUtils.defaultString(request.getParameter("userPswd")));
+		if (request != null) {
+			setEmailAddress(StringUtils.defaultString(
+					request.getParameter("userEmail")).trim());
+			setPassword(StringUtils.defaultString(request
+					.getParameter("userPswd")));
+		}
 	}
 
 	public HttpServletRequest getRequest() {

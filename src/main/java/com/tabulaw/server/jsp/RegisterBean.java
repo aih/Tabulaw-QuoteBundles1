@@ -24,7 +24,6 @@ public class RegisterBean {
 
 	private HttpServletRequest request;
 
-	private String name;
 	private String emailAddress;
 	private String password;
 	private String passwordConfirm;
@@ -33,24 +32,18 @@ public class RegisterBean {
 
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;
-		setEmailAddress(StringUtils.defaultString(
-				request.getParameter("userEmail")).trim());
-		setName(StringUtils.defaultString(request.getParameter("userName")));
-		setPassword(StringUtils.defaultString(request.getParameter("userPswd")));
-		setPasswordConfirm(StringUtils.defaultString(request
-				.getParameter("userPswdConfirm")));
+		if (request != null) {
+			setEmailAddress(StringUtils.defaultString(
+					request.getParameter("userEmail")).trim());
+			setPassword(StringUtils.defaultString(request
+					.getParameter("userPswd")));
+			setPasswordConfirm(StringUtils.defaultString(request
+					.getParameter("userPswdConfirm")));
+		}
 	}
 
 	public HttpServletRequest getRequest() {
 		return request;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	public void setEmailAddress(String emailAddress) {
@@ -87,13 +80,16 @@ public class RegisterBean {
 
 	public boolean isRegistrationValid() {
 
+		if (request == null) {
+			return false;
+		} else if (request.getParameter("submitRegister") == null) {
+			return false;
+		}
+
 		UserService userService = null;
 
 		setErrors(new ArrayList<String>());
 
-		if (getName().isEmpty()) {
-			errors.add("Empty user name.");
-		}
 		if (getPassword().isEmpty()) {
 			errors.add("Empty password.");
 		}
@@ -115,12 +111,6 @@ public class RegisterBean {
 					errors.add("Email already exists.");
 				} catch (EntityNotFoundException e) {
 				}
-				try {
-					// Check if user name already exists
-					userService.getUserRef(getName());
-					errors.add("Username already exists.");
-				} catch (EntityNotFoundException e) {
-				}
 			}
 		}
 
@@ -140,8 +130,8 @@ public class RegisterBean {
 
 	private void doUserRegister(UserService userService) {
 		try {
-			User user = userService.create(getName(), getEmailAddress(),
-					getPassword());
+			User user = userService.create(getEmailAddress(),
+					getEmailAddress(), getPassword());
 			sendEmail(user);
 		} catch (EntityExistsException e) {
 			errors.add("Email already exists");
