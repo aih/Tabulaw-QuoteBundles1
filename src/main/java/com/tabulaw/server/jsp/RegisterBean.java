@@ -10,9 +10,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.tabulaw.common.data.rpc.UserRegistrationRequest;
+import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.User;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.service.entity.UserService;
 
@@ -84,6 +83,9 @@ public class RegisterBean {
 	}
 
 	public boolean isRegistrationValid() {
+
+		UserService userService = null;
+
 		setErrors(new ArrayList<String>());
 
 		if (getName().isEmpty()) {
@@ -92,32 +94,30 @@ public class RegisterBean {
 		if (getPassword().isEmpty()) {
 			errors.add("Empty password.");
 		}
-		if (getPassword().isEmpty()) {
-			errors.add("Empty password.");
-		}
 		if (!getPassword().equals(getPasswordConfirm())) {
-			errors.add("Invalid confirm password.");
+			errors.add("Invalid password confirm.");
 		}
-
 		if (getEmailAddress().isEmpty()) {
 			errors.add("Empty email address.");
 		} else {
-			// Check if email address already exists
 			HttpSession session = request.getSession(false);
-			UserService userService = null;
-			User user = null;
-
 			if (session == null) {
 				log.fatal("No http session exists.");
 				errors.add("No http session exists.");
 			} else {
+				PersistContext persistContext = (PersistContext) session
+						.getServletContext().getAttribute(PersistContext.KEY);
+				userService = persistContext.getUserService();
 				try {
-					PersistContext persistContext = (PersistContext) session
-							.getServletContext().getAttribute(
-									PersistContext.KEY);
-					userService = persistContext.getUserService();
-					user = userService.findByEmail(getEmailAddress());
+					// Check if email address already exists
+					userService.findByEmail(getEmailAddress());
 					errors.add("Email already exists.");
+				} catch (EntityNotFoundException e) {
+				}
+				try {
+					// Check if user name already exists
+					userService.getUserRef(getName());
+					errors.add("Username already exists.");
 				} catch (EntityNotFoundException e) {
 				}
 			}
@@ -125,13 +125,26 @@ public class RegisterBean {
 
 		if (!errors.isEmpty()) {
 			return false;
+		} else {
+			if (userService == null) {
+				errors.add("Internal error.");
+				log.error("userService is null");
+			} else {
+				doUserRegister(userService);
+			}
 		}
 
-		UserRegistrationRequest request = new UserRegistrationRequest();
-		request.setName(getName());
-		request.setEmailAddress(getEmailAddress());
-		request.setPassword(getPassword());
+		return errors.isEmpty();
+	}
 
-		return false;
+	private void doUserRegister(UserService userService) {
+		try {
+			userService.create(getName(), getEmailAddress(), getPassword());
+		} catch (EntityExistsException e) {
+			errors.add("Email already exists");
+		} catch (Exception e) {
+			errors.add("Internal error");
+			log.error("", e);
+		}
 	}
 }
