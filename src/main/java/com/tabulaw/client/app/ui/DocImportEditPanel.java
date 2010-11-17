@@ -12,21 +12,22 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.tabulaw.client.ui.edit.FieldGroupEditPanel;
+import com.tabulaw.client.ui.edit.IndicatorFieldGroupEditPanel;
 import com.tabulaw.client.ui.field.AbstractFieldPanel;
 import com.tabulaw.client.ui.field.FieldGroup;
 import com.tabulaw.client.ui.field.IFieldRenderer;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
 import com.tabulaw.common.data.GoogleDocument;
 
-public class DocImportEditPanel extends FieldGroupEditPanel {
+public class DocImportEditPanel extends IndicatorFieldGroupEditPanel {
 
 	public static class Style {
 		public final static String DOC_IMPORTED_EDIT_PANEL = "doc-import-edit-panel";
 	}
 
-	class InProgressPanel extends AbstractFieldPanel {
+	private class InProgressPanel extends AbstractFieldPanel {
 
 		@Override
 		protected FieldGroup generateFieldGroup() {
@@ -38,14 +39,14 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 			return new IFieldRenderer<FlowPanel>() {
 				@Override
 				public void render(FlowPanel widget, FieldGroup fg) {
-					widget.add(new Label("Loading ..."));
+					widget.add(new HTML(
+							"Loading ... <img src=\"images/ajax-loader.gif\">"));
 				}
 			};
 		}
-
 	}
 
-	class Renderer implements IFieldRenderer<FlowPanel> {
+	private class Renderer implements IFieldRenderer<FlowPanel> {
 
 		private final List<GoogleDocument> list;
 		private final List<CheckBox> cbs = new ArrayList<CheckBox>();
@@ -88,13 +89,14 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 		}
 
 		public void setEnabled(boolean enabled) {
+			setIndicatorVisible(!enabled);
 			for (CheckBox cb : cbs) {
 				cb.setEnabled(enabled);
 			}
 		}
 	}
 
-	class FieldPanel extends AbstractFieldPanel {
+	private class FieldPanel extends AbstractFieldPanel {
 
 		private final Renderer renderer;
 
@@ -120,7 +122,7 @@ public class DocImportEditPanel extends FieldGroupEditPanel {
 	private Set<GoogleDocument> value = new HashSet<GoogleDocument>();
 
 	public DocImportEditPanel() {
-		super("Import from Google Docs", null, null, null);
+		super("Import from Google Docs");
 		addStyleName(Style.DOC_IMPORTED_EDIT_PANEL);
 		setFieldPanel(new InProgressPanel());
 		showDeleteButton(false);
