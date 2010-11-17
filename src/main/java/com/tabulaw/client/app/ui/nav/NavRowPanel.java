@@ -15,9 +15,12 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.HTML;
@@ -199,7 +202,7 @@ public class NavRowPanel extends AbstractNavPanel {
 			frmLogout = new FormPanel();
 			frmLogout.setMethod(FormPanel.METHOD_POST);
 			frmLogout.setAction(GWT.getModuleBaseURL() + "logout");
-
+			
 			pnl.add(hiddenCurrentBundleId);
 			pnl.add(welcomeText);
 			pnl.add(lnkResetPswd);
@@ -264,14 +267,14 @@ public class NavRowPanel extends AbstractNavPanel {
 
 		crntQuoteBudleWidget.setStyleName(Styles.CRNT_QB);
 
-		liuWidget.frmLogout.addSubmitHandler(new SubmitHandler() {
-
+		liuWidget.frmLogout.addSubmitCompleteHandler(new SubmitCompleteHandler() {
 			@Override
-			public void onSubmit(SubmitEvent event) {
+			public void onSubmitComplete(SubmitCompleteEvent event) {
 				// clear out user state and fire user session end event w/o waiting for
 				// server response
 				ClientModelCache.get().removeAll(EntityType.USER, liuWidget);
-				userSessionHandler.onUserSessionEvent(new UserSessionEvent(false));
+				//userSessionHandler.onUserSessionEvent(new UserSessionEvent(false));
+				Window.Location.reload();
 			}
 		});
 
