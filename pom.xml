@@ -6,7 +6,7 @@
 	<artifactId>tabulaw</artifactId>
 	<name>tabulaw</name>
 	<version>0.2.2</version>
-	<description>The GWT Tabulaw app by the Logic Lab</description>
+	<description>The GWT Tabulaw app by Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved</description>
 	<packaging>war</packaging>
 
 	<properties>

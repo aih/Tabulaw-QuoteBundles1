@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk
  * @since Feb 28, 2010
  */
@@ -29,7 +29,7 @@ import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 
 /**
- * Supports editing capabilty for a quote bundle.
+ * Supports editing capability for a quote bundle.
  * 
  * @author jpk
  */

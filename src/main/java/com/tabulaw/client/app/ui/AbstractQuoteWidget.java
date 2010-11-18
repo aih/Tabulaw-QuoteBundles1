@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk
  * @since Feb 28, 2010
  */
@@ -309,7 +309,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 					@Override
 					public void onClick(ClickEvent event) {
-						// goto hightlight switching current doc if necessary
+						// goto highlight switching current doc if necessary
 						DocRef docRef = quote.getDocument();
 						final DocViewInitializer dvi = new DocViewInitializer(docRef.getModelKey());
 						ViewManager.get().dispatch(new ShowViewRequest(dvi, new Command() {

@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk
  * @since Feb 20, 2010
  */
@@ -217,7 +217,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 			case TEXT_SELECT: {
 				final MarkOverlay mark = event.getMark();
 
-				// only add quote if a valid hightlight is possible
+				// only add quote if a valid highlight is possible
 				try {
 					mark.highlight();
 				}
@@ -294,7 +294,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 		if(crntQbId == null || !crntQbId.equals(crntQb.getId())) {
 			if(crntQbId != null) {
-				// un-hightlight quotes
+				// un-highlight quotes
 				highlightQuotes(false);
 
 				wDocQuoteBundle.clearQuotesFromUi();
