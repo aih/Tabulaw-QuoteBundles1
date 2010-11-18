@@ -89,6 +89,7 @@ a:active {
 }
 .tabulawMenuItem{
 	width: 16px;
+	margin: 0px 3px 0px 0px;
 	float:left;
 }
 
@@ -213,7 +214,7 @@ div.ro {
 		margin: 25px 0px 0px 25px;
 	}
 	
-.beta {
+	.beta {
 		-webkit-transform: rotate(270deg);
 		-moz-transform: rotate(270deg);
 		filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
@@ -491,7 +492,8 @@ div.ro {
 			float: right;
 		} 
 		.qbundle .qbbuttons img {
-			margin-left: 10px;
+			
+			margin: 20px 5px 0px 0px;
 			cursor: pointer;
 		} 
 		.qbundle .qbbuttons img.delete {
@@ -555,15 +557,26 @@ div.ro {
 .wquote .qheader .buttons {
 	float: right;
 }
-.wquote .qheader .buttons img {
-	width: 14px;
-	height: 14px;
-	margin: 4px;
+
+.wquote .qheader .buttons .x {
+	width: 7px;
+	height: 7px;
+	margin: 3px 3px 0px 0px; //hack to adjust for the size difference of the (x) and gotoQuote icons
 	cursor: pointer;
 }
-.wquote .qheader .buttons .x {
-	margin-top: 7px;
+
+.wquote .qheader .buttons .gotoQuote {
+	width: 7px;
+	height: 7px;
+	margin: 2px 3px 0px 0px;
+	cursor: pointer;
 }
+
+/*  .wquote .qheader .buttons .x .gotoQuote{  */
+/*	width: 7px;  */
+/*	height: 7px; */
+}*/
+
 .wquote .subTitle {
 	padding: 3px;
 }

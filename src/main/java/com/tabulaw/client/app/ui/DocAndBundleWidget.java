@@ -264,7 +264,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				if(!qb.equals(oqb)) {
 					// set this as the current qb
 					crntQb = qb;
-					Log.debug("Current buneld set to: " + crntQb);
+					Log.debug("Current bundle set to: " + crntQb);
 					ClientModelCache.get().getUserState().setCurrentQuoteBundleId(qb.getId());
 					// notify app of current qb change via update model change
 					Poc.fireModelChangeEvent(new ModelChangeEvent(this, ModelChangeOp.UPDATED, crntQb, null));

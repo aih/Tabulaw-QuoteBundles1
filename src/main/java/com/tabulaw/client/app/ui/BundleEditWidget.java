@@ -49,6 +49,8 @@ public class BundleEditWidget extends
 		public static final String CURRENT = "current";
 
 		public static final String X = "x";
+		
+		// public static final String CONVERT = "convert";  //For the icon to convert to .doc, etc. Elsewhere msword()
 
 		public static final String QB_CURRENT = "qbcurrent";
 	} // Styles
@@ -93,7 +95,7 @@ public class BundleEditWidget extends
 
 			if (!orphan) {
 				delete = new Image(Resources.INSTANCE.trash());
-				delete.setTitle("Remove Quote Bundle..");
+				delete.setTitle("Remove Quote Bundle...");
 				delete.setStyleName(Styles.DELETE);
 				delete.setStyleName("tabulawMenuItem");
 				delete.addClickHandler(new ClickHandler() {
@@ -155,6 +157,10 @@ public class BundleEditWidget extends
 				MenuBar downloadMenuTop = new MenuBar();
 
 				MenuBar downloadMenu = new MenuBar(true);
+				
+				// convert = new Image(Resources.INSTANCE.msword());
+				// convert.setTitle("Download Quote Bundle...");
+				// convert.setStyleName(Styles.CONVERT);
 
 				downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/>", true, downloadMenu);
 				downloadMenuTop.setStyleName("tabulawMenuItem");
@@ -193,7 +199,7 @@ public class BundleEditWidget extends
 			boolean isCurrent = cqb != null && cqb.equals(bundle);
 			// close.setVisible(!isCurrent);
 			if (isCurrent) {
-				setLabelText("Current Quote Bundle");
+				setLabelText("Current Bundle");
 				addStyleName(Styles.QB_CURRENT);
 			} else {
 				setLabelText("Quote Bundle");
