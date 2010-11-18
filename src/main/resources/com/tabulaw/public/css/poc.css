@@ -208,10 +208,20 @@ div.ro {
 		margin-left: 10px;
 	}
 	#navCol .logo {
-		width: 76px;
-		height: 53px;
-		margin: 5px 0 30px 35px;
+		width: 99px;
+		height: 69px;
+		margin: 25px 0px 0px 25px;
 	}
+	
+.beta {
+		-webkit-transform: rotate(270deg);
+		-moz-transform: rotate(270deg);
+		filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+		position: absolute;
+		left: 0px;
+		top: 12px;
+	}
+	
 	#navCol .widget {
 		margin-bottom: 10px;
 		width: 145px;
@@ -275,7 +285,6 @@ div.ro {
 /* the parent element of the nav row widget */
 #navRow {
 	/*border-bottom: 3px solid #BFBFBF;*/
-
 	/*debug*/
 	/*border: 1px solid gray*/
 }
@@ -354,7 +363,7 @@ div.ro {
 	
 	.gwt-TabBar .gwt-TabBarItem { unselected tabs }</li>
 	.gwt-TabBar .gwt-TabBarItem-wrapper { table cell around tab }</li>
-	.gwt-TabBar .gwt-TabBarItem-selected { additional style for selected
+	.gwt-TabBar .gwt-TabBarItem-selected { additional style for selected }</li>
 	*/
 	.navRow .gwt-TabBarItem {
 		background-color: #DFDFDF;

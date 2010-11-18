@@ -149,7 +149,7 @@ public class NavRowPanel extends AbstractNavPanel {
 		
 		// TODO go MVP style as this is a clone of what is in UserEditPanel
 		// we need to pull out interactions with the model from the widgets 
-		// and make it purely event driven (the views and widget are supposed to be dumb)!
+		// and make it purely event driven (the views and widgets are supposed to be dumb)!
 		final UserPasswordSetDialog dlgResetPassword = new UserPasswordSetDialog();
 
 		// wraps the form and is the top-most widget
@@ -179,7 +179,7 @@ public class NavRowPanel extends AbstractNavPanel {
 				}
 			});
 			lnkLogOut.setStyleName(Styles.LOGOUT);
-			lnkLogOut.setTitle("Logout from Tabulaw");
+			lnkLogOut.setTitle("Log out from Tabulaw");
 			
 			lnkResetPswd = new SimpleHyperLink("Reset Password", new ClickHandler() {
 				
