@@ -182,6 +182,7 @@ public class DocImportEditPanel extends IndicatorFieldGroupEditPanel {
 	public void addGoogleDocsFailure(Collection<String> ids) {
 		for (String id : ids) {
 			rows.get(id).failure = true;
+			rows.get(id).status.addStyleName("red-disabled");
 		}
 		updateRows();
 	}
@@ -189,6 +190,7 @@ public class DocImportEditPanel extends IndicatorFieldGroupEditPanel {
 	public void addGoogleDocsDownloaded(Collection<String> ids) {
 		for (String id : ids) {
 			rows.get(id).downloaded = true;
+			rows.get(id).status.addStyleName("green-disabled");
 		}
 		updateRows();
 	}
