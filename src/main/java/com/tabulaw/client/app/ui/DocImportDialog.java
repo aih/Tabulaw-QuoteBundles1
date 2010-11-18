@@ -2,6 +2,7 @@ package com.tabulaw.client.app.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -146,7 +147,24 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 				super.handleSuccess(result);
 				if (currentImportId == importId) {
 					refreshList(result.getDocRefs());
-					hide();
+					List<Msg> msgs = result.getStatus().getMsgs();
+					if (msgs == null || msgs.isEmpty()) {
+						hide();
+					} else {
+						Set<String> failure = new HashSet<String>();
+						Set<String> downloaded = new HashSet<String>();
+						for (Msg msg : result.getStatus().getMsgs()) {
+							failure.add(msg.getMsg());
+						}
+						for (GoogleDocument gdoc : resourceId) {
+							downloaded.add(gdoc.getResourceId());
+						}
+						downloaded.removeAll(failure);
+						importPanel.setEnabled(true);
+						importPanel.addGoogleDocsFailure(failure);
+						importPanel.addGoogleDocsDownloaded(downloaded);
+						importPanel.resetValue();
+					}
 				}
 			}
 		}.execute();

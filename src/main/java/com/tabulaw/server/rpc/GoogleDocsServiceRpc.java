@@ -33,8 +33,8 @@ import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.User;
 import com.tabulaw.oauth.GoogleAnonymousOAuthParametersProvider;
-import com.tabulaw.oauth.OAuthParametersProvider;
 import com.tabulaw.oauth.OAuthParameters;
+import com.tabulaw.oauth.OAuthParametersProvider;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.entity.UserDataService;
@@ -94,8 +94,10 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 					log.debug("Google document has been downloaded: "
 							+ doc.getName() + " / " + doc.getTitle());
 				} else {
-					log.error("Unable to download google document: "
-							+ document.getTitle());
+					String msg = "Unable to download google document: "
+							+ document.getTitle();
+					log.error(msg);
+					docs.getStatus().addMsg(document.getResourceId(), Msg.MsgLevel.WARN, 0);
 				}
 			} catch (Exception e) {
 				log.error("", e);
@@ -121,6 +123,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 			} else {
 				log.error("Unable to download google document: "
 						+ get.getStatusText());
+				log.debug(get.getResponseBodyAsString());
 			}
 		} catch (Exception e) {
 			log.error("", e);
@@ -131,6 +134,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	@SuppressWarnings("unchecked")
 	private List<GoogleDocument> parseDocuments(String s) {
 		log.debug("Parsing XML response of google documents list");
+		log.debug(s);
 		List<GoogleDocument> list = new ArrayList<GoogleDocument>();
 		try {
 			IXMLParser parser = XMLParserFactory.createDefaultXMLParser();
