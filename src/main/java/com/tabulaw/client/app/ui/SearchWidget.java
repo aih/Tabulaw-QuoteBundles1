@@ -17,6 +17,7 @@ public class SearchWidget extends Composite {
 	private final FlowPanel panel = new FlowPanel(); 
 	private final TextBox search = new TextBox();
 	private final ImageButton searchButton = new ImageButton(Resources.INSTANCE.magnifyingGlassSmall(), "Search"); 		
+	private final ImageButton resetSearchButton = new ImageButton(null,"X");
 
 	public SearchWidget() {
 		super();
@@ -26,7 +27,12 @@ public class SearchWidget extends Composite {
 		search.getElement().setAttribute("name", "quoteSearch");
 		panel.setStyleName("search-widget");
 		panel.add(search);
+		searchButton.setWidth("80%");
+		searchButton.getElement().setId("search");
+		resetSearchButton.setWidth("20%");
+		resetSearchButton.getElement().setId("reset");
 		panel.add(searchButton);
+		panel.add(resetSearchButton);
 
 		initWidget(panel);
 		
@@ -38,7 +44,15 @@ public class SearchWidget extends Composite {
 				Poc.getPortal().fireEvent(new SearchEvent(search.getText()));
 			}
 		});
-
+		
+		resetSearchButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				search.setText(null);
+				Poc.getPortal().fireEvent(new SearchEvent(null));
+			}
+		});
 		search.addKeyUpHandler(new KeyUpHandler() {
 
 			@Override

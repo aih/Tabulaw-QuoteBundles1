@@ -185,10 +185,15 @@ div.ro {
 	margin-bottom:10px;
 	width:145px;
 }	
-.search-widget button {
+.search-widget #search {
 	padding-left:7px;
 	text-align:left;
-	width:145px;
+}	
+.search-widget #reset {
+	text-align:center;
+}	
+.search-widget #reset span {
+	padding-left:0px !important;
 }	
 
 #navCol {
