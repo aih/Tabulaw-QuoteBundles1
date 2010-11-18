@@ -312,6 +312,8 @@ public abstract class AbstractEditPanel<T> extends Composite implements ClickHan
 			EditEvent.fireCancel(this);
 		}
 	}
+	
+	//TODO Add handler for keydown in edit fields and <return>, to create a new item
 
 	/**
 	 * Turns on/off editability.
