@@ -97,7 +97,8 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 					String msg = "Unable to download google document: "
 							+ document.getTitle();
 					log.error(msg);
-					docs.getStatus().addMsg(document.getResourceId(), Msg.MsgLevel.WARN, 0);
+					docs.getStatus().addMsg("failure", Msg.MsgLevel.WARN, 0,
+							document.getResourceId());
 				}
 			} catch (Exception e) {
 				log.error("", e);

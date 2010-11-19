@@ -2,8 +2,10 @@ package com.tabulaw.client.app.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -151,15 +153,15 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 					if (msgs == null || msgs.isEmpty()) {
 						hide();
 					} else {
-						Set<String> failure = new HashSet<String>();
+						Map<String, String> failure = new HashMap<String, String>();
 						Set<String> downloaded = new HashSet<String>();
 						for (Msg msg : result.getStatus().getMsgs()) {
-							failure.add(msg.getMsg());
+							failure.put(msg.getRefToken(), msg.getMsg());
 						}
 						for (GoogleDocument gdoc : resourceId) {
 							downloaded.add(gdoc.getResourceId());
 						}
-						downloaded.removeAll(failure);
+						downloaded.removeAll(failure.keySet());
 						importPanel.setEnabled(true);
 						importPanel.addGoogleDocsFailure(failure);
 						importPanel.addGoogleDocsDownloaded(downloaded);

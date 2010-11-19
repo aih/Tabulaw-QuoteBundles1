@@ -52,19 +52,14 @@ public class DocImportEditPanel extends IndicatorFieldGroupEditPanel {
 	private class DocumentRow {
 		public DocumentRow(String resourceId, CheckBox cb, Label date,
 				Label author, Label status) {
-			this.resourceId = resourceId;
 			this.cb = cb;
-			this.date = date;
-			this.author = author;
 			this.status = status;
 		}
 
 		public boolean failure = false;
 		public boolean downloaded = false;
-		public String resourceId;
+		public String msg = "";
 		public CheckBox cb;
-		public Label date;
-		public Label author;
 		public Label status;
 
 		public boolean isEnabled() {
@@ -179,10 +174,11 @@ public class DocImportEditPanel extends IndicatorFieldGroupEditPanel {
 		}
 	}
 
-	public void addGoogleDocsFailure(Collection<String> ids) {
-		for (String id : ids) {
-			rows.get(id).failure = true;
-			rows.get(id).status.addStyleName("red-disabled");
+	public void addGoogleDocsFailure(Map<String, String> errors) {
+		for (Map.Entry<String, String> error : errors.entrySet()) {
+			rows.get(error.getKey()).failure = true;
+			rows.get(error.getKey()).msg = error.getValue();
+			rows.get(error.getKey()).status.addStyleName("red-disabled");
 		}
 		updateRows();
 	}
@@ -219,7 +215,11 @@ public class DocImportEditPanel extends IndicatorFieldGroupEditPanel {
 			row.cb.setEnabled(row.isEnabled() && enabled);
 			if (row.failure) {
 				row.cb.setValue(false);
-				row.status.setText("failure");
+				if (row.msg == null || row.msg.isEmpty()) {
+					row.status.setText("failure");
+				} else {
+					row.status.setText(row.msg);
+				}
 			} else if (row.downloaded) {
 				row.cb.setValue(true);
 				row.status.setText("downloaded");
