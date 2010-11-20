@@ -215,9 +215,9 @@ div.ro {
 	}
 	
 	.beta {
-		-webkit-transform: rotate(270deg);
-		-moz-transform: rotate(270deg);
-		filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+		// -webkit-transform: rotate(270deg); Rotate image left to right
+		// -moz-transform: rotate(270deg);
+		// filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 		position: absolute;
 		left: 0px;
 		top: 12px;
