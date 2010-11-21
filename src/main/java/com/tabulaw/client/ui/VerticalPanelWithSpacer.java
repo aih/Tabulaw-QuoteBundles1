@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * Extension of vertical panel that permanantly keeps a label child widget to
+ * Extension of vertical panel that permanently keeps a label child widget to
  * avoid css collapse of the panel when no children exist.
  * @author jpk
  */
@@ -19,7 +19,7 @@ public class VerticalPanelWithSpacer extends VerticalPanel {
 	static class Styles {
 
 		/**
-		 * Primary style name of the permanant child widget acting as the spacer. At
+		 * Primary style name of the permanent child widget acting as the spacer. At
 		 * a minimum, this style should a height since the point is to avoid css
 		 * collapse.
 		 */

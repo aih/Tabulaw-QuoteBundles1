@@ -83,7 +83,7 @@ public interface IMsgOperator extends IDragHandler, ScrollHandler {
 	void removeUnclassifiedMsgs();
 
 	/**
-	 * Removes all messages permanantly.
+	 * Removes all messages permanently.
 	 */
 	void clearMsgs();
 }

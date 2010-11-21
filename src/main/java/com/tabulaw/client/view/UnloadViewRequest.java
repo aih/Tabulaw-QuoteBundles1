@@ -18,7 +18,7 @@ public final class UnloadViewRequest extends ViewOpRequest {
 	 * Constructor
 	 * @param viewKey
 	 * @param destroy Destroy the view?
-	 * @param erradicate Permanantly remove from cache?
+	 * @param erradicate permanently remove from cache?
 	 */
 	public UnloadViewRequest(ViewKey viewKey, boolean destroy, boolean erradicate) {
 		super(viewKey);

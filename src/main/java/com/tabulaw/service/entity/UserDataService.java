@@ -416,11 +416,11 @@ public class UserDataService extends AbstractEntityService {
 
 	/**
 	 * Deletes the doc and doc content given its id as well as all doc/user
-	 * bindings as well as any referenced quotes <em>permanantly</em>.
+	 * bindings as well as any referenced quotes <em>permanently</em>.
 	 * <p>
 	 * Both the Doc and DocContent entities are deleted.
 	 * <p>
-	 * NOTE: Quotes (which may point to the target doc) are also permanantly
+	 * NOTE: Quotes (which may point to the target doc) are also permanently
 	 * deleted!
 	 * @param docId id of the doc to delete
 	 * @throws EntityNotFoundException when the doc of the given id can't be found
@@ -727,7 +727,7 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
-	 * Permanantly deletes an existing quote for a given user from all bundles
+	 * permanently deletes an existing quote for a given user from all bundles
 	 * that contain it.
 	 * @param userId needed for removing the quote/user binding
 	 * @param quoteId

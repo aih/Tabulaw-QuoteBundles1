@@ -113,7 +113,7 @@ public interface IUserDataService extends RemoteService {
 	ModelPayload<Quote> addQuoteToBundle(String userId, String bundleId, Quote quote);
 
 	/**
-	 * Permanantly deletes the given quote for the given user (from any and all
+	 * permanently deletes the given quote for the given user (from any and all
 	 * bundles containing it).
 	 * @param userId
 	 * @param quoteId

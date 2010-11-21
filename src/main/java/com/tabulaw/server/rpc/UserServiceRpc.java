@@ -935,7 +935,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		try {
 			if(docId == null) throw new IllegalArgumentException("Null doc id");
 
-			// user must be an administrator to permanantly delete docs
+			// user must be an administrator to permanently delete docs
 			User user = getUserContext().getUser();
 			if(!user.inRole(Role.ADMINISTRATOR)) {
 				throw new Exception("Permission denied.");
@@ -967,7 +967,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		try {
 			if(id == null) throw new IllegalArgumentException("Null contract doc id");
 
-			// user must be an administrator to permanantly delete docs
+			// user must be an administrator to permanently delete docs
 			User user = getUserContext().getUser();
 			if(!user.inRole(Role.ADMINISTRATOR)) {
 				throw new Exception("Permission denied.");
@@ -1119,7 +1119,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService, I
 		try {
 			if(id == null) throw new IllegalArgumentException("Null id");
 
-			// user must be an administrator to permanantly clause bundles
+			// user must be an administrator to permanently clause bundles
 			User user = getUserContext().getUser();
 			if(!user.inRole(Role.ADMINISTRATOR)) {
 				throw new Exception("Permission denied.");

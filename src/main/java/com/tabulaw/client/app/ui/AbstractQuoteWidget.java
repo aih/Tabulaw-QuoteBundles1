@@ -250,7 +250,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 					@Override
 					public void onClick(ClickEvent event) {
-						if (Window.confirm("Delete " + getModel().descriptor() + " permanantly?")) {
+						if (Window.confirm("Delete " + getModel().descriptor() + " permanently?")) {
 							AbstractQuoteWidget.this.parentQuoteBundleWidget.removeQuote(quote, true, true);
 						}
 					}
