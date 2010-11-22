@@ -284,6 +284,9 @@
     </servlet>
 	<servlet-mapping>
 		<servlet-name>jsp</servlet-name>
-		<url-pattern>*.html</url-pattern>
+		<url-pattern>/Poc.html</url-pattern>
+		<url-pattern>/Login.html</url-pattern>
+		<url-pattern>/Password.html</url-pattern>
+		<url-pattern>/Register.html</url-pattern>
 	</servlet-mapping>
 </web-app>
