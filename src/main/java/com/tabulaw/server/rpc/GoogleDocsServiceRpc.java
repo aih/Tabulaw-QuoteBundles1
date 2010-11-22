@@ -13,7 +13,9 @@ import net.n3.nanoxml.StdXMLReader;
 import net.n3.nanoxml.XMLParserFactory;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,7 +48,8 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	private final static Log log = LogFactory
 			.getLog(GoogleDocsServiceRpc.class);
 
-	private final HttpClient client = new HttpClient();
+	private final HttpClient client = new HttpClient(
+			new MultiThreadedHttpConnectionManager());
 
 	private OAuthParametersProvider authParametersProvider = new GoogleAnonymousOAuthParametersProvider();
 
@@ -54,7 +57,9 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	public GoogleDocumentListPayload getDocuments() {
 		log.debug("Creating GoogleDocumentListPayload list");
 		GoogleDocumentListPayload list = new GoogleDocumentListPayload();
-		String path = "/feeds/default/private/full/-/document";
+		// String path = "/feeds/default/private/full/";
+		// String path = "/feeds/default/private/full/-/document";
+		String path = "/feeds/default/private/full/-/file";
 		try {
 			GetMethod get = createGetMethod(path);
 			log.debug("Executing HttpClient GetMethod with URL=" + path);
@@ -116,7 +121,9 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 			resourceId = resourceId.substring(pattern.length());
 		}
 		try {
-			GetMethod get = createGetMethod("/feeds/download/documents/Export?docID="
+			// GetMethod get =
+			// createGetMethod("/feeds/download/documents/Export?docID="
+			GetMethod get = createGetMethod("/feeds/download/file/Export?docID="
 					+ resourceId + "&exportFormat=html");
 			client.executeMethod(get);
 			if (get.getStatusCode() == 200) {
@@ -144,11 +151,13 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 			IXMLElement xml = (IXMLElement) parser.parse();
 			Vector<IXMLElement> entries = xml.getChildrenNamed("entry");
 			for (IXMLElement entry : entries) {
+				Vector<IXMLElement> id = entry.getChildrenNamed("id");
 				Vector<IXMLElement> resourceId = entry
 						.getChildrenNamed("gd:resourceId");
 				Vector<IXMLElement> title = entry.getChildrenNamed("title");
 				Vector<IXMLElement> updated = entry.getChildrenNamed("updated");
 				Vector<IXMLElement> author = entry.getChildrenNamed("author");
+				Vector<IXMLElement> content = entry.getChildrenNamed("content");
 				if (resourceId == null || resourceId.isEmpty()
 						|| resourceId.get(0) == null) {
 					continue;
@@ -156,9 +165,21 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 				if (title == null || title.isEmpty() || title.get(0) == null) {
 					continue;
 				}
+				if (id == null || id.isEmpty() || id.get(0) == null) {
+					continue;
+				}
+				if (content == null || content.isEmpty()
+						|| content.get(0) == null) {
+					continue;
+				}
+				String type = content.get(0).getAttribute("type");
+				if (!isDocument(id) || !isDocumentType(type)) {
+					continue;
+				}
 				GoogleDocument doc = new GoogleDocument();
 				doc.setResourceId(resourceId.get(0).getContent());
 				doc.setTitle(title.get(0).getContent());
+				doc.setType(type);
 				if (updated != null && !updated.isEmpty()
 						&& updated.get(0) != null) {
 					String date = updated.get(0).getContent();
@@ -181,6 +202,17 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		}
 		log.debug("Returning google documents list");
 		return list;
+	}
+
+	private boolean isDocument(Vector<IXMLElement> id) {
+		return StringUtils.defaultString(id.get(0).getContent()).contains(
+				"docs.google.com/feeds/id/document")
+				|| StringUtils.defaultString(id.get(0).getContent()).contains(
+						"docs.google.com/feeds/id/file");
+	}
+
+	private boolean isDocumentType(String type) {
+		return type.equals("text/html") || type.equals("application/msword");
 	}
 
 	private GetMethod createGetMethod(String path) throws OAuthException {
