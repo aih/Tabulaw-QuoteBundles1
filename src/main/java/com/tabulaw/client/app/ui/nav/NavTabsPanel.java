@@ -6,10 +6,8 @@ import org.cobogw.gwt.user.client.ui.VerticalTabBar;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.app.view.DocView;
 import com.tabulaw.client.app.view.IPocView;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;

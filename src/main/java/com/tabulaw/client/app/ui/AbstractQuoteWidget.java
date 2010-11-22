@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk
  * @since Feb 28, 2010
  */
@@ -250,7 +250,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 					@Override
 					public void onClick(ClickEvent event) {
-						if (Window.confirm("Delete " + getModel().descriptor() + " permanantly?")) {
+						if (Window.confirm("Delete " + getModel().descriptor() + " permanently?")) {
 							AbstractQuoteWidget.this.parentQuoteBundleWidget.removeQuote(quote, true, true);
 						}
 					}
@@ -302,14 +302,14 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		if (show) {
 			if (btnQlink == null) {
 				btnQlink = new Image(Resources.INSTANCE.gotoHighlight());
-				btnQlink.setTitle("Goto quote");
+				btnQlink.setTitle("Go to quote");
 				btnQlink.addStyleName("gotoQuote");
 				btnQlink.addStyleName("hlink");
 				btnQlink.addClickHandler(new ClickHandler() {
 
 					@Override
 					public void onClick(ClickEvent event) {
-						// goto hightlight switching current doc if necessary
+						// goto highlight switching current doc if necessary
 						DocRef docRef = quote.getDocument();
 						final DocViewInitializer dvi = new DocViewInitializer(docRef.getModelKey());
 						ViewManager.get().dispatch(new ShowViewRequest(dvi, new Command() {
@@ -320,7 +320,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 								MarkOverlay mark = (MarkOverlay) quote.getMark();
 								if (mark != null) {
 									Element elm = mark.getStartNode();
-									Window.alert("goto quote element: " + elm);
+									//Window.alert("goto quote element: " + elm);
 									if (elm != null) {
 										DOM.scrollIntoView(elm);
 									}

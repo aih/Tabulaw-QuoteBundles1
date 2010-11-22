@@ -3,13 +3,17 @@
 <%
 com.tabulaw.server.jsp.LoginSessionBean loginSession = new com.tabulaw.server.jsp.LoginSessionBean(); 
 loginSession.setRequest(request);
+String codeSvr = request.getParameter("gwt.codesvr");
+
+String url = codeSvr==null?"Poc.html" : "Poc.html?gwt.codesvr="+codeSvr;
+
 if(loginSession.isLoggedIn()) {
-	response.sendRedirect("Poc.html"); 
+	response.sendRedirect(url); 
 }
 com.tabulaw.server.jsp.LoginBean loginBean = new com.tabulaw.server.jsp.LoginBean();
 loginBean.setRequest(request); 
 if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
-	response.sendRedirect("Poc.html"); 
+	response.sendRedirect(url); 
 }
 %>
 <html>
@@ -51,7 +55,8 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 				</table>
 			</div>
 			<div>
-				<input type="submit" id="submitLogin" name="submitLogin" value="Submit"></input>
+				<input type="hidden" id="gwt.codesvr" name="gwt.codesvr" value="<%=codeSvr%>" ></input>
+			<input type="submit" id="submitLogin" name="submitLogin" value="Submit"></input>
 			</div>
 		</form>
 		<div>

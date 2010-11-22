@@ -86,30 +86,32 @@ public class LoginBean {
 
 				User user = userService.findByEmail(getEmailAddress());
 
-				if (!user.isEnabled()) {
-					errors.add("Your account is disabled.");
-				} else if (user.isExpired()) {
-					errors.add("Your account has expired.");
-				} else if (user.isLocked()) {
-					errors.add("Your account is locked.");
-				} else {
-					try {
-						if (UserService.isPasswordValid(getPassword(),
-								user.getPassword(), user.getEmailAddress())) {
-							final UserContext context = new UserContext();
-							context.setUser(user);
-							session.setAttribute(UserContext.KEY, context);
-						} else {
-							errors.add("Invalid password.");
-						}
-					} catch (IllegalArgumentException e) {
-						errors.add("Invalid or empty password.");
+				if (UserService.isPasswordValid(getPassword(),user.getPassword(), user.getEmailAddress())) {
+					if (!user.isEnabled()) {
+						errors.add("Your account is disabled.");
+						return false;
 					}
+					if (user.isExpired()) {
+						errors.add("Your account has expired.");
+						return false;
+					} 
+					if (user.isLocked()) {
+						errors.add("Your account is locked.");
+						return false;
+					} 
+					final UserContext context = new UserContext();
+					context.setUser(user);
+					session.setAttribute(UserContext.KEY, context);
+				} else {
+					errors.add("Invalid user or password.");
 				}
+				
+			} catch (IllegalArgumentException e) {
+				errors.add("Invalid or empty password.");
 			} catch (ConstraintViolationException e) {
 				errors.add("Invalid email format");
 			} catch (EntityNotFoundException e) {
-				errors.add("The account has not been found.");
+				errors.add("Invalid user or password.");
 			}
 		}
 

@@ -14,7 +14,7 @@ import com.tabulaw.client.convert.ToStringConverter;
 import com.tabulaw.client.validate.StringLengthValidator;
 
 /**
- * PasswordField
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk
  */
 public final class PasswordField extends AbstractField<String> implements IHasMaxLength {

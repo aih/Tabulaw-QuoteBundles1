@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk Aug 25, 2007
  */
 package com.tabulaw.server.rpc;
@@ -46,17 +46,16 @@ import com.tabulaw.model.IUserRef;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.User;
-import com.tabulaw.model.User.Role;
 import com.tabulaw.model.UserState;
+import com.tabulaw.model.User.Role;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.server.WebAppContext;
 import com.tabulaw.service.entity.ChangeUserCredentialsFailedException;
 import com.tabulaw.service.entity.UserDataService;
-import com.tabulaw.service.entity.UserDataService.BundleContainer;
 import com.tabulaw.service.entity.UserService;
+import com.tabulaw.service.entity.UserDataService.BundleContainer;
 import com.tabulaw.util.StringUtil;
-
 /**
  * @author jpk
  */

@@ -99,7 +99,8 @@ a:active {
 
 .tabulawMenuItem {
 	width: 16px;
-	float: left;
+	margin: 0px 3px 0px 0px;
+	float:left;
 }
 
 /* global message panel */
@@ -202,15 +203,19 @@ div.ro {
 }
 
 .search-widget input {
-	margin-bottom: 10px;
-	width: 145px;
-}
-
-.search-widget button {
-	padding-left: 7px;
-	text-align: left;
-	width: 145px;
-}
+	margin-bottom:10px;
+	width:145px;
+}	
+.search-widget #search {
+	padding-left:7px;
+	text-align:left;
+}	
+.search-widget #reset {
+	text-align:center;
+}	
+.search-widget #reset span {
+	padding-left:0px !important;
+}	
 
 #navCol {
 	float: left;
@@ -224,22 +229,29 @@ div.ro {
 	padding-top: 20px;
 	padding-left: 20px;
 }
-
-#navCol .vpanel {
-	width: 100%;
-	margin-left: 10px;
-}
-
-#navCol .logo {
-	width: 76px;
-	height: 53px;
-	margin: 5px 0 30px 35px;
-}
-
-#navCol .widget {
-	margin-bottom: 10px;
-	width: 145px;
-	/*-moz-border-radius: 5px;
+	#navCol .vpanel {
+		width: 100%;
+		margin-left: 10px;
+	}
+	#navCol .logo {
+		width: 99px;
+		height: 69px;
+		margin: 25px 0px 0px 25px;
+	}
+	
+	.beta {
+		// -webkit-transform: rotate(270deg); Rotate image left to right
+		// -moz-transform: rotate(270deg);
+		// filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+		position: absolute;
+		left: 0px;
+		top: 12px;
+	}
+	
+	#navCol .widget {
+		margin-bottom: 10px;
+		width: 145px;
+		/*-moz-border-radius: 5px;
 		-webkit-border-radius: 5px;*/
 }
 
@@ -306,7 +318,8 @@ div.ro {
 }
 
 /* the parent element of the nav row widget */
-#navRow { /*border-bottom: 3px solid #BFBFBF;*/
+#navRow {
+	/*border-bottom: 3px solid #BFBFBF;*/
 	/*debug*/
 	/*border: 1px solid gray*/
 	
@@ -406,7 +419,7 @@ div.ro {
 	
 	.gwt-TabBar .gwt-TabBarItem { unselected tabs }</li>
 	.gwt-TabBar .gwt-TabBarItem-wrapper { table cell around tab }</li>
-	.gwt-TabBar .gwt-TabBarItem-selected { additional style for selected
+	.gwt-TabBar .gwt-TabBarItem-selected { additional style for selected }</li>
 	*/
 .navRow .gwt-TabBarItem {
 	background-color: #DFDFDF;
@@ -524,6 +537,47 @@ div.ro {
 
 /* qbundle */
 .qbundle {
+}
+	.qbundle .qbheader {
+		margin-bottom: 10px;
+		overflow: hidden;
+	}
+		.qbundle .qbheader .echo {
+			text-transform: uppercase;
+			font-family: Arial, Helvetica, sans-serif;
+			font-weight: lighter;
+			font-size: 11px;
+			letter-spacing: 0.7px;
+		}
+		.qbundle .qbheader .name {
+			font-size: 20px;
+			border-bottom: 4px solid #BFBFBF/*#D0E4F6*/;
+			margin-top: 2px; /* hack so qb name text doesn't wrap if it extends at or beyond buttons div just above */
+		}
+		.qbundle .qbheader .desc {
+			font-size: 11px;
+		}
+		.qbundle .qbbuttons {
+			float: right;
+		} 
+		.qbundle .qbbuttons img {
+			
+			margin: 20px 5px 0px 0px;
+			cursor: pointer;
+		} 
+		.qbundle .qbbuttons img.delete {
+			padding-bottom: 2px;
+		} 
+	.qbundle .quotes {
+		/*height: 100%;*/
+		width: 100%;
+	}
+	.qbundle .qbcurrent {
+		border: 3px solid #DFDFDF;
+		-moz-border-radius: 6px;
+		-webkit-border-radius: 6px;
+		padding: 4px;
+	}
 	
 }
 
@@ -639,7 +693,23 @@ div.ro {
 
 .wquote .qheader .buttons .x {
 	margin-top: 7px;
+		width: 7px;
+	height: 7px;
+	margin: 3px 3px 0px 0px; //hack to adjust for the size difference of the (x) and gotoQuote icons
+	cursor: pointer;
 }
+
+.wquote .qheader .buttons .gotoQuote {
+	width: 7px;
+	height: 7px;
+	margin: 2px 3px 0px 0px;
+	cursor: pointer;
+}
+
+/*  .wquote .qheader .buttons .x .gotoQuote{  */
+/*	width: 7px;  */
+/*	height: 7px; */
+}*/
 
 .wquote .subTitle {
 	padding: 3px;
@@ -1344,8 +1414,6 @@ docHeaderMenuItem img {
 	float: right;
 }
 
-<<<<<<<
-HEAD
 
 		
 .doc-import-edit-panel .fpnl {
@@ -1381,12 +1449,4 @@ HEAD
 
 .doc-import-edit-panel td {
 	padding: 5px;
-}
-
-.red-disabled {
-	color: red;
-}
-
-.green-disabled {
-	color: green;
 }

@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk
  * @since Apr 10, 2010
  */
@@ -113,7 +113,7 @@ public interface IUserDataService extends RemoteService {
 	ModelPayload<Quote> addQuoteToBundle(String userId, String bundleId, Quote quote);
 
 	/**
-	 * Permanantly deletes the given quote for the given user (from any and all
+	 * permanently deletes the given quote for the given user (from any and all
 	 * bundles containing it).
 	 * @param userId
 	 * @param quoteId
