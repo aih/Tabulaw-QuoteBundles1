@@ -4,6 +4,7 @@
  */
 package com.tabulaw.client.ui.field;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
@@ -31,13 +32,21 @@ public class TextField extends AbstractField<String> implements IHasMaxLength, I
 		 */
 		public Impl(String name) {
 			super();
+			init(name);
+		}
+
+		public Impl(String name, Element e) {
+			super(e);
+			init(name);
+		}
+		
+		private void init(String name){
 			addStyleName(Styles.TBOX);
 			setName(name);
 		}
-
 	}
 
-	private final Impl tb;
+	private Impl tb;
 
 	/**
 	 * Optional format direcive.
@@ -55,10 +64,10 @@ public class TextField extends AbstractField<String> implements IHasMaxLength, I
 	public TextField(String name, String propName, String labelText, String helpText, int visibleLength) {
 		super(name, propName, labelText, helpText);
 		tb = new Impl(name);
-		setVisibleLen(visibleLength);
 		tb.addValueChangeHandler(this);
 		tb.addFocusHandler(this);
 		tb.addBlurHandler(this);
+		setVisibleLen(visibleLength);
 		setConverter(ToStringConverter.INSTANCE);
 		addHandler(new KeyPressHandler() {
 
@@ -69,7 +78,6 @@ public class TextField extends AbstractField<String> implements IHasMaxLength, I
 				}
 			}
 		}, KeyPressEvent.getType());
-
 	}
 
 	@Override

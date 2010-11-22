@@ -5,6 +5,7 @@
  */
 package com.tabulaw.client.ui.field;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
@@ -30,13 +31,21 @@ public final class PasswordField extends AbstractField<String> implements IHasMa
 		 */
 		public Impl(String name) {
 			super();
-			setName(name);
-			addStyleName(Styles.TBOX);
+			init(name);
 		}
 
+		public Impl(String name, Element e) {
+			super(e);
+			init(name);
+		}
+		
+		private void init(String name){
+			addStyleName(Styles.TBOX);
+			setName(name);
+		}
 	}
 
-	private final Impl tb;
+	private Impl tb;
 
 	/**
 	 * Constructor
@@ -49,13 +58,12 @@ public final class PasswordField extends AbstractField<String> implements IHasMa
 	PasswordField(String name, String propName, String lblText, String helpText, int visibleLength) {
 		super(name, propName, lblText, helpText);
 		tb = new Impl(name);
-		setVisibleLen(visibleLength);
 		tb.addValueChangeHandler(this);
 		tb.addFocusHandler(this);
 		tb.addBlurHandler(this);
+		setVisibleLen(visibleLength);
 		setConverter(ToStringConverter.INSTANCE);
 		addHandler(new KeyPressHandler() {
-
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
 				if(event.getCharCode() == KeyCodes.KEY_ENTER) {
@@ -63,7 +71,7 @@ public final class PasswordField extends AbstractField<String> implements IHasMa
 					setFocus(true);
 				}
 			}
-		}, KeyPressEvent.getType());
+		}, KeyPressEvent.getType());		
 	}
 
 	public int getVisibleLen() {

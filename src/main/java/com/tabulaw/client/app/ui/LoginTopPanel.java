@@ -22,9 +22,11 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.IDescriptorProvider;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.field.UserFieldProvider;
@@ -199,7 +201,6 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 		form.setMethod(FormPanel.METHOD_POST);
 
 		btnSubmit = new Button("Login", new ClickHandler() {
-
 			@SuppressWarnings( {
 				"synthetic-access", "unchecked"
 			})
@@ -264,7 +265,7 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 					}
 				}
 			}
-		});
+		});		
 
 		// cancel user registration
 		btnCancel = new Button("Cancel", new ClickHandler() {
@@ -367,7 +368,8 @@ implements IHasUserSessionHandlers, IHasRpcHandlers, HasValueChangeHandlers<Logi
 		switch(newMode) {
 			case LOGIN: {
 				msgPanel.clear();
-				IFieldWidget<?> fpswd = loginFieldPanel.getFieldGroup().getFieldWidget("userPswd");
+				IFieldWidget<String> fpswd = loginFieldPanel.getFieldGroup().getFieldWidget("userPswd");
+				
 				fpswd.setVisible(true);
 				lnkTgl.setTitle("Forgot Password");
 				lnkTgl.setText("Forgot Password");

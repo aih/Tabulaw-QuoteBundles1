@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ page language="java" import="java.util.*,java.lang.*" %> 
+<%
+com.tabulaw.server.jsp.RegisterBean registerBean = new com.tabulaw.server.jsp.RegisterBean();
+registerBean.setRequest(request); 
+if(registerBean.isRegistrationValid()) {
+	response.sendRedirect("Login.html?registration=success"); 
+}
+%>
+<html>
+	<head>
+		<link rel="shortcut icon" href="favicon.ico">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>Tabulaw</title>
+	</head>
+	<body>
+		<form class="register" method="post" action="Register.html">
+			<div>Register</div>
+			<%if(!registerBean.getErrors().isEmpty()) { %>
+				<div class="errors">
+					<%
+						java.util.List errors = registerBean.getErrors(); 
+						for(int i=0; i < errors.size(); i++) {
+							java.lang.Object error = errors.get(i);
+							%><div><%=error%></div><%
+						}
+					%>		
+				</div>
+			<% } %>
+			<div>
+				<table>
+					<tr>
+						<td>Email Address<sup class="rqd">*</sup></td>
+						<td><input type="text" id="userEmail" name="userEmail"></td>
+					</tr>
+					<tr>
+						<td>Password<sup class="rqd">*</sup></td>
+						<td><input type="password" id="userPswd" name="userPswd"></td>
+					</tr>
+					<tr>
+						<td>Confirm Password<sup class="rqd">*</sup></td>
+						<td><input type="password" id="userPswdConfirm" name="userPswdConfirm"></td>
+					</tr>
+				</table>
+			</div>
+			<div>
+				<input type="submit" id="submitRegister" name="submitRegister" value="Submit"></input>
+			</div>
+		</form>
+		<div>
+			<a href="Login.html">Cancel</a>
+		</div>
+	</body>
+</html>
