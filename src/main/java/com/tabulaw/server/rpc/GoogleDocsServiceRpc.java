@@ -121,9 +121,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 			resourceId = resourceId.substring(pattern.length());
 		}
 		try {
-			// GetMethod get =
-			// createGetMethod("/feeds/download/documents/Export?docID="
-			GetMethod get = createGetMethod("/feeds/download/file/Export?docID="
+			GetMethod get = createGetMethod("/feeds/download/documents/Export?docID="
 					+ resourceId + "&exportFormat=html");
 			client.executeMethod(get);
 			if (get.getStatusCode() == 200) {
@@ -139,7 +137,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	private List<GoogleDocument> parseDocuments(String s) {
 		log.debug("Parsing XML response of google documents list");
 		log.debug(s);
@@ -195,6 +193,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 					// IXMLElement email = author.get(0).getChildAtIndex(1);
 					doc.setAuthor(name.getContent());
 				}
+				doc.setImportable(isImportable(type));
 				list.add(doc);
 			}
 		} catch (Exception e) {
@@ -213,6 +212,10 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 
 	private boolean isDocumentType(String type) {
 		return type.equals("text/html") || type.equals("application/msword");
+	}
+
+	private boolean isImportable(String type) {
+		return type.equals("text/html");
 	}
 
 	private GetMethod createGetMethod(String path) throws OAuthException {

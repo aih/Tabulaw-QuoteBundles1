@@ -165,12 +165,21 @@ public class DocImportEditPanel extends IndicatorFieldGroupEditPanel {
 		setErrorHandler(ErrorHandlerBuilder.build(false, true, null), false);
 	}
 
-	public void setGoogleDocs(List<GoogleDocument> list) {
+	public void setGoogleDocs(List<GoogleDocument> docs) {
 		value = new HashSet<GoogleDocument>();
-		if (list != null) {
-			setFieldPanel(new FieldPanel(list));
+		if (docs != null) {
+			setFieldPanel(new FieldPanel(docs));
 		} else {
 			setFieldPanel(new InProgressPanel());
+		}
+		if (docs != null) {
+			Map<String, String> errors = new HashMap<String, String>();
+			for (GoogleDocument doc : docs) {
+				if (!doc.isImportable()) {
+					errors.put(doc.getResourceId(), "can't import yet");
+				}
+			}
+			addGoogleDocsFailure(errors);
 		}
 	}
 

@@ -9,6 +9,7 @@ public class GoogleDocument implements IsSerializable {
 	private String date;
 	private String author;
 	private String type;
+	private boolean importable = true;
 
 	public GoogleDocument() {
 	}
@@ -51,6 +52,14 @@ public class GoogleDocument implements IsSerializable {
 
 	public String getType() {
 		return type;
+	}
+
+	public void setImportable(boolean importable) {
+		this.importable = importable;
+	}
+
+	public boolean isImportable() {
+		return importable;
 	}
 
 	@Override
