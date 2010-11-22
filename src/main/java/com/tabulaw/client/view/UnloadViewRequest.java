@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk Jan 17, 2008
  */
 package com.tabulaw.client.view;
@@ -18,7 +18,7 @@ public final class UnloadViewRequest extends ViewOpRequest {
 	 * Constructor
 	 * @param viewKey
 	 * @param destroy Destroy the view?
-	 * @param erradicate Permanantly remove from cache?
+	 * @param erradicate permanently remove from cache?
 	 */
 	public UnloadViewRequest(ViewKey viewKey, boolean destroy, boolean erradicate) {
 		super(viewKey);

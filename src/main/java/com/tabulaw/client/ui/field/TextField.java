@@ -1,6 +1,6 @@
 /**
- * The Logic Lab
- * @author jpk Nov 5, 2007
+  * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
+  * @author jpk Nov 5, 2007
  */
 package com.tabulaw.client.ui.field;
 

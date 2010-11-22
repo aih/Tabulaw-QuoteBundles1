@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  */
 package com.tabulaw.client.app.ui;
 
@@ -22,11 +22,9 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.IDescriptorProvider;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.field.UserFieldProvider;

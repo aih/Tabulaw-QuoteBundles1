@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk
  * @since Feb 14, 2010
  */
@@ -144,7 +144,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 					// delete button
 					final User liu = ClientModelCache.get().getUser();
 					final boolean isAdmin = liu.isAdministrator();
-					final String title = isAdmin ? "Permanantly delete document" : "Remove document";
+					final String title = isAdmin ? "Permanently delete document" : "Remove document";
 					Image img = new Image(Resources.INSTANCE.trash());
 					img.setTitle(title);
 					img.addClickHandler(new ClickHandler() {
@@ -154,7 +154,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 							event.stopPropagation();
 							String docref = rowData.getTitle();
 							final String confirm =
-									isAdmin ? "Permanantly delete document '" + docref + "'?"
+									isAdmin ? "Permanently delete document '" + docref + "'?"
 											: "Remove document '" + docref + "'?";
 							if(Window.confirm(confirm)) {
 

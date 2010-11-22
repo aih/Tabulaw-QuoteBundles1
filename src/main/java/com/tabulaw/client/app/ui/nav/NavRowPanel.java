@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk
  * @since Feb 12, 2010
  */
@@ -19,10 +19,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
-import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
-import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -30,6 +26,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabBar;
 import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.UserPasswordSetDialog;
@@ -39,7 +37,6 @@ import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.SimpleHyperLink;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
-import com.tabulaw.client.ui.login.UserSessionEvent;
 import com.tabulaw.client.view.IViewInitializerProvider;
 import com.tabulaw.client.view.ShowViewRequest;
 import com.tabulaw.client.view.UnloadViewRequest;
@@ -152,7 +149,7 @@ public class NavRowPanel extends AbstractNavPanel {
 		
 		// TODO go MVP style as this is a clone of what is in UserEditPanel
 		// we need to pull out interactions with the model from the widgets 
-		// and make it purely event driven (the views and widget are supposed to be dumb)!
+		// and make it purely event driven (the views and widgets are supposed to be dumb)!
 		final UserPasswordSetDialog dlgResetPassword = new UserPasswordSetDialog();
 
 		// wraps the form and is the top-most widget

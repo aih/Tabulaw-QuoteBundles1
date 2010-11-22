@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk Feb 17, 2009
  */
 package com.tabulaw.client.ui.msg;
@@ -83,7 +83,7 @@ public interface IMsgOperator extends IDragHandler, ScrollHandler {
 	void removeUnclassifiedMsgs();
 
 	/**
-	 * Removes all messages permanantly.
+	 * Removes all messages permanently.
 	 */
 	void clearMsgs();
 }

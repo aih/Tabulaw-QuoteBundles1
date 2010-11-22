@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk Nov 3, 2007
  */
 package com.tabulaw.client.ui.edit;
@@ -312,6 +312,8 @@ public abstract class AbstractEditPanel<T> extends Composite implements ClickHan
 			EditEvent.fireCancel(this);
 		}
 	}
+	
+	//TODO Add handler for keydown in edit fields and <return>, to create a new item
 
 	/**
 	 * Turns on/off editability.

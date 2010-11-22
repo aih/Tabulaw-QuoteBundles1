@@ -1,5 +1,5 @@
 /**
- * The Logic Lab
+ * 
  * @author jpk
  * @since Feb 16, 2010
  */
