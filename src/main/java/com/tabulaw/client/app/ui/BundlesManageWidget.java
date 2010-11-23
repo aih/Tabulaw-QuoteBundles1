@@ -23,6 +23,8 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestException;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,7 +46,7 @@ import com.tabulaw.model.QuoteBundle;
  * Manages the editing of quote bundles via drag and drop.
  * @author jpk
  */
-public class BundlesManageWidget extends AbstractModelChangeAwareWidget implements HasResizeHandlers{
+public class BundlesManageWidget extends AbstractModelChangeAwareWidget implements HasResizeHandlers {
 
 	static class Styles {
 
@@ -139,7 +141,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 			}
 
 			QuoteBundle sourceBundle = sourceBundleWidget.getModel();
-			
+
 			// move the quote if moving to/from orphaned quote container
 			if(sourceBundleWidget.isOrphanedQuoteContainer() || targetBundleWidget.isOrphanedQuoteContainer()) {
 
@@ -195,9 +197,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 	// main viewing area only)
 	private final PickupDragController quoteController;
 	private final QuoteDragHandler quoteHandler;
-	
+
 	private final HandlerManager resizeHandlerManager = new HandlerManager(this);
-	
 
 	private final HashMap<BundleEditWidget, FlowPanelDropController> qbDropBindings =
 			new HashMap<BundleEditWidget, FlowPanelDropController>();
@@ -279,6 +280,20 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 		// add to nav col
 		QuoteBundle bundle = quoteBundleWidget.getModel();
 		addBundleOption(bundle);
+	}
+
+	void emailQuoteBundle(BundleEditWidget quoteBundleWidget) {
+		String id = quoteBundleWidget.getModel().getId();
+		String url="services/quotebundles/" + id + "/send_by_email";
+		RequestBuilder rb = new RequestBuilder(RequestBuilder.POST, url);
+		/*-
+		try {
+			rb.send();
+		}
+		catch(RequestException e) {
+			
+		}
+		*/
 	}
 
 	/**
@@ -395,6 +410,13 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 				unpinQuoteBundle(qbw);
 			}
 		});
+		qbw.setEmailHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				emailQuoteBundle(qbw);
+			}
+		});
 		qbw.registerSearchHandler();
 		columns.insert(qbw, index);
 
@@ -436,7 +458,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 		}
 
 		resizeHandlerManager.fireEvent(new QuoteResizeEvent());
-		
+
 	}
 
 	private boolean removeQuoteBundleColumn(QuoteBundle bundle) {
@@ -450,7 +472,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 			Widget w = columns.getWidget(i);
 			if(w instanceof BundleEditWidget) {
 				BundleEditWidget qbw = (BundleEditWidget) w;
-				
+
 				if(qbw.getModel().getId().equals(rmId)) {
 
 					// un-make quote widgets draggable
@@ -529,7 +551,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 			Quote q = (Quote) m;
 			switch(event.getChangeOp()) {
 				case DELETED:
-					// iterate through the bundles and remove the quote 
+					// iterate through the bundles and remove the quote
 					for(int i = 0; i < columns.getWidgetCount(); i++) {
 						BundleEditWidget qbw = (BundleEditWidget) columns.getWidget(i);
 						if(qbw.removeQuote(q, true, false) != null) {
