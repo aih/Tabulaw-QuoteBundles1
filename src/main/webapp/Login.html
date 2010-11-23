@@ -55,7 +55,9 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 				</table>
 			</div>
 			<div>
+				<%if (codeSvr!=null) { %>
 				<input type="hidden" id="gwt.codesvr" name="gwt.codesvr" value="<%=codeSvr%>" ></input>
+				<%}%>
 			<input type="submit" id="submitLogin" name="submitLogin" value="Submit"></input>
 			</div>
 		</form>
