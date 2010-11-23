@@ -176,7 +176,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 
 			buttons.add(downloadMenuTop);
 
-			email = new Image(Resources.INSTANCE.XButton());
+			email = new Image(Resources.INSTANCE.EmailButton());
 			email.setTitle("Email");
 			email.setStyleName(Styles.EMAIL);
 			email.setStyleName("tabulawMenuItem");
