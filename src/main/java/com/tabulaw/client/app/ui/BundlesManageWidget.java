@@ -23,8 +23,12 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -284,16 +288,29 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 
 	void emailQuoteBundle(BundleEditWidget quoteBundleWidget) {
 		String id = quoteBundleWidget.getModel().getId();
-		String url="services/quotebundles/" + id + "/send_by_email";
+		String url = "/services/quotebundles/" + id + "/send_by_email?sessionToken=" + Cookies.getCookie("JSESSIONID");
 		RequestBuilder rb = new RequestBuilder(RequestBuilder.POST, url);
-		/*-
+		rb.setCallback(new RequestCallback() {
+
+			@Override
+			public void onResponseReceived(Request request, Response response) {
+				String r = response.getText();
+				String s = response.getStatusText();
+				Log.debug(r);
+				Log.debug(s);
+			}
+
+			@Override
+			public void onError(Request request, Throwable exception) {
+				exception.printStackTrace();
+			}
+		});
 		try {
 			rb.send();
 		}
 		catch(RequestException e) {
-			
+			e.printStackTrace();
 		}
-		*/
 	}
 
 	/**
