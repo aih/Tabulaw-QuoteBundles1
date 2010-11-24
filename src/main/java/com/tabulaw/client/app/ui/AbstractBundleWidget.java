@@ -47,22 +47,7 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearc
 
 	protected QuoteBundle bundle;
 
-	protected final FlowPanel panel = new FlowPanel();
-
 	private PickupDragController dragController;
-
-	/**
-	 * Constructor
-	 * @param headerWidget The header widget
-	 */
-	protected AbstractBundleWidget(H headerWidget) {
-		super();
-		this.header = headerWidget;
-		panel.setStyleName("qbundle");
-		panel.add(header);
-		panel.add(quotePanel);
-		initWidget(panel);
-	}
 
 	/**
 	 * Set the drag controller.
