@@ -14,6 +14,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.tabulaw.cassandra.om.factory.SessionImpl;
 import com.tabulaw.cassandra.om.factory.exception.HelenaException;
+import com.tabulaw.cassandra.om.factory.relations.BagRelation;
 import com.tabulaw.cassandra.om.factory.relations.OneToManyRelation;
 
 
@@ -22,7 +23,7 @@ public class BagList<T> extends ArrayList<T> {
 	private static final long serialVersionUID = 1L;
 	
 	private SessionImpl session;	
-	private OneToManyRelation relation;
+	private BagRelation relation;
 	private Object key;	
 	private boolean isInitialized;
 	
@@ -30,7 +31,7 @@ public class BagList<T> extends ArrayList<T> {
 	private Set<Object> removedKeys;
 	private Map<Object, String> initialKeys;
 	
-	public BagList(SessionImpl session, Object key, OneToManyRelation relation) {
+	public BagList(SessionImpl session, Object key, BagRelation relation) {
 		this.key = key;
 		this.relation = relation;
 		this.session = session;

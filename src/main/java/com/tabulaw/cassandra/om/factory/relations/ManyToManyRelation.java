@@ -7,20 +7,19 @@ import me.prettyprint.cassandra.model.Mutator;
 import me.prettyprint.cassandra.model.Row;
 
 import com.tabulaw.cassandra.om.TypeConverter;
-import com.tabulaw.cassandra.om.annotations.OneToMany;
+import com.tabulaw.cassandra.om.annotations.ManyToMany;
 import com.tabulaw.cassandra.om.factory.ColumnDescriptor;
 import com.tabulaw.cassandra.om.factory.ColumnFamilyDescriptor;
 import com.tabulaw.cassandra.om.factory.SessionImpl;
 import com.tabulaw.cassandra.om.factory.exception.HelenaException;
 import com.tabulaw.cassandra.om.factory.lazy.BagList;
 
+public class ManyToManyRelation extends BagRelation {
 
-public class OneToManyRelation extends BagRelation {
-
-	private OneToMany annotation;
+	private ManyToMany annotation;
 	
-	public OneToManyRelation(ColumnFamilyDescriptor cfDescriptor, ColumnFamilyDescriptor relationCf, 
-			ColumnDescriptor descriptor, OneToMany annotation) {
+	public ManyToManyRelation(ColumnFamilyDescriptor cfDescriptor, ColumnFamilyDescriptor relationCf, 
+			ColumnDescriptor descriptor, ManyToMany annotation) {
 		super(cfDescriptor, relationCf, descriptor);
 		this.annotation = annotation;
 	}
@@ -58,20 +57,21 @@ public class OneToManyRelation extends BagRelation {
 		for (Object obj : bagList.getRemovedKeys()) {
 			String relationKey = TypeConverter.INSTANCE.asString(obj);
 			mutator.addDeletion(key, annotation.columnFamily().columnFamily(), bagList.getInitialKeys().get(obj), se);
-			mutator.addDeletion(relationKey, relationCf.getName(), annotation.inverseColumn(), se);
+			mutator.addDeletion(relationKey, annotation.inverseColumnFamily().columnFamily(), key, se);
 		}
 		for (Object obj : bagList.getAddedKeys()) {
 			String relationKey = TypeConverter.INSTANCE.asString(obj);
-			HColumn<String, String> column = HFactory.createColumn(annotation.inverseColumn(), key, se, se);
+			HColumn<String, String> column = HFactory.createColumn(
+					annotation.inverseColumnFamily().byValue() ?  ("" + System.currentTimeMillis()) : key, key, se, se);
 			HColumn<String, String> joinColumn = HFactory.createColumn(
 					annotation.columnFamily().byValue() ?  ("" + System.currentTimeMillis()) : relationKey, relationKey, se, se);
 			
-			mutator.addInsertion(relationKey, relationCf.getName(), column);
+			mutator.addInsertion(relationKey, annotation.inverseColumnFamily().columnFamily(), column);
 			mutator.addInsertion(key, annotation.columnFamily().columnFamily(), joinColumn);
 		}
 				
 	}
-
+	
 	public ColumnFamilyDescriptor getRelationCF() {
 		return relationCf;
 	}
