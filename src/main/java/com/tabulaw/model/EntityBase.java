@@ -2,6 +2,7 @@ package com.tabulaw.model;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.tabulaw.cassandra.om.annotations.HelenaSuperclass;
 import com.tabulaw.schema.Managed;
 import com.tabulaw.util.StringUtil;
 
@@ -9,6 +10,7 @@ import com.tabulaw.util.StringUtil;
  * EntityBase - Base class for all entities.
  * @author jpk
  */
+@HelenaSuperclass
 public abstract class EntityBase implements IEntity {
 
 	private static final long serialVersionUID = -4641847785797486723L;

@@ -6,11 +6,11 @@ import java.util.Map.Entry;
 
 
 import me.prettyprint.cassandra.dao.Command;
-import me.prettyprint.cassandra.model.HFactory;
 import me.prettyprint.cassandra.model.HectorException;
 import me.prettyprint.cassandra.model.KeyspaceOperator;
 import me.prettyprint.cassandra.model.Mutator;
 import me.prettyprint.cassandra.service.Keyspace;
+import me.prettyprint.hector.api.factory.HFactory;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;

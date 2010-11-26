@@ -16,6 +16,9 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.tabulaw.cassandra.om.annotations.HelenaBean;
+import com.tabulaw.cassandra.om.annotations.KeyProperty;
+
 /**
  * The doc entity.
  * <p>
@@ -24,6 +27,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author jpk
  */
 @XmlRootElement(name = "docRef")
+@HelenaBean(columnFamily = "DocRef", keyspace = "Tabulaw")
 public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEntity {
 
 	private static final long serialVersionUID = -8257785916791525146L;
@@ -31,6 +35,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	/**
 	 * Surrogate primary key.
 	 */
+	@KeyProperty
 	private String id;
 
 	private String title;

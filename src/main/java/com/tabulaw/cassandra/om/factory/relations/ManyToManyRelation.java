@@ -1,10 +1,10 @@
 package com.tabulaw.cassandra.om.factory.relations;
 
-import me.prettyprint.cassandra.extractors.StringExtractor;
 import me.prettyprint.cassandra.model.HColumn;
-import me.prettyprint.cassandra.model.HFactory;
 import me.prettyprint.cassandra.model.Mutator;
 import me.prettyprint.cassandra.model.Row;
+import me.prettyprint.cassandra.serializers.StringSerializer;
+import me.prettyprint.hector.api.factory.HFactory;
 
 import com.tabulaw.cassandra.om.TypeConverter;
 import com.tabulaw.cassandra.om.annotations.ManyToMany;
@@ -53,7 +53,7 @@ public class ManyToManyRelation extends BagRelation {
 		}
 		BagList<?> bagList = (BagList<?>) list;
 		String key = TypeConverter.INSTANCE.asString(cfDescriptor.getKey(object));
-		StringExtractor se = StringExtractor.get();
+		StringSerializer se = StringSerializer.get();
 		for (Object obj : bagList.getRemovedKeys()) {
 			String relationKey = TypeConverter.INSTANCE.asString(obj);
 			mutator.addDeletion(key, annotation.columnFamily().columnFamily(), bagList.getInitialKeys().get(obj), se);

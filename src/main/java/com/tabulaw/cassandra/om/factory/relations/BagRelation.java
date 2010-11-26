@@ -3,12 +3,12 @@ package com.tabulaw.cassandra.om.factory.relations;
 import java.util.List;
 import java.util.Map;
 
-import me.prettyprint.cassandra.extractors.StringExtractor;
 import me.prettyprint.cassandra.model.ColumnSlice;
 import me.prettyprint.cassandra.model.HColumn;
-import me.prettyprint.cassandra.model.HFactory;
 import me.prettyprint.cassandra.model.KeyspaceOperator;
 import me.prettyprint.cassandra.model.SliceQuery;
+import me.prettyprint.cassandra.serializers.StringSerializer;
+import me.prettyprint.hector.api.factory.HFactory;
 
 import com.google.common.collect.Maps;
 import com.tabulaw.cassandra.om.TypeConverter;
@@ -37,7 +37,7 @@ public abstract class BagRelation implements Relation {
 	public Map<Object, String> loadList(SessionImpl session, Object key) {
 		SessionFactory factory = session.getFactory();
 		KeyspaceOperator operator = factory.createKeyspaceOperator();
-		StringExtractor se = StringExtractor.get();
+		StringSerializer se = StringSerializer.get();
 		String keyStr = TypeConverter.INSTANCE.asString(key);
 		
 		SliceQuery<String, String> query = HFactory.createSliceQuery(operator, se, se);

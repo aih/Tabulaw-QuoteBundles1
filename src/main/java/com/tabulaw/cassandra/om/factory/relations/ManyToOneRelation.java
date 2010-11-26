@@ -1,10 +1,10 @@
 package com.tabulaw.cassandra.om.factory.relations;
 
-import me.prettyprint.cassandra.extractors.StringExtractor;
 import me.prettyprint.cassandra.model.HColumn;
-import me.prettyprint.cassandra.model.HFactory;
 import me.prettyprint.cassandra.model.Mutator;
 import me.prettyprint.cassandra.model.Row;
+import me.prettyprint.cassandra.serializers.StringSerializer;
+import me.prettyprint.hector.api.factory.HFactory;
 
 
 import com.google.common.base.Objects;
@@ -50,7 +50,7 @@ public class ManyToOneRelation implements Relation {
 		}
 		Object newKey = relationCF.getKey(newRel);
 		Object oldKey = relationCF.getKey(descriptor.getValue(existent));
-		StringExtractor se = StringExtractor.get();
+		StringSerializer se = StringSerializer.get();
 		if (! Objects.equal(newKey, oldKey)) {
 			String key = TypeConverter.INSTANCE.asString(cfDescriptor.getKey(object));
 			String keyRel = TypeConverter.INSTANCE.asString(newKey);

@@ -5,16 +5,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import me.prettyprint.cassandra.extractors.StringExtractor;
 import me.prettyprint.cassandra.model.HColumn;
-import me.prettyprint.cassandra.model.HFactory;
 import me.prettyprint.cassandra.model.KeyspaceOperator;
 import me.prettyprint.cassandra.model.MultigetSliceQuery;
 import me.prettyprint.cassandra.model.Mutator;
 import me.prettyprint.cassandra.model.Row;
 import me.prettyprint.cassandra.model.Rows;
 
+import me.prettyprint.cassandra.serializers.StringSerializer;
 import me.prettyprint.cassandra.service.Keyspace;
+import me.prettyprint.hector.api.factory.HFactory;
 
 import org.apache.cassandra.thrift.ColumnPath;
 
@@ -201,7 +201,7 @@ public class ColumnFamilyDescriptor {
 	public void mutate(SessionImpl session, Mutator mutator, Object object, Object existent) {
 		String key = TypeConverter.INSTANCE.asString(keyColumn.getValue(object));
 		String columnFamily = getDescription().columnFamily();
-		StringExtractor se = StringExtractor.get();		
+		StringSerializer se = StringSerializer.get();		
 		if (existent == null && discriminators != null) {
 			for (Entry<String, String> discriminator : discriminators.entrySet()) {
 				if (discriminator.getValue() == null) {
@@ -243,7 +243,7 @@ public class ColumnFamilyDescriptor {
 		if (keys == null || keys.length == 0) {
 			return Lists.newArrayList();
 		}
-		StringExtractor se = StringExtractor.get();	
+		StringSerializer se = StringSerializer.get();	
 		MultigetSliceQuery<String, String> query = HFactory.createMultigetSliceQuery(operator, se, se);
 		
 		String[] keysStr = new String[keys.length];

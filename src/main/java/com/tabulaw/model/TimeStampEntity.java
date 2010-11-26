@@ -2,6 +2,7 @@ package com.tabulaw.model;
 
 import java.util.Date;
 
+import com.tabulaw.cassandra.om.annotations.HelenaSuperclass;
 import com.tabulaw.schema.Managed;
 
 /**
@@ -9,6 +10,7 @@ import com.tabulaw.schema.Managed;
  * is the create/modify date and the create/modify user.
  * @author jpk
  */
+@HelenaSuperclass
 public abstract class TimeStampEntity extends EntityBase implements ITimeStampEntity {
 
 	private static final long serialVersionUID = 1800355868972602348L;

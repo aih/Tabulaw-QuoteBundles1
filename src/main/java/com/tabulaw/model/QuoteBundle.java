@@ -16,19 +16,27 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.tabulaw.cassandra.om.annotations.HelenaBean;
+import com.tabulaw.cassandra.om.annotations.JoinColumnFamily;
+import com.tabulaw.cassandra.om.annotations.KeyProperty;
+import com.tabulaw.cassandra.om.annotations.OneToMany;
+
 /**
  * NOTE: there are no natural business keys defined for quote bundles.
  * @author jpk
  */
 @XmlRootElement(name = "quoteBundle")
+@HelenaBean(columnFamily = "QuoteBundle", keyspace = "Tabulaw")
 public class QuoteBundle extends TimeStampEntity implements INamedEntity, Comparable<QuoteBundle> {
 
 	private static final long serialVersionUID = -6606826756860275551L;
 
+	@KeyProperty
 	private String id;
 
 	private String name, description;
 
+	@OneToMany(inverseColumn = "quoteBundle", columnFamily = @JoinColumnFamily(columnFamily = "QuoteBundleQuotes"))
 	private List<Quote> quotes;
 
 	/**

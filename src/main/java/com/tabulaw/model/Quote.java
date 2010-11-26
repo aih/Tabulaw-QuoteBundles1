@@ -14,6 +14,10 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.tabulaw.cassandra.om.annotations.HelenaBean;
+import com.tabulaw.cassandra.om.annotations.JoinColumnFamily;
+import com.tabulaw.cassandra.om.annotations.KeyProperty;
+import com.tabulaw.cassandra.om.annotations.ManyToOne;
 import com.tabulaw.schema.Reference;
 import com.tabulaw.util.StringUtil;
 
@@ -28,10 +32,12 @@ import com.tabulaw.util.StringUtil;
 }))
 */
 @XmlRootElement(name = "quote")
+@HelenaBean(columnFamily = "Quotes", keyspace = "Tabulaw")
 public class Quote extends TimeStampEntity implements Comparable<Quote> {
 
 	private static final long serialVersionUID = -2887172300623884436L;
 
+	@KeyProperty
 	private String id;
 
 	private int startPage, endPage;
@@ -43,6 +49,7 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	 */
 	private transient Object mark;
 
+	@ManyToOne(column = "document", inverseColumnFamily = @JoinColumnFamily(columnFamily = "DocumentQuotes"))
 	private DocRef document;
 
 	/**

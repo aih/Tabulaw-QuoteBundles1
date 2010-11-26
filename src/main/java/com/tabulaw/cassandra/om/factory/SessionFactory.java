@@ -10,9 +10,9 @@ import com.tabulaw.cassandra.om.annotations.HelenaBean;
 
 import me.prettyprint.cassandra.dao.Command;
 import me.prettyprint.cassandra.model.ConsistencyLevelPolicy;
-import me.prettyprint.cassandra.model.HFactory;
 import me.prettyprint.cassandra.model.KeyspaceOperator;
 import me.prettyprint.cassandra.service.Cluster;
+import me.prettyprint.hector.api.factory.HFactory;
 
 
 public class SessionFactory {
