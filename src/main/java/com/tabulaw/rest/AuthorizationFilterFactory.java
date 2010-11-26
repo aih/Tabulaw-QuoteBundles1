@@ -17,6 +17,8 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.container.ResourceFilterFactory;
 
+import com.tabulaw.rest.resources.BaseResource;
+import com.tabulaw.server.UserContext;
 
 /**
  * 
@@ -55,6 +57,10 @@ public class AuthorizationFilterFactory implements ResourceFilterFactory {
 				HttpSession session = RESTSessionManager.findSession(sessionToken);
 				if (session != null) {
 					RESTServletRequest.changeSession(httpRequest, session);
+					if (session.getAttribute(BaseResource.REST_USER_KEY) == null &&
+						session.getAttribute(UserContext.KEY) != null) {
+						session.setAttribute(BaseResource.REST_USER_KEY, session.getAttribute(UserContext.KEY));
+					}
 					return request;
 				}
 				throw new WebApplicationException(Status.UNAUTHORIZED);

@@ -18,7 +18,7 @@ import com.tabulaw.service.entity.UserService;
  *
  */
 public class BaseResource {	
-	static final String REST_USER_KEY = UserContext.KEY + "-rest";
+	public static final String REST_USER_KEY = UserContext.KEY + "-rest";
 
 	@Context
 	protected HttpServletRequest httpRequest;
