@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ page language="java" import="java.util.*,java.lang.*" %> 
+<jsp:useBean id="loginSession" class="com.tabulaw.server.jsp.LoginSessionBean" > 	</jsp:useBean>
+ 
+<c:set target="${loginSession}" property="request" value="${pageContext.request}" />
+
+<c:if test="${loginSession.loggedIn}">
+	<c:redirect url="Poc.html"/>
+</c:if> 
+
+<jsp:useBean id="loginBean" class="com.tabulaw.server.jsp.LoginBean" > 	</jsp:useBean>
+<c:set target="${loginBean}" property="request" value="${pageContext.request}" />
+
+<c:if test="${loginBean.loginValid && loginSession.loggedIn}">
+	<c:redirect url="Poc.html"/>
+</c:if> 
+<html>
+<head>	
+	<title>Tabulaw</title>
+    <link href="login.css" rel="stylesheet"/>
+	<script src="js/login.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="h-top">
+    <div class="l-top">
+		<img src="images/logo-transparent.png" class="tlogo"/>		
+        <ul class="b-menu b-menu-top">
+            <li class="b-menu-item"><a href="#" class="b-menu-item-link">Home</a></li>
+            <li class="b-menu-item"><a href="#" class="b-menu-item-link">Sign&nbsp;in</a></li>
+        </ul>              
+    </div>
+    <div class="l-central">
+		<c:if test="${fn:length(loginBean.errors)>0}">
+				<div class="msg errors">
+					<c:forEach var="error" items="${loginBean.errors}">
+							<div><c:out value="${error}"/></div>
+					</c:forEach><br />				
+				</div>
+		</c:if> 
+		<c:if test="${param.registration=='success'}">
+			<div class="msg">
+				<div>*Registration successful.</div>
+				<div>*Now login!</div>
+			</div>
+		</c:if> 
+        <form class="b-auth" method="post" id="auth-form" action="Login.html">
+            <div class="left_form_part">
+                <label>Email&nbsp;Address:</label>
+                <label>Password:</label>
+				
+            </div>
+            <div class="right_form_part">
+                <input type="text" id="userEmail" name="userEmail" class="b-auth-input" />
+                <input type="password" d="userPswd" name="userPswd" class="b-auth-input" />
+            </div>    
+			<input type="submit" id="submit-button" name="submitLogin" value="Submit"></input>
+		</form>
+		<span class="niceCheck" onclick="changeCheck(this)" id="niceCheckbox1">
+			<input type="checkbox" name="chl"/>	
+		</span>
+		<div class="remember">Remember&nbsp;me</div>
+		
+		<a href="#" id="submit-url" class="button1"><span><span><b>&nbsp;</b><u>Sign&nbsp;in</u></span></span></a>
+		
+		<span class="google-signin-text">Or sign in with your...</span>
+		<a href="openid?hd=gmail.com" class="btn-round"><span style="color:blue">G</span><span style="color:red">o</span><span style="color:yellow">o</span><span style="color:blue">g</span><span style="color:green">l</span><span style="color:red">e</span> Account</a>
+		<a href="#" class="forgot">Forgot&nbsp;Password?</a>
+    </div>
+    <div class="r-central">
+        <div class="l">&nbsp;</div>
+		<span class="register-button-text">If you don't have a Tabulaw account yet...</span>
+		
+		<span class="register-button">
+        	<a href="Register.html" class="button1"><span><span><b>&nbsp;</b><u>Register&nbsp;Now</u></span></span></a>
+		</span>
+    </div>
+	<div class="central">  
+	</div>
+    <div class="footer">
+       	<p> &copy;&nbsp;2010&nbsp;Tabulaw,&nbsp;Inc</p>
+	     <ul class="f-menu f-menu-bottom">
+			<li class="f-menu-item"><a href="#" class="f-menu-item-link">About&nbsp;Us</a></li>
+			<li class="f-menu-item"><a href="#" class="f-menu-item-link">Contact</a></li>
+		</ul>
+    </div>
+</div>
+</body>
+</html>
