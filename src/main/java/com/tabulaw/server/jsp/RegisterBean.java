@@ -25,6 +25,8 @@ public class RegisterBean {
 
 	private HttpServletRequest request;
 
+	private String userName;
+
 	private String emailAddress;
 	private String password;
 	private String passwordConfirm;
@@ -34,6 +36,9 @@ public class RegisterBean {
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;
 		if (request != null) {
+			setUserName(StringUtils.defaultString(
+					request.getParameter("userName")).trim());
+
 			setEmailAddress(StringUtils.defaultString(
 					request.getParameter("userEmail")).trim());
 			setPassword(StringUtils.defaultString(request
@@ -75,6 +80,14 @@ public class RegisterBean {
 		this.errors = errors;
 	}
 
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
 	public List<String> getErrors() {
 		return errors;
 	}
@@ -90,11 +103,15 @@ public class RegisterBean {
 
 		UserService userService = null;
 
+		if (getUserName().isEmpty()) {
+			errors.add("User name is required.");
+		}
+
 		if (getPassword().isEmpty()) {
-			errors.add("Empty password.");
+			errors.add("Password is required.");
 		}
 		if (!getPassword().equals(getPasswordConfirm())) {
-			errors.add("Invalid password confirm.");
+			errors.add("Password doesn't match.");
 		}
 		if (getEmailAddress().isEmpty()) {
 			errors.add("Empty email address.");
@@ -130,7 +147,7 @@ public class RegisterBean {
 
 	private void doUserRegister(UserService userService) {
 		try {
-			User user = userService.create(getEmailAddress(),
+			User user = userService.create(getUserName(),
 					getEmailAddress(), getPassword());
 			sendEmail(user);
 		} catch (EntityExistsException e) {

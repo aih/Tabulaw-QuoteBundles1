@@ -1,0 +1,610 @@
+* {
+    margin: 0px auto;
+    padding: 0px;
+    outline: 0;
+    border: 0;
+}
+
+
+body {
+    background-color: #fff;
+    font: 14px Georgia, Arial;
+           
+}
+
+a {    
+    text-decoration: none;
+	color:#fff;
+}
+
+.h-top {
+	width:900px;
+	position:relative;
+}
+
+.tlogo {
+	margin-top: 15px;
+	margin-left: 2px;
+	margin-right:5px;
+	height: 5.5em;
+	
+}
+
+.l-top {
+	background-color:#BCDEDF;
+    height: 95px;
+	position:relative;
+}
+/*top_menu*/
+.b-menu{
+	list-style:none;
+	font-weight:bold;
+}
+.b-menu-item{
+	float:left;
+	padding-left:20px;
+}
+.b-menu-item:first-child{
+	padding-right:20px;
+	border-right:1px solid #fff;
+}
+.b-menu-top{
+	position:absolute;
+	top:70px;
+	right:30px;
+}
+/*end_top_menu*/
+
+.l-central{
+	width:445px;
+	height:370px;
+	position:relative;
+	float:left;          
+}
+
+/*
+.l-central a{
+	color:#54AFAF;
+	text-decoration:none;
+	font-size:13px;
+	position:absolute;
+	right:200px;
+	bottom:2px;
+}
+*/
+
+
+.l-central a:hover{
+	text-decoration:underline;
+}
+
+.l-central h3{
+	font:20px Georgia, Arial;
+	position:absolute;
+	left:175px;
+	top:80px;
+}
+
+.b-auth {
+	position:absolute;
+	top:80px;
+	right:20px;
+    width:400px;    
+}
+.b-auth-input {
+	border:1px solid #C0DFDF;
+	height:20px;
+	width:213px;
+	margin-bottom:10px;
+	color:#434343;
+}
+
+*html .b-auth-input{
+  	margin-bottom:0px;
+}
+
+.l-central .niceCheck {
+	padding-right:4px;	
+	width: 15px;
+	height: 15px;
+	cursor: pointer;	
+	background: url(images/check.png) no-repeat;
+    position:absolute;
+	left:180px;    	
+    top:150px;
+}
+
+*html .niceCheck{
+    margin-left: 6px;
+    margin-top: 10px;
+}
+
+*+html .niceCheck{
+    margin-left: 91px;
+}
+
+.niceCheck input {
+	display: none;
+}
+
+.l-central .remember {
+	position:absolute;
+	left:200px;    	
+    top:150px;
+}		
+*html .remember{
+    padding-top: 4px;
+}
+
+*+html .remember{
+    padding-top: 4px;
+}
+
+.l-central .forgot {
+	position:absolute;
+	right: 50px;    	
+    top:300px;
+}
+
+.forgot {
+	
+	color:#54AFAF;
+}
+
+
+.l-central span{
+/*	color:#FF0000; */
+}
+
+.l{
+    position: absolute;
+    border-left: 1px solid #54AFAF;;
+    height: 210px;
+    width: 1px;
+    top:75px;
+    left:-10px;
+}
+.auth-reg{
+    position:absolute;
+    left:420px;
+	top:-20px;
+}
+
+.r-central{
+    width:445px;
+    height: 370px;
+    float: left;
+    position: relative;
+}
+
+.r-intro{
+	
+}
+
+.central{
+    clear: both;
+    position: relative;
+    height: 100px;
+}
+.central p{
+    position: absolute;
+    top:35px;
+    left:170px;
+}
+
+.google-signin-text{
+	position:absolute;
+	top:220px;
+    right:50px;
+}
+
+.l-central .btn-round{
+	position:absolute;
+	top:250px;
+    right:50px;
+}
+
+.btn-round{
+	padding: 6px 10px;
+	cursor:pointer;
+	vertical-align:center;
+	background: #BCDEDF;
+	border: 1px solid #a0a0a0;
+	border-right: 1px solid #444444 !important;
+}
+
+/*
+
+.btn-round .border.side.center
+{
+	border-right: 1px solid #444444 !important;
+	border-left: 1px solid #ffffff !important;
+}
+
+.btn-round .border.side.right
+{
+	border-left: 1px solid #ffffff !important;
+}
+
+
+
+.btn-round .background.top
+{
+	background: #f3f3f3;
+}
+
+.btn-round .background.bottom
+{
+	background: #e3e3e3;
+}
+
+
+.btn-round .border.down
+{
+	border-color: black;
+}
+
+.btn-round .background.top.down
+{
+	background: #e3e3e3;
+}
+
+.btn-round .background.bottom.down
+{
+	background: #f3f3f3;
+}
+
+
+.btn-round .background.main.active
+{
+	background: #aaaaaa;
+}
+
+.btn-round .background.top.active
+{
+	background: #a1a1a1;
+}
+
+.btn-round .background.bottom.active
+{
+	background: #b2b2b2;
+}
+
+.btn-round .border.active
+{
+	border-color: #222222;
+}
+
+.btn-round .border.side.center.active, .button .border.side.right.active
+{
+	border-left: 1px solid #cccccc !important;
+}
+*/
+
+
+
+.footer{
+	border-top:5px solid #c2e0e0;
+	position:relative;
+	margin-bottom:20px;
+}
+.footer p{
+	margin-left:25px;
+	margin-top:15px;
+}
+/*footer_menu*/
+.f-menu{
+	list-style:none;
+}
+.f-menu-item{
+	float:left;
+	padding-left:10px;
+}
+.f-menu-item:first-child{
+	padding-right:10px;
+	border-right:1px solid #434343;
+}
+.f-menu-bottom{
+	position:absolute;
+	top:15px;
+	right:25px;
+}
+.f-menu-item a{
+	color:#434343;
+}
+
+.f-menu-item a:hover{
+		text-decoration:underline;
+}
+/*end_footer_menu*/
+
+.footreg{
+    clear: both;
+}
+.b-auth-button-reg{
+    position: absolute;
+    top:85px;
+    left: 380px;
+}
+.g-button-reg{
+	background-image:url(img/btn.png);
+	height:25px;
+	font: bold 13px Arial;
+	text-align:center;
+	background-color:#fff;
+	color:#434343;
+	margin-top:10px;
+	margin-right:127px;
+	width:106px;
+	cursor:pointer;	
+	padding-bottom: 1px;
+}
+.g-button-cancel{
+	background-image:url(img/btn.png);
+	height:25px;
+	font: bold 13px Arial;	
+	background-color:#fff;
+	color:#434343;
+	margin-top:10px;
+	margin-right:127px;
+    padding-bottom: 1px;
+	width:106px;
+	cursor:pointer;
+    text-align: center;	
+	
+}
+.register{
+    height: 440px;
+    width: 900px;
+}
+.reg-form-title{
+    position:absolute;
+	top:80px;
+	left: 230px;
+	font-size:20px;
+}
+
+.r-intro{
+	position:absolute;
+	top: 330px;
+	left: 230px;
+	font-size:18px;
+}
+
+.r-intro a{
+	color:blue;
+}
+.b-reg {
+	position:absolute;
+	top:130px;
+	left:220px;
+	text-align:right;
+}
+/*************forgot************/
+.forgot-info{
+    position: absolute;
+    left:230px;
+    top:115px;
+    border: 1px solid #a8d6d6;
+    padding: 5px;
+}
+.b-forgot{
+    position:absolute;
+	top:180px;
+	left:260px;
+	text-align:right;
+}
+
+.b-auth-button-forgot{
+    position: absolute;
+    top:20px;
+    left: 109px;    
+}
+.g-button-back{
+    position:absolute;
+    top:40px;    
+    width:106px;
+    height:25px;
+    background-image: url(img/btn.png);
+}
+.g-button-back a{
+    position: absolute;
+    top:0px;
+    left:0px;
+	font:bold 12px Arial;
+	color:#434343;
+	display:block;
+	width:106px;
+	height:25px;
+    text-align: center;	
+	padding-top:5px;
+}
+.g-button-back a:hover{
+    text-decoration: none;
+}
+* html
+.remember{    
+    position: absolute;
+    top:65px;
+}
+
+.left_form_part{
+    float:left;
+	width:150px;
+    text-align: right;   
+}
+
+.left_form_part_reg{
+    float:left;
+    height:120px;
+    width:150px;
+    text-align: right;     
+}
+
+.left_form_part_reg label{
+    line-height: 31px;
+}
+
+.left_form_part_forgot{
+    float:left;
+    width:100px;
+    text-align: right;           
+}
+
+.left_form_part_forgot label{
+    line-height: 18px;
+}
+
+.right_form_part{
+    float:left;
+    margin-right:5px;
+	margin-left:5px;
+    width:210px;
+    margin-top:8px;
+}
+
+.right_form_part_reg{
+    float:left;
+    margin-left:5px;
+    width:215px;
+    margin-top:8px;
+}
+
+.right_form_part_forgot{
+    float:left;
+    margin-left:5px;
+    width:215px;        
+}
+
+*html .right_form_part_reg input{
+    margin-bottom:8px;
+}
+
+*+html .right_form_part_reg input{
+    margin-top:-2px;
+}
+
+*html .right_form_part{
+    margin-top:-5px;
+}
+
+.left_form_part label{
+    line-height: 33px;
+}
+
+.l-central .button1 {
+	position: absolute;
+	top:150px;
+	right:50px;
+}
+
+.register-button-text {
+	position: absolute;
+	top:71px;
+	left: 50px;
+}
+.register-button {
+	position: absolute;
+	top:153px;
+	left: 50px;
+}
+
+
+.button1 {
+  
+  background:none;
+  margin:0;
+  padding:3px 0;
+  border-width:0;
+  overflow:visible;
+  font:100%/1.2 Arial,Sans-serif;
+  text-decoration:none;
+  color:#333;
+  }
+
+* html button.button1 {
+  padding-bottom:1px;
+  }
+/* Immediately below is a temporary hack to serve the 
+   following margin values only to Gecko browsers
+   Gecko browsers add an extra 3px of left/right 
+   padding to button elements which can't be overriden.
+   Thus, we use -3px of left/right margin to overcome this. */
+html:not([lang*=""]) button.button1 {
+ margin:0 -3px; 
+  }
+	
+	
+.button1 span {
+  height:23px;
+  font: bold 20px Arial;
+  text-align:center;
+  background-color:#BCDEDD;
+  color:#434343;
+  z-index:1;
+  margin-top:6px;
+  margin-left: 0px;
+  width:84px !important;
+  cursor:pointer;	
+  padding-bottom:0px;
+  border-left:1px solid #ccc;
+  border-right:1px solid #bbb;
+  white-space:nowrap;
+  }
+* html .button1 span {
+  padding-top:0;
+  }
+.button1 span span {
+  background:none;
+  position:relative;
+  padding:0px .4em 0 .4em;
+  border-width:0;
+  border-top:1px solid #ccc;
+  border-bottom:1px solid #bbb;
+  }
+.button1 b {
+  background:#e3e3e3;
+  position:absolute;
+  z-index:2;
+  bottom:0;
+  left:0;
+  width:100%;
+  overflow:hidden;
+  height:40%;
+  border-top:3px solid #eee;
+  }
+
+* html .button1 b {
+  top:1px;
+  }
+.button1 u {
+  text-decoration:none;
+  position:relative;
+  z-index:3;
+  }
+
+/* only needed if implementing separate hover state for buttons */
+.button1:hover span, .g-button-in:hover span span {
+  cursor:pointer;
+  border-color:#9cf !important;
+  color:#000;
+  }
+
+/* use if one button should be the 'primary' button */
+.primary {
+  font-weight:bold;
+  color:#000;
+  }
+ #submit-button {
+	width : 1px;
+	height : 1px;
+ }
+ 
+.msg {
+	position: absolute;
+	top: 35px;
+	left: 30px;
+ }
+ .errors {
+	color	:red;
+ }
