@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.jws.soap.SOAPBinding.Use;
 import javax.validation.ValidationException;
 import javax.validation.ValidatorFactory;
 
@@ -13,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
+import com.tabulaw.cassandra.om.factory.Session;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.EntityExistsException;
@@ -77,21 +79,19 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 
 	@Transactional
 	public void init() {
-
-		try {
+		Session session = TabulawSession.FACTORY.createSession();
 			// load admin account and create if not present
-			User superadmin = dao.load(User.class, "admin@tabulaw.com");
-			log.debug("Admin user retrieved.");
+			//User superadmin = dao.load(User.class, "admin@tabulaw.com");
+		User superadmin = session.find(User.class, "admin@tabulaw.com");
+		log.debug("Admin user retrieved.");
 
-			// HACK: retro-fit user's role as we no longer have Authority entities
-			if(superadmin.getRoles().size() == 0) {
-				superadmin.addRole(Role.ADMINISTRATOR);
-				dao.persist(superadmin);
-			}
-			// END HACK
+		// HACK: retro-fit user's role as we no longer have Authority entities
+		if(superadmin != null && superadmin.getRoles().size() == 0) {
+			superadmin.addRole(Role.ADMINISTRATOR);
+			session.persist(superadmin);
 		}
-		catch(EntityNotFoundException e) {
-			// create the admin user
+			// END HACK
+		if (superadmin == null) {
 			User adminUser = new User();
 			adminUser.addRole(Role.ADMINISTRATOR);
 			Date now = new Date();
@@ -101,15 +101,16 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 			adminUser.setPassword(encodePassword("admin123", adminUser.getEmailAddress()));
 			adminUser.setEnabled(true);
 			adminUser.setLocked(false);
+			
 			Calendar c = Calendar.getInstance();
 			c.setTime(now);
 			c.add(Calendar.YEAR, 1);
 			adminUser.setExpires(c.getTime());
 			adminUser.setName("Tabulaw Administrator");
-
-			dao.persist(adminUser);
+			session.persist(adminUser);
 			log.debug("admin user created.");
 		}
+		session.close();
 	}
 
 	/**
@@ -117,8 +118,10 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 */
 	@Transactional(readOnly = true)
 	public List<User> getAllUsers() {
-		List<User> list = dao.loadAll(User.class);
+		Session session = TabulawSession.FACTORY.createSession();
+		List<User> list = session.findAll(User.class);
 		if(list == null) return Collections.emptyList();
+		session.close();
 		return list;
 	}
 
@@ -131,7 +134,12 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	@Transactional(readOnly = true)
 	public User loadUser(String userId) throws EntityNotFoundException {
 		if(userId == null) throw new NullPointerException();
-		User existing = dao.load(User.class, userId);
+		Session session = TabulawSession.FACTORY.createSession();		
+		User existing = session.find(User.class, userId);
+		if (existing == null) {
+			throw new EntityNotFoundException("Bad entity");
+		}
+		session.close();
 		return existing;
 	}
 
@@ -145,9 +153,11 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	@Transactional
 	public void deleteUser(String userId) throws EntityNotFoundException {
 		if(userId == null) throw new NullPointerException();
-		User existing = dao.load(User.class, userId);
+		Session session = TabulawSession.FACTORY.createSession();	
+		User existing = session.find(User.class, userId);
 		assert existing != null;
-		dao.purge(existing);
+		session.remove(existing);
+		session.close();
 		// TODO delete user related entities
 	}
 
@@ -161,24 +171,19 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 		if(user == null) throw new NullPointerException();
 
 		User existing;
-		try {
-			existing = dao.load(User.class, user.getId());
-
+		Session session = TabulawSession.FACTORY.createSession();
+		
+		existing = session.find(User.class, user.getId());
+		if (existing != null) {
 			// transfer password as we don't require this for update
 			// nor do we actually update it
 			user.setPassword(existing.getPassword());
 		}
-		catch(EntityNotFoundException e) {
-			// new
-			existing = null;
-		}
 
 		validate(user);
 
-		// clear out existing
-		if(existing != null) dao.purge(existing);
-
-		user = dao.persist(user);
+		user = session.merge(user);
+		session.close();
 
 		return user;
 	}
@@ -225,7 +230,9 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 
 		validate(user);
 
-		dao.persist(user);
+		Session session = TabulawSession.FACTORY.createSession();
+		session.merge(user);
+		session.close();
 
 		return user;
 	}
@@ -239,18 +246,9 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 
 	@Transactional(readOnly = true)
 	public User findByEmail(String emailAddress) throws EntityNotFoundException {
-		User user;
-		try {
-			final Criteria<User> criteria = new Criteria<User>(User.class);
-			criteria.getPrimaryGroup().addCriterion("emailAddress", emailAddress, true);
-			user = dao.findEntity(criteria);
-		}
-		catch(final InvalidCriteriaException e) {
-			throw new IllegalStateException("Unexpected invalid criteria exception occurred");
-		}
-		catch(EntityNotFoundException e) {
-			throw new EntityNotFoundException("No user with email address: '" + emailAddress + "' was found.");
-		}
+		Session session = TabulawSession.FACTORY.createSession();
+		User user = session.find(User.class, emailAddress);
+		session.close();
 
 		assert user != null;
 		return user;
@@ -262,28 +260,27 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	@Override
 	public String resetPassword(String userId) throws ChangeUserCredentialsFailedException {
 
-		try {
-			// get the user
-			final User user = dao.load(User.class, userId);
-			final String username = user.getEmailAddress();
-
-			// encode the new password
-			final String random = RandomStringUtils.randomAlphanumeric(8);
-			final String encNewPassword = encodePassword(random, username);
-
-			// set the credentials
-			user.setPassword(encNewPassword);
-			dao.persist(user);
-
-			// updateSecurityContextIfNecessary(username, username, random, false);
-
-			return random;
-		}
-		catch(final EntityNotFoundException nfe) {
+		// get the user
+		Session session = TabulawSession.FACTORY.createSession();
+		final User user = session.find(User.class, userId);
+		if (user == null) {
 			throw new ChangeUserCredentialsFailedException("Unable to re-set user password: User of id: " + userId
 					+ " not found");
 		}
+		final String username = user.getEmailAddress();
 
+		// encode the new password
+		final String random = RandomStringUtils.randomAlphanumeric(8);
+		final String encNewPassword = encodePassword(random, username);
+
+		// set the credentials
+		user.setPassword(encNewPassword);
+		session.persist(user);
+
+		// updateSecurityContextIfNecessary(username, username, random, false);
+		session.close();
+		
+		return random;
 	}
 
 	/**

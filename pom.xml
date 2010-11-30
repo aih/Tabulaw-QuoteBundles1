@@ -847,5 +847,16 @@
 			<artifactId>libthrift</artifactId>
 			<version>917130</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-pool</groupId>
+			<artifactId>commons-pool</artifactId>
+			<version>1.5.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.perf4j</groupId>
+			<artifactId>perf4j</artifactId>
+			<version>0.9.12</version>
+		</dependency>
+
 	</dependencies>
 </project>

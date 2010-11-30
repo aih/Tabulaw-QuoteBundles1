@@ -13,6 +13,10 @@ public interface Session {
 	
 	<T> List<T> find(Class<T> klass, Object... keys);
 	
+	<T> List<T> findAll(Class<T> klass);
+	
+	<T> List<T> findRange(Class<T> klass, Object lastKey, int limit);
+	
 	<T> T merge(T object);
 	
 	<T> void refresh(T object);

@@ -5,6 +5,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import com.tabulaw.cassandra.om.factory.exception.HelenaException;
 
@@ -45,7 +46,16 @@ public class ColumnDescriptor {
 		throw new HelenaException("Bad config!");
 	}
 	
-	public void setValue(Object object, Object value) {		
+	public void setValue(Object object, Object value) {
+		if (annotated instanceof Field) {
+			if (((Field) annotated).getType().isPrimitive() && value == null) {
+				return; 
+			}
+		} else {
+			if (((Method) annotated).getReturnType().isPrimitive() && value == null) {
+				return;
+			}
+		}
 		if (property != null) {
 			try {
 				property.getWriteMethod().invoke(object, value);

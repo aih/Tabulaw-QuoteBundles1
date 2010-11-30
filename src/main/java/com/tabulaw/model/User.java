@@ -23,6 +23,12 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.tabulaw.IMarshalable;
+import com.tabulaw.cassandra.om.annotations.HelenaBean;
+import com.tabulaw.cassandra.om.annotations.JoinColumnFamily;
+import com.tabulaw.cassandra.om.annotations.KeyProperty;
+import com.tabulaw.cassandra.om.annotations.ManyToMany;
+import com.tabulaw.cassandra.om.annotations.ManyToOne;
+import com.tabulaw.cassandra.om.annotations.Transient;
 import com.tabulaw.model.bk.BusinessKeyDef;
 import com.tabulaw.model.bk.BusinessObject;
 
@@ -32,6 +38,7 @@ import com.tabulaw.model.bk.BusinessObject;
  */
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress" }))
 @XmlRootElement(name = "user")
+@HelenaBean(keyspace = "Tabulaw", columnFamily = "Users")
 public class User extends TimeStampEntity implements IUserRef, INamedEntity, Comparable<User> {
 
 	/**
@@ -63,8 +70,14 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	private boolean enabled = true;
 
 	private Date expires;
+	
+	private QuoteBundle orphanedQuoteBundle;
+	
+	private List<DocRef> documents;
+	
+	private List<QuoteBundle> bundles;
 
-	private ArrayList<Role> roles;
+	private List<Role> roles;
 
 	private HashSet<AppFeature> appFeatures;
 
@@ -95,6 +108,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	}
 
 	@Override
+	@Transient
 	public String getId() {
 		return emailAddress;
 	}
@@ -150,6 +164,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	@NotEmpty
 	@Email
 	@Length(max = MAXLEN_EMAIL_ADDRESS)
+	@KeyProperty
 	public String getEmailAddress() {
 		return emailAddress;
 	}
@@ -215,7 +230,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 		return new ArrayList<Role>(roles);
 	}
 
-	public void setRoles(Collection<Role> roles) {
+	public void setRoles(List<Role> roles) {
 		this.roles = roles == null ? null : new ArrayList<Role>(roles);
 	}
 
@@ -346,4 +361,31 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	public Map<String,String> getOAuthParametersExtra() {
 		return oauthParametersExtra;
 	}
+
+	@ManyToMany(columnFamily = @JoinColumnFamily(columnFamily = "UserDocuments"), inverseColumnFamily = @JoinColumnFamily(columnFamily = "DocumentUsers"))
+	public List<DocRef> getDocuments() {
+		return documents;
+	}
+	
+	public void setDocuments(List<DocRef> documents) {
+		this.documents = documents;
+	}
+
+	@ManyToMany(columnFamily = @JoinColumnFamily(columnFamily = "UserQuoteBundles"), inverseColumnFamily = @JoinColumnFamily(columnFamily = "QuoteBundleUsers"))
+	public List<QuoteBundle> getBundles() {
+		return bundles;
+	}
+
+	public void setBundles(List<QuoteBundle> bundles) {
+		this.bundles = bundles;
+	}
+
+	@ManyToOne(column = "orphanedQuoteBundle", inverseColumnFamily = @JoinColumnFamily(columnFamily = "QuoteBundleUsers"))
+	public QuoteBundle getOrphanedQuoteBundle() {
+		return orphanedQuoteBundle;
+	}
+
+	public void setOrphanedQuoteBundle(QuoteBundle orphanedQuoteBundle) {
+		this.orphanedQuoteBundle = orphanedQuoteBundle;
+	}	
 }

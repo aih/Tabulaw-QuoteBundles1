@@ -36,7 +36,7 @@ public class ManyToManyRelation extends BagRelation {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void load(SessionImpl session, Object object, Row<String, String> row) {
+	public void load(SessionImpl session, Object object, Row<String, byte[]> row) {
 		Object key = cfDescriptor.getKey(object);
 		BagList list = new BagList(session, key, this);
 		descriptor.setValue(object, list);

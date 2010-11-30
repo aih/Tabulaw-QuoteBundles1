@@ -16,6 +16,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.sun.xml.txw2.annotation.XmlCDATA;
+import com.tabulaw.cassandra.om.annotations.HelenaBean;
+import com.tabulaw.cassandra.om.annotations.KeyProperty;
 
 /**
  * Holds html content for a document.
@@ -25,6 +27,7 @@ import com.sun.xml.txw2.annotation.XmlCDATA;
  * @author jpk
  */
 @XmlRootElement(name = "docContent")
+@HelenaBean(columnFamily = "DocContent", keyspace = "Tabulaw")
 public class DocContent extends EntityBase {
 
 	private static final long serialVersionUID = 7579142517520079175L;
@@ -34,6 +37,7 @@ public class DocContent extends EntityBase {
 	 * <p>
 	 * This is the same id as the <code>DocRef</code> id.
 	 */
+	@KeyProperty
 	private String id;
 
 	/**

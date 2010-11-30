@@ -34,12 +34,16 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
 import java.util.UUID;
 
 
 import com.google.common.collect.ImmutableMap;
 import com.tabulaw.cassandra.om.factory.exception.HelenaException;
 import com.tabulaw.cassandra.om.mappings.AbstractStringBasedTypeMapping;
+import com.tabulaw.cassandra.om.mappings.BooleanTypeMapping;
+import com.tabulaw.cassandra.om.mappings.DateTypeMapping;
 import com.tabulaw.cassandra.om.mappings.IntegerTypeMapping;
 import com.tabulaw.cassandra.om.mappings.LongTypeMapping;
 import com.tabulaw.cassandra.om.mappings.StringTypeMapping;
@@ -50,10 +54,10 @@ public class TypeConverter {
 	public static final TypeConverter INSTANCE = new TypeConverter(
 	    ImmutableMap.<Class<?>, TypeMapping<?>>of(
           String.class, new StringTypeMapping(),
-          UUID.class, new UUIDTypeMapping(),
+          Boolean.class, new BooleanTypeMapping(),
           Long.class, new LongTypeMapping(),
           Integer.class, new IntegerTypeMapping(),
-          URI.class, new URITypeMapping()
+          Date.class, new DateTypeMapping()
 	    ),
 	    SerializeUnknownClasses.YES
 	);
@@ -62,7 +66,8 @@ public class TypeConverter {
 	private static final ImmutableMap<Class<?>, Class<?>> _typeReplacition = 
 		ImmutableMap.<Class<?>, Class<?>>of(
 				int.class, Integer.class,
-				long.class, Long.class
+				long.class, Long.class,
+				boolean.class, Boolean.class
 		);
 
 	private final ImmutableMap<Class<?>, TypeMapping<?>> _typeMappings;
@@ -84,7 +89,7 @@ public class TypeConverter {
 		if(Enum.class.isAssignableFrom(propertyValue.getClass())) {
 			return stringToBytes(((Enum<?>) propertyValue).name());
 		}
-		if(propertyValue instanceof Serializable && _serializationPolicy == SerializeUnknownClasses.YES) {
+		if((propertyValue instanceof Serializable || propertyValue instanceof Collection<?>) && _serializationPolicy == SerializeUnknownClasses.YES) {
 			return serialize(propertyValue);
 		}
 
@@ -168,7 +173,7 @@ public class TypeConverter {
 		if(returnType.isEnum()) {
 			return makeEnumInstance(returnType, value);
 		}
-		if(Serializable.class.isAssignableFrom(returnType)) {
+		if(Serializable.class.isAssignableFrom(returnType) || Collection.class.isAssignableFrom(returnType)) {
 			return returnType.cast(deserialize(value));
 		}
 		throw new HelenaException("Can not handle type " + returnType.getClass()

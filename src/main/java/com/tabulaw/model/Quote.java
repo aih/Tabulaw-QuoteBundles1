@@ -18,6 +18,7 @@ import com.tabulaw.cassandra.om.annotations.HelenaBean;
 import com.tabulaw.cassandra.om.annotations.JoinColumnFamily;
 import com.tabulaw.cassandra.om.annotations.KeyProperty;
 import com.tabulaw.cassandra.om.annotations.ManyToOne;
+import com.tabulaw.cassandra.om.annotations.Transient;
 import com.tabulaw.schema.Reference;
 import com.tabulaw.util.StringUtil;
 
@@ -49,7 +50,6 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	 */
 	private transient Object mark;
 
-	@ManyToOne(column = "document", inverseColumnFamily = @JoinColumnFamily(columnFamily = "DocumentQuotes"))
 	private DocRef document;
 
 	/**
@@ -135,6 +135,7 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	@Reference
 	@NotNull
 	@XmlElement(name = "docRef")
+	@ManyToOne(column = "document", inverseColumnFamily = @JoinColumnFamily(columnFamily = "DocumentQuotes"))
 	public DocRef getDocument() {
 		return document;
 	}

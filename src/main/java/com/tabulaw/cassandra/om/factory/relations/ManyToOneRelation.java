@@ -32,10 +32,11 @@ public class ManyToOneRelation implements Relation {
 	}
 	
 	@Override
-	public void load(SessionImpl session, Object object, Row<String, String> row) {
-		HColumn<String, String> column = row.getColumnSlice().getColumnByName(descriptor.getName());
+	public void load(SessionImpl session, Object object, Row<String, byte[]> row) {
+		HColumn<String, byte[]> column = row.getColumnSlice().getColumnByName(descriptor.getName());
 		if (column != null && column.getValue() != null) {
-			session.loadRelation(this, column.getValue(), object);
+			String relKey = (String) TypeConverter.INSTANCE.asObject(String.class, column.getValue());
+			session.loadRelation(this, relKey, object);
 		}
 	}
 	

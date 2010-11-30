@@ -73,6 +73,31 @@ public class SessionImpl implements Session {
 	}
 	
 	@Override
+	public <T> List<T> findRange(Class<T> klass, Object lastKey, int limit) {
+		ColumnFamilyDescriptor cfDescriptor = safeFindCF(klass);
+		KeyspaceOperator operator = factory.createKeyspaceOperator();
+		
+		List<Object> fromDb = cfDescriptor.findRange(this, operator, lastKey, limit);
+		List<T> result = Lists.newArrayListWithCapacity(fromDb.size());
+		for (Object dbObject : fromDb) {
+			Object cached = findInCache(cfDescriptor.getName(), cfDescriptor.getKey(dbObject));
+			if (cached == null) {
+				addToCache(cfDescriptor.getName(), cfDescriptor.getKey(dbObject), dbObject);
+				result.add((T) dbObject);
+			} else {
+				result.add((T) cached);
+			}
+		}
+		loadDeferredRelations();
+		return result;	
+	}
+	
+	@Override
+	public <T> List<T> findAll(Class<T> klass) {
+		return findRange(klass, "", 100000);
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T find(Class<T> klass, Object key) {
 		ColumnFamilyDescriptor cfDescriptor = safeFindCF(klass);

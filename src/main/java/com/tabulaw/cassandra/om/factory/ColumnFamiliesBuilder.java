@@ -7,6 +7,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -210,6 +211,9 @@ public class ColumnFamiliesBuilder {
 			}
 		}
 		for (Field field : klass.getFields()) {
+			if (Modifier.isStatic(field.getModifiers())) {
+				continue;
+			}
 			if (! properties.containsKey(field.getName())) {
 				properties.put(field.getName(), null);
 			}

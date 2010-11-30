@@ -18,6 +18,7 @@ import javax.validation.ValidatorFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
+import com.tabulaw.cassandra.om.factory.Session;
 import com.tabulaw.criteria.Comparator;
 import com.tabulaw.criteria.Criteria;
 import com.tabulaw.criteria.InvalidCriteriaException;
@@ -37,6 +38,7 @@ import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.QuoteUserBinding;
+import com.tabulaw.model.User;
 import com.tabulaw.model.UserState;
 
 /**
@@ -93,24 +95,10 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional(readOnly = true)
 	public List<DocRef> getDocsForUser(String userId) {
 		if(userId == null) throw new NullPointerException();
-		Criteria<DocUserBinding> c = new Criteria<DocUserBinding>(DocUserBinding.class);
-		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
-		try {
-			List<DocUserBinding> bindings = dao.findEntities(c, null);
-			if(bindings.size() < 1) return new ArrayList<DocRef>(0);
-			ArrayList<String> docIds = new ArrayList<String>(bindings.size());
-			for(DocUserBinding b : bindings) {
-				docIds.add(b.getDocId());
-			}
-			List<DocRef> list = dao.findByIds(DocRef.class, docIds, new Sorting("name"));
-			if(list.size() != docIds.size())
-				throw new IllegalStateException("Doc id list and doc entity list size mis-match.");
-
-			return list;
-		}
-		catch(InvalidCriteriaException e) {
-			throw new IllegalStateException(e);
-		}
+		Session session = TabulawSession.FACTORY.createSession();
+		User user = session.find(User.class, userId);
+		session.close();
+		return new ArrayList<DocRef>(user.getDocuments());
 	}
 
 	/**
@@ -118,7 +106,7 @@ public class UserDataService extends AbstractEntityService {
 	 * @param userId user id
 	 * @return list of docs
 	 */
-	@Transactional(readOnly = true)
+	/*@Transactional(readOnly = true)
 	public List<ContractDoc> getContractDocsForUser(String userId) {
 		if(userId == null) throw new NullPointerException();
 		Criteria<ContractDocUserBinding> c = new Criteria<ContractDocUserBinding>(ContractDocUserBinding.class);
@@ -139,7 +127,7 @@ public class UserDataService extends AbstractEntityService {
 		catch(InvalidCriteriaException e) {
 			throw new IllegalStateException(e);
 		}
-	}
+	}*/
 
 	/**
 	 * Provides a list of all doc refs in the system.
@@ -147,7 +135,9 @@ public class UserDataService extends AbstractEntityService {
 	 */
 	@Transactional(readOnly = true)
 	public List<DocRef> getAllDocs() {
-		List<DocRef> docs = dao.loadAll(DocRef.class);
+		Session session = TabulawSession.FACTORY.createSession();
+		List<DocRef> docs = session.findAll(DocRef.class);
+		session.close();
 		return docs;
 	}
 
@@ -155,11 +145,11 @@ public class UserDataService extends AbstractEntityService {
 	 * Provides a list of all contract doc in the system.
 	 * @return doc list
 	 */
-	@Transactional(readOnly = true)
+	/*@Transactional(readOnly = true)
 	public List<ContractDoc> getAllContractDocs() {
 		List<ContractDoc> docs = dao.loadAll(ContractDoc.class);
 		return docs;
-	}
+	}*/
 
 	/**
 	 * Gets the doc ref given the doc id.
@@ -170,7 +160,9 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional(readOnly = true)
 	public DocRef getDoc(String docId) throws EntityNotFoundException {
 		if(docId == null) throw new NullPointerException();
-		DocRef dr = dao.load(DocRef.class, docId);
+		Session session = TabulawSession.FACTORY.createSession();		
+		DocRef dr = session.find(DocRef.class, docId);
+		session.close();
 		return dr;
 	}
 
@@ -180,12 +172,12 @@ public class UserDataService extends AbstractEntityService {
 	 * @return to loaded doc ref
 	 * @throws EntityNotFoundException
 	 */
-	@Transactional(readOnly = true)
+	/*@Transactional(readOnly = true)
 	public ContractDoc getContractDoc(String id) throws EntityNotFoundException {
 		if(id == null) throw new NullPointerException();
 		ContractDoc dr = dao.load(ContractDoc.class, id);
 		return dr;
-	}
+	}*/
 
 	/**
 	 * Gets the doc <em>content</em> given the doc id.
@@ -196,7 +188,9 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional(readOnly = true)
 	public DocContent getDocContent(String docId) throws EntityNotFoundException {
 		if(docId == null) throw new NullPointerException();
-		DocContent dr = dao.load(DocContent.class, docId);
+		Session session = TabulawSession.FACTORY.createSession();	
+		DocContent dr = session.find(DocContent.class, docId);
+		session.close();
 		return dr;
 	}
 
@@ -261,27 +255,18 @@ public class UserDataService extends AbstractEntityService {
 
 		QuoteBundle oqc = null;
 
-		Criteria<BundleUserBinding> c = new Criteria<BundleUserBinding>(BundleUserBinding.class);
-		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
-		c.getPrimaryGroup().addCriterion("orphaned", Boolean.TRUE, Comparator.EQUALS, true);
-		try {
-			BundleUserBinding binding = dao.findEntity(c);
-			oqc = dao.load(QuoteBundle.class, binding.getBundleId());
-		}
-		catch(InvalidCriteriaException e) {
-			throw new IllegalStateException(e);
-		}
-		catch(EntityNotFoundException e) {
-			// create the orphaned quote container
+		Session session = TabulawSession.FACTORY.createSession();
+		User user = session.find(User.class, userId);
+		if (user.getOrphanedQuoteBundle() == null) {
 			oqc = new QuoteBundle();
 			oqc.setName("Un-Assigned Quotes");
 			oqc.setDescription("Quotes not currently assigned to a bundle");
-			oqc = dao.persist(oqc);
-			BundleUserBinding binding = new BundleUserBinding(oqc.getId(), userId, true);
-			dao.persist(binding);
+			session.persist(oqc);
+			user.getBundles().add(oqc);
+			user.setOrphanedQuoteBundle(oqc);			
 		}
-
-		return oqc;
+		session.close();
+		return user.getOrphanedQuoteBundle();
 	}
 
 	/**
@@ -335,7 +320,9 @@ public class UserDataService extends AbstractEntityService {
 		if(bundleId == null) {
 			throw new NullPointerException();
 		}
-		QuoteBundle bundle = dao.load(QuoteBundle.class, bundleId);
+		Session session = TabulawSession.FACTORY.createSession();
+		QuoteBundle bundle = session.find(QuoteBundle.class, bundleId);
+		session.close();
 		return bundle;
 	}
 
@@ -359,10 +346,11 @@ public class UserDataService extends AbstractEntityService {
 
 		validate(bundle);
 
-		QuoteBundle existingQb = dao.load(QuoteBundle.class, bundle.getId());
+		Session session = TabulawSession.FACTORY.createSession();
+		QuoteBundle existingQb = session.find(QuoteBundle.class, bundle.getId());
 		existingQb.setName(bundle.getName());
 		existingQb.setDescription(bundle.getDescription());
-		dao.persist(existingQb);
+		session.close();
 	}
 
 	/**
@@ -374,7 +362,9 @@ public class UserDataService extends AbstractEntityService {
 	public Quote updateQuote(Quote quote) {
 		if(quote == null) throw new NullPointerException();
 		validate(quote);
-		quote = dao.persist(quote);
+		Session session = TabulawSession.FACTORY.createSession();
+		quote = session.merge(quote);
+		session.close();
 		return quote;
 	}
 

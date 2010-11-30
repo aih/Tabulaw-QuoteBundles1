@@ -9,9 +9,11 @@ import me.prettyprint.cassandra.model.HColumn;
 import me.prettyprint.cassandra.model.KeyspaceOperator;
 import me.prettyprint.cassandra.model.MultigetSliceQuery;
 import me.prettyprint.cassandra.model.Mutator;
+import me.prettyprint.cassandra.model.RangeSlicesQuery;
 import me.prettyprint.cassandra.model.Row;
 import me.prettyprint.cassandra.model.Rows;
 
+import me.prettyprint.cassandra.serializers.BytesSerializer;
 import me.prettyprint.cassandra.serializers.StringSerializer;
 import me.prettyprint.cassandra.service.Keyspace;
 import me.prettyprint.hector.api.factory.HFactory;
@@ -201,7 +203,8 @@ public class ColumnFamilyDescriptor {
 	public void mutate(SessionImpl session, Mutator mutator, Object object, Object existent) {
 		String key = TypeConverter.INSTANCE.asString(keyColumn.getValue(object));
 		String columnFamily = getDescription().columnFamily();
-		StringSerializer se = StringSerializer.get();		
+		StringSerializer se = StringSerializer.get();	
+		BytesSerializer be = BytesSerializer.get();
 		if (existent == null && discriminators != null) {
 			for (Entry<String, String> discriminator : discriminators.entrySet()) {
 				if (discriminator.getValue() == null) {
@@ -220,9 +223,9 @@ public class ColumnFamilyDescriptor {
 			Object newValue = column.getValue().getValue(object);
 			if (! Objects.equal(newValue, oldValue)) {
 				if (newValue != null) {
-					String strValue = TypeConverter.INSTANCE.asString(newValue);
+					byte[] rawValue = TypeConverter.INSTANCE.asByteArray(newValue);
 					mutator.addInsertion(key, columnFamily, 
-							HFactory.createColumn(column.getKey(), strValue, se, se));
+							HFactory.createColumn(column.getKey(), rawValue, se, be));
 				} else {
 					mutator.addDeletion(key, columnFamily, column.getKey(), se);
 				}
@@ -244,7 +247,9 @@ public class ColumnFamilyDescriptor {
 			return Lists.newArrayList();
 		}
 		StringSerializer se = StringSerializer.get();	
-		MultigetSliceQuery<String, String> query = HFactory.createMultigetSliceQuery(operator, se, se);
+		BytesSerializer be = BytesSerializer.get();
+		
+		MultigetSliceQuery<String, byte[]> query = HFactory.createMultigetSliceQuery(operator, se, be);
 		
 		String[] keysStr = new String[keys.length];
 		for (int i = 0; i < keys.length; i++) {
@@ -258,9 +263,9 @@ public class ColumnFamilyDescriptor {
 		query.setKeys(keysStr);
 		query.setColumnNames(columnNames);
 		
-		Rows<String, String> rows = query.execute().get();
+		Rows<String, byte[]> rows = query.execute().get();
 		List<Object> result = Lists.newArrayListWithCapacity(rows.getCount());
-		for (Row<String, String> row : rows) {
+		for (Row<String, byte[]> row : rows) {
 			if (! row.getColumnSlice().getColumns().isEmpty() || columnNames.length == 0) {
 				ColumnFamilyDescriptor resultCF = findResultCF(row);
 				if (resultCF != null) {
@@ -271,7 +276,40 @@ public class ColumnFamilyDescriptor {
 		return result;
 	}
 	
-	private Object createObject(SessionImpl session, Row<String, String> row) {
+	public List<Object> findRange(SessionImpl session, KeyspaceOperator operator, Object lastKey, int limit) {
+		StringSerializer se = StringSerializer.get();	
+		BytesSerializer be = BytesSerializer.get();
+		String[] columnNames = this.columnNames.toArray(new String[this.columnNames.size()]);
+		String lastKeyStr = TypeConverter.INSTANCE.asString(lastKey);
+		
+		RangeSlicesQuery<String, byte[]> query = HFactory.createRangeSlicesQuery(operator, se, be);
+		query.setColumnFamily(getName());
+		query.setColumnNames(columnNames);
+		query.setRowCount(limit + 1);
+		query.setKeys(lastKeyStr, "");
+		
+		
+		Rows<String, byte[]> rows = query.execute().get();
+		List<Object> result = Lists.newArrayListWithCapacity(rows.getCount());
+		boolean first = true;
+		for (Row<String, byte[]> row : rows) {
+			if (first) {
+				first = false;
+				if (row.getKey().equals(lastKeyStr)) {
+					continue;	
+				}				
+			}
+			if (! row.getColumnSlice().getColumns().isEmpty() || columnNames.length == 0) {
+				ColumnFamilyDescriptor resultCF = findResultCF(row);
+				if (resultCF != null) {
+					result.add(resultCF.createObject(session, row));
+				}
+			}
+		}
+		return result;		
+	}
+	
+	private Object createObject(SessionImpl session, Row<String, byte[]> row) {
 		Object object;
 		try {
 			object = columnFamilyClass.newInstance();
@@ -281,7 +319,7 @@ public class ColumnFamilyDescriptor {
 		Object key = TypeConverter.INSTANCE.asObject(keyColumn.getType(), row.getKey());
 		keyColumn.setValue(object, key);
 		for (Entry<String, ColumnDescriptor> column : columnDescriptors.entrySet()) {
-			HColumn<String, String> hColumn = row.getColumnSlice().getColumnByName(column.getKey());
+			HColumn<String, byte[]> hColumn = row.getColumnSlice().getColumnByName(column.getKey());
 			if (hColumn != null) {
 				Object value = TypeConverter.INSTANCE.asObject(column.getValue().getType(), hColumn.getValue());
 				column.getValue().setValue(object, value);
@@ -293,7 +331,7 @@ public class ColumnFamilyDescriptor {
 		return object;
 	}
 	
-	private ColumnFamilyDescriptor findResultCF(Row<String, String> row) {
+	private ColumnFamilyDescriptor findResultCF(Row<String, byte[]> row) {
 		if (discriminators == null) {
 			return this;
 		}
@@ -307,10 +345,10 @@ public class ColumnFamilyDescriptor {
 		}
 		for (Entry<String, String> discriminator : discriminators.entrySet()) {
 			String expected = discriminator.getValue();
-			HColumn<String, String> column = row.getColumnSlice().getColumnByName(discriminator.getKey());
+			HColumn<String, byte[]> column = row.getColumnSlice().getColumnByName(discriminator.getKey());
 			String value = null;
 			if (column != null) {
-				value = column.getValue();
+				value = (String) TypeConverter.INSTANCE.asObject(String.class, column.getValue());
 			}
 			if (! Objects.equal(expected, value)) {
 				return null;

@@ -27,7 +27,7 @@ import com.tabulaw.cassandra.om.annotations.KeyProperty;
  * @author jpk
  */
 @XmlRootElement(name = "docRef")
-@HelenaBean(columnFamily = "DocRef", keyspace = "Tabulaw")
+@HelenaBean(columnFamily = "DocRefs", keyspace = "Tabulaw")
 public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEntity {
 
 	private static final long serialVersionUID = -8257785916791525146L;

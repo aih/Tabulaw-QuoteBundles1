@@ -83,6 +83,22 @@ public class SessionFacade implements Session {
 		}
 		impl.remove(object);
 	}
+	
+	@Override
+	public <T> List<T> findAll(Class<T> klass) {
+		if (closed) {
+			throw new IllegalStateException("Session is closed");
+		}
+		return impl.findAll(klass);
+	}
+	
+	@Override
+	public <T> List<T> findRange(Class<T> klass, Object lastKey, int limit) {
+		if (closed) {
+			throw new IllegalStateException("Session is closed");
+		}
+		return impl.findRange(klass, lastKey, limit);
+	}
 
 	@Override
 	public boolean isClosed() {
