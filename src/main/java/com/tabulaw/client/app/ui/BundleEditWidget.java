@@ -256,6 +256,15 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		header.email.addClickHandler(emailHandler);
 	}
 
+	public void setEmailInProgress(boolean inprogress) {
+		if(inprogress) {
+			header.email.setResource(Resources.INSTANCE.AjaxLoader());
+		}
+		else {
+			header.email.setResource(Resources.INSTANCE.EmailButton());
+		}
+	}
+
 	@Override
 	public QuoteEditWidget removeQuote(Quote mQuote, boolean removeFromModel, boolean persist) {
 		QuoteEditWidget w = super.removeQuote(mQuote, removeFromModel, persist);

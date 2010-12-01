@@ -53,6 +53,9 @@ public interface Resources extends ClientBundle {
 	@Source("../../public/images/email-button.png")
 	ImageResource EmailButton();
 
+	@Source("../../public/images/ajax-loader.gif")
+	ImageResource AjaxLoader();
+
 	@Source("../../public/images/document-icon.png")
 	ImageResource documentIcon();
 

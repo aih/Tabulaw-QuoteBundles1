@@ -1,5 +1,5 @@
 /**
-	 * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
+ * Copyright (C) Tabulaw, Inc. 2009-2010 All Rights Reserved
  * @author jpk
  * @since Feb 14, 2010
  */
@@ -14,7 +14,13 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -22,6 +28,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
@@ -31,9 +38,12 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.xml.client.Document;
+import com.google.gwt.xml.client.XMLParser;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
+import com.tabulaw.client.ui.Dialog;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.dao.EntityNotFoundException;
@@ -59,7 +69,6 @@ import com.tabulaw.util.StringUtil;
  * <p>
  * Fires a {@link ValueChangeEvent} of value: "static" when the document view is
  * set to read-only mode.
- * 
  * @author jpk
  */
 public class DocViewer extends Composite implements IHasDocHandlers, HasValueChangeHandlers<DocViewer.ViewMode> {
@@ -69,7 +78,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	public static final String RTF_MIME_TYPE = "text/rtf";
 
 	public static enum ViewMode {
-		EDIT, STATIC;
+		EDIT,
+		STATIC;
 	}
 
 	private class DownloadDocCommand implements Command {
@@ -94,6 +104,14 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			$wnd.location.href = url;
 		}-*/;
 	}
+
+	private final Command emailDocumentCommand = new Command() {
+
+		@Override
+		public void execute() {
+			emailDocument();
+		}
+	};
 
 	private class DocMenu extends MenuBar {
 
@@ -129,7 +147,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			// true, downloadMenu);
 			this.addItem("File", true, fileMenu);
 			this.addItem("Documents", true, DocumentsMenuBar.getDocumentsMenuBar());
-			
+
 			MenuBar downloadMenu = new MenuBar(true);
 			editDoc = new MenuItem("Edit", editCommand);
 			viewDoc = new MenuItem("View", viewCommand);
@@ -138,6 +156,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			fileMenu.addItem(viewDoc);
 
 			fileMenu.addItem("Download", true, downloadMenu);
+			fileMenu.addItem("Email", true, emailDocumentCommand);
 
 			MenuItem fireRtf = new MenuItem("rtf format", rtfDownloadCommand);
 			MenuItem fireDocx = new MenuItem("docx format", docxDownloadCommand);
@@ -189,6 +208,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	};
 
 	private class SaveWarningDialog extends DialogBox implements ClickHandler {
+
 		private Button cancel, save, doNotSave;
 
 		public SaveWarningDialog(String docTitle) {
@@ -225,22 +245,24 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 		public void onClick(ClickEvent clkEvt) {
 			hide();
-			if (clkEvt.getSource() == save) {
+			if(clkEvt.getSource() == save) {
 				updateDocContent(getAsyncCallback());
 			}
-			if (clkEvt.getSource() == doNotSave) {
+			if(clkEvt.getSource() == doNotSave) {
 				staticMode();
 			}
 		}
 
 		private AsyncCallback<Payload> getAsyncCallback() {
 			AsyncCallback<Payload> asyncCallback = new AsyncCallback<Payload>() {
+
 				@Override
 				public void onSuccess(Payload result) {
 					Notifier.get().showFor(result, null);
 					staticMode();
 
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					Notifier.get().showFor(caught);
@@ -302,8 +324,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	}
 
 	/**
-	 * @return <code>true</code> if html content exists within the containing
-	 *         doc frame element.
+	 * @return <code>true</code> if html content exists within the containing doc
+	 *         frame element.
 	 */
 	public boolean isDocContentLoaded() {
 		return docContentLoaded;
@@ -350,18 +372,18 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		if(rng.getStartNode().nodeType != 3 || rng.getEndNode().nodeType != 3)
 		return;
 
-			var mark;
-			var root = tsapi.@com.tabulaw.client.app.ui.DocViewer::getDocBody()();
-			try {
-				//if(framedoc !== rng.getDocument()) alert('range.document != framedoc!');
-				//alert('framedoc: ' + framedoc + ', rng.getDocument(): ' + rng.getDocument());
-				mark  = new $wnd.Mark(root, rng);
-				tsapi.@com.tabulaw.client.app.ui.DocViewer::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
-			}
-			catch(e) {
-				alert('Unable to select this portion of text\n(' + e + ')');
-				//alert('Unable to select this portion of text');
-			}
+		var mark;
+		var root = tsapi.@com.tabulaw.client.app.ui.DocViewer::getDocBody()();
+		try {
+		//if(framedoc !== rng.getDocument()) alert('range.document != framedoc!');
+		//alert('framedoc: ' + framedoc + ', rng.getDocument(): ' + rng.getDocument());
+		mark  = new $wnd.Mark(root, rng);
+		tsapi.@com.tabulaw.client.app.ui.DocViewer::fireTextSelectEvent(Lcom/tabulaw/client/app/model/MarkOverlay;)(mark);
+		}
+		catch(e) {
+		alert('Unable to select this portion of text\n(' + e + ')');
+		//alert('Unable to select this portion of text');
+		}
 		};
 
 		// capture user selections w/in the doc frame
@@ -376,11 +398,9 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	}-*/;
 
 	/**
-	 * Call this to turn "off" the capturing of user text selections in a
-	 * document under view.
-	 * 
-	 * @param docId
-	 *            the doc id
+	 * Call this to turn "off" the capturing of user text selections in a document
+	 * under view.
+	 * @param docId the doc id
 	 */
 	native void shutdownDocFrame(String docId) /*-{
 		//alert('shutdown - frameId: ' + frameId);
@@ -404,14 +424,15 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	public JavaScriptObject getDocBody() {
 		return frame.getElement();
 	}
-	
-//	/*-{
-		//var frameId = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
-		//var frame = $wnd.goog.dom.$(frameId);
-		//var fbody = frame.contentDocument? frame.contentDocument.body : frame.contentWindow.document.body;
-		//return fbody;
-//		return $wnd.body;
-//	}-*/;
+
+	// /*-{
+	// var frameId = this.@com.tabulaw.client.app.ui.DocViewer::getFrameId()();
+	// var frame = $wnd.goog.dom.$(frameId);
+	// var fbody = frame.contentDocument? frame.contentDocument.body :
+	// frame.contentWindow.document.body;
+	// return fbody;
+	// return $wnd.body;
+	// }-*/;
 
 	public DocRef getModel() {
 		return doc;
@@ -421,13 +442,12 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	 * Sets the document model data.
 	 * <p>
 	 * NOTE: <code>null</code> model is supported.
-	 * 
 	 * @param doc
 	 * @param docContent
 	 */
 	public void setModel(DocRef doc, DocContent docContent) {
 
-		if (this.doc != null) {
+		if(this.doc != null) {
 			shutdownDocFrame(this.doc.getId());
 		}
 
@@ -438,19 +458,20 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 		frame.getElement().setId(getFrameId());
 
-		if (doc != null) {
+		if(doc != null) {
 			initDocFrame();
 			menu.setId(doc.getId());
 		}
 
 		// set html content directly or via url?
 		String htmlContent = docContent == null ? null : docContent.getHtmlContent();
-		if (!StringUtil.isEmpty(htmlContent)) {
+		if(!StringUtil.isEmpty(htmlContent)) {
 			// html content
 			// frame.setUrl("");
 			setDocHtml(htmlContent);
 			Log.debug("DocViewer html content set directly");
-		} else {
+		}
+		else {
 			throw new IllegalStateException("No doc content specified");
 		}
 	}
@@ -490,11 +511,13 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	}
 
 	public Widget[] getNavColWidgets() {
-		return isEditMode() ? new Widget[] { btnSave, btnCancel } : null;
+		return isEditMode() ? new Widget[] {
+			btnSave, btnCancel } : null;
 	}
 
 	public void updateDocContent() {
 		AsyncCallback<Payload> asyncCallback = new AsyncCallback<Payload>() {
+
 			@Override
 			public void onSuccess(Payload result) {
 				Notifier.get().showFor(result, null);
@@ -516,7 +539,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		// update the cache
 		try {
 			ClientModelCache.get().remove(new ModelKey(EntityType.DOC_CONTENT.name(), doc.getId()), null);
-		} catch (EntityNotFoundException enf) {
+		}
+		catch(EntityNotFoundException enf) {
 			// do nothing
 		}
 		// persist to server
@@ -529,7 +553,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		super.onUnload();
 
 		String docId = doc == null ? null : doc.getId();
-		if (docId != null) {
+		if(docId != null) {
 			shutdownDocFrame(docId);
 			// fire doc frame unload event
 			fireEvent(DocEvent.createDocLoadEvent(false));
@@ -554,22 +578,23 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	}
 
 	private void createDew() {
-		if (dew == null) {
+		if(dew == null) {
 
 			// wire up save/cancel buttons
 			assert btnSave == null;
 			assert btnCancel == null;
 			btnSave = new PushButton("Save", new ClickHandler() {
+
 				@Override
 				public void onClick(ClickEvent clkEvt) {
-					if (doc == null)
-						return;
+					if(doc == null) return;
 					// save the doc
 					updateDocContent();
 				}
 			});
 			btnSave.setTitle("Save Document");
 			btnCancel = new PushButton("View", new ClickHandler() {
+
 				@Override
 				public void onClick(ClickEvent clkEvt) {
 					tryToCloseEditor();
@@ -583,17 +608,18 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			dew.addClickHandler(docClickHandler);
 		}
 
-		if (!dew.isVisible()) {
+		if(!dew.isVisible()) {
 			editMode();
 		}
 
 	}
 
 	private void tryToCloseEditor() {
-		if (isContentChanged()) {
+		if(isContentChanged()) {
 			SaveWarningDialog dialogbox = new SaveWarningDialog(doc.getTitle());
 			dialogbox.center();
-		} else {
+		}
+		else {
 			staticMode();
 		}
 	}
@@ -619,7 +645,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		Poc.getNavCol().addWidget(btnCancel);
 
 		autosave.scheduleRepeating(5 * 60 * 1000);
-		
+
 		ValueChangeEvent.fire(this, ViewMode.EDIT);
 	}
 
@@ -635,7 +661,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		RootPanel.get().addStyleName("doc-static");
 		RootPanel.get().removeStyleName("doc-edit");
 		frame.setVisible(true);
-		if (dew != null) {
+		if(dew != null) {
 			dew.setVisible(false);
 			menu.toogleEditItemVisibility();
 			dew.getEditToolBar().removeFromParent();
@@ -644,14 +670,91 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			ValueChangeEvent.fire(this, ViewMode.STATIC);
 		}
 	}
-	
-	private final Timer autosave = new Timer(){
+
+	private final Timer autosave = new Timer() {
+
 		@Override
 		public void run() {
-			if (doc != null) {
+			if(doc != null) {
 				Notifier.get().info("Document autosave");
 				updateDocContent();
 			}
 		}
 	};
+
+	private Dialog emailDocumentInProgress = null;
+
+	private void emailDocument() {
+		if(doc != null) {
+			emailDocument(doc);
+		}
+	}
+
+	void emailDocument(final DocRef doc) {
+		if(emailDocumentInProgress == null) {
+			setEmailQuoteBundleInProgress(true);
+			String id = doc.getId();
+			String url = "/services/docments/" + id + "/send_by_email?sessionToken=" + Cookies.getCookie("JSESSIONID");
+			final RequestBuilder rb = new RequestBuilder(RequestBuilder.POST, url);
+			rb.setCallback(new RequestCallback() {
+
+				@Override
+				public void onResponseReceived(Request request, Response response) {
+					setEmailQuoteBundleInProgress(false);
+					try {
+						if("OK".equalsIgnoreCase(response.getStatusText())) {
+							Document xml = XMLParser.parse(response.getText());
+							String value = xml.getDocumentElement().getNodeName();
+							if("success".equalsIgnoreCase(value)) {
+								Notifier.get().info("Document has been sent via email.");
+							}
+							else {
+								onEmailDocumentError();
+							}
+						}
+						else {
+							onEmailDocumentError();
+						}
+					}
+					catch(Exception e) {
+						onEmailDocumentError();
+					}
+				}
+
+				@Override
+				public void onError(Request request, Throwable exception) {
+					onEmailDocumentError();
+				}
+			});
+			try {
+				rb.send();
+			}
+			catch(RequestException e) {
+				onEmailDocumentError();
+			}
+		}
+	}
+
+	private void setEmailQuoteBundleInProgress(boolean inprogress) {
+		if(inprogress) {
+			if(emailDocumentInProgress == null) {
+				emailDocumentInProgress = new Dialog(null, true);
+				emailDocumentInProgress.setText("Email Document");
+				emailDocumentInProgress.add(new HTML("Document is sending via email <img src=\"images/ajax-loader.gif\">"));
+				emailDocumentInProgress.setGlassEnabled(true);
+				emailDocumentInProgress.center();
+			}
+		}
+		else {
+			if(emailDocumentInProgress != null) {
+				emailDocumentInProgress.hide();
+				emailDocumentInProgress = null;
+			}
+		}
+	}
+
+	private void onEmailDocumentError() {
+		setEmailQuoteBundleInProgress(false);
+		Notifier.get().error("Unable to send document via email.");
+	}
 }
