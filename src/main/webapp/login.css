@@ -29,6 +29,9 @@ a {
 	height: 5.5em;
 	
 }
+.disabled {
+	color : #E7E3E3;
+}
 
 .l-top {
 	background-color:#BCDEDF;
