@@ -1,54 +1,70 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page language="java" import="java.util.*,java.lang.*" %> 
-<%
-com.tabulaw.server.jsp.RegisterBean registerBean = new com.tabulaw.server.jsp.RegisterBean();
-registerBean.setRequest(request); 
-if(registerBean.isRegistrationValid()) {
-	response.sendRedirect("Login.html?registration=success"); 
-}
-%>
+<jsp:useBean id="registerBean" class="com.tabulaw.server.jsp.RegisterBean" > 	</jsp:useBean>
+ 
+<c:set target="${registerBean}" property="request" value="${pageContext.request}" />
+
+<c:if test="${registerBean.registrationValid}">
+	<c:redirect url="Login.html?registration=success"/>
+</c:if> 
+
 <html>
-	<head>
-		<link rel="shortcut icon" href="favicon.ico">
-		<meta http-equiv="content-type" content="text/html; charset=utf-8">
-		<title>Tabulaw</title>
-	</head>
-	<body>
-		<form class="register" method="post" action="Register.html">
-			<div>Register</div>
-			<%if(!registerBean.getErrors().isEmpty()) { %>
-				<div class="errors">
-					<%
-						java.util.List errors = registerBean.getErrors(); 
-						for(int i=0; i < errors.size(); i++) {
-							java.lang.Object error = errors.get(i);
-							%><div><%=error%></div><%
-						}
-					%>		
+<head>	
+	<title>Tabulaw</title>
+	<link rel="Shortcut Icon" href="favicon.ico" />
+    <link href="login.css" rel="stylesheet"/>
+	<script src="js/login.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="h-top">
+    <div class="l-top">
+		<img src="images/logo-transparent.png" class="tlogo"/>	
+        <ul class="b-menu b-menu-top">
+            <li class="b-menu-item"><a href="Login.html" class="b-menu-item-link">Home</a></li>
+            <li class="b-menu-item"><a href="Login.html" class="b-menu-item-link">Sign&nbsp;In</a></li>
+        </ul>              
+    </div>
+    <div class="l-central register">
+		<c:if test="${fn:length(registerBean.errors)>0}">
+				<div class="msg errors">
+					<c:forEach var="error" items="${registerBean.errors}">
+							<div><c:out value="${error}"/></div>
+					</c:forEach><br />				
 				</div>
-			<% } %>
-			<div>
-				<table>
-					<tr>
-						<td>Email Address<sup class="rqd">*</sup></td>
-						<td><input type="text" id="userEmail" name="userEmail"></td>
-					</tr>
-					<tr>
-						<td>Password<sup class="rqd">*</sup></td>
-						<td><input type="password" id="userPswd" name="userPswd"></td>
-					</tr>
-					<tr>
-						<td>Confirm Password<sup class="rqd">*</sup></td>
-						<td><input type="password" id="userPswdConfirm" name="userPswdConfirm"></td>
-					</tr>
-				</table>
-			</div>
-			<div>
-				<input type="submit" id="submitRegister" name="submitRegister" value="Submit"></input>
-			</div>
-		</form>
-		<div>
-			<a href="Login.html">Cancel</a>
-		</div>
-	</body>
+		</c:if> 
+        <span class="reg-form-title">Create an Account</span> 
+		<span class="r-intro">Start organizing your legal work today!  If you already have a Tabulaw Account, or want to use your Google login (e.g. from your Gmail account), you can <a href="Login.html">sign in here</a>.</span>
+        <form action="#" class="b-reg" method="post" action="Register.html">
+		
+        <div class="left_form_part_reg">
+            <label class="lab3">Name<span>*  </span></label><br />
+            <label class="lab4">Email Address<span>*  </span></label><br />
+            <label class="lab5">Password<span>*  </span></label><br />
+            <label class="lab6">Confirm Password<span>*  </span></label><br /> 
+        </div>
+        <div class="right_form_part_reg">
+            <input type="text" id="userName" name="userName" class="b-auth-input" />
+            <input type="text" id="userEmail" name="userEmail" class="b-auth-input" />
+            <input type="password" id="userPswd" name="userPswd" class="b-auth-input" />
+            <input type="password" id="userPswdConfirm" name="userPswdConfirm" class="b-auth-input" />     
+         </div>       
+            <span class="auth-reg">
+				<a href="#" id="submit-url" class="button1"><span><span><b>&nbsp;</b><u>Register</u></span></span></a>
+			</span>  
+			<input type="submit" id="submit-button" name="submitRegister" value="Submit"></input>
+        </form>        
+    </div>  
+	<div class="central">  
+	</div>      
+    <div class="footer">
+        <p> &copy; 2010 Tabulaw, Inc</p>
+	     <ul class="f-menu f-menu-bottom">
+			<li class="f-menu-item"><a href="#" class="f-menu-item-link">About Us</a></li>
+			<li class="f-menu-item"><a href="#" class="f-menu-item-link">Contact</a></li>
+		</ul>
+    </div>
+</div>
+</body>
 </html>

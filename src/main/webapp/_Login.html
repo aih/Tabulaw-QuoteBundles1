@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ page language="java" import="java.util.*,java.lang.*" %> 
+<%
+com.tabulaw.server.jsp.LoginSessionBean loginSession = new com.tabulaw.server.jsp.LoginSessionBean(); 
+loginSession.setRequest(request);
+String codeSvr = request.getParameter("gwt.codesvr");
+
+String url = codeSvr==null?"Poc.html" : "Poc.html?gwt.codesvr="+codeSvr;
+
+if(loginSession.isLoggedIn()) {
+	response.sendRedirect(url); 
+}
+com.tabulaw.server.jsp.LoginBean loginBean = new com.tabulaw.server.jsp.LoginBean();
+loginBean.setRequest(request); 
+if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
+	response.sendRedirect(url); 
+}
+%>
+<html>
+	<head>
+		<link rel="shortcut icon" href="favicon.ico">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>Tabulaw</title>
+	</head>
+	<body>
+		<%if("success".equals(request.getParameter("registration"))){ %>
+			<div>
+			    <div>*Registration successful.</div>
+		    	<div>*Now login!</div>
+	    	</div>
+	    <% } %>
+		<form class="login" method="post" action="Login.html">
+			<div>Login</div>
+			<%if(!loginBean.getErrors().isEmpty()) { %>
+				<div class="errors">
+					<%
+						java.util.List errors = loginBean.getErrors(); 
+						for(int i=0; i < errors.size(); i++) {
+							java.lang.Object error = errors.get(i);
+							%><div><%=error%></div><%
+						}
+					%>		
+				</div>
+			<% } %>
+			<div>
+				<table>
+					<tr>
+						<td>Email Address<sup class="rqd">*</sup></td>
+						<td><input type="text" id="userEmail" name="userEmail"></td>
+					</tr>
+					<tr>
+						<td>Password<sup class="rqd">*</sup></td>
+						<td><input type="password" id="userPswd" name="userPswd"></td>
+					</tr>
+				</table>
+			</div>
+			<div>
+				<%if (codeSvr!=null) { %>
+				<input type="hidden" id="gwt.codesvr" name="gwt.codesvr" value="<%=codeSvr%>" ></input>
+				<%}%>
+			<input type="submit" id="submitLogin" name="submitLogin" value="Submit"></input>
+			</div>
+		</form>
+		<div>
+			<a href="Register.html">Register</a>
+			<a href="Password.html">Forgot Password</a>
+		</div>
+	</body>
+</html>

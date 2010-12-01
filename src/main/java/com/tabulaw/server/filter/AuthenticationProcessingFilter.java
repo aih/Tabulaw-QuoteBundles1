@@ -36,6 +36,8 @@ public final class AuthenticationProcessingFilter implements Filter {
 
 	public static final String AUTH_EXCEPTION_KEY = AuthenticationProcessingFilter.class.getName();	
 	private static final String REST_SERVICES_PATH = "/services";
+	private static final String GWT_APP_PATH = "/Poc.html";
+	private static final String LOGIN_PATH = "/Login.html";
 
 	private static final String filterProcessesUrl = "/poc/login";
 
@@ -120,6 +122,8 @@ public final class AuthenticationProcessingFilter implements Filter {
 			}
 		}
 
+		redirectToLogin(httpRequest, httpResponse, session);
+		
 		if(requiresAuthentication(httpRequest, httpResponse)) {
 			if(log.isDebugEnabled()) {
 				log.debug("Request is to process authentication");
@@ -162,6 +166,20 @@ public final class AuthenticationProcessingFilter implements Filter {
 		chain.doFilter(request, response);
 	}
 
+	private void redirectToLogin(HttpServletRequest request, HttpServletResponse response, HttpSession session ){
+		if (session.getAttribute(UserContext.KEY) == null) {
+			String uri = request.getRequestURI();
+			if (uri.endsWith(GWT_APP_PATH)) {
+				String redirectUrl = uri.replaceAll(GWT_APP_PATH, LOGIN_PATH);
+				 try {
+					response.sendRedirect(response.encodeRedirectURL(redirectUrl));
+				} catch (IOException e) {
+					log.debug("Can't redirect to login page");
+				}
+			}
+		}
+		
+	}
 	private boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
 		String uri = request.getRequestURI();
 
