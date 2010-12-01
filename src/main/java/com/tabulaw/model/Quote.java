@@ -135,7 +135,7 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	@Reference
 	@NotNull
 	@XmlElement(name = "docRef")
-	@ManyToOne(column = "document", inverseColumnFamily = @JoinColumnFamily(columnFamily = "DocumentQuotes"))
+	@ManyToOne(column = "document", inverseColumnFamily = @JoinColumnFamily(columnFamily = "DocumentQuotes"), readonly = true)
 	public DocRef getDocument() {
 		return document;
 	}

@@ -7,6 +7,7 @@
 package com.tabulaw.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -17,7 +18,10 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.tabulaw.cassandra.om.annotations.HelenaBean;
+import com.tabulaw.cassandra.om.annotations.JoinColumnFamily;
 import com.tabulaw.cassandra.om.annotations.KeyProperty;
+import com.tabulaw.cassandra.om.annotations.ManyToMany;
+import com.tabulaw.cassandra.om.annotations.OneToMany;
 
 /**
  * The doc entity.
@@ -43,6 +47,10 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	private CaseRef caseRef;
 	
 	private boolean referenceDoc;
+	
+	private List<User> users;
+	
+	private List<Quote> quotes;
 
 	/**
 	 * Constructor
@@ -156,6 +164,24 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 
 	public void setReferenceDoc(boolean referenceDoc) {
 		this.referenceDoc = referenceDoc;
+	}
+	
+	@ManyToMany(columnFamily = @JoinColumnFamily(columnFamily = "DocumentUsers"), inverseColumnFamily = @JoinColumnFamily(columnFamily = "UserDocuments"), readonly = true)
+	public List<User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(List<User> users) {
+		this.users = users;
+	}
+	
+	@OneToMany(columnFamily = @JoinColumnFamily(columnFamily = "DocumentQuotes"), inverseColumn = "document")
+	public List<Quote> getQuotes() {
+		return quotes;
+	}
+
+	public void setQuotes(List<Quote> quotes) {
+		this.quotes = quotes;
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidatorFactory;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
@@ -378,7 +379,9 @@ public class UserDataService extends AbstractEntityService {
 	public DocRef saveDoc(DocRef doc) throws ConstraintViolationException {
 		if(doc == null) throw new NullPointerException();
 		validate(doc);
-		doc = dao.persist(doc);
+		Session session = TabulawSession.FACTORY.createSession();
+		doc = session.merge(doc);
+		session.close();
 		return doc;
 	}
 
@@ -386,7 +389,9 @@ public class UserDataService extends AbstractEntityService {
 	public void saveDocContent(DocContent docContent) throws ConstraintViolationException {
 		if(docContent == null) throw new NullPointerException();
 		validate(docContent);
-		dao.persist(docContent);
+		Session session = TabulawSession.FACTORY.createSession();
+		session.persist(docContent);
+		session.close();
 	}
 
 	/**
@@ -396,13 +401,13 @@ public class UserDataService extends AbstractEntityService {
 	 * @throws ConstraintViolationException When the given contract doc isn't
 	 *         valid
 	 */
-	@Transactional
+/*	@Transactional
 	public ContractDoc saveContractDoc(ContractDoc doc) throws ConstraintViolationException {
 		if(doc == null) throw new NullPointerException();
 		validate(doc);
 		doc = dao.persist(doc);
 		return doc;
-	}
+	}*/
 
 	/**
 	 * Deletes the doc and doc content given its id as well as all doc/user
@@ -419,30 +424,20 @@ public class UserDataService extends AbstractEntityService {
 	public void deleteDoc(String docId) throws EntityNotFoundException {
 		if(docId == null) throw new NullPointerException();
 
-		List<DocUserBinding> userBindings = getDocUserBindingsForDoc(docId);
-		dao.purgeAll(userBindings);
-
-		// remove all quotes and quote/user bindings
-		List<Quote> quotes = findQuotesByDoc(docId);
-		for(Quote q : quotes) {
-			List<QuoteUserBinding> bindings = getQuoteUserBindingsForQuote(q.getId());
-			for(QuoteUserBinding b : bindings) {
-				dao.purge(b);
-			}
-
-			// db4o-ism
-			removeQuoteRefFromBundles(q.getId());
-
-			dao.purge(Quote.class, q.getId());
+		Session session = TabulawSession.FACTORY.createSession();
+		DocRef doc = session.find(DocRef.class, docId);
+		DocContent content = session.find(DocContent.class, docId);		
+		for (User user : doc.getUsers()) {
+			user.getDocuments().remove(doc);
 		}
-
-		dao.purge(DocRef.class, docId);
-		try {
-			dao.purge(DocContent.class, docId);
+		for (Quote quote : doc.getQuotes()) {
+			session.remove(quote);
 		}
-		catch(EntityNotFoundException e) {
-			// ok
+		if (content != null) {
+			session.remove(content);
 		}
+		session.remove(doc);
+		session.close();
 	}
 
 	/**
@@ -452,13 +447,13 @@ public class UserDataService extends AbstractEntityService {
 	 * @throws EntityNotFoundException when the contract doc of the given id can't
 	 *         be found
 	 */
-	@Transactional
+/*	@Transactional
 	public void deleteContractDoc(String docId) throws EntityNotFoundException {
 		if(docId == null) throw new NullPointerException();
 		List<ContractDocUserBinding> userBindings = getContractDocUserBindingsForDoc(docId);
 		dao.purgeAll(userBindings);
 		dao.purge(ContractDoc.class, docId);
-	}
+	}*/
 
 	/**
 	 * Finds a case type doc by its remote url property.
@@ -469,19 +464,14 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional(readOnly = true)
 	public DocRef findCaseDocByRemoteUrl(String remoteUrl) throws EntityNotFoundException {
 		if(remoteUrl == null) throw new NullPointerException();
-		Criteria<DocRef> c = new Criteria<DocRef>(DocRef.class);
-		c.getPrimaryGroup().addCriterion("caseRef.url", remoteUrl, Comparator.EQUALS, true);
-		try {
-			DocRef doc = dao.findEntity(c);
-			return doc;
+		Session session = TabulawSession.FACTORY.createSession();
+		List<DocRef> docs = session.findAll(DocRef.class);
+		for (DocRef doc : docs) {
+			if (doc.getCaseRef() != null && StringUtils.equals(doc.getCaseRef().getUrl(), remoteUrl)) {
+				return doc;
+			}
 		}
-		catch(NonUniqueResultException e) {
-			throw new IllegalStateException("Non-unique remote url: " + remoteUrl);
-		}
-		catch(InvalidCriteriaException e) {
-			throw new IllegalStateException(e);
-		}
-
+		throw new EntityNotFoundException("Can't find doc with remoteUrl=" + remoteUrl);
 	}
 
 	/**
@@ -499,7 +489,8 @@ public class UserDataService extends AbstractEntityService {
 
 		validate(bundle);
 
-		QuoteBundle existing;
+		Session session = TabulawSession.FACTORY.createSession();		
+		QuoteBundle existing = session.find(QuoteBundle.class, bundle.getId());
 		try {
 			existing = dao.load(QuoteBundle.class, bundle.getId());
 		}
