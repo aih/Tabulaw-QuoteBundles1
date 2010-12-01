@@ -489,42 +489,36 @@ public class UserDataService extends AbstractEntityService {
 
 		validate(bundle);
 
-		Session session = TabulawSession.FACTORY.createSession();		
+		Session session = TabulawSession.FACTORY.createSession();
+		User user = session.find(User.class, userId);
 		QuoteBundle existing = session.find(QuoteBundle.class, bundle.getId());
-		try {
-			existing = dao.load(QuoteBundle.class, bundle.getId());
-		}
-		catch(EntityNotFoundException e) {
-			// new
-			existing = null;
-		}
 
 		// clear out existing
 		if(existing != null) {
-			dao.purge(QuoteBundle.class, existing.getId());
-			List<Quote> existingQuotes = existing.getQuotes();
-			if(existingQuotes != null) {
-				for(Quote eq : existingQuotes) {
-					dao.purge(eq);
-				}
+			for (Quote quote : existing.getQuotes()) {
+				session.remove(quote);
 			}
-		}
+			session.remove(existing);
+		}		
 
 		// save the bundle
-		QuoteBundle persistedBundle = dao.persist(bundle);
+		List<Quote> quotes = bundle.getQuotes();
+		bundle.setQuotes(null);
+		QuoteBundle persistedBundle = session.merge(bundle);
 
 		// save the quotes
-		List<Quote> quotes = persistedBundle.getQuotes();
 		if(quotes != null && quotes.size() > 0) {
-			ArrayList<Quote> savedQuotes = new ArrayList<Quote>(quotes.size());
 			for(Quote q : quotes) {
-				savedQuotes.add(dao.persist(q));
+				session.persist(q);
+				persistedBundle.getQuotes().add(q);
 			}
-			persistedBundle.setQuotes(savedQuotes);
 		}
 
 		// create binding if this is a new bundle
-		if(existing == null) addBundleUserBinding(userId, bundle.getId());
+		if(existing == null) {
+			user.getBundles().add(persistedBundle);
+		}
+		session.close();
 
 		return persistedBundle;
 	}
@@ -568,18 +562,22 @@ public class UserDataService extends AbstractEntityService {
 	@Transactional
 	public QuoteBundle addBundleForUser(String userId, QuoteBundle bundle) throws ConstraintViolationException {
 		if(userId == null || bundle == null) throw new NullPointerException();
-
-		try {
-			dao.load(QuoteBundle.class, bundle.getId());
+		
+		Session session = TabulawSession.FACTORY.createSession();
+		
+		QuoteBundle existing = session.find(QuoteBundle.class, bundle.getId());
+		if (existing != null) {
 			throw new IllegalArgumentException("Bundle already exists.");
 		}
-		catch(EntityNotFoundException e) {
-			// desired
-			validate(bundle);
-			QuoteBundle persistedBundle = dao.persist(bundle);
-			addBundleUserBinding(userId, persistedBundle.getId());
-			return persistedBundle;
-		}
+		validate(bundle);
+
+		QuoteBundle persistedBundle = session.merge(bundle);
+		User user = session.find(User.class, userId);
+		user.getBundles().add(persistedBundle);
+		
+		session.close();
+		
+		return persistedBundle;
 	}
 
 	/**
@@ -596,7 +594,9 @@ public class UserDataService extends AbstractEntityService {
 	public void deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes) throws EntityNotFoundException {
 		if(userId == null || bundleId == null) throw new NullPointerException();
 
-		QuoteBundle bundle = dao.load(QuoteBundle.class, bundleId);
+		Session session = TabulawSession.FACTORY.createSession();
+		QuoteBundle bundle = session.find(QuoteBundle.class, bundleId);
+		User user = session.find(User.class, userId);
 
 		List<Quote> quotes = bundle.getQuotes();
 		if(quotes != null) {
@@ -607,8 +607,8 @@ public class UserDataService extends AbstractEntityService {
 
 			for(Quote q : quotes) {
 				if(deleteQuotes) {
-					removeQuoteUserBinding(userId, q.getId());
-					dao.purge(q);
+					//user.getQuotes().remove(q);
+					session.remove(q);
 				}
 				else {
 					// bundle.removeQuote(q);
@@ -617,11 +617,12 @@ public class UserDataService extends AbstractEntityService {
 				}
 			}
 
-			if(oqc != null) dao.persist(oqc);
+			if(oqc != null) session.persist(oqc);
 		}
 
-		dao.purge(bundle);
-		removeBundleUserBinding(userId, bundleId);
+		session.remove(bundle);
+		user.getBundles().remove(bundle);
+		session.close();
 	}
 
 	/**
@@ -635,7 +636,9 @@ public class UserDataService extends AbstractEntityService {
 		if(quoteId == null) {
 			throw new NullPointerException();
 		}
-		Quote quote = dao.load(Quote.class, quoteId);
+		Session session = TabulawSession.FACTORY.createSession();
+		Quote quote = session.find(Quote.class, quoteId);
+		session.close();
 		return quote;
 	}
 	
@@ -668,16 +671,14 @@ public class UserDataService extends AbstractEntityService {
 			EntityNotFoundException {
 		if(userId == null || bundleId == null || quote == null) throw new NullPointerException();
 
-		QuoteBundle qb = dao.load(QuoteBundle.class, bundleId);
+		Session session = TabulawSession.FACTORY.createSession();
+		QuoteBundle qb = session.find(QuoteBundle.class, bundleId);
 		assert qb != null;
 
 		// ensure quote is new
-		try {
-			dao.load(Quote.class, quote.getId());
+		Quote existing = session.find(Quote.class, quote.getId());
+		if (existing != null) {
 			throw new IllegalArgumentException("Quote already exists");
-		}
-		catch(EntityNotFoundException e) {
-			// expected
 		}
 
 		validate(quote);
@@ -686,23 +687,21 @@ public class UserDataService extends AbstractEntityService {
 		// persisted!
 		// NOTE: this is a db4o specific issue
 		DocRef persistedDoc = null;
-		try {
-			persistedDoc = dao.load(DocRef.class, quote.getDocument().getId());
-			assert persistedDoc != null;
+		persistedDoc = session.find(DocRef.class, quote.getDocument().getId());
+		if (persistedDoc != null) {
 			quote.setDocument(persistedDoc);
-		}
-		catch(EntityNotFoundException e) {
-			// presume doc exists on filesystem but not in db
-			// persist it
-			persistedDoc = dao.persist(quote.getDocument());
+		} else {
+			persistedDoc = session.merge(quote.getDocument());
 		}
 
-		Quote persistedQuote = dao.persist(quote);
+		Quote persistedQuote = session.merge(quote);
 		qb.addQuote(persistedQuote);
-		dao.persist(qb);
+		session.persist(qb);		
+		
 
 		// add quote/user binding
 		addQuoteUserBinding(userId, persistedQuote.getId());
+		session.close();
 
 		return persistedQuote;
 	}
