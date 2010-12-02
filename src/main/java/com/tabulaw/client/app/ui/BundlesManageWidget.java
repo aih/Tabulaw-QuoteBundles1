@@ -32,6 +32,8 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.xml.client.Document;
+import com.google.gwt.xml.client.XMLParser;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.BundleListingWidget.BOption;
@@ -172,7 +174,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 			targetBundleWidget.addQuote(mQuoteClone, true, true);
 			// deny since we are copying
 			throw new VetoDragException();
-			// String msg = "'" + dscQuote + "' copied to Quote Bundle: " + dscBundle;
+			// String msg = "'" + dscQuote + "' copied to Quote Bundle: " +
+			// dscBundle;
 			// Notifier.get().info(msg);
 		}
 	}
@@ -286,31 +289,61 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 		addBundleOption(bundle);
 	}
 
-	void emailQuoteBundle(BundleEditWidget quoteBundleWidget) {
-		String id = quoteBundleWidget.getModel().getId();
-		String url = "/services/quotebundles/" + id + "/send_by_email?sessionToken=" + Cookies.getCookie("JSESSIONID");
-		RequestBuilder rb = new RequestBuilder(RequestBuilder.POST, url);
-		rb.setCallback(new RequestCallback() {
+	boolean emailQuoteBundleInProgress = false;
 
-			@Override
-			public void onResponseReceived(Request request, Response response) {
-				String r = response.getText();
-				String s = response.getStatusText();
-				Log.debug(r);
-				Log.debug(s);
-			}
+	void emailQuoteBundle(final BundleEditWidget quoteBundleWidget) {
+		if(!emailQuoteBundleInProgress) {
+			setEmailQuoteBundleInProgress(quoteBundleWidget, true);
+			String id = quoteBundleWidget.getModel().getId();
+			String url = "/services/quotebundles/" + id + "/send_by_email?sessionToken=" + Cookies.getCookie("JSESSIONID");
+			final RequestBuilder rb = new RequestBuilder(RequestBuilder.POST, url);
+			rb.setCallback(new RequestCallback() {
 
-			@Override
-			public void onError(Request request, Throwable exception) {
-				exception.printStackTrace();
+				@Override
+				public void onResponseReceived(Request request, Response response) {
+					setEmailQuoteBundleInProgress(quoteBundleWidget, false);
+					try {
+						if("OK".equalsIgnoreCase(response.getStatusText())) {
+							Document xml = XMLParser.parse(response.getText());
+							String value = xml.getDocumentElement().getNodeName();
+							if("success".equalsIgnoreCase(value)) {
+								Notifier.get().info("Quote Bundle has been sent via email.");
+							}
+							else {
+								onEmailQuoteBundleError(quoteBundleWidget);
+							}
+						}
+						else {
+							onEmailQuoteBundleError(quoteBundleWidget);
+						}
+					}
+					catch(Exception e) {
+						onEmailQuoteBundleError(quoteBundleWidget);
+					}
+				}
+
+				@Override
+				public void onError(Request request, Throwable exception) {
+					onEmailQuoteBundleError(quoteBundleWidget);
+				}
+			});
+			try {
+				rb.send();
 			}
-		});
-		try {
-			rb.send();
+			catch(RequestException e) {
+				onEmailQuoteBundleError(quoteBundleWidget);
+			}
 		}
-		catch(RequestException e) {
-			e.printStackTrace();
-		}
+	}
+
+	private void setEmailQuoteBundleInProgress(BundleEditWidget quoteBundleWidget, boolean inprogress) {
+		emailQuoteBundleInProgress = inprogress;
+		quoteBundleWidget.setEmailInProgress(inprogress);
+	}
+
+	private void onEmailQuoteBundleError(BundleEditWidget quoteBundleWidget) {
+		setEmailQuoteBundleInProgress(quoteBundleWidget, false);
+		Notifier.get().error("Unable to send Quote Bundle via email.");
 	}
 
 	/**
@@ -343,11 +376,10 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 
 	private void clearBundleOptions() {
 		/*
-		BOption[] currentOptions = qbListingWidget.getOptionsPanel().getOptions();
-		for(BOption option : currentOptions) {
-			bundleOptionController.makeNotDraggable(option);
-		}
-		*/
+		 * BOption[] currentOptions =
+		 * qbListingWidget.getOptionsPanel().getOptions(); for(BOption option :
+		 * currentOptions) { bundleOptionController.makeNotDraggable(option); }
+		 */
 		qbListingWidget.getOptionsPanel().clearOptions();
 	}
 
@@ -459,7 +491,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 		}
 
 		if(numBundles > 2) {
-			// only make added qb widget draggable and assume existing one are already
+			// only make added qb widget draggable and assume existing one are
+			// already
 			bundleController.makeDraggable(qbw, qbw.header.getDraggable());
 		}
 
