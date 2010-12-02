@@ -43,8 +43,8 @@ public class GoogleAnonymousOAuthParametersProvider implements
 			return (GoogleOAuthParameters) request.getSession().getAttribute(
 					OAUTH_PARAMETERS);
 		} else {
-			String CONSUMER_KEY = "anonymous";
-			String CONSUMER_SECRET = "anonymous";
+			String CONSUMER_KEY = "dev.tabulaw.com";
+			String CONSUMER_SECRET = "c72cJB/WIXJuAtc9Ob8yq4GT";
 			GoogleOAuthParameters oauthParameters = new OAuthParameters();
 			oauthParameters.setOAuthConsumerKey(CONSUMER_KEY);
 			oauthParameters.setOAuthConsumerSecret(CONSUMER_SECRET);
