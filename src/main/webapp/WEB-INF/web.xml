@@ -288,5 +288,6 @@
 		<url-pattern>/_Login.html</url-pattern>
 		<url-pattern>/Password.html</url-pattern>
 		<url-pattern>/Register.html</url-pattern>
+		<url-pattern>/_Register.html</url-pattern>
 	</servlet-mapping>
 </web-app>

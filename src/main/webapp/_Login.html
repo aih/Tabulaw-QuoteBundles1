@@ -29,7 +29,7 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 		    	<div>*Now login!</div>
 	    	</div>
 	    <% } %>
-		<form class="login" method="post" action="Login.html">
+		<form class="login" method="post" action="_Login.html">
 			<div>Login</div>
 			<%if(!loginBean.getErrors().isEmpty()) { %>
 				<div class="errors">
@@ -62,7 +62,7 @@ if(loginBean.isLoginValid() && loginSession.isLoggedIn()) {
 			</div>
 		</form>
 		<div>
-			<a href="Register.html">Register</a>
+			<a href="_Register.html">Register</a>
 			<a href="Password.html">Forgot Password</a>
 		</div>
 	</body>
