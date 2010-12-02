@@ -156,7 +156,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			fileMenu.addItem(viewDoc);
 
 			fileMenu.addItem("Download", true, downloadMenu);
-			fileMenu.addItem("Email", true, emailDocumentCommand);
+			//fileMenu.addItem("Email", true, emailDocumentCommand);
 
 			MenuItem fireRtf = new MenuItem("rtf format", rtfDownloadCommand);
 			MenuItem fireDocx = new MenuItem("docx format", docxDownloadCommand);
