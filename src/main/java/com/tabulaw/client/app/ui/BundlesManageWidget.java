@@ -295,7 +295,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 		if(!emailQuoteBundleInProgress) {
 			setEmailQuoteBundleInProgress(quoteBundleWidget, true);
 			String id = quoteBundleWidget.getModel().getId();
-			String url = "/services/quotebundles/" + id + "/send_by_email?sessionToken=" + Cookies.getCookie("JSESSIONID");
+			String url = "services/quotebundles/" + id + "/send_by_email?sessionToken=" + Cookies.getCookie("JSESSIONID");
 			final RequestBuilder rb = new RequestBuilder(RequestBuilder.POST, url);
 			rb.setCallback(new RequestCallback() {
 

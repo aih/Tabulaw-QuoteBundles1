@@ -263,6 +263,7 @@
 	<servlet-mapping>
 		<servlet-name>RESTServlet</servlet-name>
 		<url-pattern>/services/*</url-pattern>
+		<url-pattern>/poc/services/*</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
