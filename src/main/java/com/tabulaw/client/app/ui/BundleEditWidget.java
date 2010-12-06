@@ -63,7 +63,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	 */
 	static class EditHeader extends EditableBundleHeader {
 
-		private final Image delete, current, close;
+		private final Image delete, current, notCurrent, close;
 
 		private final PushButton email;
 		private final PushButton emailInProgress;
@@ -133,11 +133,15 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			}
 
 			if(!orphan) {
-				current = new Image(Resources.INSTANCE.documentIcon());
-				current.setTitle("Set as current");
+				current = new Image(Resources.INSTANCE.Star());
+				current.setTitle("Current Quote Bundle");
 				current.setStyleName(Styles.CURRENT);
 				current.setStyleName("tabulawMenuItem");
-				current.addClickHandler(new ClickHandler() {
+				notCurrent = new Image(Resources.INSTANCE.StarPressed());
+				notCurrent.setTitle("Set as current");
+				notCurrent.setStyleName(Styles.CURRENT);
+				notCurrent.setStyleName("tabulawMenuItem");
+				notCurrent.addClickHandler(new ClickHandler() {
 
 					@Override
 					public void onClick(ClickEvent event) {
@@ -152,9 +156,13 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 					}
 				});
 				buttons.add(current);
+				buttons.add(notCurrent);
+				current.setVisible(false);
+				notCurrent.setVisible(false);
 			}
 			else {
 				current = null;
+				notCurrent = null;
 			}
 
 			MenuBar downloadMenuTop = new MenuBar();
@@ -224,7 +232,8 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 				setLabelText("Quote Bundle");
 				removeStyleName(Styles.QB_CURRENT);
 			}
-			if(current != null) current.setVisible(!isCurrent);
+			if(current != null) current.setVisible(isCurrent);
+			if(notCurrent != null) notCurrent.setVisible(!isCurrent);
 			// if(delete != null) delete.setVisible(!isCurrent);
 		}
 

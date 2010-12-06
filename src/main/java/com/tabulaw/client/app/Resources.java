@@ -65,6 +65,12 @@ public interface Resources extends ClientBundle {
 	@Source("../../public/images/document-icon.png")
 	ImageResource documentIcon();
 
+	@Source("../../public/images/star2.png")
+	ImageResource Star();
+
+	@Source("../../public/images/star2-pressed.png")
+	ImageResource StarPressed();
+
 	@Source("../../public/images/quote-bundle-icon.png")
 	ImageResource quoteBundleIcon();
 
