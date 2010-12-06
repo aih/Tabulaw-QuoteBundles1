@@ -18,6 +18,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.PushButton;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.model.ClientModelCache;
@@ -64,7 +65,8 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 
 		private final Image delete, current, close;
 
-		private final Image email;
+		private final PushButton email;
+		private final PushButton emailInProgress;
 
 		private class DownloadBundleCommand implements Command {
 
@@ -176,11 +178,19 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 
 			buttons.add(downloadMenuTop);
 
-			email = new Image(Resources.INSTANCE.EmailButton());
+			email =
+					new PushButton(new Image(Resources.INSTANCE.IconEnvelope()), new Image(
+							Resources.INSTANCE.IconEnvelopePressed()));
+			emailInProgress = new PushButton(new Image(Resources.INSTANCE.AjaxLoader()));
+			emailInProgress.setVisible(false);
 			email.setTitle("Email");
 			email.setStyleName(Styles.EMAIL);
 			email.setStyleName("tabulawMenuItem");
+			emailInProgress.setTitle("Email");
+			emailInProgress.setStyleName(Styles.EMAIL);
+			emailInProgress.setStyleName("tabulawMenuItem");
 			buttons.add(email);
+			buttons.add(emailInProgress);
 
 			close = new Image(Resources.INSTANCE.XButton());
 			close.setTitle("Close");
@@ -257,12 +267,8 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	}
 
 	public void setEmailInProgress(boolean inprogress) {
-		if(inprogress) {
-			header.email.setResource(Resources.INSTANCE.AjaxLoader());
-		}
-		else {
-			header.email.setResource(Resources.INSTANCE.EmailButton());
-		}
+		header.email.setVisible(!inprogress);
+		header.emailInProgress.setVisible(inprogress);
 	}
 
 	@Override

@@ -40,18 +40,24 @@ public interface Resources extends ClientBundle {
 
 	@Source("../../public/images/edit-icon.png")
 	ImageResource edit();
-	
-	//@Source("../../public/images/delete-button.png")
-	//ImageResource delete();
 
-	//@Source("../../public/images/delete-button-larger.png")
-	//ImageResource deleteLarger();
-	
+	// @Source("../../public/images/delete-button.png")
+	// ImageResource delete();
+
+	// @Source("../../public/images/delete-button-larger.png")
+	// ImageResource deleteLarger();
+
 	@Source("../../public/images/x-button.png")
 	ImageResource XButton();
 
 	@Source("../../public/images/email-button.png")
 	ImageResource EmailButton();
+
+	@Source("../../public/images/icon_envelope.png")
+	ImageResource IconEnvelope();
+
+	@Source("../../public/images/icon_envelope_pressed.png")
+	ImageResource IconEnvelopePressed();
 
 	@Source("../../public/images/ajax-loader.gif")
 	ImageResource AjaxLoader();
@@ -61,7 +67,7 @@ public interface Resources extends ClientBundle {
 
 	@Source("../../public/images/quote-bundle-icon.png")
 	ImageResource quoteBundleIcon();
-	
+
 	@Source("../../public/images/plus.png")
 	ImageResource plus();
 
@@ -74,7 +80,7 @@ public interface Resources extends ClientBundle {
 	@Source("../../public/images/permalink.gif")
 	ImageResource permalink();
 
-//-----Rich text toolbar buttons---// 
+	// -----Rich text toolbar buttons---//
 	@Source("../../public/images/toolbar/bold.gif")
 	ImageResource bold();
 
@@ -83,7 +89,7 @@ public interface Resources extends ClientBundle {
 
 	@Source("../../public/images/toolbar/outdent.gif")
 	ImageResource outdent();
-	
+
 	@Source("../../public/images/toolbar/italic.gif")
 	ImageResource italic();
 
@@ -101,12 +107,16 @@ public interface Resources extends ClientBundle {
 
 	@Source("../../public/images/toolbar/superscript.gif")
 	ImageResource superscript();
+
 	@Source("../../public/images/toolbar/underline.gif")
 	ImageResource underline();
+
 	@Source("../../public/images/toolbar/ul.gif")
 	ImageResource ul();
+
 	@Source("../../public/images/toolbar/ol.gif")
 	ImageResource ol();
+
 	@Source("../../public/images/toolbar/removeFormat.gif")
 	ImageResource removeFormat();
 }
