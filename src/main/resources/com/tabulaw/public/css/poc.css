@@ -545,7 +545,7 @@ div.ro {
 		} 
 	.qbundle .quotes {
 		/*height: 100%;*/
-		width: 100%;
+		width		: 100%;
 	}
 	.qbundle .qbcurrent {
 		border: 3px solid #DFDFDF;
@@ -1277,8 +1277,9 @@ docHeaderMenuItem img {
 }
 
 .doc .quotes {
-	overflow: auto;
-	height: 100%;
+	overflow-y	: auto;
+	overflow-x	: hidden;
+	height		: 100%;
 }
 
 .doc .wquote .cite { /*display: none;*/

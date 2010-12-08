@@ -15,6 +15,7 @@ import com.google.gwt.event.logical.shared.HasResizeHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -215,6 +216,7 @@ public class BundleEditWidget extends
 	private final boolean orphanedQuoteContainer;
 	private final HasResizeHandlers resizeHandlerManager;
 	private HandlerRegistration searchHandlerRegistration;
+	protected final FlowPanel panel = new FlowPanel();
 
 	/**
 	 * Constructor
@@ -224,7 +226,14 @@ public class BundleEditWidget extends
 	 * @param orphanedQuoteContainer
 	 */
 	public BundleEditWidget(PickupDragController dragController, boolean orphanedQuoteContainer, HasResizeHandlers resizeHandlerManager) {
-		super(new EditHeader(orphanedQuoteContainer));
+		super();
+		this.header = new EditHeader(orphanedQuoteContainer);
+		panel.setStyleName("qbundle");
+		panel.add(header);
+		panel.add(quotePanel);
+		initWidget(panel);
+		
+		
 
 		this.orphanedQuoteContainer = orphanedQuoteContainer;
 		header.pName.setEditable(!orphanedQuoteContainer);
