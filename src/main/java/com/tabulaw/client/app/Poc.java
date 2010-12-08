@@ -5,14 +5,19 @@ import java.util.List;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.LoginTopPanel;
 import com.tabulaw.client.app.ui.Portal;
+import com.tabulaw.client.app.ui.nav.CurrentQuoteBundleDisplayWidget;
 import com.tabulaw.client.app.ui.nav.NavColPanel;
 import com.tabulaw.client.app.ui.nav.NavRowPanel;
 import com.tabulaw.client.app.ui.nav.NavTabsPanel;
@@ -135,10 +140,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	}
 
 	public static void parkGlobalMsgPanel() {
-		RootPanel mainCol = RootPanel.get("mainCol");
-		if (mainCol.getWidgetCount() == 2) {
-			mainCol.insert(msgPanel, 1);
-		}
+		mainColPanel.insert(msgPanel, 1);
 	}
 
 	/**
@@ -152,19 +154,22 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	}
 
 	public static NavRowPanel getNavRow() {
-		return (NavRowPanel) RootPanel.get("navRow").getWidget(0);
+		return navRow;
 	}
 
 	public static NavColPanel getNavCol() {
-		return (NavColPanel) RootPanel.get("navCol").getWidget(0);
+		return navCol;
 	}
 
 	public static NavTabsPanel getNavTabs() {
-		return (NavTabsPanel) RootPanel.get("navTabs").getWidget(0);
+		return navTabs;
 	}
 
 	public static Portal getPortal() {
-		return (Portal) RootPanel.get("portal").getWidget(0);
+		return portal;
+	}
+	public static CurrentQuoteBundleDisplayWidget getCrntQuoteBudleWidget() {
+		return crntQuoteBudleWidget;
 	}
 
 	private LoginTopPanel loginPanel;
@@ -256,7 +261,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		getNavCol().setVisible(false);
 		getNavTabs().setVisible(false);
 		getPortal().setVisible(false);
-		RootPanel.get("portal").add(loginPanel);
+//		RootPanel.get("portal").add(loginPanel);
 	}
 
 	private void hideLoginPanel() {
@@ -304,41 +309,72 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		ClientModelCache.get().clear();
 	}
 
+	private static Portal portal = new Portal(); 
+	private static NavColPanel navCol = new NavColPanel();
+	private static NavRowPanel navRow;
+	private static NavTabsPanel navTabs;
+	private static FlowPanel mainColPanel = new FlowPanel();
+	private static CurrentQuoteBundleDisplayWidget crntQuoteBudleWidget = new CurrentQuoteBundleDisplayWidget();
+	
 	private void build() {
-		Log.debug("Building..");
 
-		// add the portal
-		Portal portal = new Portal();
-		portal.setVisible(false);
-		RootPanel.get("portal").add(portal);
+		Log.debug("Building..");
 
 		ClientModelCache.init(portal);
 
-		// add the nav row panel
-		NavRowPanel navRowPanel = new NavRowPanel(this);
-		navRowPanel.setVisible(false);
-		RootPanel.get("navRow").add(navRowPanel);
-
-		// add the nav row panel
-		NavTabsPanel navTabsPanel = new NavTabsPanel(this);
-		navTabsPanel.setVisible(false);
-		RootPanel.get("navTabs").add(navTabsPanel);
-
-		// add the nav col panel
-		NavColPanel navColPanel = new NavColPanel();
-		navColPanel.setVisible(false);
-		RootPanel.get("navCol").add(navColPanel);
-
 		ViewManager.initialize(portal.getPanel(), 10);
+		portal.setVisible(false);
+		
+		DockLayoutPanel container = new DockLayoutPanel(Unit.PX);
+		container.getElement().setId("container");
+		
+		navTabs = new NavTabsPanel(this) ;
+
+		FlowPanel navColPanel = new FlowPanel();
+		
+		navColPanel.setWidth("148px");
+		
+		navColPanel.getElement().setId("navCol");
+		
+		
+		HTML img1 = new HTML("<img title='Beta' class='beta' src='images/beta_banner_left.png' alt='Tabulaw Beta'>");
+		HTML img2 = new HTML("<img title='Tabulaw' class='logo' src='images/tabulaw_logo.png' alt='Tabulaw'>");
+
+		navColPanel.add(img1);
+		navColPanel.add(img2);
+		navColPanel.add(navTabs);
+		navColPanel.add(navCol);
+
+		navRow = new NavRowPanel(this);
+		portal.setVisible(false);
+
+		crntQuoteBudleWidget.setStyleName("crntqb");
+		crntQuoteBudleWidget.makeModelChangeAware();
+		
+		mainColPanel.add(crntQuoteBudleWidget);
+		mainColPanel.add(portal);
+
+		HTML footer = new HTML("<div id='footer'><p class='footer'>&copy; 2010 Tabulaw, Inc.</p></div>");
+		container.addWest(navColPanel,180);
+		container.addNorth(navRow,44);
+		container.addSouth(footer,30);
+		
+		container.add(mainColPanel);
+		
+		RootLayoutPanel root = RootLayoutPanel.get();
+		
+		root.add(container);
 
 		// create handler for displaying nav row/col content which is view
 		// specific
-		ViewManager.get().addViewChangeHandler(navColPanel);
-		ViewManager.get().addViewChangeHandler(navRowPanel);
-		ViewManager.get().addViewChangeHandler(navTabsPanel);
+		ViewManager.get().addViewChangeHandler(navCol);
+		ViewManager.get().addViewChangeHandler(navRow);
+		ViewManager.get().addViewChangeHandler(navTabs);
+		
+		
 
 		// initialize the ui msg notifier
-		Notifier.init(navColPanel, Position.TOP, -20, 0);
+		Notifier.init(navCol, Position.TOP, -20, 0);
 
 		Log.debug("Building complete.");
 	}

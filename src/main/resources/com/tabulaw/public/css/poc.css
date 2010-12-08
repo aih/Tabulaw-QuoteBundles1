@@ -217,18 +217,7 @@ div.ro {
 	padding-left:0px !important;
 }	
 
-#navCol {
-	float: left;
-	width: 145px;
-	margin-left: -100%;
-	/*debug*/
-	/*border: 1px solid pink;*/
-}
 
-* html #navCol {
-	padding-top: 20px;
-	padding-left: 20px;
-}
 	#navCol .vpanel {
 		width: 100%;
 		margin-left: 10px;
@@ -310,20 +299,6 @@ div.ro {
 	padding-left: 10px;
 }
 
-/* the parent element of the app portal panel */
-#mainCol {
-	margin-left: 180px;
-	/*debug*/
-	/*border: 1px solid brown;*/
-}
-
-/* the parent element of the nav row widget */
-#navRow {
-	/*border-bottom: 3px solid #BFBFBF;*/
-	/*debug*/
-	/*border: 1px solid gray*/
-	
-}
 
 * html #navRow { /*padding-top: 20px;
 	margin-right: 20px;
@@ -451,16 +426,16 @@ div.ro {
 	float: left;
 }
 
-.navRow .crntqb {
+.crntqb {
 	text-align: right;
 }
 
-.navRow .crntqb p {
+.crntqb p {
 	font-weight: bold;
 	font-size: 11px;
 }
 
-.navRow .crntqb .echo {
+.crntqb .echo {
 	font-style: italic;
 	font-weight: normal;
 	margin-right: 5px;
@@ -882,7 +857,7 @@ docHeaderMenuItem img {
 }
 
 .docEdit {
-	
+	height: 100%;
 }
 
 .documentContainer {

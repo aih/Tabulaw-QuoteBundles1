@@ -5,7 +5,7 @@
  */
 package com.tabulaw.client.app.ui.nav;
 
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.view.IPocView;
 import com.tabulaw.client.view.ViewClass;
@@ -31,7 +31,7 @@ public class NavColPanel extends AbstractNavPanel {
 		public static final String WIDGET = "widget";
 	}
 	
-	private final VerticalPanel vp = new VerticalPanel();
+	private final FlowPanel vp = new FlowPanel();
 
 	/**
 	 * Constructor
