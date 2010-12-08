@@ -19,6 +19,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
@@ -84,7 +85,9 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 			throw new VetoDragException();
 		}
 	} // DocQuoteDragHandler
+
 	class DocAndBundleSplitLayoutPanel extends SplitLayoutPanel {
+
 		@Override
 		public void onResize() {
 			super.onResize();
@@ -95,7 +98,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	private final DocViewer wDocViewer = new DocViewer();
 
 	private HandlerRegistration hrViewMode, hrDoc;
-	
+
 	private HandlerManager resizeHandlerManager = new HandlerManager(this);
 
 	private final BundleDocWidget wDocQuoteBundle;
@@ -130,7 +133,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		SimpleDropController quoteDropController = new SimpleDropController(wDocViewer);
 		quoteController.registerDropController(quoteDropController);
 
-		wDocQuoteBundle = new BundleDocWidget(this,this);
+		wDocQuoteBundle = new BundleDocWidget(this, this);
 
 		splitPanel.addEast(wDocQuoteBundle, 200);
 		splitPanel.add(wDocViewer);
@@ -140,9 +143,11 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 		initWidget(boundaryPanel);
 	}
+
 	public void onActivate() {
 		resizeHandlerManager.fireEvent(new QuoteResizeEvent());
 	}
+
 	public HandlerRegistration addResizeHandler(ResizeHandler handler) {
 		return resizeHandlerManager.addHandler(ResizeEvent.getType(), handler);
 	}
@@ -228,7 +233,8 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 				// create the quote
 				String serializedMark = mark.serialize();
-				// we will fill startPage and endPage fields on the server by data from serializedMark
+				// we will fill startPage and endPage fields on the server by data from
+				// serializedMark
 				Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark, 0, 0);
 				quote.setMark(mark);
 				// eagerly set id since EntityBase.equals() depends on it
@@ -277,7 +283,10 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				DocRef mDoc = wDocViewer.getModel();
 				if(mDoc == null) return false;
 				Log.debug("Auto-creating quote bundle for doc: " + mDoc);
-				String qbName = mDoc.getTitle();
+
+				String title = getNewQuoteBundleTitle(qbs);
+
+				String qbName = title;
 				String qbDesc = "Quote Bundle for " + qbName;
 				crntQb = EntityFactory.get().buildBundle(qbName, qbDesc);
 				crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
@@ -324,24 +333,24 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				if(docRef.isCaseDoc()) {
 					CaseRef caseRef = docRef.getCaseRef();
 					StringBuilder caseRefBuilder = new StringBuilder(" ");
-					
-					if (! StringUtil.isEmpty(caseRef.getParties())) {
+
+					if(!StringUtil.isEmpty(caseRef.getParties())) {
 						caseRefBuilder.append("<i>");
 						caseRefBuilder.append(caseRef.getParties());
 						caseRefBuilder.append(", ");
-						caseRefBuilder.append("</i>");						
+						caseRefBuilder.append("</i>");
 					}
 					caseRefBuilder.append(caseRef.getDocLoc());
-					if (q.getStartPage() != 0) {
+					if(q.getStartPage() != 0) {
 						caseRefBuilder.append(", ");
 						caseRefBuilder.append(q.getStartPage());
-						if (q.getStartPage() != q.getEndPage()) {
+						if(q.getStartPage() != q.getEndPage()) {
 							caseRefBuilder.append("-");
 							caseRefBuilder.append(q.getEndPage());
 						}
 					}
 					caseRefBuilder.append(" (");
-					if (! caseRef.isSupremeCourt() && ! StringUtil.isEmpty(caseRef.getCourt())) {
+					if(!caseRef.isSupremeCourt() && !StringUtil.isEmpty(caseRef.getCourt())) {
 						caseRefBuilder.append(caseRef.getCourt());
 						caseRefBuilder.append(" ");
 					}
@@ -377,14 +386,14 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	}
 
 	public void setDocKey(DocKey docKey) {
-		
+
 		// get doc ref and content
 		final DocRef docRef = (DocRef) ClientModelCache.get().get(docKey);
-		
+
 		DocContent docContent;
 		try {
 			docContent = (DocContent) ClientModelCache.get().get(new ModelKey(EntityType.DOC_CONTENT.name(), docKey.getId()));
-			
+
 			// update doc viewer with doc
 			wDocViewer.setModel(docRef, docContent);
 
@@ -394,22 +403,22 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		catch(EntityNotFoundException e) {
 			// fetch it
 			Poc.getUserDataService().getDoc(docKey.getId(), new AsyncCallback<DocPayload>() {
-				
+
 				@Override
 				public void onSuccess(DocPayload result) {
 					DocContent dc = result.getDocContent();
-					
+
 					// cache the doc content
 					// TODO verify we want to do this
 					ClientModelCache.get().persist(dc, null);
-					
+
 					// update doc viewer with doc
 					wDocViewer.setModel(docRef, dc);
 
 					// grab the current quote bundle
 					maybeSetCurrentQuoteBundle();
 				}
-				
+
 				@Override
 				public void onFailure(Throwable caught) {
 					Notifier.get().showFor(caught);
@@ -447,5 +456,49 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		hrViewMode = null;
 
 		super.onUnload();
+	}
+
+	private int findMaxUntitledIndex(List<QuoteBundle> qbs) {
+		int maxIndex = 0;
+		String pattern = "untitled ";
+		for(QuoteBundle qb : qbs) {
+			String title = qb.getDescription().toLowerCase();
+			if(title.startsWith(pattern)) {
+				String index = title.substring(pattern.length()).trim();
+				try {
+					maxIndex = Math.max(maxIndex, Integer.parseInt(index));
+				}
+				catch(Exception e) {
+				}
+			}
+		}
+		return maxIndex;
+	}
+
+	private boolean alreadyQuoteBundleTitleExist(List<QuoteBundle> qbs, String title) {
+		for(QuoteBundle qb : qbs) {
+			if(qb.getDescription().equals(title)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private String getNewQuoteBundleTitle(List<QuoteBundle> qbs) {
+		String title =
+				Window.prompt("Please set Quote Bundle title for this document", "Untitled " + (findMaxUntitledIndex(qbs) + 1));
+		while(true) {
+			if(title.isEmpty()) {
+				title =
+						Window.prompt("Title cannot be empty. Please set Quote Bundle title for this document", "Untitled "
+								+ (findMaxUntitledIndex(qbs) + 1));
+			}
+			else if(alreadyQuoteBundleTitleExist(qbs, title)) {
+				title = Window.prompt("Title already exists. Please set Quote Bundle title for this document", title);
+			}
+			else {
+				return title;
+			}
+		}
 	}
 }
