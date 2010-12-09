@@ -284,7 +284,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				if(mDoc == null) return false;
 				Log.debug("Auto-creating quote bundle for doc: " + mDoc);
 
-				String title = getNewQuoteBundleTitle(qbs);
+				String title = getNextUntitledQuoteBundle(qbs);
 
 				String qbName = title;
 				String qbDesc = "Quote Bundle for " + qbName;
@@ -458,6 +458,10 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		super.onUnload();
 	}
 
+	private String getNextUntitledQuoteBundle(List<QuoteBundle> qbs) {
+		return "Untitled " + (findMaxUntitledIndex(qbs) + 1);
+	}
+
 	private int findMaxUntitledIndex(List<QuoteBundle> qbs) {
 		int maxIndex = 0;
 		String pattern = "untitled ";
@@ -485,13 +489,12 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	}
 
 	private String getNewQuoteBundleTitle(List<QuoteBundle> qbs) {
-		String title =
-				Window.prompt("Please set Quote Bundle title for this document", "Untitled " + (findMaxUntitledIndex(qbs) + 1));
+		String title = Window.prompt("Please set Quote Bundle title for this document", getNextUntitledQuoteBundle(qbs));
 		while(true) {
 			if(title.isEmpty()) {
 				title =
-						Window.prompt("Title cannot be empty. Please set Quote Bundle title for this document", "Untitled "
-								+ (findMaxUntitledIndex(qbs) + 1));
+						Window.prompt("Title cannot be empty. Please set Quote Bundle title for this document",
+								getNextUntitledQuoteBundle(qbs));
 			}
 			else if(alreadyQuoteBundleTitleExist(qbs, title)) {
 				title = Window.prompt("Title already exists. Please set Quote Bundle title for this document", title);
