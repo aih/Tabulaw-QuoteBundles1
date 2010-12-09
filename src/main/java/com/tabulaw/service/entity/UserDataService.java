@@ -7,10 +7,7 @@ package com.tabulaw.service.entity;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidatorFactory;
@@ -26,19 +23,14 @@ import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.dao.IEntityDao;
-import com.tabulaw.dao.NonUniqueResultException;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.model.BundleUserBinding;
-import com.tabulaw.model.ClauseBundle;
-import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.ContractDocUserBinding;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
-import com.tabulaw.model.DocUserBinding;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
-import com.tabulaw.model.QuoteUserBinding;
 import com.tabulaw.model.User;
 import com.tabulaw.model.UserState;
 
@@ -103,34 +95,6 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
-	 * Gets a list of all contract docs for a given user.
-	 * @param userId user id
-	 * @return list of docs
-	 */
-	/*@Transactional(readOnly = true)
-	public List<ContractDoc> getContractDocsForUser(String userId) {
-		if(userId == null) throw new NullPointerException();
-		Criteria<ContractDocUserBinding> c = new Criteria<ContractDocUserBinding>(ContractDocUserBinding.class);
-		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
-		try {
-			List<ContractDocUserBinding> bindings = dao.findEntities(c, null);
-			if(bindings.size() < 1) return new ArrayList<ContractDoc>(0);
-			ArrayList<String> docIds = new ArrayList<String>(bindings.size());
-			for(ContractDocUserBinding b : bindings) {
-				docIds.add(b.getDocId());
-			}
-			List<ContractDoc> list = dao.findByIds(ContractDoc.class, docIds, new Sorting("name"));
-			if(list.size() != docIds.size())
-				throw new IllegalStateException("Contract doc id list and contract doc entity list size mis-match.");
-
-			return list;
-		}
-		catch(InvalidCriteriaException e) {
-			throw new IllegalStateException(e);
-		}
-	}*/
-
-	/**
 	 * Provides a list of all doc refs in the system.
 	 * @return doc list
 	 */
@@ -141,16 +105,6 @@ public class UserDataService extends AbstractEntityService {
 		session.close();
 		return docs;
 	}
-
-	/**
-	 * Provides a list of all contract doc in the system.
-	 * @return doc list
-	 */
-	/*@Transactional(readOnly = true)
-	public List<ContractDoc> getAllContractDocs() {
-		List<ContractDoc> docs = dao.loadAll(ContractDoc.class);
-		return docs;
-	}*/
 
 	/**
 	 * Gets the doc ref given the doc id.
@@ -167,18 +121,6 @@ public class UserDataService extends AbstractEntityService {
 		return dr;
 	}
 
-	/**
-	 * Gets the contract doc given the id.
-	 * @param id
-	 * @return to loaded doc ref
-	 * @throws EntityNotFoundException
-	 */
-	/*@Transactional(readOnly = true)
-	public ContractDoc getContractDoc(String id) throws EntityNotFoundException {
-		if(id == null) throw new NullPointerException();
-		ContractDoc dr = dao.load(ContractDoc.class, id);
-		return dr;
-	}*/
 
 	/**
 	 * Gets the doc <em>content</em> given the doc id.
@@ -393,21 +335,6 @@ public class UserDataService extends AbstractEntityService {
 		session.persist(docContent);
 		session.close();
 	}
-
-	/**
-	 * Creates or updates the given contract doc.
-	 * @param doc the doc to save
-	 * @return the saved doc
-	 * @throws ConstraintViolationException When the given contract doc isn't
-	 *         valid
-	 */
-/*	@Transactional
-	public ContractDoc saveContractDoc(ContractDoc doc) throws ConstraintViolationException {
-		if(doc == null) throw new NullPointerException();
-		validate(doc);
-		doc = dao.persist(doc);
-		return doc;
-	}*/
 
 	/**
 	 * Deletes the doc and doc content given its id as well as all doc/user
@@ -808,19 +735,6 @@ public class UserDataService extends AbstractEntityService {
 	}
 
 	/**
-	 * Adds an association of an existing contract doc to an existing user.
-	 * @param userId
-	 * @param docId
-	 * @throws EntityExistsException if the association already exists
-	 */
-	@Transactional
-	public void addContractDocUserBinding(String userId, String docId) throws EntityExistsException {
-		if(docId == null || userId == null) throw new NullPointerException();
-		ContractDocUserBinding binding = new ContractDocUserBinding(docId, userId);
-		dao.persist(binding);
-	}
-
-	/**
 	 * Removes a user doc association.
 	 * @param userId
 	 * @param docId
@@ -836,45 +750,21 @@ public class UserDataService extends AbstractEntityService {
 		session.close();
 	}
 
-	/**
-	 * Removes a user contract doc association.
-	 * @param userId
-	 * @param docId
-	 * @throws EntityNotFoundException when the association doesn't exist
-	 */
-	@Transactional
-	public void removeContractDocUserBinding(String userId, String docId) throws EntityNotFoundException {
-		if(docId == null || userId == null) throw new NullPointerException();
-		Criteria<ContractDocUserBinding> c = new Criteria<ContractDocUserBinding>(ContractDocUserBinding.class);
-		c.getPrimaryGroup().addCriterion("docId", docId, Comparator.EQUALS, true);
-		c.getPrimaryGroup().addCriterion("userId", userId, Comparator.EQUALS, true);
-		ContractDocUserBinding binding;
-		try {
-			binding = dao.findEntity(c);
-		}
-		catch(InvalidCriteriaException e) {
-			throw new IllegalStateException(e);
-		}
-		dao.purge(binding);
-	}
 
 	/**
 	 * Returns all user/doc bindings that exist for a given doc
 	 * @param docId id of the doc
 	 * @return list of doc user bindings
 	 */
-	/*@Transactional
-	public List<DocUserBinding> getDocUserBindingsForDoc(String docId) {
+	@Transactional
+	public boolean isOrphanedDoc(String docId) {
 		if(docId == null) throw new NullPointerException();
-		Criteria<DocUserBinding> c = new Criteria<DocUserBinding>(DocUserBinding.class);
-		c.getPrimaryGroup().addCriterion("docId", docId, Comparator.EQUALS, true);
-		try {
-			return dao.findEntities(c, null);
-		}
-		catch(InvalidCriteriaException e) {
-			throw new IllegalStateException(e);
-		}
-	}*/
+		Session session = TabulawSession.FACTORY.createSession();
+		DocRef doc = session.find(DocRef.class, docId);
+		boolean result = doc.getUsers().isEmpty();
+		session.close();
+		return result;
+	}
 
 	/**
 	 * Returns all contract doc/user bindings that exist for a given contract doc
@@ -1013,54 +903,6 @@ public class UserDataService extends AbstractEntityService {
 		//result.addAll(user.getQuotes());
 		session.close();
 		return result;
-	}
-
-	/**
-	 * Creates or updates a clause bundle
-	 * @param cb the clause bundle to persist
-	 * @return the persisted bundle
-	 * @throws ConstraintViolationException
-	 * @throws EntityExistsException
-	 */
-	@Transactional
-	public ClauseBundle persistClauseBundle(ClauseBundle cb) throws ConstraintViolationException, EntityExistsException {
-		if(cb == null) throw new NullPointerException();
-		validate(cb);
-		cb = dao.persist(cb);
-		return cb;
-	}
-
-	/**
-	 * Deletes a clause bundle from the system.
-	 * @param id id of the clause bundle to be deleted
-	 * @throws EntityNotFoundException
-	 */
-	@Transactional
-	public void deleteClauseBundle(String id) throws EntityNotFoundException {
-		if(id == null) throw new NullPointerException();
-		dao.purge(ClauseBundle.class, id);
-	}
-
-	/**
-	 * Retrieves the clause bundle of the given id
-	 * @param id id of the clause bundle
-	 * @return clause bundle
-	 * @throws EntityNotFoundException
-	 */
-	@Transactional(readOnly = true)
-	public ClauseBundle getClauseBundle(String id) throws EntityNotFoundException {
-		if(id == null) throw new NullPointerException();
-		ClauseBundle cb = dao.load(ClauseBundle.class, id);
-		return cb;
-	}
-	
-	/**
-	 * @return list of all defined clause bundles in the system.
-	 */
-	@Transactional(readOnly = true)
-	public List<ClauseBundle> getAllClauseBundles() {
-		List<ClauseBundle> list = dao.loadAll(ClauseBundle.class);
-		return list;
 	}
 
 	/**

@@ -322,7 +322,7 @@ public class DocumentResource extends BaseResource {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 		getDataService().removeDocUserBinding(getUserId(), id);
-		if (getDataService().getDocUserBindingsForDoc(id).isEmpty()) {
+		if (getDataService().isOrphanedDoc(id)) {
 			getDataService().deleteDoc(id);
 		}
 	}

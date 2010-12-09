@@ -7,8 +7,6 @@ package com.tabulaw.common.data.rpc;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.tabulaw.model.ClauseBundle;
-import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.Quote;
@@ -140,23 +138,10 @@ public interface IUserDataService extends RemoteService {
 	ModelListPayload<DocRef> getDocsForUser(String userId);
 
 	/**
-	 * Gets the contract docs associated with a particular user.
-	 * @param userId id of the user for which to get contract docs
-	 * @return model list payload
-	 */
-	ModelListPayload<ContractDoc> getContractDocsForUser(String userId);
-
-	/**
 	 * Requires user administrator priviliges.
 	 * @return All doc refs in the system.
 	 */
 	ModelListPayload<DocRef> getAllDocs();
-	
-	/**
-	 * Requires user administrator priviliges.
-	 * @return All contract docs in the system.
-	 */
-	ModelListPayload<ContractDoc> getAllContractDocs();
 	
 	/**
 	 * Fetches both the doc ref and content for a doc.
@@ -166,25 +151,11 @@ public interface IUserDataService extends RemoteService {
 	DocPayload getDoc(String docId);
 
 	/**
-	 * Fetches the contract doc given its id.
-	 * @param id the contract doc id
-	 * @return the contract doc payload
-	 */
-	ModelPayload<ContractDoc> getContractDoc(String id);
-
-	/**
 	 * Removes a doc from the system.
 	 * @param docId id of the doc to delete
 	 * @return resultant status wrapped in a payload
 	 */
 	Payload deleteDoc(String docId);
-
-	/**
-	 * Removes a contract doc from the system.
-	 * @param id id of the contract doc to delete
-	 * @return resultant status wrapped in a payload
-	 */
-	Payload deleteContractDoc(String id);
 
 	/**
 	 * Creates a new doc on the server given a new doc entity with all required
@@ -204,14 +175,6 @@ public interface IUserDataService extends RemoteService {
 	 * @return the persisted quote
 	 */
 	ModelListPayload<EntityBase> addOrphanQuote(String userId, String title, String quoteText, String quoteBundleId);
-	
-	/**
-	 * Creates a new contract doc on the server given a new contract doc entity with all required
-	 * properties set.
-	 * @param doc new contract doc
-	 * @return the created contract doc wrapped in a doc payload
-	 */
-	Payload persistContractDoc(ContractDoc doc);
 
 	/**
 	 * Updates the contents of an existing document.
@@ -220,23 +183,4 @@ public interface IUserDataService extends RemoteService {
 	 * @return the resultant status wrapped in a payload
 	 */
 	Payload updateDocContent(String docId, String htmlContent);
-	
-	/**
-	 * @return list of all clause bundles.
-	 */
-	ModelListPayload<ClauseBundle> getAllClauseBundles();
-	
-	/**
-	 * Creates or updates a clause bundle
-	 * @param cb
-	 * @return the status of the persist op
-	 */
-	Payload persistClauseBundle(ClauseBundle cb);
-	
-	/**
-	 * Deletes a clause bundle by its id
-	 * @param id id of the clause bundle
-	 * @return the status of the delete op
-	 */
-	Payload deleteClauseBundle(String id);
 }
