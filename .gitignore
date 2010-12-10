@@ -1,6 +1,8 @@
 *.settings
 *.class
 *.war
+.classpath
+.project
 /test-output
 /target
 /userDataServiceTestDb

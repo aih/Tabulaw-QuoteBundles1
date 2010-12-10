@@ -21,6 +21,7 @@ import org.openid4java.OpenIDException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
 import org.openid4java.message.MessageException;
+import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
 
 import com.google.inject.Inject;
@@ -49,11 +50,10 @@ public class OpenIdServlet extends InjectableServlet {
 	private String redirectOnSuccess;
 
 	/**
-	 * Init the servlet. For demo purposes, we're just using an in-memory
-	 * version of OpenID4Java's ConsumerAssociationStore. Production apps,
-	 * particularly those in a clustered environment, should consider using an
-	 * implementation backed by shared storage (memcache, DB, etc.)
-	 * 
+	 * Init the servlet. For demo purposes, we're just using an in-memory version
+	 * of OpenID4Java's ConsumerAssociationStore. Production apps, particularly
+	 * those in a clustered environment, should consider using an implementation
+	 * backed by shared storage (memcache, DB, etc.)
 	 * @param config
 	 * @throws ServletException
 	 */
@@ -71,28 +71,27 @@ public class OpenIdServlet extends InjectableServlet {
 	/**
 	 * Either initiates a login to a given provider or processes a response from
 	 * an IDP.
-	 * 
 	 * @param req
 	 * @param resp
 	 * @throws ServletException
 	 * @throws IOException
 	 */
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String domain = req.getParameter("hd");
-		if (domain != null) {
+		if(domain != null) {
 			// User attempting to login with provided domain, build and OpenID
 			// request and redirect
 			try {
 				AuthRequest authRequest = startAuthentication(domain, req);
 				String url = authRequest.getDestinationUrl(true);
 				resp.sendRedirect(url);
-			} catch (OpenIDException e) {
-				throw new ServletException("Error initializing OpenID request",
-						e);
 			}
-		} else {
+			catch(OpenIDException e) {
+				throw new ServletException("Error initializing OpenID request", e);
+			}
+		}
+		else {
 			// This is a response from the provider, go ahead and validate
 			doPost(req, resp);
 		}
@@ -100,76 +99,63 @@ public class OpenIdServlet extends InjectableServlet {
 
 	/**
 	 * Handle the response from the OpenID Provider.
-	 * 
-	 * @param req
-	 *            Current servlet request
-	 * @param resp
-	 *            Current servlet response
-	 * @throws ServletException
-	 *             if unable to process request
-	 * @throws IOException
-	 *             if unable to process request
+	 * @param req Current servlet request
+	 * @param resp Current servlet response
+	 * @throws ServletException if unable to process request
+	 * @throws IOException if unable to process request
 	 */
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			UserInfo openIdUser = completeAuthentication(req);
 			signInUser(req, resp, openIdUser);
 			// req.getSession().setAttribute("user", openIdUser);
-			if (openIdUser == null) {
-				IOUtils.write("Invalid OpenId authorization.",
-						resp.getOutputStream());
-			} else if (openIdUser.isHasOpenIdOAuth()) {
-				IOUtils.write("Success: OpenId+OAuth works.",
-						resp.getOutputStream());
-			} else {
-				IOUtils.write("Failure: OpenId+OAuth is not working.",
-						resp.getOutputStream());
+			if(openIdUser == null) {
+				IOUtils.write("Invalid OpenId authorization.", resp.getOutputStream());
 			}
-			if ("true".equalsIgnoreCase(redirectOnSuccess)) {
+			else if(openIdUser.isHasOpenIdOAuth()) {
+				IOUtils.write("Success: OpenId+OAuth works.", resp.getOutputStream());
+			}
+			else {
+				IOUtils.write("Failure: OpenId+OAuth is not working.", resp.getOutputStream());
+			}
+			if("true".equalsIgnoreCase(redirectOnSuccess)) {
 				resp.sendRedirect(addGWTHosted(req, homePath));
 			}
-		} catch (OpenIDException e) {
+		}
+		catch(OpenIDException e) {
 			throw new ServletException("Error processing OpenID response", e);
 		}
 	}
 
-	private User signInUser(HttpServletRequest req, HttpServletResponse resp,
-			UserInfo openIdUser) throws IOException {
+	private User signInUser(HttpServletRequest req, HttpServletResponse resp, UserInfo openIdUser) throws IOException {
 		return new UserSignIn(req).signInUser(openIdUser);
 	}
 
 	/**
 	 * Builds an auth request for a given OpenID provider.
-	 * 
-	 * @param op
-	 *            OpenID Provider URL. In the context of Google Apps, this can
-	 *            be a naked domain name such as "saasycompany.com". The length
-	 *            of the domain can exceed 100 chars.
-	 * @param request
-	 *            Current servlet request
+	 * @param op OpenID Provider URL. In the context of Google Apps, this can be a
+	 *        naked domain name such as "saasycompany.com". The length of the
+	 *        domain can exceed 100 chars.
+	 * @param request Current servlet request
 	 * @return Auth request
-	 * @throws org.openid4java.OpenIDException
-	 *             if unable to discover the OpenID endpoint
+	 * @throws org.openid4java.OpenIDException if unable to discover the OpenID
+	 *         endpoint
 	 */
-	private AuthRequest startAuthentication(String op,
-			HttpServletRequest request) throws OpenIDException {
+	private AuthRequest startAuthentication(String op, HttpServletRequest request) throws OpenIDException {
 		IdpIdentifier openId = new IdpIdentifier(op);
 
 		String realm = realm(request);
 		String returnToUrl = returnTo(request);
 
-		AuthRequestHelper helper = consumerHelper.getAuthRequestHelper(openId,
-				returnToUrl);
+		AuthRequestHelper helper = consumerHelper.getAuthRequestHelper(openId, returnToUrl);
 		addAttributes(helper);
 
 		try {
 			OAuthAccessor accessor = createOAuthAccessor();
-			helper.requestOauthAuthorization(accessor.consumer.consumerKey,
-		 "http://docs.google.com/feeds/");
-				//"http://www.google.com/m8/feeds/");
-		} catch (Exception e) {
+			helper.requestOauthAuthorization(accessor.consumer.consumerKey, "http://docs.google.com/feeds/");
+		}
+		catch(Exception e) {
 			log.error("", e);
 		}
 
@@ -181,41 +167,33 @@ public class OpenIdServlet extends InjectableServlet {
 		authReq.addExtension(uiExtension);
 		authReq.setRealm(realm);
 
-		request.getSession().setAttribute("discovered",
-				helper.getDiscoveryInformation());
+		request.getSession().setAttribute("discovered", helper.getDiscoveryInformation());
 
 		return authReq;
 	}
 
 	private OAuthAccessor createOAuthAccessor() {
 		OAuthServiceProvider provider = new OAuthServiceProvider("", "", "");
-		OAuthConsumer consumer = new OAuthConsumer(homePath, consumerKey,
-				consumerSecret, provider);
+		OAuthConsumer consumer = new OAuthConsumer(homePath, consumerKey, consumerSecret, provider);
 		return new OAuthAccessor(consumer);
 	}
 
 	/**
-	 * Validates the response to an auth request, returning an authenticated
-	 * user object if successful.
-	 * 
-	 * @param request
-	 *            Current servlet request
+	 * Validates the response to an auth request, returning an authenticated user
+	 * object if successful.
+	 * @param request Current servlet request
 	 * @return User
-	 * @throws org.openid4java.OpenIDException
-	 *             if unable to verify response
+	 * @throws org.openid4java.OpenIDException if unable to verify response
 	 */
 
-	UserInfo completeAuthentication(HttpServletRequest request)
-			throws OpenIDException {
+	UserInfo completeAuthentication(HttpServletRequest request) throws OpenIDException {
 		HttpSession session = request.getSession();
 		ParameterList openidResp = Step2.getParameterList(request);
 		String receivingUrl = currentUrl(request);
-		DiscoveryInformation discovered = (DiscoveryInformation) session
-				.getAttribute("discovered");
+		DiscoveryInformation discovered = (DiscoveryInformation) session.getAttribute("discovered");
 
-		AuthResponseHelper authResponse = consumerHelper.verify(receivingUrl,
-				openidResp, discovered);
-		if (authResponse.getAuthResultType() == AuthResponseHelper.ResultType.AUTH_SUCCESS) {
+		AuthResponseHelper authResponse = consumerHelper.verify(receivingUrl, openidResp, discovered);
+		if(authResponse.getAuthResultType() == AuthResponseHelper.ResultType.AUTH_SUCCESS) {
 			return onSuccess(authResponse, request);
 		}
 		return onFail(authResponse, request);
@@ -223,21 +201,16 @@ public class OpenIdServlet extends InjectableServlet {
 
 	/**
 	 * Adds the requested AX attributes to the request
-	 * 
-	 * @param helper
-	 *            Request builder
+	 * @param helper Request builder
 	 */
 	void addAttributes(AuthRequestHelper helper) {
-		helper.requestAxAttribute(Step2.AxSchema.EMAIL, true)
-				.requestAxAttribute(Step2.AxSchema.FIRST_NAME, true)
+		helper.requestAxAttribute(Step2.AxSchema.EMAIL, true).requestAxAttribute(Step2.AxSchema.FIRST_NAME, true)
 				.requestAxAttribute(Step2.AxSchema.LAST_NAME, true);
 	}
 
 	/**
 	 * Reconstructs the current URL of the request, as sent by the user
-	 * 
-	 * @param request
-	 *            Current servlet request
+	 * @param request Current servlet request
 	 * @return URL as sent by user
 	 */
 	String currentUrl(HttpServletRequest request) {
@@ -248,15 +221,14 @@ public class OpenIdServlet extends InjectableServlet {
 	 * Gets the realm to advertise to the IDP. If not specified in the servlet
 	 * configuration. it dynamically constructs the realm based on the current
 	 * request.
-	 * 
-	 * @param request
-	 *            Current servlet request
+	 * @param request Current servlet request
 	 * @return Realm
 	 */
 	String realm(HttpServletRequest request) {
-		if (StringUtils.isNotBlank(realm)) {
+		if(StringUtils.isNotBlank(realm)) {
 			return realm;
-		} else {
+		}
+		else {
 			return baseUrl(request);
 		}
 	}
@@ -264,33 +236,25 @@ public class OpenIdServlet extends InjectableServlet {
 	/**
 	 * Gets the <code>openid.return_to</code> URL to advertise to the IDP.
 	 * Dynamically constructs the URL based on the current request.
-	 * 
-	 * @param request
-	 *            Current servlet request
+	 * @param request Current servlet request
 	 * @return Return to URL
 	 */
 	private String returnTo(HttpServletRequest request) {
-		String returnTo = new StringBuffer(baseUrl(request))
-				.append(request.getContextPath()).append("/")
-				.append(returnToPath).toString();
+		String returnTo =
+				new StringBuffer(baseUrl(request)).append(request.getContextPath()).append("/").append(returnToPath).toString();
 		return addGWTHosted(request, returnTo);
 	}
 
 	/**
-	 * Dynamically constructs the base URL for the applicaton based on the
-	 * current request
-	 * 
-	 * @param request
-	 *            Current servlet request
+	 * Dynamically constructs the base URL for the applicaton based on the current
+	 * request
+	 * @param request Current servlet request
 	 * @return Base URL (path to servlet context)
 	 */
 	private String baseUrl(HttpServletRequest request) {
-		StringBuffer url = new StringBuffer(request.getScheme()).append("://")
-				.append(request.getServerName());
-		if ((request.getScheme().equalsIgnoreCase("http") && request
-				.getServerPort() != 80)
-				|| (request.getScheme().equalsIgnoreCase("https") && request
-						.getServerPort() != 443)) {
+		StringBuffer url = new StringBuffer(request.getScheme()).append("://").append(request.getServerName());
+		if((request.getScheme().equalsIgnoreCase("http") && request.getServerPort() != 80)
+				|| (request.getScheme().equalsIgnoreCase("https") && request.getServerPort() != 443)) {
 			url.append(":").append(request.getServerPort());
 		}
 		return url.toString();
@@ -298,10 +262,11 @@ public class OpenIdServlet extends InjectableServlet {
 
 	private String addGWTHosted(HttpServletRequest request, String url) {
 		String gwt_codesvr = request.getParameter("gwt.codesvr");
-		if (gwt_codesvr != null) {
-			if (url.contains("?")) {
+		if(gwt_codesvr != null) {
+			if(url.contains("?")) {
 				url += "&";
-			} else {
+			}
+			else {
 				url += "?";
 			}
 			url += "gwt.codesvr=" + gwt_codesvr;
@@ -311,48 +276,42 @@ public class OpenIdServlet extends InjectableServlet {
 
 	/**
 	 * Map the OpenID response into a user for our app.
-	 * 
-	 * @param helper
-	 *            Auth response
-	 * @param request
-	 *            Current servlet request
+	 * @param helper Auth response
+	 * @param request Current servlet request
 	 * @return User representation
 	 */
 	@SuppressWarnings("rawtypes")
 	UserInfo onSuccess(AuthResponseHelper helper, HttpServletRequest request) {
-		for (Object o : request.getParameterMap().entrySet()) {
+		for(Object o : request.getParameterMap().entrySet()) {
 			Map.Entry e = (Map.Entry) o;
 			log.debug(e.getKey() + " -> " + e.getValue());
 		}
 		try {
-			if (helper.hasHybridOauthExtension()) {
-				ParameterList params = helper.getHybridOauthResponse()
-						.getParameters();
-				for (Object param : params.getParameters()) {
-					log.debug(param + " -> "
-							+ params.getParameterValue(param.toString()));
+			if(helper.hasHybridOauthExtension()) {
+				log.warn("The OpenID + OAuth Hybrid.");
+				ParameterList params = helper.getHybridOauthResponse().getParameters();
+				for(Object o : params.getParameters()) {
+					Parameter param = (Parameter) o;
+					log.debug(param.getKey() + " -> " + param.getValue());
 				}
-			} else {
+			}
+			else {
 				log.warn("No OpenID + OAuth Hybrid !!!");
 			}
-		} catch (MessageException e) {
+		}
+		catch(MessageException e) {
 			log.error("", e);
 		}
-		return new UserInfo(helper.getClaimedId().toString(),
-				helper.getAxFetchAttributeValue(Step2.AxSchema.EMAIL),
+		return new UserInfo(helper.getClaimedId().toString(), helper.getAxFetchAttributeValue(Step2.AxSchema.EMAIL),
 				helper.getAxFetchAttributeValue(Step2.AxSchema.FIRST_NAME),
-				helper.getAxFetchAttributeValue(Step2.AxSchema.LAST_NAME),
-				helper.hasHybridOauthExtension());
+				helper.getAxFetchAttributeValue(Step2.AxSchema.LAST_NAME), helper.hasHybridOauthExtension());
 	}
 
 	/**
-	 * Handles the case where authentication failed or was canceled. Just a
-	 * no-op here.
-	 * 
-	 * @param helper
-	 *            Auth response
-	 * @param request
-	 *            Current servlet request
+	 * Handles the case where authentication failed or was canceled. Just a no-op
+	 * here.
+	 * @param helper Auth response
+	 * @param request Current servlet request
 	 * @return User representation
 	 */
 	UserInfo onFail(AuthResponseHelper helper, HttpServletRequest request) {
@@ -361,11 +320,8 @@ public class OpenIdServlet extends InjectableServlet {
 
 	/**
 	 * Small helper for fetching init params with default values
-	 * 
-	 * @param key
-	 *            Parameter to fetch
-	 * @param defaultValue
-	 *            Default value to use if not set in web.xml
+	 * @param key Parameter to fetch
+	 * @param defaultValue Default value to use if not set in web.xml
 	 * @return
 	 */
 	protected String getInitParameter(String key, String defaultValue) {
