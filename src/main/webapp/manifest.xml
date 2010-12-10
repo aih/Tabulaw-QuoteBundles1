@@ -5,20 +5,20 @@
 
 	<!-- Administrators and users will be sent to this URL for application support -->
 	<Support>
-		<Link rel="support" href="http://www.tabulaw.com/support.html" />
+		<Link rel="support" href="http://dev.tabulaw.com/support.html" />
 	</Support>
 
 	<!-- Show this link in Google's universal navigation for all users -->
 	<Extension id="navLink" type="link">
 		<Name>Hello World</Name>
-		<Url>http://www.tabulaw.com/openid?hd=${DOMAIN_NAME}</Url>
+		<Url>http://dev.tabulaw.com/openid?hd=${DOMAIN_NAME}</Url>
 		<Scope ref="documentsList" />
 		<Scope ref="documentDownload" />
 	</Extension>
 
 	<!-- Declare our OpenID realm so our app is white listed -->
 	<Extension id="realm" type="openIdRealm">
-		<Url>http://www.tabulaw.com/</Url>
+		<Url>http://dev.tabulaw.com</Url>
 	</Extension>
 
 	<Scope id="documentsList">

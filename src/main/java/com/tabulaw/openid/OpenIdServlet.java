@@ -85,9 +85,14 @@ public class OpenIdServlet extends InjectableServlet {
 			try {
 				AuthRequest authRequest = startAuthentication(domain, req);
 				String url = authRequest.getDestinationUrl(true);
+				log.debug("returnToPathKey=" + returnToPath);
+				log.debug("consumerKey=" + consumerKey);
+				log.debug("consumerSecret=" + consumerSecret);
+				log.debug("realm=" + realm(req));
 				resp.sendRedirect(url);
 			}
 			catch(OpenIDException e) {
+				log.error("", e);
 				throw new ServletException("Error initializing OpenID request", e);
 			}
 		}
@@ -124,6 +129,7 @@ public class OpenIdServlet extends InjectableServlet {
 			}
 		}
 		catch(OpenIDException e) {
+			log.error("", e);
 			throw new ServletException("Error processing OpenID response", e);
 		}
 	}
@@ -282,6 +288,7 @@ public class OpenIdServlet extends InjectableServlet {
 	 */
 	@SuppressWarnings("rawtypes")
 	UserInfo onSuccess(AuthResponseHelper helper, HttpServletRequest request) {
+		log.debug("onSuccess()");
 		for(Object o : request.getParameterMap().entrySet()) {
 			Map.Entry e = (Map.Entry) o;
 			log.debug(e.getKey() + " -> " + e.getValue());
@@ -302,7 +309,9 @@ public class OpenIdServlet extends InjectableServlet {
 		catch(MessageException e) {
 			log.error("", e);
 		}
-		return new UserInfo(helper.getClaimedId().toString(), helper.getAxFetchAttributeValue(Step2.AxSchema.EMAIL),
+		String claimedId = helper.getClaimedId().toString();
+		log.debug("claimedId: " + claimedId);
+		return new UserInfo(claimedId, helper.getAxFetchAttributeValue(Step2.AxSchema.EMAIL),
 				helper.getAxFetchAttributeValue(Step2.AxSchema.FIRST_NAME),
 				helper.getAxFetchAttributeValue(Step2.AxSchema.LAST_NAME), helper.hasHybridOauthExtension());
 	}
@@ -315,6 +324,7 @@ public class OpenIdServlet extends InjectableServlet {
 	 * @return User representation
 	 */
 	UserInfo onFail(AuthResponseHelper helper, HttpServletRequest request) {
+		log.debug("onFail()");
 		return null;
 	}
 

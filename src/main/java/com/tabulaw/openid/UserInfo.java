@@ -19,14 +19,6 @@ public class UserInfo implements Serializable {
 	}
 
 	public UserInfo(String claimedId, String email, String firstName,
-			String lastName) {
-		this.claimedId = claimedId;
-		this.email = email;
-		this.firstName = firstName;
-		this.lastName = lastName;
-	}
-
-	public UserInfo(String claimedId, String email, String firstName,
 			String lastName, boolean hasOpenIdOAuth) {
 		this.claimedId = claimedId;
 		this.email = email;
