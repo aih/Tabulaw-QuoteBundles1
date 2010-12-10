@@ -110,7 +110,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements IGoogleDocsServi
 			resourceId = resourceId.substring(pattern.length());
 		}
 		try {
-			GetMethod get = createGetMethod("/feeds/download/documents/Export?docID=" + resourceId + "&exportFormat=html");
+			GetMethod get = createGetMethod("/feeds/download/documents/Export?docID=" + resourceId + "&exportFormat=html&format=html");
 			client.executeMethod(get);
 			if(get.getStatusCode() == 200) {
 				return saveDocument(document, get.getResponseBodyAsString());
@@ -187,7 +187,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements IGoogleDocsServi
 	}
 
 	private boolean isImportable(String type) {
-		return type.equals("text/html");
+		return !type.equals("application/pdf");
 	}
 
 	private GetMethod createGetMethod(String path) throws OAuthException {

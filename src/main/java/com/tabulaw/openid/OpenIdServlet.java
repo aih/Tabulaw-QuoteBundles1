@@ -167,8 +167,8 @@ public class OpenIdServlet extends InjectableServlet {
 		try {
 			OAuthAccessor accessor = createOAuthAccessor();
 			helper.requestOauthAuthorization(accessor.consumer.consumerKey,
-			// "http://docs.google.com/feeds/");
-				"http://www.google.com/m8/feeds/");
+		 "http://docs.google.com/feeds/");
+				//"http://www.google.com/m8/feeds/");
 		} catch (Exception e) {
 			log.error("", e);
 		}

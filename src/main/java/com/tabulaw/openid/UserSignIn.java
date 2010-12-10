@@ -21,18 +21,19 @@ public class UserSignIn {
 
 	public UserSignIn(HttpServletRequest req) {
 		this.req = req;
-		this.persistContext = (PersistContext) req.getSession(false)
-				.getServletContext().getAttribute(PersistContext.KEY);
+		this.persistContext = (PersistContext) req.getSession(false).getServletContext().getAttribute(PersistContext.KEY);
 	}
 
 	public User signInUser(UserInfo openIdUser) throws IOException {
 		UserService userService = persistContext.getUserService();
-		User user;
-		try {
-			user = userService.findByEmail(openIdUser.getEmail());
-		} catch (EntityNotFoundException e) {
-			user = userService.create(getUserName(openIdUser),
-					openIdUser.getEmail(), getPasswordGenerated());
+		User user = null;
+		if(openIdUser != null) {
+			try {
+				user = userService.findByEmail(openIdUser.getEmail());
+			}
+			catch(EntityNotFoundException e) {
+				user = userService.create(getUserName(openIdUser), openIdUser.getEmail(), getPasswordGenerated());
+			}
 		}
 		reLoginUser(user);
 		return user;
@@ -40,7 +41,7 @@ public class UserSignIn {
 
 	private void reLoginUser(User user) throws IOException {
 		logout(req);
-		if (user != null) {
+		if(user != null) {
 			HttpSession session = req.getSession();
 			UserContext context = new UserContext();
 			context.setUser(user);
@@ -51,10 +52,11 @@ public class UserSignIn {
 	private void logout(HttpServletRequest req) {
 		try {
 			HttpSession session = req.getSession(false);
-			if (session != null) {
+			if(session != null) {
 				session.invalidate();
 			}
-		} catch (IllegalStateException e) {
+		}
+		catch(IllegalStateException e) {
 		}
 	}
 
@@ -63,8 +65,7 @@ public class UserSignIn {
 	}
 
 	private String getUserName(UserInfo user) {
-		String name = StringUtils.defaultString(user.getFirstName()) + " "
-				+ StringUtils.defaultString(user.getLastName());
+		String name = StringUtils.defaultString(user.getFirstName()) + " " + StringUtils.defaultString(user.getLastName());
 		return StringUtils.trim(name);
 	}
 
@@ -79,14 +80,14 @@ public class UserSignIn {
 		 * shell commands (i.e., not ' <', '>', '$', '!', ...). I, L and O are
 		 * good to leave out, as are numeric zero and one.
 		 */
-		char[] goodChar = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k',
-				'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
-				'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M',
-				'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-				'2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '@', };
+		char[] goodChar =
+				{
+					'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
+					'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+					'Y', 'Z', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '@', };
 
 		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < MIN_LENGTH; i++) {
+		for(int i = 0; i < MIN_LENGTH; i++) {
 			sb.append(goodChar[r.nextInt(goodChar.length)]);
 		}
 
