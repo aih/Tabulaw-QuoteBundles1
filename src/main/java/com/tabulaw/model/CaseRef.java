@@ -81,7 +81,7 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 	
 	private int firstPageNumber;
 	
-	private int lastPageNuber;
+	private int lastPageNumber;
 
 	/**
 	 * Constructor
@@ -172,7 +172,7 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		cr.url = url;
 		cr.year = year;
 		cr.firstPageNumber = firstPageNumber;
-		cr.lastPageNuber = lastPageNuber;
+		cr.lastPageNumber = lastPageNumber;
 	}
 
 	@Override
@@ -261,12 +261,12 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		this.firstPageNumber = firstPageNumber;
 	}
 
-	public int getLastPageNuber() {
-		return lastPageNuber;
+	public int getLastPageNumber() {
+		return lastPageNumber;
 	}
 
-	public void setLastPageNuber(int lastPageNuber) {
-		this.lastPageNuber = lastPageNuber;
+	public void setLastPageNumber(int lastPageNumber) {
+		this.lastPageNumber = lastPageNumber;
 	}
 
 	@Override

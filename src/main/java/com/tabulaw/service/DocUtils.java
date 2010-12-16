@@ -109,7 +109,7 @@ public class DocUtils {
 			sb.append("|firstPageNumber::");
 			sb.append(caseRef.getFirstPageNumber());
 			sb.append("|lastPageNumber::");
-			sb.append(caseRef.getLastPageNuber());			
+			sb.append(caseRef.getLastPageNumber());			
 		}
 		else {
 			// throw new IllegalStateException("Un-handled document model type");
