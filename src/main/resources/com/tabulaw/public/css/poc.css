@@ -862,7 +862,7 @@ docHeaderMenuItem img {
 
 .documentContainer {
 	font-family: serif;
-	font-size: 16;
+	font-size: 16px;
 }
 
 .documentContainer p {
@@ -873,21 +873,21 @@ docHeaderMenuItem img {
 .documentContainer h1 {
 	margin-top: 16px;
 	margin-bottom: 16px;
-	font-size: 32;
+	font-size: 32px;
 	font-weight: bold;
 }
 
 .documentContainer h2 {
 	margin-top: 16px;
 	margin-bottom: 16px;
-	font-size: 24;
+	font-size: 24px;
 	font-weight: bold;
 }
 
 .documentContainer h3 {
 	margin-top: 16px;
 	margin-bottom: 16px;
-	font-size: 18;
+	font-size: 18px;
 	font-weight: bold;
 }
 

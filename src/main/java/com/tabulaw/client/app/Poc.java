@@ -360,6 +360,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		container.addSouth(footer,30);
 		
 		container.add(mainColPanel);
+		container.getElement().setId("container");
 		
 		RootLayoutPanel root = RootLayoutPanel.get();
 		
