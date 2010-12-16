@@ -97,11 +97,6 @@ a:active {
 	font-size: 12px;
 }
 
-.tabulawMenuItem {
-	margin: 20px 5px 5px 0px;
-	float: right;
-}
-
 /* global message panel */
 .gmsg {
 	margin-bottom: 15px;
@@ -557,14 +552,17 @@ div.ro {
 			font-size: 11px;
 }
 
-.qbbbuttons {
+.tabulawMenuItem {
+	float: left;
+}
+
+.qbundle .qbbuttons {
 	float: right;
-	margin: 20px 10px 5px 0px;
-	cursor: pointer;
 }
 
 .qbundle .qbbuttons img {
-	
+	margin: 20px 10px 5px 0px;
+	cursor: pointer;
 } 
 
 .qbundle .qbbuttons img.delete {
