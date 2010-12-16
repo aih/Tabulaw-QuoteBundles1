@@ -45,7 +45,6 @@ import com.tabulaw.client.view.ViewManager;
 import com.tabulaw.model.DocKey;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IEntity;
-import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.User;
 
 /**
@@ -82,53 +81,7 @@ public class NavRowPanel extends AbstractNavPanel {
 		 */
 		public static final String OPEN_DOCS = "openDocs";
 
-		/**
-		 * Style applied to the current quote bundle widget.
-		 */
-		public static final String CRNT_QB = "crntqb";
 	} // Styles
-
-	/**
-	 * Widget that updates its content from current quote bundle model change
-	 * events.
-	 * @author jpk
-	 */
-	public static class CurrentQuoteBundleDisplayWidget extends Composite implements IModelChangeHandler {
-
-		private final HTML html = new HTML();
-		private String crntQbId;
-
-		public CurrentQuoteBundleDisplayWidget() {
-			super();
-			initWidget(html);
-		}
-
-		public void update() {
-			QuoteBundle cqb = ClientModelCache.get().getCurrentQuoteBundle();
-			if(cqb != null) {
-				String id = cqb.getId();
-				if(!id.equals(crntQbId)) {
-					this.crntQbId = id;
-					html.setHTML("<p><span class=\"echo\">Current Quote Bundle:</span>" + cqb.getName() + "</p>");
-					html.setVisible(true);
-				}
-			}
-			else {
-				html.setVisible(false);
-			}
-		}
-
-		@Override
-		public void onModelChangeEvent(ModelChangeEvent event) {
-			update();
-		}
-
-		public void clear() {
-			html.setHTML("");
-			crntQbId = null;
-		}
-
-	} // CurrentQuoteBundleDisplayWidget
 
 	static class LoggedInUserWidget extends Composite implements IModelChangeHandler {
 
@@ -179,7 +132,7 @@ public class NavRowPanel extends AbstractNavPanel {
 				}
 			});
 			lnkLogOut.setStyleName(Styles.LOGOUT);
-			lnkLogOut.setTitle("Logout from Tabulaw");
+			lnkLogOut.setTitle("Log out from Tabulaw");
 			
 			lnkResetPswd = new SimpleHyperLink("Reset Password", new ClickHandler() {
 				
@@ -242,8 +195,6 @@ public class NavRowPanel extends AbstractNavPanel {
 
 	private final TabBar openDocTabs = new TabBar();
 
-	private final CurrentQuoteBundleDisplayWidget crntQuoteBudleWidget = new CurrentQuoteBundleDisplayWidget();
-
 	private final LoggedInUserWidget liuWidget = new LoggedInUserWidget();
 
 	private final HorizontalPanel hp = new HorizontalPanel();
@@ -262,7 +213,6 @@ public class NavRowPanel extends AbstractNavPanel {
 
 		openDocTabs.addStyleName(Styles.OPEN_DOCS);
 
-		crntQuoteBudleWidget.setStyleName(Styles.CRNT_QB);
 
 		liuWidget.frmLogout.addSubmitCompleteHandler(new SubmitCompleteHandler() {
 			@Override
@@ -285,7 +235,6 @@ public class NavRowPanel extends AbstractNavPanel {
 
 		panel.add(liuWidget);
 		panel.add(hpWrapper);
-		panel.add(crntQuoteBudleWidget);
 
 		openDocTabs.addSelectionHandler(new SelectionHandler<Integer>() {
 
@@ -308,7 +257,6 @@ public class NavRowPanel extends AbstractNavPanel {
 			openDocTabs.removeTab(0);
 		openDocNavButtons.clear();
 
-		crntQuoteBudleWidget.clear();
 		liuWidget.clear();
 	}
 
@@ -374,9 +322,6 @@ public class NavRowPanel extends AbstractNavPanel {
 		return -1;
 	}
 
-	public CurrentQuoteBundleDisplayWidget getCrntQuoteBudleWidget() {
-		return crntQuoteBudleWidget;
-	}
 
 	@Override
 	public void onModelChangeEvent(ModelChangeEvent event) {
@@ -401,7 +346,6 @@ public class NavRowPanel extends AbstractNavPanel {
 			}
 		}
 		
-		crntQuoteBudleWidget.onModelChangeEvent(event);
 		liuWidget.onModelChangeEvent(event);
 	}
 }

@@ -105,13 +105,13 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	/**
 	 * Facilitate drag/drop ops.
 	 */
-	private final AbsolutePanel boundaryPanel;
 
 	private final PickupDragController quoteController;
 
 	private final DocQuoteDragHandler quoteHandler;
 
 	private String crntQbId;
+	private final AbsolutePanel boundaryPanel;
 
 	/**
 	 * Constructor
@@ -119,7 +119,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	public DocAndBundleWidget() {
 		super();
 
-		boundaryPanel = new AbsolutePanel();
+		boundaryPanel = new AbsolutePanel(); 
 
 		quoteController = new PickupDragController(boundaryPanel, false);
 		quoteController.setBehaviorMultipleSelection(false);
@@ -134,11 +134,14 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 		splitPanel.addEast(wDocQuoteBundle, 200);
 		splitPanel.add(wDocViewer);
-		splitPanel.setSize("100%", "90%");
+		
 		splitPanel.setWidgetMinSize(wDocQuoteBundle, 100);
-		boundaryPanel.add(splitPanel);
+		
 
-		initWidget(boundaryPanel);
+		boundaryPanel.add(splitPanel);
+		//TODO Drag&Drop of quotes is broken now 
+		initWidget(splitPanel);
+		
 	}
 	public void onActivate() {
 		resizeHandlerManager.fireEvent(new QuoteResizeEvent());

@@ -211,18 +211,7 @@ div.ro {
 	padding-left:0px !important;
 }	
 
-#navCol {
-	float: left;
-	width: 145px;
-	margin-left: -100%;
-	/*debug*/
-	/*border: 1px solid pink;*/
-}
 
-* html #navCol {
-	padding-top: 20px;
-	padding-left: 20px;
-}
 	#navCol .vpanel {
 		width: 100%;
 		margin-left: 10px;
@@ -304,20 +293,6 @@ div.ro {
 	padding-left: 10px;
 }
 
-/* the parent element of the app portal panel */
-#mainCol {
-	margin-left: 180px;
-	/*debug*/
-	/*border: 1px solid brown;*/
-}
-
-/* the parent element of the nav row widget */
-#navRow {
-	/*border-bottom: 3px solid #BFBFBF;*/
-	/*debug*/
-	/*border: 1px solid gray*/
-	
-}
 
 * html #navRow { /*padding-top: 20px;
 	margin-right: 20px;
@@ -445,16 +420,16 @@ div.ro {
 	float: left;
 }
 
-.navRow .crntqb {
+.crntqb {
 	text-align: right;
 }
 
-.navRow .crntqb p {
+.crntqb p {
 	font-weight: bold;
 	font-size: 11px;
 }
 
-.navRow .crntqb .echo {
+.crntqb .echo {
 	font-style: italic;
 	font-weight: normal;
 	margin-right: 5px;
@@ -834,12 +809,12 @@ docHeaderMenuItem img {
 }
 
 .docEdit {
-	
+	height: 100%;
 }
 
 .documentContainer {
 	font-family: serif;
-	font-size: 16;
+	font-size: 16px;
 }
 
 .documentContainer p {
@@ -850,21 +825,21 @@ docHeaderMenuItem img {
 .documentContainer h1 {
 	margin-top: 16px;
 	margin-bottom: 16px;
-	font-size: 32;
+	font-size: 32px;
 	font-weight: bold;
 }
 
 .documentContainer h2 {
 	margin-top: 16px;
 	margin-bottom: 16px;
-	font-size: 24;
+	font-size: 24px;
 	font-weight: bold;
 }
 
 .documentContainer h3 {
 	margin-top: 16px;
 	margin-bottom: 16px;
-	font-size: 18;
+	font-size: 18px;
 	font-weight: bold;
 }
 
@@ -1254,8 +1229,9 @@ docHeaderMenuItem img {
 }
 
 .doc .quotes {
-	overflow: auto;
-	height: 100%;
+	overflow-y	: auto;
+	overflow-x	: hidden;
+	height		: 100%;
 }
 
 .doc .wquote .cite { /*display: none;*/

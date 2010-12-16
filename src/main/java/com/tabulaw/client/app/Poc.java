@@ -5,14 +5,19 @@ import java.util.List;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.ui.LoginTopPanel;
 import com.tabulaw.client.app.ui.Portal;
+import com.tabulaw.client.app.ui.nav.CurrentQuoteBundleDisplayWidget;
 import com.tabulaw.client.app.ui.nav.NavColPanel;
 import com.tabulaw.client.app.ui.nav.NavRowPanel;
 import com.tabulaw.client.app.ui.nav.NavTabsPanel;
@@ -50,6 +55,7 @@ import com.tabulaw.model.UserState;
 
 /**
  * Poc
+ * 
  * @author jpk
  */
 public class Poc implements EntryPoint, IUserSessionHandler {
@@ -86,7 +92,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	 * @return The user admin service.
 	 */
 	public static IUserAdminServiceAsync getUserAdminService() {
-		if(userAdminService == null) {
+		if (userAdminService == null) {
 			userAdminService = (IUserAdminServiceAsync) GWT.create(IUserAdminService.class);
 		}
 		return userAdminService;
@@ -103,7 +109,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	 * @return The user register service.
 	 */
 	public static IUserCredentialsServiceAsync getUserRegisterService() {
-		if(userCredentialsService == null) {
+		if (userCredentialsService == null) {
 			userCredentialsService = (IUserCredentialsServiceAsync) GWT.create(IUserCredentialsService.class);
 		}
 		return userCredentialsService;
@@ -125,8 +131,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 	/**
 	 * @return The sole global msg panel in the app. This is intended to be used
-	 *         freely by those who need it meaning it may be detached and attached
-	 *         in different parts of the DOM.
+	 *         freely by those who need it meaning it may be detached and
+	 *         attached in different parts of the DOM.
 	 */
 	public static GlobalMsgPanel unparkGlobalMsgPanel() {
 		msgPanel.removeFromParent();
@@ -134,34 +140,36 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	}
 
 	public static void parkGlobalMsgPanel() {
-		RootPanel mainCol = RootPanel.get("mainCol");
-		if(mainCol.getWidgetCount() == 2) {
-			mainCol.insert(msgPanel, 1);
-		}
+		mainColPanel.insert(msgPanel, 1);
 	}
 
 	/**
 	 * Manual firing of a model change event throughout the client app.
-	 * @param mce model change event to fire
+	 * 
+	 * @param mce
+	 *            model change event to fire
 	 */
 	public static void fireModelChangeEvent(ModelChangeEvent mce) {
 		getPortal().fireEvent(mce);
 	}
 
 	public static NavRowPanel getNavRow() {
-		return (NavRowPanel) RootPanel.get("navRow").getWidget(0);
+		return navRow;
 	}
 
 	public static NavColPanel getNavCol() {
-		return (NavColPanel) RootPanel.get("navCol").getWidget(0);
+		return navCol;
 	}
 
 	public static NavTabsPanel getNavTabs() {
-		return (NavTabsPanel) RootPanel.get("navTabs").getWidget(0);
+		return navTabs;
 	}
 
 	public static Portal getPortal() {
-		return (Portal) RootPanel.get("portal").getWidget(0);
+		return portal;
+	}
+	public static CurrentQuoteBundleDisplayWidget getCrntQuoteBudleWidget() {
+		return crntQuoteBudleWidget;
 	}
 
 	private LoginTopPanel loginPanel;
@@ -175,11 +183,10 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 			@Override
 			public void onSuccess(UserContextPayload result) {
 				User liu = result.getUser();
-				if(liu == null) {
+				if (liu == null) {
 					// not logged in
 					showLoginPanel();
-				}
-				else {
+				} else {
 					hideLoginPanel();
 
 					// attach the global msg panel in its native place
@@ -198,22 +205,23 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// load up user bundles
 					List<QuoteBundle> userBundles = result.getBundles();
 
-					// we need to individually add the contained quotes as well but don't
+					// we need to individually add the contained quotes as well
+					// but don't
 					// throw model changes events for quotes
-					for(QuoteBundle qb : userBundles) {
+					for (QuoteBundle qb : userBundles) {
 						ClientModelCache.get().persistAll(qb.getQuotes());
 					}
 
 					// cache bundles (w/ no notification)
 					ClientModelCache.get().persistAll(userBundles);
 
-					// load bundles view (this will pull all just stored bundles from
-					// cache)
+					// load bundles view (this will pull all just stored bundles
+					// from cache)
 					ViewManager.get().loadView(new StaticViewInitializer(BundlesView.klas));
 
 					// cache user state
 					UserState userState = result.getUserState();
-					if(userState == null) {
+					if (userState == null) {
 						Log.debug("Creating new UserState instance");
 						userState = new UserState(liu.getId());
 					}
@@ -227,7 +235,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 			@Override
 			public void onFailure(Throwable caught) {
 				// assume not logged in
-				// (this will happen when an AccessDeniedException is thrown for this
+				// (this will happen when an AccessDeniedException is thrown for
+				// this
 				// RPC call)
 				showLoginPanel();
 			}
@@ -235,13 +244,13 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	}
 
 	private void showLoginPanel() {
-		if(loginPanel == null) {
+		if (loginPanel == null) {
 			loginPanel = new LoginTopPanel();
 			loginPanel.addUserSessionHandler(new IUserSessionHandler() {
 
 				@Override
 				public void onUserSessionEvent(UserSessionEvent event) {
-					if(event.isStart()) {
+					if (event.isStart()) {
 						hideLoginPanel();
 						getUserContext();
 					}
@@ -252,11 +261,11 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		getNavCol().setVisible(false);
 		getNavTabs().setVisible(false);
 		getPortal().setVisible(false);
-		RootPanel.get("portal").add(loginPanel);
+//		RootPanel.get("portal").add(loginPanel);
 	}
 
 	private void hideLoginPanel() {
-		if(loginPanel != null) {
+		if (loginPanel != null) {
 			loginPanel.removeFromParent();
 			loginPanel = null;
 		}
@@ -286,7 +295,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 	@Override
 	public void onUserSessionEvent(UserSessionEvent event) {
-		if(!event.isStart()) {
+		if (!event.isStart()) {
 			clear();
 			showLoginPanel();
 		}
@@ -300,40 +309,73 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		ClientModelCache.get().clear();
 	}
 
+	private static Portal portal = new Portal(); 
+	private static NavColPanel navCol = new NavColPanel();
+	private static NavRowPanel navRow;
+	private static NavTabsPanel navTabs;
+	private static FlowPanel mainColPanel = new FlowPanel();
+	private static CurrentQuoteBundleDisplayWidget crntQuoteBudleWidget = new CurrentQuoteBundleDisplayWidget();
+	
 	private void build() {
-		Log.debug("Building..");
 
-		// add the portal
-		Portal portal = new Portal();
-		portal.setVisible(false);
-		RootPanel.get("portal").add(portal);
+		Log.debug("Building..");
 
 		ClientModelCache.init(portal);
 
-		// add the nav row panel
-		NavRowPanel navRowPanel = new NavRowPanel(this);
-		navRowPanel.setVisible(false);
-		RootPanel.get("navRow").add(navRowPanel);
-
-		// add the nav row panel
-		NavTabsPanel navTabsPanel = new NavTabsPanel(this);
-		navTabsPanel.setVisible(false);
-		RootPanel.get("navTabs").add(navTabsPanel);
-
-		// add the nav col panel
-		NavColPanel navColPanel = new NavColPanel();
-		navColPanel.setVisible(false);
-		RootPanel.get("navCol").add(navColPanel);
-
 		ViewManager.initialize(portal.getPanel(), 10);
+		portal.setVisible(false);
+		
+		DockLayoutPanel container = new DockLayoutPanel(Unit.PX);
+		container.getElement().setId("container");
+		
+		navTabs = new NavTabsPanel(this) ;
 
-		// create handler for displaying nav row/col content which is view specific
-		ViewManager.get().addViewChangeHandler(navColPanel);
-		ViewManager.get().addViewChangeHandler(navRowPanel);
-		ViewManager.get().addViewChangeHandler(navTabsPanel);
+		FlowPanel navColPanel = new FlowPanel();
+		
+		navColPanel.setWidth("148px");
+		
+		navColPanel.getElement().setId("navCol");
+		
+		
+		HTML img1 = new HTML("<img title='Beta' class='beta' src='images/beta_banner_left.png' alt='Tabulaw Beta'>");
+		HTML img2 = new HTML("<img title='Tabulaw' class='logo' src='images/tabulaw_logo.png' alt='Tabulaw'>");
+
+		navColPanel.add(img1);
+		navColPanel.add(img2);
+		navColPanel.add(navTabs);
+		navColPanel.add(navCol);
+
+		navRow = new NavRowPanel(this);
+		portal.setVisible(false);
+
+		crntQuoteBudleWidget.setStyleName("crntqb");
+		crntQuoteBudleWidget.makeModelChangeAware();
+		
+		mainColPanel.add(crntQuoteBudleWidget);
+		mainColPanel.add(portal);
+
+		HTML footer = new HTML("<div id='footer'><p class='footer'>&copy; 2010 Tabulaw, Inc.</p></div>");
+		container.addWest(navColPanel,180);
+		container.addNorth(navRow,44);
+		container.addSouth(footer,30);
+		
+		container.add(mainColPanel);
+		container.getElement().setId("container");
+		
+		RootLayoutPanel root = RootLayoutPanel.get();
+		
+		root.add(container);
+
+		// create handler for displaying nav row/col content which is view
+		// specific
+		ViewManager.get().addViewChangeHandler(navCol);
+		ViewManager.get().addViewChangeHandler(navRow);
+		ViewManager.get().addViewChangeHandler(navTabs);
+		
+		
 
 		// initialize the ui msg notifier
-		Notifier.init(navColPanel, Position.TOP, -20, 0);
+		Notifier.init(navCol, Position.TOP, -20, 0);
 
 		Log.debug("Building complete.");
 	}
