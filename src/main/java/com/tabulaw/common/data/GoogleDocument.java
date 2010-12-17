@@ -9,6 +9,8 @@ public class GoogleDocument implements IsSerializable {
 	private String date;
 	private String author;
 	private String type;
+	private String src;
+	
 	private boolean importable = true;
 
 	public GoogleDocument() {
@@ -75,5 +77,13 @@ public class GoogleDocument implements IsSerializable {
 		} else {
 			return resourceId.hashCode();
 		}
+	}
+
+	public void setSrc(String src) {
+		this.src = src;
+	}
+
+	public String getSrc() {
+		return src;
 	}
 }

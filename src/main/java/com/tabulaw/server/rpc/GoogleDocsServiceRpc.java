@@ -1,5 +1,6 @@
 package com.tabulaw.server.rpc;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -41,11 +42,14 @@ import com.tabulaw.server.UserContext;
 import com.tabulaw.service.entity.UserDataService;
 
 @SuppressWarnings("serial")
-public class GoogleDocsServiceRpc extends RpcServlet implements IGoogleDocsService {
+public class GoogleDocsServiceRpc extends RpcServlet implements
+		IGoogleDocsService {
 
-	private final static Log log = LogFactory.getLog(GoogleDocsServiceRpc.class);
+	private final static Log log = LogFactory
+			.getLog(GoogleDocsServiceRpc.class);
 
-	private final HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
+	private final HttpClient client = new HttpClient(
+			new MultiThreadedHttpConnectionManager());
 
 	private OAuthParametersProvider authParametersProvider = new GoogleAnonymousOAuthParametersProvider();
 
@@ -58,20 +62,24 @@ public class GoogleDocsServiceRpc extends RpcServlet implements IGoogleDocsServi
 			GetMethod get = createGetMethod(path);
 			log.debug("Executing HttpClient GetMethod with URL=" + path);
 			client.executeMethod(get);
-			log.debug("HttpClient execute status code is: " + get.getStatusCode());
-			if(get.getStatusCode() == 200) {
+			log.debug("HttpClient execute status code is: "
+					+ get.getStatusCode());
+			if (get.getStatusCode() == 200) {
 				list.setDocuments(parseDocuments(get.getResponseBodyAsString()));
-			}
-			else {
-				log.debug("HttpClient execute status message is: " + get.getStatusText());
+			} else {
+				log.debug("HttpClient execute status message is: "
+						+ get.getStatusText());
 				log.error(get.getStatusText());
-				return new GoogleDocumentListPayload(new Status(new Msg("Google Docs rejected request.", MsgLevel.ERROR)));
+				return new GoogleDocumentListPayload(new Status(new Msg(
+						"Google Docs rejected request.", MsgLevel.ERROR)));
 			}
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			log.error("", e);
-			return new GoogleDocumentListPayload(new Status(new Msg(
-					"Problem occured when connecting to the Google Docs server.", MsgLevel.ERROR)));
+			return new GoogleDocumentListPayload(
+					new Status(
+							new Msg(
+									"Problem occured when connecting to the Google Docs server.",
+									MsgLevel.ERROR)));
 		}
 		log.debug("Returning GoogleDocumentListPayload list");
 		return list;
@@ -81,20 +89,21 @@ public class GoogleDocsServiceRpc extends RpcServlet implements IGoogleDocsServi
 	public DocRefListPayload download(Collection<GoogleDocument> documents) {
 		DocRefListPayload docs = new DocRefListPayload();
 		log.debug("Iterating google documents to download");
-		for(GoogleDocument document : documents) {
+		for (GoogleDocument document : documents) {
 			try {
 				DocRef doc = download(document);
-				if(doc != null) {
+				if (doc != null) {
 					docs.getDocRefs().add(doc);
-					log.debug("Google document has been downloaded: " + doc.getName() + " / " + doc.getTitle());
-				}
-				else {
-					String msg = "Unable to download google document: " + document.getTitle();
+					log.debug("Google document has been downloaded: "
+							+ doc.getName() + " / " + doc.getTitle());
+				} else {
+					String msg = "Unable to download google document: "
+							+ document.getTitle();
 					log.error(msg);
-					docs.getStatus().addMsg("failure", Msg.MsgLevel.WARN, 0, document.getResourceId());
+					docs.getStatus().addMsg("failure", Msg.MsgLevel.WARN, 0,
+							document.getResourceId());
 				}
-			}
-			catch(Exception e) {
+			} catch (Exception e) {
 				log.error("", e);
 			}
 		}
@@ -106,28 +115,27 @@ public class GoogleDocsServiceRpc extends RpcServlet implements IGoogleDocsServi
 		String pattern = "document:";
 		String resourceId = document.getResourceId();
 		int k = resourceId.indexOf(pattern);
-		if(k >= 0) {
+		if (k >= 0) {
 			resourceId = resourceId.substring(pattern.length());
 		}
 		try {
-			GetMethod get = createGetMethod("/feeds/download/documents/Export?docID=" + resourceId + "&exportFormat=html&format=html");
+			GetMethod get = createGetMethod(document.getSrc(), true);
+			log.debug(get.getURI());
 			client.executeMethod(get);
-			if(get.getStatusCode() == 200) {
+			if (get.getStatusCode() == 200) {
 				return saveDocument(document, get.getResponseBodyAsString());
-			}
-			else {
-				log.error("Unable to download google document: " + get.getStatusText());
+			} else {
+				log.error("Unable to download google document: "
+						+ get.getStatusText());
 				log.debug(get.getResponseBodyAsString());
 			}
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			log.error("", e);
 		}
 		return null;
 	}
 
-	@SuppressWarnings({
-		"unchecked", "deprecation" })
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	private List<GoogleDocument> parseDocuments(String s) {
 		log.debug("Parsing XML response of google documents list");
 		log.debug(s);
@@ -138,39 +146,46 @@ public class GoogleDocsServiceRpc extends RpcServlet implements IGoogleDocsServi
 			parser.setReader(reader);
 			IXMLElement xml = (IXMLElement) parser.parse();
 			Vector<IXMLElement> entries = xml.getChildrenNamed("entry");
-			for(IXMLElement entry : entries) {
+			for (IXMLElement entry : entries) {
 				Vector<IXMLElement> id = entry.getChildrenNamed("id");
-				Vector<IXMLElement> resourceId = entry.getChildrenNamed("gd:resourceId");
+				Vector<IXMLElement> resourceId = entry
+						.getChildrenNamed("gd:resourceId");
 				Vector<IXMLElement> title = entry.getChildrenNamed("title");
 				Vector<IXMLElement> updated = entry.getChildrenNamed("updated");
 				Vector<IXMLElement> author = entry.getChildrenNamed("author");
 				Vector<IXMLElement> content = entry.getChildrenNamed("content");
-				if(resourceId == null || resourceId.isEmpty() || resourceId.get(0) == null) {
+				if (resourceId == null || resourceId.isEmpty()
+						|| resourceId.get(0) == null) {
 					continue;
 				}
-				if(title == null || title.isEmpty() || title.get(0) == null) {
+				if (title == null || title.isEmpty() || title.get(0) == null) {
 					continue;
 				}
-				if(id == null || id.isEmpty() || id.get(0) == null) {
+				if (id == null || id.isEmpty() || id.get(0) == null) {
 					continue;
 				}
-				if(content == null || content.isEmpty() || content.get(0) == null) {
+				if (content == null || content.isEmpty()
+						|| content.get(0) == null) {
 					continue;
 				}
 				String type = content.get(0).getAttribute("type");
+				String src = content.get(0).getAttribute("src");
 				GoogleDocument doc = new GoogleDocument();
 				doc.setResourceId(resourceId.get(0).getContent());
 				doc.setTitle(title.get(0).getContent());
 				doc.setType(type);
-				if(updated != null && !updated.isEmpty() && updated.get(0) != null) {
+				doc.setSrc(src);
+				if (updated != null && !updated.isEmpty()
+						&& updated.get(0) != null) {
 					String date = updated.get(0).getContent();
 					int i = date.indexOf("T");
-					if(i > 0) {
+					if (i > 0) {
 						date = date.substring(0, i);
 					}
 					doc.setDate(date);
 				}
-				if(author != null && !author.isEmpty() && author.get(0) != null) {
+				if (author != null && !author.isEmpty()
+						&& author.get(0) != null) {
 					IXMLElement name = author.get(0).getChildAtIndex(0);
 					// IXMLElement email = author.get(0).getChildAtIndex(1);
 					doc.setAuthor(name.getContent());
@@ -178,8 +193,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements IGoogleDocsServi
 				doc.setImportable(isImportable(type));
 				list.add(doc);
 			}
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			log.error("", e);
 		}
 		log.debug("Returning google documents list");
@@ -191,35 +205,50 @@ public class GoogleDocsServiceRpc extends RpcServlet implements IGoogleDocsServi
 	}
 
 	private GetMethod createGetMethod(String path) throws OAuthException {
+		return createGetMethod(path, false);
+	}
+
+	private GetMethod createGetMethod(String path, boolean forDownloading)
+			throws OAuthException {
 		authParametersProvider.setHttpServletRequest(getThreadLocalRequest());
-		GoogleOAuthParameters oauthParameters =
-				new OAuthParameters(authParametersProvider.getGoogleDocumentsOAuthParameters());
-		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(new OAuthHmacSha1Signer());
+		GoogleOAuthParameters oauthParameters = new OAuthParameters(
+				authParametersProvider.getGoogleDocumentsOAuthParameters());
+		GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
+				new OAuthHmacSha1Signer());
 		// TODO if no token then throw RPC exception to redirect user to Google
 		// Authorization page and create token
-		String header = oauthHelper.getAuthorizationHeader(getUrl(path), "GET", oauthParameters);
-		GetMethod get = new GetMethod(getUrl(path));
+		String header = oauthHelper.getAuthorizationHeader(
+				getUrl(path, forDownloading), "GET", oauthParameters);
+		GetMethod get = new GetMethod(getUrl(path, forDownloading));
 		get.addRequestHeader("Authorization", header);
 		get.addRequestHeader("GData-Version", "3.0");
 		return get;
 	}
 
 	private DocRef saveDocument(GoogleDocument document, String htmlContent) {
-		final PersistContext pc =
-				(PersistContext) getThreadLocalRequest().getSession(false).getServletContext().getAttribute(PersistContext.KEY);
-		final UserContext uc = (UserContext) getThreadLocalRequest().getSession(false).getAttribute(UserContext.KEY);
+		final PersistContext pc = (PersistContext) getThreadLocalRequest()
+				.getSession(false).getServletContext()
+				.getAttribute(PersistContext.KEY);
+		final UserContext uc = (UserContext) getThreadLocalRequest()
+				.getSession(false).getAttribute(UserContext.KEY);
 		UserDataService uds = pc.getUserDataService();
 		User user = uc.getUser();
 		Date docDate = new Date();
-		DocRef mDoc = EntityFactory.get().buildDoc("GDocs " + document.getTitle(), docDate, false);
+		DocRef mDoc = EntityFactory.get().buildDoc(
+				"GDocs " + document.getTitle(), docDate, false);
 		mDoc = uds.saveDoc(mDoc);
-		DocContent docContent = EntityFactory.get().buildDocContent(mDoc.getId(), htmlContent);
+		DocContent docContent = EntityFactory.get().buildDocContent(
+				mDoc.getId(), htmlContent);
 		uds.addDocUserBinding(user.getId(), mDoc.getId());
 		uds.saveDocContent(docContent);
 		return mDoc;
 	}
 
-	private String getUrl(String path) {
-		return "https://docs.google.com" + path;
+	private String getUrl(String path, boolean forDownloading) {
+		if (forDownloading) {
+			return path;
+		} else {
+			return "https://docs.google.com" + path;
+		}
 	}
 }

@@ -1,6 +1,7 @@
 *.settings
 *.class
 *.war
+*.svn
 .classpath
 .project
 /test-output
