@@ -69,7 +69,7 @@ public class DocUtilsTest {
 		Assert.assertEquals(caseRef.getUrl(), "url");
 		Assert.assertEquals(caseRef.getYear(), 1975);
 		Assert.assertEquals(caseRef.getFirstPageNumber(), 1);
-		Assert.assertEquals(caseRef.getLastPageNuber(), 20);
+		Assert.assertEquals(caseRef.getLastPageNumber(), 20);
 	}
 	
 	/**

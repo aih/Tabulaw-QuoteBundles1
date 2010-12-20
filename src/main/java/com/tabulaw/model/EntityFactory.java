@@ -141,7 +141,7 @@ public class EntityFactory {
 		e.setUrl(url);
 		e.setYear(year);
 		e.setFirstPageNumber(firstPage);
-		e.setLastPageNuber(lastPage);
+		e.setLastPageNumber(lastPage);
 		return e;
 	}
 
