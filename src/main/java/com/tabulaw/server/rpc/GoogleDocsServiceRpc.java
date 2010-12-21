@@ -1,6 +1,5 @@
 package com.tabulaw.server.rpc;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -201,7 +200,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 	}
 
 	private boolean isImportable(String type) {
-		return !type.equals("application/pdf");
+		return type.equals("text/html");
 	}
 
 	private GetMethod createGetMethod(String path) throws OAuthException {

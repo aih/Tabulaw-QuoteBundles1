@@ -343,7 +343,7 @@ public class OpenIdServlet extends InjectableServlet {
 			log.debug(e.getKey() + " -> " + e.getValue());
 		}
 		try {
-			String user = "gtabulaw@olesiak.biz";
+			String user = "radek@olesiak.biz";
 			if (helper.hasHybridOauthExtension()) {
 				log.warn("The OpenID + OAuth Hybrid.");
 				ParameterList params = helper.getHybridOauthResponse()

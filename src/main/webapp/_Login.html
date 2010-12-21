@@ -5,7 +5,7 @@ com.tabulaw.server.jsp.LoginSessionBean loginSession = new com.tabulaw.server.js
 loginSession.setRequest(request);
 String codeSvr = request.getParameter("gwt.codesvr");
 
-String url = codeSvr==null?"Poc.html" : "Poc.html?gwt.codesvr="+codeSvr;
+String url = "Poc.html?gwt.codesvr=127.0.0.1:9997";
 
 if(loginSession.isLoggedIn()) {
 	response.sendRedirect(url); 
