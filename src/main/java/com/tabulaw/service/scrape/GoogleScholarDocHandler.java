@@ -322,7 +322,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 						int courtlen = court.length();
 						if(courtlen > 4) {
 							String sub = court.substring(courtlen - 4);
-							if(sub.startsWith("1") && sub.length() == 4) {
+							if((sub.startsWith("1") || sub.startsWith("20")) && sub.length() == 4) {
 								syear = sub;
 								court = court.substring(0, courtlen - 4).trim();
 							}
@@ -341,7 +341,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 				int dtlen = reftoken.length();
 				if(dtlen > 4) {
 					String sub = reftoken.substring(dtlen - 4);
-					if(sub.startsWith("19") || sub.startsWith("20")) {
+					if(sub.startsWith("1") || sub.startsWith("20")) {
 						syear = sub;
 					}
 				}
