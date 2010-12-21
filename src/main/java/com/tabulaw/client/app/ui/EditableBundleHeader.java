@@ -76,6 +76,8 @@ public class EditableBundleHeader extends Composite {
 
 		pName = new EditableTextWidget();
 		pName.addStyleName("name");
+		pName.addStyleName("tabulaw-util-elipsis");
+		
 		pName.addValueChangeHandler(new ValueChangeHandler<String>() {
 
 			@Override
@@ -89,6 +91,7 @@ public class EditableBundleHeader extends Composite {
 			}
 		});
 		header.add(pName);
+
 
 		pDesc = new EditableTextWidget(headerDescTextExtractor,
 				headerDescInnerHtmlSetter);

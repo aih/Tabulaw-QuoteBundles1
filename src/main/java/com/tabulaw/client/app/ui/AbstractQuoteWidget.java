@@ -107,7 +107,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 		private void syncElementWidth() {
 			if (panel.getOffsetWidth() > 0) {
-				title.setWidth(Integer.toString(panel.getOffsetWidth() - buttonsPanel.getOffsetWidth() - 20));
+				title.setWidth(Integer.toString(panel.getOffsetWidth() - buttonsPanel.getOffsetWidth() - 20)+"px");
 			}
 		}
 

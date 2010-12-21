@@ -8,8 +8,10 @@ package com.tabulaw.client.app.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.HasResizeHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.tabulaw.client.app.model.MarkOverlay;
 import com.tabulaw.model.Quote;
 
@@ -29,12 +31,21 @@ public class BundleDocWidget extends AbstractBundleWidget<BundleDocWidget, Quote
 
 	private Map<QuoteDocWidget, HandlerRegistration> hrQuoteEventBindings;
 
+	private final DockLayoutPanel panel = new DockLayoutPanel(Unit.PX); 
+
+	
 	/**
 	 * Constructor
 	 * @param aQuoteEventHandler optional quote event handler
 	 */
 	public BundleDocWidget(IQuoteHandler aQuoteEventHandler, HasResizeHandlers resizeHandlerManager) {
-		super(new EditableBundleHeader());
+		super();
+		this.header = new EditableBundleHeader();
+		panel.setStyleName("qbundle");
+		panel.addNorth(header,90);
+		panel.add(quotePanel);
+		initWidget(panel);
+		
 		this.quoteEventHandler = aQuoteEventHandler;
 		this.resizeHandlerManager=resizeHandlerManager;
 		

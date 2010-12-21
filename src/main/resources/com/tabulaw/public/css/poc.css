@@ -97,12 +97,6 @@ a:active {
 	font-size: 12px;
 }
 
-.tabulawMenuItem {
-	width: 16px;
-	margin: 0px 3px 0px 0px;
-	float:left;
-}
-
 /* global message panel */
 .gmsg {
 	margin-bottom: 15px;
@@ -217,18 +211,7 @@ div.ro {
 	padding-left:0px !important;
 }	
 
-#navCol {
-	float: left;
-	width: 145px;
-	margin-left: -100%;
-	/*debug*/
-	/*border: 1px solid pink;*/
-}
 
-* html #navCol {
-	padding-top: 20px;
-	padding-left: 20px;
-}
 	#navCol .vpanel {
 		width: 100%;
 		margin-left: 10px;
@@ -310,20 +293,6 @@ div.ro {
 	padding-left: 10px;
 }
 
-/* the parent element of the app portal panel */
-#mainCol {
-	margin-left: 180px;
-	/*debug*/
-	/*border: 1px solid brown;*/
-}
-
-/* the parent element of the nav row widget */
-#navRow {
-	/*border-bottom: 3px solid #BFBFBF;*/
-	/*debug*/
-	/*border: 1px solid gray*/
-	
-}
 
 * html #navRow { /*padding-top: 20px;
 	margin-right: 20px;
@@ -451,16 +420,16 @@ div.ro {
 	float: left;
 }
 
-.navRow .crntqb {
+.crntqb {
 	text-align: right;
 }
 
-.navRow .crntqb p {
+.crntqb p {
 	font-weight: bold;
 	font-size: 11px;
 }
 
-.navRow .crntqb .echo {
+.crntqb .echo {
 	font-style: italic;
 	font-weight: normal;
 	margin-right: 5px;
@@ -538,71 +507,28 @@ div.ro {
 /* qbundle */
 .qbundle {
 }
-	.qbundle .qbheader {
+.qbundle .qbheader {
 		margin-bottom: 10px;
 		overflow: hidden;
-	}
-		.qbundle .qbheader .echo {
+}
+.qbundle .qbheader .echo {
 			text-transform: uppercase;
 			font-family: Arial, Helvetica, sans-serif;
 			font-weight: lighter;
 			font-size: 11px;
 			letter-spacing: 0.7px;
-		}
-		.qbundle .qbheader .name {
+}
+.qbundle .qbheader .name {
 			font-size: 20px;
 			border-bottom: 4px solid #BFBFBF/*#D0E4F6*/;
 			margin-top: 2px; /* hack so qb name text doesn't wrap if it extends at or beyond buttons div just above */
-		}
-		.qbundle .qbheader .desc {
-			font-size: 11px;
-		}
-		.qbundle .qbbuttons {
-			float: right;
-		} 
-		.qbundle .qbbuttons img {
-			
-			margin: 20px 5px 0px 0px;
-			cursor: pointer;
-		} 
-		.qbundle .qbbuttons img.delete {
-			padding-bottom: 2px;
-		} 
-	.qbundle .quotes {
-		/*height: 100%;*/
-		width: 100%;
-	}
-	.qbundle .qbcurrent {
-		border: 3px solid #DFDFDF;
-		-moz-border-radius: 6px;
-		-webkit-border-radius: 6px;
-		padding: 4px;
-	}
-	
 }
-
-.qbundle .qbheader {
-	margin-bottom: 10px;
-	overflow: hidden;
-}
-
-.qbundle .qbheader .echo {
-	text-transform: uppercase;
-	font-family: Arial, Helvetica, sans-serif;
-	font-weight: lighter;
-	font-size: 11px;
-	letter-spacing: 0.7px;
-}
-
-.qbundle .qbheader .name {
-	font-size: 20px;
-	border-bottom: 4px solid #BFBFBF /*#D0E4F6*/;
-	margin-top: 2px;
-	/* hack so qb name text doesn't wrap if it extends at or beyond buttons div just above */
-}
-
 .qbundle .qbheader .desc {
-	font-size: 11px;
+			font-size: 11px;
+}
+
+.tabulawMenuItem {
+	float: left;
 }
 
 .qbundle .qbbuttons {
@@ -610,23 +536,24 @@ div.ro {
 }
 
 .qbundle .qbbuttons img {
-	margin-left: 10px;
+	margin: 20px 10px 5px 0px;
 	cursor: pointer;
-}
+} 
 
 .qbundle .qbbuttons img.delete {
-	padding-bottom: 2px;
-}
+			padding-bottom: 2px;
+} 
 
-.qbundle .quotes { /*height: 100%;*/
-	width: 100%;
+.qbundle .quotes {
+		/*height: 100%;*/
+		width: 100%;
 }
 
 .qbundle .qbcurrent {
-	border: 3px solid #DFDFDF;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	padding: 4px;
+		/* border: 3px solid #DFDFDF;
+		-moz-border-radius: 6px;
+		-webkit-border-radius: 6px;
+		padding: 4px;*/
 }
 
 .requiredNote {
@@ -882,12 +809,12 @@ docHeaderMenuItem img {
 }
 
 .docEdit {
-	
+	height: 100%;
 }
 
 .documentContainer {
 	font-family: serif;
-	font-size: 16;
+	font-size: 16px;
 }
 
 .documentContainer p {
@@ -898,21 +825,21 @@ docHeaderMenuItem img {
 .documentContainer h1 {
 	margin-top: 16px;
 	margin-bottom: 16px;
-	font-size: 32;
+	font-size: 32px;
 	font-weight: bold;
 }
 
 .documentContainer h2 {
 	margin-top: 16px;
 	margin-bottom: 16px;
-	font-size: 24;
+	font-size: 24px;
 	font-weight: bold;
 }
 
 .documentContainer h3 {
 	margin-top: 16px;
 	margin-bottom: 16px;
-	font-size: 18;
+	font-size: 18px;
 	font-weight: bold;
 }
 
@@ -1302,8 +1229,9 @@ docHeaderMenuItem img {
 }
 
 .doc .quotes {
-	overflow: auto;
-	height: 100%;
+	overflow-y	: auto;
+	overflow-x	: hidden;
+	height		: 100%;
 }
 
 .doc .wquote .cite { /*display: none;*/
