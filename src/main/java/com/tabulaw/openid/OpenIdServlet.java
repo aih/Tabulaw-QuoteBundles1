@@ -396,7 +396,7 @@ public class OpenIdServlet extends InjectableServlet {
 	private void getDocuments(String scope) {
 		// it doesn't work for this user (grhh):
 		String user = "radek@olesiak.biz";
-		// it works for this user and realm=http://dev.imdzone.biz :
+		// it works for this user and when realm=http://dev.imdzone.biz :
 		// String user = "radek@dev.imdzone.biz";
 		GoogleOAuthParameters oauthParameters = new GoogleOAuthParameters();
 		oauthParameters.setOAuthConsumerKey(consumerKey);
