@@ -59,6 +59,7 @@ public class OpenIdServlet extends InjectableServlet {
 	private String consumerKey;
 	private String consumerSecret;
 	private String redirectOnSuccess;
+	private String oauthHybrid;
 
 	/**
 	 * Init the servlet. For demo purposes, we're just using an in-memory
@@ -78,6 +79,7 @@ public class OpenIdServlet extends InjectableServlet {
 		consumerKey = getInitParameter("consumerKey", "http://127.0.0.1:8888");
 		consumerSecret = getInitParameter("consumerSecret", "");
 		redirectOnSuccess = getInitParameter("redirectOnSuccess", "true");
+		oauthHybrid = getInitParameter("oauthHybrid", null);
 	}
 
 	/**
@@ -182,12 +184,14 @@ public class OpenIdServlet extends InjectableServlet {
 				returnToUrl);
 		addAttributes(helper);
 
-		try {
-			OAuthAccessor accessor = createOAuthAccessor();
-			helper.requestOauthAuthorization(accessor.consumer.consumerKey,
-					"http://docs.google.com/feeds/");
-		} catch (Exception e) {
-			log.error("", e);
+		if ("true".equalsIgnoreCase(oauthHybrid)) {
+			try {
+				OAuthAccessor accessor = createOAuthAccessor();
+				helper.requestOauthAuthorization(accessor.consumer.consumerKey,
+						"http://docs.google.com/feeds/");
+			} catch (Exception e) {
+				log.error("", e);
+			}
 		}
 
 		AuthRequest authReq = helper.generateRequest();
