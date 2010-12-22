@@ -442,6 +442,11 @@ public class OpenIdServlet extends InjectableServlet {
 			oauthParameters.setOAuthToken(requestToken);
 			oauthParameters.setOAuthTokenSecret("");
 			oauthParameters.setScope(scope);
+			String userAuthorizationUrl = oauthHelper
+					.createUserAuthorizationUrl(oauthParameters);
+			log.debug(userAuthorizationUrl);
+			log.debug(request.getQueryString());
+			log.debug(request.getParameter("oauth_verifier"));
 			log.debug(oauthHelper.getAccessTokenUrl());
 			log.debug("OpenId+OAuth hybrid access token: "
 					+ oauthHelper.getAccessToken(oauthParameters));

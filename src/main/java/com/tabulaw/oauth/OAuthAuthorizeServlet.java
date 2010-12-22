@@ -77,13 +77,13 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 			GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 					new OAuthHmacSha1Signer());
 			oauthHelper.getUnauthorizedRequestToken(oauthParameters);
-			String approvalPageUrl = oauthHelper
+			String userAuthorizationUrl = oauthHelper
 					.createUserAuthorizationUrl(oauthParameters);
+			log.debug(userAuthorizationUrl);
 
 			storeParametersInTheHttpSession(request, oauthParameters);
 
-			log.debug(approvalPageUrl);
-			response.sendRedirect(approvalPageUrl);
+			response.sendRedirect(userAuthorizationUrl);
 		} catch (OAuthException e) {
 			log.error("OAuth authorization error", e);
 		}
