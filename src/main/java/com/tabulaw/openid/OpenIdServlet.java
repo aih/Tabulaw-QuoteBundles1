@@ -25,6 +25,7 @@ import org.openid4java.message.MessageException;
 import org.openid4java.message.Parameter;
 import org.openid4java.message.ParameterList;
 
+import com.google.gdata.client.DocumentQuery;
 import com.google.gdata.client.authn.oauth.GoogleOAuthHelper;
 import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
 import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer;
@@ -342,28 +343,10 @@ public class OpenIdServlet extends InjectableServlet {
 			Map.Entry e = (Map.Entry) o;
 			log.debug(e.getKey() + " -> " + e.getValue());
 		}
-		try {
-			String user = "radek@olesiak.biz";
-			if (helper.hasHybridOauthExtension()) {
-				log.warn("The OpenID + OAuth Hybrid.");
-				ParameterList params = helper.getHybridOauthResponse()
-						.getParameters();
-				for (Object o : params.getParameters()) {
-					Parameter param = (Parameter) o;
-					log.debug(param.getKey() + " -> " + param.getValue());
-				}
-				String requestToken = params.getParameter("request_token")
-						.getValue();
-				String scope = params.getParameter("scope").getValue();
-				getDocuments(user, scope);
-				// getDocumentspersistOAuth(requestToken, scope);
-			} else {
-				log.warn("No OpenID + OAuth Hybrid !!!");
-				String scope = "http://docs.google.com/feeds/";
-				getDocuments(user, scope);
-			}
-		} catch (MessageException e) {
-			log.error("", e);
+		if (helper.hasHybridOauthExtension()) {
+			hybridOpenIdOAuth(helper, request);
+		} else {
+			log.warn("No OpenID + OAuth Hybrid !!!");
 		}
 		String claimedId = helper.getClaimedId().toString();
 		log.debug("claimedId: " + claimedId);
@@ -390,7 +373,31 @@ public class OpenIdServlet extends InjectableServlet {
 		return null;
 	}
 
-	private void getDocuments(String user, String scope) {
+	private void hybridOpenIdOAuth(AuthResponseHelper helper,
+			HttpServletRequest request) {
+		try {
+			log.info("The OpenID + OAuth Hybrid.");
+			ParameterList params = helper.getHybridOauthResponse()
+					.getParameters();
+			for (Object o : params.getParameters()) {
+				Parameter param = (Parameter) o;
+				log.debug(param.getKey() + " -> " + param.getValue());
+			}
+			String requestToken = params.getParameter("request_token")
+					.getValue();
+			String scope = params.getParameter("scope").getValue();
+			getDocuments(scope);
+			persistOAuth(request, requestToken, scope);
+		} catch (MessageException e) {
+			log.error("", e);
+		}
+	}
+
+	private void getDocuments(String scope) {
+		// it doesn't work for this user (grhh):
+		String user = "radek@olesiak.biz";
+		// it works for this user and realm=http://dev.imdzone.biz :
+		// String user = "radek@dev.imdzone.biz";
 		GoogleOAuthParameters oauthParameters = new GoogleOAuthParameters();
 		oauthParameters.setOAuthConsumerKey(consumerKey);
 		oauthParameters.setOAuthConsumerSecret(consumerSecret);
@@ -400,15 +407,21 @@ public class OpenIdServlet extends InjectableServlet {
 			OAuthSigner signer = new OAuthHmacSha1Signer();
 			DocsService client = new DocsService("tabulaw-webapp-2");
 			client.setOAuthCredentials(oauthParameters, signer);
-			String url = "https://docs.google.com/feeds/default/private/full"
-					+ "?xoauth_requestor_id=" + user;
+			String url = "http://docs.google.com/feeds/default/private/full";
 			log.debug(scope);
 			log.debug(consumerKey);
 			log.debug(consumerSecret);
 			log.debug(url);
 			URL feedUrl = new URL(url);
-			DocumentListFeed resultFeed = client.getFeed(feedUrl,
+			DocumentQuery query = new DocumentQuery(feedUrl);
+			query.setStringCustomParameter("xoauth_requestor_id", user);
+			log.debug(query.getFeedUrl());
+			log.debug("FullTextQuery: " + query.getFullTextQuery());
+			log.debug("max results: " + query.getMaxResults());
+			DocumentListFeed resultFeed = client.getFeed(query,
 					DocumentListFeed.class);
+			log.debug("READING DOCUMENTS FROM THE DEFAULT USER: "
+					+ resultFeed.getEntries().size());
 			for (DocumentListEntry entry : resultFeed.getEntries()) {
 				log.debug(entry.getTitle().getPlainText());
 			}
@@ -417,19 +430,23 @@ public class OpenIdServlet extends InjectableServlet {
 		}
 	}
 
-	private void persistOAuth(String requestToken, String scope) {
+	private void persistOAuth(HttpServletRequest request, String requestToken,
+			String scope) {
 		try {
 			OAuthParameters oauthParameters = new OAuthParameters();
-			GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
-					new OAuthHmacSha1Signer());
+			OAuthSigner signer = new OAuthHmacSha1Signer();
+			GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(signer);
 			oauthParameters.setOAuthConsumerKey(consumerKey);
 			oauthParameters.setOAuthConsumerSecret(consumerSecret);
 			oauthParameters.setRealm(realm);
 			oauthParameters.setOAuthToken(requestToken);
+			oauthParameters.setOAuthTokenSecret("");
 			oauthParameters.setScope(scope);
-			oauthParameters.setOAuthType(OAuthType.TWO_LEGGED_OAUTH);
-			oauthHelper.getAccessToken(oauthParameters);
-			oauthParameters.getOAuthTokenSecret();
+			log.debug(oauthHelper.getAccessTokenUrl());
+			log.debug("OpenId+OAuth hybrid access token: "
+					+ oauthHelper.getAccessToken(oauthParameters));
+			log.debug("OpenId+OAuth hybrid token secret: "
+					+ oauthParameters.getOAuthTokenSecret());
 			log.debug(oauthParameters.getBaseParameters());
 			log.debug(oauthParameters.getExtraParameters());
 		} catch (Exception e) {

@@ -52,6 +52,9 @@ public class OAuthPersistAccessTokenServlet extends HttpServlet {
 
 	private void getAndPersistAccessToken(HttpServletRequest request) {
 		try {
+			// e.g.
+			// oauth_verifier=lKVl7XuUBCY%2BPR7Z38AjCu%2FD&oauth_token=4%2FkpnfuLltyJsacDX0sZgnIV4IRckf
+			log.debug("OAuth query string: " + request.getQueryString());
 			authParametersProvider.setHttpServletRequest(request);
 			OAuthParameters oauthParameters = new OAuthParameters(
 					authParametersProvider.getGoogleDocumentsOAuthParameters());

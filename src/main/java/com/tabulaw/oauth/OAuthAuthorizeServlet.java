@@ -80,7 +80,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 			String approvalPageUrl = oauthHelper
 					.createUserAuthorizationUrl(oauthParameters);
 
-			persistToken(request, oauthParameters);
+			storeParametersInTheHttpSession(request, oauthParameters);
 
 			log.debug(approvalPageUrl);
 			response.sendRedirect(approvalPageUrl);
@@ -96,7 +96,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 		response.sendRedirect(path);
 	}
 
-	private void persistToken(HttpServletRequest request,
+	private void storeParametersInTheHttpSession(HttpServletRequest request,
 			GoogleOAuthParameters oauthParameters) {
 		request.getSession().setAttribute(
 				OAuthParametersProvider.OAUTH_PARAMETERS, oauthParameters);
