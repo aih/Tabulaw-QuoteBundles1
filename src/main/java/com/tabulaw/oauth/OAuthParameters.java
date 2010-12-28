@@ -44,14 +44,14 @@ public class OAuthParameters extends GoogleOAuthParameters {
 
 	public void fromMap(Map<String, String> map) {
 		for (Map.Entry<String, String> entry : map.entrySet()) {
-			log.debug("basic: " + entry.getKey() + " -> " + entry.getValue());
+			log.debug("OAuth basic parameter: " + entry.getKey() + " -> " + entry.getValue());
 			addCustomBaseParameter(entry.getKey(), entry.getValue());
 		}
 	}
 
 	public void fromMapExtra(Map<String, String> map) {
 		for (Map.Entry<String, String> entry : map.entrySet()) {
-			log.debug("extra: " + entry.getKey() + " -> " + entry.getValue());
+			log.debug("OAuth extra parameter: " + entry.getKey() + " -> " + entry.getValue());
 			addExtraParameter(entry.getKey(), entry.getValue());
 		}
 	}

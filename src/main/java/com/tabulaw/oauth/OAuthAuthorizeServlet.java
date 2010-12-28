@@ -77,10 +77,12 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 			GoogleOAuthHelper oauthHelper = new GoogleOAuthHelper(
 					new OAuthHmacSha1Signer());
 			oauthHelper.getUnauthorizedRequestToken(oauthParameters);
+			
 			String userAuthorizationUrl = oauthHelper
 					.createUserAuthorizationUrl(oauthParameters);
-			log.debug(userAuthorizationUrl);
-
+			log.debug("OAuth redirecting to the authorization URL: "
+					+ userAuthorizationUrl);
+			
 			storeParametersInTheHttpSession(request, oauthParameters);
 
 			response.sendRedirect(userAuthorizationUrl);
@@ -92,7 +94,7 @@ public class OAuthAuthorizeServlet extends HttpServlet {
 	private void forward(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 		String path = request.getContextPath() + REDIRECT_URL;
-		log.debug("redirect to:" + path);
+		log.debug("Redirecting to: " + path);
 		response.sendRedirect(path);
 	}
 

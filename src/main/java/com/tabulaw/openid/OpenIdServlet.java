@@ -105,6 +105,7 @@ public class OpenIdServlet extends InjectableServlet {
 				log.debug("consumerKey=" + consumerKey);
 				log.debug("consumerSecret=" + consumerSecret);
 				log.debug("realm=" + realm(req));
+				log.debug("oauthHybrid=" + realm(req));
 				resp.sendRedirect(url);
 			} catch (OpenIDException e) {
 				log.error("", e);
@@ -342,7 +343,7 @@ public class OpenIdServlet extends InjectableServlet {
 	@SuppressWarnings("rawtypes")
 	private UserInfo onSuccess(AuthResponseHelper helper,
 			HttpServletRequest request) {
-		log.debug("onSuccess()");
+		log.debug("OpenId success");
 		for (Object o : request.getParameterMap().entrySet()) {
 			Map.Entry e = (Map.Entry) o;
 			log.debug(e.getKey() + " -> " + e.getValue());
@@ -353,7 +354,7 @@ public class OpenIdServlet extends InjectableServlet {
 			log.warn("No OpenID + OAuth Hybrid !!!");
 		}
 		String claimedId = helper.getClaimedId().toString();
-		log.debug("claimedId: " + claimedId);
+		log.debug("OpenId ClaimedId: " + claimedId);
 		return new UserInfo(claimedId,
 				helper.getAxFetchAttributeValue(Step2.AxSchema.EMAIL),
 				helper.getAxFetchAttributeValue(Step2.AxSchema.FIRST_NAME),
@@ -373,25 +374,27 @@ public class OpenIdServlet extends InjectableServlet {
 	 */
 	private UserInfo onFail(AuthResponseHelper helper,
 			HttpServletRequest request) {
-		log.debug("onFail()");
+		log.debug("OpenId Failure");
 		return null;
 	}
 
 	private void hybridOpenIdOAuth(AuthResponseHelper helper,
 			HttpServletRequest request) {
 		try {
-			log.info("The OpenID + OAuth Hybrid.");
+			log.info("Processing OpenID + OAuth Hybrid ...");
 			ParameterList params = helper.getHybridOauthResponse()
 					.getParameters();
 			for (Object o : params.getParameters()) {
 				Parameter param = (Parameter) o;
-				log.debug(param.getKey() + " -> " + param.getValue());
+				log.debug("OpenID + OAuth Hybrid param: " + param.getKey()
+						+ " -> " + param.getValue());
 			}
 			String requestToken = params.getParameter("request_token")
 					.getValue();
 			String scope = params.getParameter("scope").getValue();
 			getDocuments(scope);
-			persistOAuth(request, requestToken, scope);
+			changeOpenIdOAuthHybridRequestTokenToAccessToken(request,
+					requestToken, scope);
 		} catch (MessageException e) {
 			log.error("", e);
 		}
@@ -412,30 +415,30 @@ public class OpenIdServlet extends InjectableServlet {
 			DocsService client = new DocsService("tabulaw-webapp-2");
 			client.setOAuthCredentials(oauthParameters, signer);
 			String url = "http://docs.google.com/feeds/default/private/full";
-			log.debug(scope);
-			log.debug(consumerKey);
-			log.debug(consumerSecret);
-			log.debug(url);
+			log.debug("2-legged OAuth; scope: " + scope);
+			log.debug("2-legged OAuth; consumerKey: " + consumerKey);
+			log.debug("2-legged OAuth; consumerSecret: " + consumerSecret);
+			log.debug("2-legged OAuth; url: " + url);
+			log.debug("2-legged OAuth; user: " + user);
 			URL feedUrl = new URL(url);
 			DocumentQuery query = new DocumentQuery(feedUrl);
 			query.setStringCustomParameter("xoauth_requestor_id", user);
-			log.debug(query.getFeedUrl());
-			log.debug("FullTextQuery: " + query.getFullTextQuery());
-			log.debug("max results: " + query.getMaxResults());
+			log.debug("2-legged OAuth; feed url: " + query.getFeedUrl());
 			DocumentListFeed resultFeed = client.getFeed(query,
 					DocumentListFeed.class);
-			log.debug("READING DOCUMENTS FROM THE DEFAULT USER: "
-					+ resultFeed.getEntries().size());
+			log.debug("2-legged OAuth; #docs was read: "
+					+ +resultFeed.getEntries().size());
 			for (DocumentListEntry entry : resultFeed.getEntries()) {
-				log.debug(entry.getTitle().getPlainText());
+				log.debug("2-legged OAuth; document title: "
+						+ entry.getTitle().getPlainText());
 			}
 		} catch (Exception e) {
 			log.error("", e);
 		}
 	}
 
-	private void persistOAuth(HttpServletRequest request, String requestToken,
-			String scope) {
+	private void changeOpenIdOAuthHybridRequestTokenToAccessToken(
+			HttpServletRequest request, String requestToken, String scope) {
 		try {
 			OAuthParameters oauthParameters = new OAuthParameters();
 			OAuthSigner signer = new OAuthHmacSha1Signer();
@@ -446,18 +449,22 @@ public class OpenIdServlet extends InjectableServlet {
 			oauthParameters.setOAuthToken(requestToken);
 			oauthParameters.setOAuthTokenSecret("");
 			oauthParameters.setScope(scope);
-			String userAuthorizationUrl = oauthHelper
-					.createUserAuthorizationUrl(oauthParameters);
-			log.debug(userAuthorizationUrl);
-			log.debug(request.getQueryString());
-			log.debug(request.getParameter("oauth_verifier"));
-			log.debug(oauthHelper.getAccessTokenUrl());
-			log.debug("OpenId+OAuth hybrid access token: "
+			log.debug("OpenId+OAuth hybrid; authorizationUrl: "
+					+ oauthHelper.createUserAuthorizationUrl(oauthParameters));
+			log.debug("OpenId+OAuth hybrid; request queryString: "
+					+ request.getQueryString());
+			log.debug("OpenId+OAuth hybrid; oauth_verifier: "
+					+ request.getParameter("oauth_verifier"));
+			log.debug("OpenId+OAuth hybrid; baseParameters: "
+					+ oauthParameters.getBaseParameters());
+			log.debug("OpenId+OAuth hybrid; extraParameters: "
+					+ oauthParameters.getExtraParameters());
+			log.debug("OpenId+OAuth hybrid; accessTokenUrl: "
+					+ oauthHelper.getAccessTokenUrl());
+			log.debug("OpenId+OAuth hybrid; accessToken: "
 					+ oauthHelper.getAccessToken(oauthParameters));
-			log.debug("OpenId+OAuth hybrid token secret: "
+			log.debug("OpenId+OAuth hybrid; OAuthTokenSecret: "
 					+ oauthParameters.getOAuthTokenSecret());
-			log.debug(oauthParameters.getBaseParameters());
-			log.debug(oauthParameters.getExtraParameters());
 		} catch (Exception e) {
 			log.error("", e);
 		}
