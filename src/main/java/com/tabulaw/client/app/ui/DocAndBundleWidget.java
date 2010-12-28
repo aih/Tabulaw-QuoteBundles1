@@ -287,9 +287,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				if(mDoc == null) return false;
 				Log.debug("Auto-creating quote bundle for doc: " + mDoc);
 
-				String title = getNextUntitledQuoteBundle(qbs);
-
-				String qbName = title;
+				String qbName = getNextUntitledQuoteBundle(qbs);
 				String qbDesc = "Quote Bundle for " + qbName;
 				crntQb = EntityFactory.get().buildBundle(qbName, qbDesc);
 				crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
@@ -469,7 +467,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		int maxIndex = 0;
 		String pattern = "untitled ";
 		for(QuoteBundle qb : qbs) {
-			String title = qb.getDescription().toLowerCase();
+			String title = qb.getName().toLowerCase();
 			if(title.startsWith(pattern)) {
 				String index = title.substring(pattern.length()).trim();
 				try {
@@ -482,29 +480,4 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 		return maxIndex;
 	}
 
-	private boolean alreadyQuoteBundleTitleExist(List<QuoteBundle> qbs, String title) {
-		for(QuoteBundle qb : qbs) {
-			if(qb.getDescription().equals(title)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private String getNewQuoteBundleTitle(List<QuoteBundle> qbs) {
-		String title = Window.prompt("Please set Quote Bundle title for this document", getNextUntitledQuoteBundle(qbs));
-		while(true) {
-			if(title.isEmpty()) {
-				title =
-						Window.prompt("Title cannot be empty. Please set Quote Bundle title for this document",
-								getNextUntitledQuoteBundle(qbs));
-			}
-			else if(alreadyQuoteBundleTitleExist(qbs, title)) {
-				title = Window.prompt("Title already exists. Please set Quote Bundle title for this document", title);
-			}
-			else {
-				return title;
-			}
-		}
-	}
 }
