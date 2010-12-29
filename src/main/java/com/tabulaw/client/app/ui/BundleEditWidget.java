@@ -27,7 +27,6 @@ import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
-import com.tabulaw.model.EntityType;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 
@@ -308,9 +307,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	@Override
 	public QuoteEditWidget addQuote(Quote mQuote, boolean persist, boolean addToThisBundleModel) {
 		QuoteEditWidget w = super.addQuote(mQuote, persist, addToThisBundleModel);
-		if(addToThisBundleModel) {
-			updateQuoteBundleTitle();
-		}
 		dropAreaCheck();
 		return w;
 	}
@@ -372,60 +368,5 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
 		modelStateCheck();
-	}
-
-	private void updateQuoteBundleTitle() {
-		String oldValue = bundle.getName();
-		String newValue = getNewQuoteBundleTitle();
-		if(!oldValue.equals(newValue)) {
-			bundle.setName(newValue);
-			ClientModelCache.get().persist(bundle, this);
-			ServerPersistApi.get().updateBundleProps(bundle);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private String getNewQuoteBundleTitle() {
-		return getNewQuoteBundleTitle((List<QuoteBundle>) ClientModelCache.get().getAll(EntityType.QUOTE_BUNDLE),
-				bundle.getName());
-	}
-
-	private String getNewQuoteBundleTitle(List<QuoteBundle> qbs, String title) {
-		while(true) {
-			if(title.toLowerCase().startsWith("untitled")) {
-				title = prompt("Title cannot be named 'Untitled ...'. Please set Quote Bundle title for this quote", title);
-			}
-			else if(title.isEmpty()) {
-				title = prompt("Title cannot be empty. Please set Quote Bundle title for this quote", title);
-			}
-			else if(alreadyQuoteBundleTitleExist(qbs, title)) {
-				title = prompt("Title already exists. Please set Quote Bundle title for this quote", title);
-			}
-			else {
-				return title;
-			}
-		}
-	}
-
-	private boolean alreadyQuoteBundleTitleExist(List<QuoteBundle> qbs, String title) {
-		for(QuoteBundle qb : qbs) {
-			if(qb.getDescription().equals(title)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private String prompt(String description, String value) {
-		return onPrompt(Window.prompt(description, value), value);
-	}
-
-	private String onPrompt(String newValue, String oldValue) {
-		if(newValue == null) {
-			return oldValue;
-		}
-		else {
-			return newValue;
-		}
 	}
 }

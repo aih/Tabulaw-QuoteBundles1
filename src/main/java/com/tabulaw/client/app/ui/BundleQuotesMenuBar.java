@@ -10,6 +10,7 @@ import com.tabulaw.client.model.IModelChangeHandler;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.UpdateQuoteBundle;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.QuoteBundle;
 
@@ -71,6 +72,7 @@ public class BundleQuotesMenuBar extends MenuBar {
 		addItem("New Quote ...", new Command() {
 			@Override
 			public void execute() {
+				UpdateQuoteBundle.updateQuoteBundleTitle(BundleQuotesMenuBar.this);
 				UserQuoteDialog userQuoteDialog = new UserQuoteDialog();
 				userQuoteDialog.setGlassEnabled(true);
 				userQuoteDialog.center();

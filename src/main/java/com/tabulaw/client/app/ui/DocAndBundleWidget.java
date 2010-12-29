@@ -19,7 +19,6 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
@@ -36,6 +35,7 @@ import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.client.ui.LoggingDragHandler;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.QuoteResizeEvent;
+import com.tabulaw.client.ui.UpdateQuoteBundle;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.model.CaseRef;
@@ -234,6 +234,8 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 					return;
 				}
 
+				UpdateQuoteBundle.updateQuoteBundleTitle(wDocQuoteBundle.getModel());
+				
 				// create the quote
 				String serializedMark = mark.serialize();
 				// we will fill startPage and endPage fields on the server by data from
