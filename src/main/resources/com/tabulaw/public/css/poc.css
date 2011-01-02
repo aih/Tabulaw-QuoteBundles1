@@ -521,6 +521,7 @@ div.ro {
 .qbundle .qbheader .name {
 			font-size: 20px;
 			border-bottom: 4px solid #BFBFBF/*#D0E4F6*/;
+			white-space:nowrap;
 			margin-top: 2px; /* hack so qb name text doesn't wrap if it extends at or beyond buttons div just above */
 }
 .qbundle .qbheader .desc {
