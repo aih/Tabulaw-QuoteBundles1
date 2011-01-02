@@ -517,6 +517,7 @@ div.ro {
 			font-weight: lighter;
 			font-size: 11px;
 			letter-spacing: 0.7px;
+			white-space: nowrap;
 }
 .qbundle .qbheader .name {
 			font-size: 20px;
