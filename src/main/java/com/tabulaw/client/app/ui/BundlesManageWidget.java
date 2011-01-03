@@ -29,6 +29,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -217,6 +218,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 		super();
 
 		boundaryPanel.addStyleName(Styles.BOUNDARY_AREA);
+		boundaryPanel.getElement().getStyle().clearOverflow();
+		
 		initWidget(boundaryPanel);
 
 		qbListingWidget = new BundleListingWidget();

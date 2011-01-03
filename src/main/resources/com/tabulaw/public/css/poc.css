@@ -547,8 +547,11 @@ div.ro {
 } 
 
 .qbundle .quotes {
-		/*height: 100%;*/
-		width: 100%;
+	max-height: 300px;
+}
+		
+* html .qbundle .quotes {
+	height: expression(this.scrollHeight <= 300 ? "auto" : "300px");
 }
 
 .qbundle .qbcurrent {
