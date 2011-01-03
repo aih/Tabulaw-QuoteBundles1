@@ -1380,3 +1380,7 @@ docHeaderMenuItem img {
 .doc-import-edit-panel td {
 	padding: 5px;
 }
+
+.doc-import-dialog {
+	top: 20px !important;
+}

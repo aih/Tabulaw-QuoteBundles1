@@ -34,6 +34,10 @@ import com.tabulaw.model.DocRef;
 
 public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> {
 
+	public static class Style {
+		public final static String DOC_IMPORT_DIALOG="doc-import-dialog";
+	}
+	
 	private final DocImportEditPanel importPanel = new DocImportEditPanel();
 
 	private int importId = 0;
@@ -43,6 +47,7 @@ public class DocImportDialog extends Dialog implements IEditHandler<FieldGroup> 
 
 	public DocImportDialog() {
 		super(null, false);
+		addStyleName(Style.DOC_IMPORT_DIALOG);
 		setText("Import from Google Docs");
 		setAnimationEnabled(true);
 		importPanel.addEditHandler(this);
