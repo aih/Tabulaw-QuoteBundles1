@@ -1,5 +1,6 @@
 package com.tabulaw.server.rpc;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -39,6 +40,7 @@ import com.tabulaw.oauth.OAuthParametersProvider;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
 import com.tabulaw.service.entity.UserDataService;
+import com.tabulaw.util.SafeHtmlUtils;
 
 @SuppressWarnings("serial")
 public class GoogleDocsServiceRpc extends RpcServlet implements
@@ -224,7 +226,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		return get;
 	}
 
-	private DocRef saveDocument(GoogleDocument document, String htmlContent) {
+	private DocRef saveDocument(GoogleDocument document, String htmlContent) throws IOException {
 		final PersistContext pc = (PersistContext) getThreadLocalRequest()
 				.getSession(false).getServletContext()
 				.getAttribute(PersistContext.KEY);
@@ -236,8 +238,9 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		DocRef mDoc = EntityFactory.get().buildDoc(
 				"GDocs " + document.getTitle(), docDate, false);
 		mDoc = uds.saveDoc(mDoc);
+		String safeHtmlContent=SafeHtmlUtils.sanitizeHtml(htmlContent);
 		DocContent docContent = EntityFactory.get().buildDocContent(
-				mDoc.getId(), htmlContent);
+				mDoc.getId(), safeHtmlContent);
 		uds.addDocUserBinding(user.getId(), mDoc.getId());
 		uds.saveDocContent(docContent);
 		return mDoc;
