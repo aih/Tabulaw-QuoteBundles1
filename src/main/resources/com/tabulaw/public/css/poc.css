@@ -988,6 +988,12 @@ docHeaderMenuItem img {
 	
 }
 
+.docs .gwt-SuggestBoxPopup .item .entry .citation {
+	color: green;
+	font-size: smaller;
+	white-space: normal;
+}
+
 .docs .gwt-SuggestBoxPopup .item .entry .summary {
 	color: gray;
 	font-size: smaller;

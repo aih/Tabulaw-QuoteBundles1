@@ -75,9 +75,12 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 		public DocSuggestion(CaseDocSearchResult doc) {
 			super();
 			this.doc = doc;
-			displayString =
-					"<div class=\"entry\"><div class=\"title\">" + doc.getTitleHtml() + "</div><div class=\"summary\">"
-							+ doc.getSummary() + "</div></div>";
+			String s = "<div class=\"entry\">";
+			s += "<div class=\"title\">" + doc.getTitleHtml() + "</div>";
+			s += "<div class=\"citation\">" + doc.getCitation() + "</div>";
+			s += "<div class=\"summary\">" + doc.getSummary() + "</div>";
+			s += "</div>";
+			displayString = s;
 			queryToken = null;
 		}
 
@@ -162,10 +165,11 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 			super(new DocSearchSuggestOracle());
 		}
 	}
-	
+
 	static class SearchPlaceholder extends FocusPanel {
+
 		private final FlowPanel flowPanel = new FlowPanel();
-		
+
 		/**
 		 * Constructor
 		 */
@@ -208,22 +212,22 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 
 		searchPlaceholder = new SearchPlaceholder();
 		searchPlaceholder.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
-				//searchPlaceholder.setVisible(false);
+				// searchPlaceholder.setVisible(false);
 				docSuggestBox.getTextBox().setFocus(true);
 			}
 		});
 		docSuggestBox.getTextBox().addFocusHandler(new FocusHandler() {
-			
+
 			@Override
 			public void onFocus(FocusEvent event) {
 				searchPlaceholder.setVisible(false);
 			}
 		});
 		docSuggestBox.getTextBox().addBlurHandler(new BlurHandler() {
-			
+
 			@Override
 			public void onBlur(BlurEvent event) {
 				String text = docSuggestBox.getText();
@@ -277,7 +281,7 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 									Msgs.post(result.getStatus().getMsgs(Msg.MsgAttr.EXCEPTION.flag), docSuggestBox);
 									return;
 								}
-								
+
 								final DocRef docRef = result.getDocRef();
 								final DocKey docKey = docRef.getModelKey();
 								final DocContent docContent = result.getDocContent();
@@ -285,7 +289,7 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 								// persist the new doc and propagate through app
 								ClientModelCache.get().persist(docRef, DocSuggestWidget.this);
 								if(docContent != null) ClientModelCache.get().persist(docContent, null);
-								
+
 								DeferredCommand.addCommand(new Command() {
 
 									@Override
