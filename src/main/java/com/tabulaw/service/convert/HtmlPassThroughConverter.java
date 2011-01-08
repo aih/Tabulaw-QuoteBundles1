@@ -8,7 +8,7 @@ package com.tabulaw.service.convert;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.tabulaw.util.SafeHtmlUtils;
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author jpk
@@ -27,6 +27,6 @@ public class HtmlPassThroughConverter extends AbstractDataConverter {
 
 	@Override
 	public void convert(InputStream input, OutputStream output) throws Exception {
-		SafeHtmlUtils.sanitizeHtml(input, output);
+		IOUtils.copy(input, output);
 	}
 }

@@ -12,12 +12,13 @@
     </description>
 		<param-name>di.modules</param-name>
 		<param-value>
-	    com.tabulaw.di.MailModule
-		  com.tabulaw.di.ExceptionHandlerModule
-    	com.tabulaw.di.ModelModule
-    	com.tabulaw.di.Db4oDaoModule
-    	com.tabulaw.di.PersistContextModule
-	com.tabulaw.di.DataConverterModule
+			com.tabulaw.di.MailModule
+			com.tabulaw.di.ExceptionHandlerModule
+			com.tabulaw.di.ModelModule
+			com.tabulaw.di.Db4oDaoModule
+			com.tabulaw.di.PersistContextModule
+			com.tabulaw.di.DataConverterModule
+			com.tabulaw.di.HtmlSanitizerModule
     </param-value>
 	</context-param>
 
