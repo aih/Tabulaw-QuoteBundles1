@@ -76,7 +76,7 @@ public class EditableBundleHeader extends Composite {
 
 		pName = new EditableTextWidget();
 		pName.addStyleName("name");
-		pName.addStyleName("tabulaw-util-elipsis");
+		pName.getReadOnlyWidget().addStyleName("tabulaw-util-elipsis");
 		
 		pName.addValueChangeHandler(new ValueChangeHandler<String>() {
 
