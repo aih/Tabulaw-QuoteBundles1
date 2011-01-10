@@ -7,6 +7,7 @@ package com.tabulaw.client.app.ui.nav;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.HTML;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.view.DocViewInitializer;
 import com.tabulaw.client.view.IViewInitializer;
@@ -33,7 +34,7 @@ public class DocViewNavButton extends AbstractNavButton implements IModelKeyProv
 		super();
 		this.documentKey = docKey;
 		setTitle(documentKey.descriptor());
-		setDisplay(docKey.getName(), "doc", Resources.INSTANCE.XButton());
+		setDisplay(new HTML(docKey.getName()).getText(), "doc", Resources.INSTANCE.XButton());
 		// image goes last
 		DOM.appendChild(getElement(), img.getElement());
 		img.setTitle("Close");
