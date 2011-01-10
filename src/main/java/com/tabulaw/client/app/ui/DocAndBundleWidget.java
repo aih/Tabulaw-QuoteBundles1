@@ -38,7 +38,7 @@ import com.tabulaw.client.ui.QuoteResizeEvent;
 import com.tabulaw.client.ui.UpdateQuoteBundle;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.CaseReference;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocKey;
 import com.tabulaw.model.DocRef;
@@ -48,6 +48,7 @@ import com.tabulaw.model.IEntity;
 import com.tabulaw.model.ModelKey;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.Reference.ReferenceFormat;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -334,32 +335,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 				// append citation in italics if a case doc
 				if(docRef.isCaseDoc()) {
-					CaseRef caseRef = docRef.getCaseRef();
-					StringBuilder caseRefBuilder = new StringBuilder(" ");
-
-					if(!StringUtil.isEmpty(caseRef.getParties())) {
-						caseRefBuilder.append("<i>");
-						caseRefBuilder.append(caseRef.getParties());
-						caseRefBuilder.append(", ");
-						caseRefBuilder.append("</i>");
-					}
-					caseRefBuilder.append(caseRef.getDocLoc());
-					if(q.getStartPage() != 0) {
-						caseRefBuilder.append(", ");
-						caseRefBuilder.append(q.getStartPage());
-						if(q.getStartPage() != q.getEndPage()) {
-							caseRefBuilder.append("-");
-							caseRefBuilder.append(q.getEndPage());
-						}
-					}
-					caseRefBuilder.append(" (");
-					if(!caseRef.isSupremeCourt() && !StringUtil.isEmpty(caseRef.getCourt())) {
-						caseRefBuilder.append(caseRef.getCourt());
-						caseRefBuilder.append(" ");
-					}
-					caseRefBuilder.append(caseRef.getYear());
-					caseRefBuilder.append(").");
-					htmlQuote += caseRefBuilder.toString();
+					htmlQuote += docRef.getReference().format(ReferenceFormat.HTML, q);
 				}
 				dew.getFormatter().insertHTML(htmlQuote);
 			}

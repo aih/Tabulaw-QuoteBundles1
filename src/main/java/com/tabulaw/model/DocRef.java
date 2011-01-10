@@ -35,7 +35,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 
 	private String title;
 	private Date date;
-	private CaseRef caseRef;
+	private Reference reference;
 	
 	private boolean referenceDoc;
 
@@ -76,7 +76,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 		dr.title = title;
 		dr.referenceDoc = referenceDoc;
 		dr.date = date == null ? null : new Date(date.getTime());
-		dr.caseRef = (CaseRef) (caseRef == null ? null : caseRef.clone());
+		dr.reference = (Reference) (reference == null ? null : reference.clone());
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	 * @return true/false
 	 */
 	public boolean isCaseDoc() {
-		return caseRef != null;
+		return reference != null;
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	 */
 	@XmlTransient
 	public String getCitation() {
-		return caseRef == null ? null : caseRef.descriptor();
+		return reference == null ? null : reference.descriptor();
 	}
 
 	@NotEmpty
@@ -137,12 +137,12 @@ public class DocRef extends EntityBase implements Comparable<DocRef>, INamedEnti
 	 * @return the case ref if specified
 	 */
 	@Valid
-	public CaseRef getCaseRef() {
-		return caseRef;
+	public Reference getReference() {
+		return reference;
 	}
 
-	public void setCaseRef(CaseRef caseRef) {
-		this.caseRef = caseRef;
+	public void setReference(Reference reference) {
+		this.reference = reference;
 	}
 	
 	public boolean isReferenceDoc() {

@@ -21,7 +21,7 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 			case DOC_USER_BINDING:
 				return DocUserBinding.class;
 			case CASE:
-				return CaseRef.class;
+				return CaseReference.class;
 			case DOCUMENT:
 				return DocRef.class;
 			case DOC_CONTENT:
@@ -55,7 +55,7 @@ public class EntityTypeResolver implements IEntityTypeResolver {
 		else if(clz == UserState.class) {
 			return EntityType.USER_STATE.name();
 		}
-		else if(clz == CaseRef.class) {
+		else if(clz == CaseReference.class) {
 			return EntityType.CASE.name();
 		}
 		else if(clz == DocRef.class) {

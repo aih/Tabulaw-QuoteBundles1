@@ -102,7 +102,7 @@ public class EntityFactory {
 		IEntity e = null;
 		switch(entityType) {
 			case CASE:
-				e = new CaseRef();
+				e = new CaseReference();
 				break;
 			case DOCUMENT:
 				e = new DocRef();
@@ -132,8 +132,8 @@ public class EntityFactory {
 	 * @param year
 	 * @return
 	 */
-	public CaseRef buildCase(String parties, String reftoken, String docLoc, String court, String url, int year, int firstPage, int lastPage) {
-		CaseRef e = (CaseRef) create(EntityType.CASE);
+	public CaseReference buildCase(String parties, String reftoken, String docLoc, String court, String url, int year, int firstPage, int lastPage) {
+		CaseReference e = (CaseReference) create(EntityType.CASE);
 		e.setReftoken(reftoken);
 		e.setParties(parties);
 		e.setDocLoc(docLoc);
@@ -193,7 +193,7 @@ public class EntityFactory {
 	public DocRef buildCaseDoc(String docTitle, Date docDate, boolean referenceDoc, String parties, String reftoken,
 			String docLoc, String court, String url, int year, int firstPage, int lastPage) {
 		DocRef doc = buildDoc(docTitle, docDate, referenceDoc);
-		doc.setCaseRef(buildCase(parties, reftoken, docLoc, court, url, year, firstPage, lastPage));
+		doc.setReference(buildCase(parties, reftoken, docLoc, court, url, year, firstPage, lastPage));
 		return doc;
 	}
 

@@ -13,6 +13,7 @@ import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.Reference;
 import com.tabulaw.model.UserState;
 
 /**
@@ -203,7 +204,7 @@ public interface IUserDataService extends RemoteService {
 	 * @param quoteBundleId quote bundle id
 	 * @return the persisted quote
 	 */
-	ModelListPayload<EntityBase> addOrphanQuote(String userId, String title, String quoteText, String quoteBundleId);
+	ModelListPayload<EntityBase> addOrphanQuote(String userId, String title, Reference reference, String quoteText, String quoteBundleId);
 	
 	/**
 	 * Creates a new contract doc on the server given a new contract doc entity with all required

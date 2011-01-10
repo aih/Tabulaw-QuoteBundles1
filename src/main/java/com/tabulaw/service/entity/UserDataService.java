@@ -37,6 +37,7 @@ import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.QuoteUserBinding;
+import com.tabulaw.model.Reference;
 import com.tabulaw.model.UserState;
 
 /**
@@ -659,8 +660,11 @@ public class UserDataService extends AbstractEntityService {
 	}
 	
 	@Transactional
-	public Quote addOrphanQuote(String userId, String title, String quoteText, String quoteBundleId) throws ConstraintViolationException,EntityNotFoundException {
+	public Quote addOrphanQuote(String userId, String title, Reference reference, String quoteText, String quoteBundleId) throws ConstraintViolationException,EntityNotFoundException {
 		DocRef document = EntityFactory.get().buildDoc(title, new Date(), true);
+		if (reference != null) {
+			document.setReference(reference);
+		}
 		saveDoc(document);
 
 		DocContent docContent = EntityFactory.get().buildDocContent(document.getId(), quoteText);

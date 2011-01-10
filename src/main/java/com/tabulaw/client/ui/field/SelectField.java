@@ -22,6 +22,8 @@ import com.tabulaw.util.ObjectUtil;
  */
 public final class SelectField<V> extends AbstractDataField<V, V> {
 
+	private boolean withEmptyOption = true;
+	
 	/**
 	 * Impl
 	 * @author jpk
@@ -48,7 +50,8 @@ public final class SelectField<V> extends AbstractDataField<V, V> {
 		public V getValue() {
 			final int i = super.getSelectedIndex();
 			// NOTE: we ignore the first index since it is an empty placeholder
-			return i < 1 ? null : getDataValue(getValue(i));
+			final int startIndex = withEmptyOption ? 1 : 0;
+			return i < startIndex ? null : getDataValue(getValue(i));
 		}
 
 		@Override
@@ -57,7 +60,7 @@ public final class SelectField<V> extends AbstractDataField<V, V> {
 			if(value != null) {
 				// NOTE: we start from index of 1 since the first index is always
 				// stubbed as empty
-				for(int i = 1; i < super.getItemCount(); i++) {
+				for(int i = withEmptyOption ? 1 : 0; i < super.getItemCount(); i++) {
 					final V dv = getDataValue(getValue(i));
 					if(value.equals(dv)) {
 						setSelectedIndex(i);
@@ -113,12 +116,14 @@ public final class SelectField<V> extends AbstractDataField<V, V> {
 		super.setEnabled(enabled);
 	}
 
-	@Override
-	public void setData(Map<V, String> data) {
+	public void setData(Map<V, String> data, boolean withEmptyOption) {
 		super.setData(data);
 		final V oldval = lb.getValue();
 		lb.clear();
-		lb.addItem(""); // ensure we have a null/empty option
+		this.withEmptyOption = withEmptyOption;
+		if (withEmptyOption) {
+			lb.addItem(""); // ensure we have a null/empty option
+		}
 		if(data != null) {
 			for(final Map.Entry<V, String> e : data.entrySet()) {
 				lb.addItem(e.getValue());
@@ -127,6 +132,11 @@ public final class SelectField<V> extends AbstractDataField<V, V> {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void setData(Map<V, String> data) {
+		setData(data, true);
 	}
 
 	@Override

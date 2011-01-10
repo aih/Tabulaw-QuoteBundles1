@@ -68,7 +68,7 @@ public class CellFieldComposer extends AbstractFieldComposer implements HasAlign
 		canvas.add(vp);
 	}
 
-	private HorizontalPanel getCurrentRow() {
+	public HorizontalPanel getCurrentRow() {
 		if(currentRow == null) {
 			currentRow = new HorizontalPanel();
 			currentRow.setStyleName(Styles.FIELD_ROW);
