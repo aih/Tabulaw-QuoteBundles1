@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.htmlcleaner.ContentToken;
+import org.htmlcleaner.ContentNode;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
@@ -161,12 +161,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 		HtmlCleaner cleaner = new HtmlCleaner();
 
 		TagNode root;
-		try {
-			root = cleaner.clean(rawHtml);
-		}
-		catch(IOException e) {
-			throw new IllegalArgumentException(e);
-		}
+		root = cleaner.clean(rawHtml);
 		
 		// isolate all the raw search result html fragments
 		TagNode[] nlist = root.getElementsByAttValue("class", "gs_r", true, false);
@@ -237,7 +232,7 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 	private void findPageNodes(TagNode current, List<Integer> currentNode, DocContent pages, int level) {
 		boolean first = true;
 		for (Object child : current.getChildren()) {
-			if (child instanceof TagNode || child instanceof ContentToken) {
+			if (child instanceof TagNode || child instanceof ContentNode) {
 				while (currentNode.size() <= level) {
 					currentNode.add(0);
 				}			
@@ -275,7 +270,6 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 		String reftoken = "", dlcy = "", parties = "", docLoc = "", court = "", syear = "", docTitle = "", htmlContent = "";
 		DocContent docContent = null;
 
-		try {
 			HtmlCleaner cleaner = new HtmlCleaner();
 			TagNode root = cleaner.clean(rawHtml);
 			TagNode[] tnarr;
@@ -371,10 +365,6 @@ public class GoogleScholarDocHandler extends AbstractDocHandler {
 			// absolutize local hrefs			
 			htmlContent = htmlContent.replace("/scholar_case", "http://scholar.google.com/scholar_case");			
 			docContent.setHtmlContent(htmlContent);
-		}
-		catch(IOException e) {
-			throw new IllegalArgumentException(e);
-		}
 		int year = 0;
 		
 		if(!syear.trim().equals("")){
