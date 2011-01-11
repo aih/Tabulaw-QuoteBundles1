@@ -15,9 +15,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.CaseReference;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
+import com.tabulaw.model.Reference;
 import com.tabulaw.util.IOUtils;
 import com.tabulaw.util.StringUtil;
 
@@ -90,26 +91,10 @@ public class DocUtils {
 		sb.append("|referenceDoc::");
 		sb.append(doc.isReferenceDoc());
 
-		CaseRef caseRef = doc.getCaseRef();
-		if(caseRef != null) {
-			sb.insert(0, "[casedoc]");
-
-			sb.append("|parties::");
-			sb.append(caseRef.getParties());
-			sb.append("|reftoken::");
-			sb.append(caseRef.getReftoken());
-			sb.append("|docLoc::");
-			sb.append(caseRef.getDocLoc());
-			sb.append("|court::");
-			sb.append(caseRef.getCourt());
-			sb.append("|url::");
-			sb.append(caseRef.getUrl());
-			sb.append("|year::");
-			sb.append(caseRef.getYear());
-			sb.append("|firstPageNumber::");
-			sb.append(caseRef.getFirstPageNumber());
-			sb.append("|lastPageNumber::");
-			sb.append(caseRef.getLastPageNumber());			
+		Reference reference = doc.getReference();
+		if(reference != null) {
+			sb.insert(0, "[" + Reference.getReferenceType(reference) + "]");
+			sb.append(reference.serializeToString());
 		}
 		else {
 			// throw new IllegalStateException("Un-handled document model type");

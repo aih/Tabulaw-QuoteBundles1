@@ -32,7 +32,7 @@ import com.tabulaw.config.IConfigAware;
 import com.tabulaw.config.IConfigKey;
 import com.tabulaw.dao.IEntityDao;
 import com.tabulaw.model.BundleUserBinding;
-import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.CaseReference;
 import com.tabulaw.model.ClauseBundle;
 import com.tabulaw.model.ClauseDef;
 import com.tabulaw.model.ContractDoc;
@@ -126,7 +126,7 @@ public class Db4oDaoModule extends AbstractModule implements IConfigAware {
 		CommonConfiguration cc = c.common();
 		cc.objectClass(User.class).updateDepth(1);
 		cc.objectClass(UserState.class).updateDepth(0);
-		cc.objectClass(CaseRef.class).updateDepth(0);
+		cc.objectClass(CaseReference.class).updateDepth(0);
 		
 		// the case is managed in the doc's life-cycle
 		cc.objectClass(DocRef.class).updateDepth(1);

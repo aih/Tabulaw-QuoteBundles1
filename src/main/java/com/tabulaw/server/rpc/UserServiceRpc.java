@@ -45,6 +45,7 @@ import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IUserRef;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.Reference;
 import com.tabulaw.model.User;
 import com.tabulaw.model.UserState;
 import com.tabulaw.model.User.Role;
@@ -1184,7 +1185,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 
 	@Override
 	public ModelListPayload<EntityBase> addOrphanQuote(String userId,
-			String title, String quoteText, String quoteBundleId) {
+			String title, Reference reference, String quoteText, String quoteBundleId) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
@@ -1194,7 +1195,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 
 		List<EntityBase> documentAndBundle = new ArrayList<EntityBase>();
 		try {
-			Quote quote = userDataService.addOrphanQuote(userId, title,
+			Quote quote = userDataService.addOrphanQuote(userId, title, reference,
 					quoteText, quoteBundleId);
 			documentAndBundle
 					.add(userDataService.getQuoteBundle(quoteBundleId));

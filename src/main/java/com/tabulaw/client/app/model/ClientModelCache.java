@@ -19,13 +19,14 @@ import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.CaseReference;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IEntity;
 import com.tabulaw.model.ModelKey;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.Reference;
 import com.tabulaw.model.User;
 import com.tabulaw.model.UserState;
 
@@ -374,9 +375,9 @@ public class ClientModelCache {
 	public DocRef getCaseDocByRemoteUrl(String remoteCaseUrl) {
 		List<IEntity> list = entities.get(EntityType.DOCUMENT.name());
 		for(IEntity m : list) {
-			CaseRef caseRef = ((DocRef) m).getCaseRef();
-			if(caseRef == null) continue;
-			String surl = caseRef.getUrl();
+			Reference ref = ((DocRef) m).getReference();
+			if(ref == null) continue;
+			String surl = ref.getUrl();
 			if(surl != null && surl.equals(remoteCaseUrl)) return (DocRef) m;
 		}
 		return null;

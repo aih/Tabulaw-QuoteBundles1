@@ -203,9 +203,9 @@ public class DocumentResource extends BaseResource {
 		if (! "upload".equals(source)) {
 			String htmlContent = StringUtils.isNotEmpty(docContent) ? docContent : downloadDocument(source);
 			if (StringUtils.isEmpty(url)) {
-				document.getCaseRef().setUrl(source);
+				document.getReference().setUrl(source);
 			} else {
-				document.getCaseRef().setUrl(url);
+				document.getReference().setUrl(url);
 			}
 			document = getDataService().saveDoc(document);
 			
@@ -214,7 +214,7 @@ public class DocumentResource extends BaseResource {
 			getDataService().addDocUserBinding(getUserId(), document.getId());
 		} else {
 			if (! StringUtils.isEmpty(url)) {
-				document.getCaseRef().setUrl(url);
+				document.getReference().setUrl(url);
 			}
 			httpRequest.getSession().setAttribute("documentToUpload", document);
 			return null;

@@ -454,7 +454,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		this.doc = doc;
 
 		// disallow doc editing for case type docs
-		menu.setVisibleEditItem(doc != null && doc.getCaseRef() == null);
+		menu.setVisibleEditItem(doc != null && doc.getReference() == null);
 
 		frame.getElement().setId(getFrameId());
 
