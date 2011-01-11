@@ -13,6 +13,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -131,7 +132,7 @@ public class DocListingWidget extends AbstractModelChangeAwareWidget {
 		public void renderCell(int rowIndex, final int cellIndex, final DocRef rowData, Column column, final HTMLTable table) {
 			switch(cellIndex) {
 				case 0:
-					table.setText(rowIndex, cellIndex, rowData.getTitle());
+					table.setText(rowIndex, cellIndex, new HTML(rowData.getTitle()).getText());
 					break;
 				case 1:
 					String sdate = Fmt.format(rowData.getDate(), GlobalFormat.DATE);

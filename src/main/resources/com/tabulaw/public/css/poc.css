@@ -1209,9 +1209,10 @@ docHeaderMenuItem img {
 
 .bundles .boundaryArea {
 	width: 100%;
+	overflow-y: auto !important;
 	/*min-height: 578px;*/
 	/*height: 535px;
-		overflow-y: auto !important;*/
+		*/
 }
 
 /* document view styling */
