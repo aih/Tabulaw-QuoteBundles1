@@ -29,7 +29,7 @@ import com.tabulaw.client.ui.field.IFieldWidget;
 import com.tabulaw.client.ui.field.SelectField;
 import com.tabulaw.client.validate.ErrorHandlerBuilder;
 import com.tabulaw.common.data.rpc.ModelListPayload;
-import com.tabulaw.model.CaseReference;
+import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.QuoteBundle;
@@ -340,7 +340,7 @@ public class UserQuoteDialog extends Dialog implements IEditHandler<FieldGroup>{
 		QuoteReferenceType type = ((SelectField<QuoteReferenceType>) fieldGroup.getFieldWidget("quoteReferenceType")).getValue();
 		switch (type) {
 			case COURT:
-				CaseReference caseRef = new CaseReference();
+				CaseRef caseRef = new CaseRef();
 				caseRef.setCourt((String) fieldGroup.getFieldWidget("courtCourt").getValue());
 				caseRef.setDocLoc((String) fieldGroup.getFieldWidget("courtDocLoc").getValue());
 				caseRef.setParties((String) fieldGroup.getFieldWidget("courtParties").getValue());

@@ -61,7 +61,7 @@ public abstract class Reference extends EntityBase {
 	
 	public static Reference createReferenceByType(String type) {
 		if ("casedoc".equals(type)) {
-			return new CaseReference();
+			return new CaseRef();
 		} else if ("statutedoc".equals(type)) {
 			return new StatuteReference();
 		} else if ("regulationdoc".equals(type)) {
@@ -71,7 +71,7 @@ public abstract class Reference extends EntityBase {
 	}
 	
 	public static String getReferenceType(Reference ref) {
-		if (ref instanceof CaseReference) {
+		if (ref instanceof CaseRef) {
 			return "casedoc";
 		} else if (ref instanceof StatuteReference) {
 			return "statutedoc";

@@ -38,7 +38,7 @@ import com.tabulaw.client.ui.QuoteResizeEvent;
 import com.tabulaw.client.ui.UpdateQuoteBundle;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.CaseReference;
+import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocKey;
 import com.tabulaw.model.DocRef;

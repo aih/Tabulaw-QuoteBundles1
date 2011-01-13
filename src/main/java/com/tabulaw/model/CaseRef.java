@@ -39,7 +39,7 @@ import com.tabulaw.util.StringUtil;
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Url", properties = { "url"
 }))
 @XmlRootElement(name = "caseRef")
-public class CaseReference extends Reference implements Comparable<CaseReference> {
+public class CaseRef extends Reference implements Comparable<CaseRef> {
 
 	private static final long serialVersionUID = 6628199715132440622L;
 
@@ -54,7 +54,7 @@ public class CaseReference extends Reference implements Comparable<CaseReference
 	/**
 	 * Constructor
 	 */
-	public CaseReference() {
+	public CaseRef() {
 		super();
 	}
 
@@ -216,7 +216,7 @@ public class CaseReference extends Reference implements Comparable<CaseReference
 	@Override
 	protected void doClone(IEntity cln) {
 		super.doClone(cln);
-		CaseReference cr = (CaseReference) cln;
+		CaseRef cr = (CaseRef) cln;
 		cr.parties = parties;
 		cr.reftoken = reftoken;
 		cr.docLoc = docLoc;
@@ -228,7 +228,7 @@ public class CaseReference extends Reference implements Comparable<CaseReference
 
 	@Override
 	protected IEntity newInstance() {
-		return new CaseReference();
+		return new CaseRef();
 	}
 
 	@Override
@@ -310,7 +310,7 @@ public class CaseReference extends Reference implements Comparable<CaseReference
 	}
 
 	@Override
-	public int compareTo(CaseReference o) {
+	public int compareTo(CaseRef o) {
 		if(year > o.year) return 1;
 		if(o.year > year) return -1;
 		if(parties != null && o.parties != null) {
