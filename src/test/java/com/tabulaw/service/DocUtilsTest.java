@@ -18,7 +18,7 @@ import java.util.Date;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.tabulaw.model.CaseReference;
+import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
 

@@ -15,7 +15,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.tabulaw.model.CaseReference;
+import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.Reference;

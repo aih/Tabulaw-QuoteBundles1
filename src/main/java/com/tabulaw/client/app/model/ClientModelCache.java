@@ -19,7 +19,7 @@ import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.CaseReference;
+import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IEntity;
