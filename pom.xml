@@ -725,18 +725,6 @@
 			<classifier>jdk15</classifier>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.0.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpmime</artifactId>
-			<version>4.0.1</version>
-			<scope>compile</scope>
-		</dependency>
 		<!-- Google Docs parser -->
 		<dependency>
 			<groupId>be.cyberelf.nanoxml</groupId>
@@ -775,15 +763,18 @@
 			<version>3.0</version>
 		</dependency>
 		<dependency>
-			<groupId>apache-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.0.1</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.0.1</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
+			<artifactId>httpmime</artifactId>
 			<version>4.0.1</version>
+			<scope>compile</scope>
 		</dependency>
+
 		<!-- OpenID+OAuth -->
 		<dependency>
 			<groupId>org.openid4java</groupId>
@@ -864,10 +855,6 @@
             <artifactId>antisamy</artifactId>
             <version>1.4.2</version>
 			<exclusions>
-				<exclusion>
-		            <groupId>commons-httpclient</groupId>
-        		    <artifactId>commons-httpclient</artifactId>
-				</exclusion>
 				<exclusion>
 		            <groupId>junit</groupId>
         		    <artifactId>junit</artifactId>
