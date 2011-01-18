@@ -15,7 +15,6 @@
 			com.tabulaw.di.MailModule
 			com.tabulaw.di.ExceptionHandlerModule
 			com.tabulaw.di.ModelModule
-			com.tabulaw.di.Db4oDaoModule
 			com.tabulaw.di.PersistContextModule
 			com.tabulaw.di.DataConverterModule
 			com.tabulaw.di.HtmlSanitizerModule
@@ -31,7 +30,6 @@
 		<param-name>di.handlers</param-name>
 		<param-value>
     	com.tabulaw.server.WebAppContextBootstrapper
-    	com.tabulaw.server.Db4oBootstrapper
     	com.tabulaw.server.PersistContextBootstrapper
     	com.tabulaw.server.DataConverterBootstrapper
     </param-value>

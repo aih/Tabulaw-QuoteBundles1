@@ -37,7 +37,6 @@ import com.tabulaw.client.validate.IValidator;
 import com.tabulaw.client.validate.IntegerValidator;
 import com.tabulaw.client.validate.NotEmptyValidator;
 import com.tabulaw.client.validate.ValidationException;
-import com.tabulaw.schema.IPropertyMetadataProvider;
 import com.tabulaw.schema.PropertyMetadata;
 import com.tabulaw.util.ObjectUtil;
 import com.tabulaw.util.StringUtil;
@@ -435,19 +434,6 @@ public abstract class AbstractField<V> extends Composite implements IFieldWidget
 		default:
 			throw new IllegalStateException("Unhandled property type: " + metadata.getPropertyType().name());
 		}
-	}
-
-	public final void applyPropertyMetadata(IPropertyMetadataProvider provider) {
-		// Log.debug("AbstractField.applyPropertyMetadata() for " + toString());
-		final PropertyMetadata metadata = provider.getPropertyMetadata(getPropertyName());
-		if(metadata == null) {
-			Log.warn("No property metadata found for field: " + toString());
-		}
-		else {
-			setPropertyMetadata(metadata);
-		}
-		// apply model new flag
-		//validateIncrementally(!isNewModelData);
 	}
 
 	public final void removeValidator(Class<? extends IValidator> type) {

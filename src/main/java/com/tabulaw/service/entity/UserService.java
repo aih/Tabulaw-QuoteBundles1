@@ -10,14 +10,10 @@ import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
-import com.tabulaw.criteria.Criteria;
-import com.tabulaw.criteria.InvalidCriteriaException;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.dao.IEntityDao;
 import com.tabulaw.model.IUserRef;
 import com.tabulaw.model.User;
 import com.tabulaw.model.User.Role;
@@ -28,7 +24,7 @@ import com.tabulaw.util.StringUtil;
  * Manages the persistence of {@link User}s.
  * @author jpk
  */
-public class UserService extends AbstractEntityService implements IForgotPasswordHandler {
+public class UserService implements IForgotPasswordHandler {
 
 	// private static PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
 
@@ -71,55 +67,19 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 * @param vfactory
 	 */
 	@Inject
-	public UserService(IEntityDao dao, ValidatorFactory vfactory) {
-		super(dao, vfactory);
+	public UserService(ValidatorFactory vfactory) {
+
 	}
 
-	@Transactional
 	public void init() {
 
-		try {
-			// load admin account and create if not present
-			User superadmin = dao.load(User.class, "admin@tabulaw.com");
-			log.debug("Admin user retrieved.");
-
-			// HACK: retro-fit user's role as we no longer have Authority entities
-			if(superadmin.getRoles().size() == 0) {
-				superadmin.addRole(Role.ADMINISTRATOR);
-				dao.persist(superadmin);
-			}
-			// END HACK
-		}
-		catch(EntityNotFoundException e) {
-			// create the admin user
-			User adminUser = new User();
-			adminUser.addRole(Role.ADMINISTRATOR);
-			Date now = new Date();
-			adminUser.setDateCreated(now);
-			adminUser.setDateModified(now);
-			adminUser.setEmailAddress("admin@tabulaw.com");
-			adminUser.setPassword(encodePassword("admin123", adminUser.getEmailAddress()));
-			adminUser.setEnabled(true);
-			adminUser.setLocked(false);
-			Calendar c = Calendar.getInstance();
-			c.setTime(now);
-			c.add(Calendar.YEAR, 1);
-			adminUser.setExpires(c.getTime());
-			adminUser.setName("Tabulaw Administrator");
-
-			dao.persist(adminUser);
-			log.debug("admin user created.");
-		}
 	}
 
 	/**
 	 * @return list of all users in the system.
 	 */
-	@Transactional(readOnly = true)
 	public List<User> getAllUsers() {
-		List<User> list = dao.loadAll(User.class);
-		if(list == null) return Collections.emptyList();
-		return list;
+		return null;
 	}
 
 	/**
@@ -128,11 +88,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 * @return the found user
 	 * @throws EntityNotFoundException when the user can't be found
 	 */
-	@Transactional(readOnly = true)
 	public User loadUser(String userId) throws EntityNotFoundException {
-		if(userId == null) throw new NullPointerException();
-		User existing = dao.load(User.class, userId);
-		return existing;
+		return null;
 	}
 
 	/**
@@ -142,13 +99,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 * @param userId
 	 * @throws EntityNotFoundException When the user of the given id isn't found
 	 */
-	@Transactional
 	public void deleteUser(String userId) throws EntityNotFoundException {
-		if(userId == null) throw new NullPointerException();
-		User existing = dao.load(User.class, userId);
-		assert existing != null;
-		dao.purge(existing);
-		// TODO delete user related entities
+
 	}
 
 	/**
@@ -156,31 +108,8 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 * @param user
 	 * @return
 	 */
-	@Transactional
 	public User updateUser(User user) {
-		if(user == null) throw new NullPointerException();
-
-		User existing;
-		try {
-			existing = dao.load(User.class, user.getId());
-
-			// transfer password as we don't require this for update
-			// nor do we actually update it
-			user.setPassword(existing.getPassword());
-		}
-		catch(EntityNotFoundException e) {
-			// new
-			existing = null;
-		}
-
-		validate(user);
-
-		// clear out existing
-		if(existing != null) dao.purge(existing);
-
-		user = dao.persist(user);
-
-		return user;
+		return null;
 	}
 
 	/**
@@ -192,98 +121,22 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 * @throws ValidationException
 	 * @throws EntityExistsException
 	 */
-	@Transactional
 	public User create(String name, String emailAddress, String password) throws ValidationException,
 			EntityExistsException {
-		if(name == null || emailAddress == null || password == null) throw new NullPointerException();
-
-		final User user = new User();
-
-		String encPassword = null;
-		try {
-			encPassword = encodePassword(password, emailAddress);
-		}
-		catch(final IllegalArgumentException iae) {
-			throw new ValidationException("Invalid password");
-		}
-
-		user.setEmailAddress(emailAddress);
-		user.setPassword(encPassword);
-		user.setName(name);
-
-		// set default expiry date to 6 years from now
-		final Calendar clndr = Calendar.getInstance();
-		clndr.add(Calendar.YEAR, 6);
-		final Date expires = clndr.getTime();
-		user.setExpires(expires);
-
-		// set the user as un-locked by default
-		user.setLocked(false);
-
-		// set the role as user
-		user.addRole(Role.USER);
-
-		validate(user);
-
-		dao.persist(user);
-
-		return user;
+		return null;
 	}
 
-	@Transactional(readOnly = true)
-	@Override
 	public IUserRef getUserRef(String username) throws EntityNotFoundException {
-		// NOTE: the username is the email address
-		return findByEmail(username);
+		return null;
 	}
 
-	@Transactional(readOnly = true)
 	public User findByEmail(String emailAddress) throws EntityNotFoundException {
-		User user;
-		try {
-			final Criteria<User> criteria = new Criteria<User>(User.class);
-			criteria.getPrimaryGroup().addCriterion("emailAddress", emailAddress, true);
-			user = dao.findEntity(criteria);
-		}
-		catch(final InvalidCriteriaException e) {
-			throw new IllegalStateException("Unexpected invalid criteria exception occurred");
-		}
-		catch(EntityNotFoundException e) {
-			throw new EntityNotFoundException("No user with email address: '" + emailAddress + "' was found.");
-		}
-
-		assert user != null;
-		return user;
+		return null;
 	}
 
-	@Transactional(rollbackFor = {
-		ChangeUserCredentialsFailedException.class, RuntimeException.class
-	})
 	@Override
 	public String resetPassword(String userId) throws ChangeUserCredentialsFailedException {
-
-		try {
-			// get the user
-			final User user = dao.load(User.class, userId);
-			final String username = user.getEmailAddress();
-
-			// encode the new password
-			final String random = RandomStringUtils.randomAlphanumeric(8);
-			final String encNewPassword = encodePassword(random, username);
-
-			// set the credentials
-			user.setPassword(encNewPassword);
-			dao.persist(user);
-
-			// updateSecurityContextIfNecessary(username, username, random, false);
-
-			return random;
-		}
-		catch(final EntityNotFoundException nfe) {
-			throw new ChangeUserCredentialsFailedException("Unable to re-set user password: User of id: " + userId
-					+ " not found");
-		}
-
+		return null;
 	}
 
 	/**
@@ -292,37 +145,7 @@ public class UserService extends AbstractEntityService implements IForgotPasswor
 	 * @param password the new un-encoded password to set
 	 * @throws ChangeUserCredentialsFailedException when the password set fails
 	 */
-	@Transactional(rollbackFor = {
-		ChangeUserCredentialsFailedException.class, RuntimeException.class
-	})
 	public void setPassword(String userId, String password) throws ChangeUserCredentialsFailedException {
-		if(userId == null || password == null) throw new NullPointerException();
-
-		// TODO add more constraints for a valid password
-		if(StringUtil.isEmpty(password)) throw new IllegalArgumentException("Invalid password");
-
-		try {
-			// get the user
-			final User user = dao.load(User.class, userId);
-			final String username = user.getEmailAddress();
-
-			// encode the new password
-			final String encNewPassword = encodePassword(password, username);
-
-			// set the credentials
-			user.setPassword(encNewPassword);
-			dao.persist(user);
-
-			// updateSecurityContextIfNecessary(username, username, random, false);
-		}
-		catch(final IllegalArgumentException e) {
-			throw new ChangeUserCredentialsFailedException("Unable to re-set user password: User of id: " + userId + ": "
-					+ e.getMessage());
-		}
-		catch(final EntityNotFoundException nfe) {
-			throw new ChangeUserCredentialsFailedException("Unable to re-set user password: User of id: " + userId
-					+ " not found");
-		}
 
 	}
 

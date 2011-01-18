@@ -23,14 +23,11 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.tabulaw.IMarshalable;
-import com.tabulaw.model.bk.BusinessKeyDef;
-import com.tabulaw.model.bk.BusinessObject;
 
 /**
  * The user entity. NOTE: no surrogate primary key is needed here.
  * @author jpk
  */
-@BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress" }))
 @XmlRootElement(name = "user")
 public class User extends TimeStampEntity implements IUserRef, INamedEntity, Comparable<User> {
 

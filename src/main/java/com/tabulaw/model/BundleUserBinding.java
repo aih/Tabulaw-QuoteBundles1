@@ -7,18 +7,12 @@ package com.tabulaw.model;
 
 import javax.validation.constraints.NotNull;
 
-import com.tabulaw.model.bk.BusinessKeyDef;
-import com.tabulaw.model.bk.BusinessObject;
-
 /**
  * Associates a {@link QuoteBundle} to a {@link User}.
  * <p>
  * NOTE: No primary surrogate key is needed here.
  * @author jpk
  */
-@BusinessObject(businessKeys = @BusinessKeyDef(name = "Quote Bundle User Binding", properties = {
-	"bundleId", "userId"
-}))
 public class BundleUserBinding extends EntityBase {
 
 	private static final long serialVersionUID = -4676769373977438262L;

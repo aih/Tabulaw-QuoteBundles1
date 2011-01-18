@@ -2,7 +2,6 @@ package com.tabulaw.model;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.tabulaw.schema.Managed;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -56,7 +55,6 @@ public abstract class EntityBase implements IEntity {
 		return new ModelKey(getEntityType(), getId());
 	}
 
-	@Managed
 	@Override
 	@XmlTransient
 	public final int getVersion() {
