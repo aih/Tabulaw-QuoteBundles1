@@ -47,6 +47,9 @@ public class DataConverterBootstrapper implements IBootstrapHandler {
 
 		// doc to html 
 		converters.add(new ExternalConverter("application/msword", "html", httpclient));
+
+		// rtf to html 
+		converters.add(new ExternalConverter("text/rtf", "html", httpclient));
 		
 		// docx to html 
 		converters.add(new ExternalConverter("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "html", httpclient));
