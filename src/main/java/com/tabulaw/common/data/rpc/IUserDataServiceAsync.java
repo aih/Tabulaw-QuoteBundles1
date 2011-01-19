@@ -12,6 +12,7 @@ import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.Reference;
 import com.tabulaw.model.UserState;
 
 /**
@@ -74,5 +75,5 @@ public interface IUserDataServiceAsync {
 	
 	void deleteClauseBundle(String id, AsyncCallback<Payload> callback);
 
-	void addOrphanQuote(String userId, String title, String quoteText, String quoteBundleId, AsyncCallback<ModelListPayload<EntityBase>> callback);
+	void addOrphanQuote(String userId, String title, Reference reference, String quoteText, String quoteBundleId, AsyncCallback<ModelListPayload<EntityBase>> callback);
 }

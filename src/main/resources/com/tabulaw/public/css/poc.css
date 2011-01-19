@@ -183,7 +183,7 @@ div.ro {
 }
 
 .search-panel {
-	margin-bottom: 10px;
+	height: 62px;
 }
 
 .search-widget {
@@ -257,7 +257,7 @@ div.ro {
 	width: 150px;
 	background-color: #EFEFEF;
 	margin: 3px;
-	padding: 3px 10px 3px 15px;
+	padding: 3px 10px 3px 10px;
 }
 
 .navTabsPanel .gwt-TabBarItem-selected .navButton {

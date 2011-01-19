@@ -247,8 +247,25 @@ public final class FieldGroup implements IField, Iterable<IField> {
 				validate(errors, ((FieldGroup) field), list);
 			}
 			else {
-				try {
-					field.validate();
+				try {					
+					if (field.isVisible()) {
+						if (field instanceof AbstractField<?>) {
+							Widget widget = (AbstractField<?>) field;
+							boolean visible = true;
+							while (widget.getParent() != null) {
+								if (! widget.getParent().isVisible()) {
+									visible = false;
+									break;
+								}
+								widget = widget.getParent();
+							}
+							if (visible) {
+								field.validate();
+							}
+						} else {
+							field.validate();
+						}
+					}
 				}
 				catch(final ValidationException e) {
 					final ArrayList<IField> list = new ArrayList<IField>(parents.size() + 1);

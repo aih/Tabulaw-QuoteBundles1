@@ -185,9 +185,9 @@ public class QuoteBundleResource extends BaseResource {
 		for (Quote quote : bundle.getQuotes()) {
 			QuoteInfo info = new QuoteInfo(quote);
 			quotes.add(info);
-			if (quote.getDocument().getCaseRef() != null && 
-					quote.getDocument().getCaseRef().getUrl() != null) {
-				urls.add(quote.getDocument().getCaseRef().getUrl());
+			if (quote.getDocument().getReference() != null && 
+					quote.getDocument().getReference().getUrl() != null) {
+				urls.add(quote.getDocument().getReference().getUrl());
 			}
 		}		
 		

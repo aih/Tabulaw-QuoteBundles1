@@ -35,3 +35,11 @@ eclipse settings:
  		=========
  		From a command line at project root:
  		"mvn package -P prod"
+
+ 6) manually install htmlcleaner 2.2 into your local maven repo.
+
+ 7) Probably you may run into issues with antisamy 1.4.2 lib. 
+    To fix:
+	1. goto your local maven repository
+	2. find antisamy-1.4.2.pom file there
+	3. remove <parent> at the top of file
