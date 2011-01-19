@@ -49,6 +49,8 @@ public class NavTabsPanel extends AbstractNavPanel {
 
 		mainViewTabs.addTab(nbDocListing);
 		mainViewTabs.addTab(nbQuoteBundles);
+		
+		mainViewTabs.selectTab(0);
 
 		mainViewTabs.addSelectionHandler(new SelectionHandler<Integer>() {
 			@Override

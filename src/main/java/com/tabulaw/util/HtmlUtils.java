@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.htmlcleaner.ContentToken;
+import org.htmlcleaner.ContentNode;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
@@ -273,11 +273,11 @@ public class HtmlUtils {
 				prefix.setPrefix("");
 			}
 			for (Object child : node.getChildren()) {
-				if (child instanceof ContentToken) {
+				if (child instanceof ContentNode) {
 					// if current child is text, try to find the word
 					levels.set(level, levels.get(level) + 1);
 					levels.set(level + 1, -1);
-					String content = ((ContentToken) child).getContent().replace("&nbsp;", " ");
+					String content = ((ContentNode) child).getContent().toString().replace("&nbsp;", " ");
 					content = StringEscapeUtils.unescapeHtml(content).replace("apos;", "'");
 					processTextElement(content, level);					
 				}

@@ -6,3 +6,10 @@ call installall.bat
 cd ..
 cd step2
 call installall.bat
+cd ..
+cd gwt
+call installall.bat
+cd ..
+cd html
+call installall.bat
+cd ..

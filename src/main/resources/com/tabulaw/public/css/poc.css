@@ -183,7 +183,7 @@ div.ro {
 }
 
 .search-panel {
-	margin-bottom: 10px;
+	height: 62px;
 }
 
 .search-widget {
@@ -257,7 +257,7 @@ div.ro {
 	width: 150px;
 	background-color: #EFEFEF;
 	margin: 3px;
-	padding: 3px 10px 3px 15px;
+	padding: 3px 10px 3px 10px;
 }
 
 .navTabsPanel .gwt-TabBarItem-selected .navButton {
@@ -546,12 +546,8 @@ div.ro {
 			padding-bottom: 2px;
 } 
 
-.qbundle .quotes {
+.qbundle .quotes.dragdrop-dropTarget {
 	max-height: 300px;
-}
-		
-* html .qbundle .quotes {
-	height: expression(this.scrollHeight <= 300 ? "auto" : "300px");
 }
 
 .qbundle .qbcurrent {

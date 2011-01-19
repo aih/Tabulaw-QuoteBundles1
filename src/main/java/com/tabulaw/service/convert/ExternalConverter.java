@@ -38,7 +38,7 @@ public class ExternalConverter extends AbstractDataConverter {
 		httppost.addHeader("accept-type", this.getTargetMimeType());
 
 		HttpResponse response = httpClient.execute(httppost);
-		if (response.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
+		if (response.getStatusLine().getStatusCode() > HttpStatus.SC_BAD_REQUEST) {
 			throw new ServletException("Converter communication error:" + response.getStatusLine().getReasonPhrase());
 		}
 		HttpEntity resEntity = response.getEntity();

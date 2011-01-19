@@ -39,43 +39,11 @@ import com.tabulaw.util.StringUtil;
 @BusinessObject(businessKeys = @BusinessKeyDef(name = "Url", properties = { "url"
 }))
 @XmlRootElement(name = "caseRef")
-public class CaseRef extends EntityBase implements Comparable<CaseRef> {
-
-	/**
-	 * Ciation format flags.
-	 */
-	public static enum CitationFormatFlag {
-		ALL(0),
-		EXCLUDE_PARTIES(1),
-		EXCLUDE_YEAR(2);
-
-		private final int flag;
-
-		private CitationFormatFlag(int flag) {
-			this.flag = flag;
-		}
-
-		public int flag() {
-			return flag;
-		}
-		
-		public static boolean hasFormat(int flags, CitationFormatFlag flag) {
-			return (flags & flag.flag) == flag.flag;
-		}
-
-		public static int addFormat(int flags, CitationFormatFlag flag) {
-			return flags | flag.flag;
-		}
-	}
+public class CaseRef extends Reference implements Comparable<CaseRef> {
 
 	private static final long serialVersionUID = 6628199715132440622L;
 
-	/**
-	 * Surrogate primary key.
-	 */
-	private String id;
-
-	private String reftoken, parties, docLoc, court, url;
+	private String reftoken, parties, docLoc, court;
 	
 	private int year;
 	
@@ -98,78 +66,161 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		return court != null && (court.indexOf("Supreme Court") >= 0);
 	}
 
-	/**
-	 * Gets a custom formatted citation token.
-	 * @param formatFlags the desired format directive bit flags based on
-	 *        <code>CFF_*</code> flag constants.
-	 * @return
-	 */
-	public String format(int formatFlags) {
-		StringBuilder sb = new StringBuilder(512);
+	@Override
+	public String format(ReferenceFormat format, Quote quote) {
+		switch (format) {
+			case HTML: 
+					return formatFull(true, quote);					
+			case TITLE:
+					return parties == null ? "" : parties;					
+			case SUB_TITLE:
+					return formatSubTitle(quote);
+			case SHORT_SUB_TITLE:
+				return formatShortSubTitle();					
+					
+			default:
+				return formatFull(false, quote);					
+		}
+	}
 
-		if(isSupremeCourt()) {
-			// FORMAT: New York Times Co. v. Sullivan, 376 U.S. 254 (1964).
-			if(!CitationFormatFlag.hasFormat(formatFlags, CitationFormatFlag.EXCLUDE_PARTIES)) {
-				sb.append(getParties());
-				sb.append(", ");
-			}
-			sb.append(getDocLoc());
-			if (! CitationFormatFlag.hasFormat(formatFlags, CitationFormatFlag.EXCLUDE_YEAR)) {
-				sb.append(" (");
-				sb.append(getYear());
-				sb.append(").");
+	public String formatSubTitle(Quote quote) {
+		StringBuilder subtitleBuilder = new StringBuilder();
+		subtitleBuilder.append(getDocLoc());
+		subtitleBuilder.append(", ");
+			
+		if (quote != null && quote.getStartPage() > 0) {
+			subtitleBuilder.append(quote.getStartPage());
+			if (quote.getStartPage() != quote.getEndPage()) {
+				subtitleBuilder.append("-");
+				subtitleBuilder.append(quote.getEndPage());
 			}
 		}
-		else {
-			// FORMAT: Curtis Publishing Company v. Butts, 351 F. 2d 702 (5th Cir.
-			// 1965)
-			if(!CitationFormatFlag.hasFormat(formatFlags, CitationFormatFlag.EXCLUDE_PARTIES)) {
-				sb.append(getParties());
-				sb.append(", ");
+		subtitleBuilder.append(" (");
+		if (! isSupremeCourt() && getCourt() != null && ! getCourt().isEmpty()) {
+			subtitleBuilder.append(getCourt());
+			subtitleBuilder.append(" ");
+		}
+		subtitleBuilder.append(getYear());
+		subtitleBuilder.append(").");
+		return subtitleBuilder.toString();
+	}
+	
+	public String formatShortSubTitle() {
+		StringBuilder shortSubtitleBuilder = new StringBuilder(); 
+		if (isSupremeCourt()) {
+			shortSubtitleBuilder
+					.append("US (")
+					.append(getYear())
+					.append(")");
+		} else {
+			shortSubtitleBuilder.append("(");			
+			if (StringUtil.isEmpty(getCourt())) {
+				shortSubtitleBuilder.append(getCourt());
+				shortSubtitleBuilder.append(" ");
 			}
-			sb.append(getDocLoc());
-			if (! CitationFormatFlag.hasFormat(formatFlags, CitationFormatFlag.EXCLUDE_YEAR)) {
-				sb.append(" (");
-				String theCourt = getCourt();
-				if(!StringUtil.isEmpty(theCourt)) {
-					sb.append(theCourt);
-					sb.append(" ");
-				}
-				sb.append(getYear());
-				sb.append(")");
+			shortSubtitleBuilder.append(getYear());
+			shortSubtitleBuilder.append(")");
+		}
+		return shortSubtitleBuilder.toString();
+	}
+	
+	public String formatFull(boolean html, Quote quote) {
+		StringBuilder caseRefBuilder = new StringBuilder(512);
+		
+		if (! StringUtil.isEmpty(getParties())) {
+			if (html) {
+				caseRefBuilder.append("<i>");
+			}
+			caseRefBuilder.append(getParties());
+			caseRefBuilder.append(", ");
+			if (html) {
+				caseRefBuilder.append("</i>");
 			}
 		}
-
+		caseRefBuilder.append(getDocLoc());
+		if (quote != null && quote.getStartPage() > 0) {
+			caseRefBuilder.append(", ");
+			caseRefBuilder.append(quote.getStartPage());
+			if (quote.getStartPage() != quote.getEndPage()) {
+				caseRefBuilder.append("-");
+				caseRefBuilder.append(quote.getEndPage());
+			}
+		}
+		caseRefBuilder.append(" (");
+		if (! isSupremeCourt() && ! StringUtil.isEmpty(getCourt())) {
+			caseRefBuilder.append(getCourt());
+			caseRefBuilder.append(" ");
+		}
+		caseRefBuilder.append(getYear());
+		caseRefBuilder.append(").");
+		return caseRefBuilder.toString();
+	}
+	
+	@Override
+	public String serializeToString() {
+		StringBuilder sb = new StringBuilder(512); 
+		sb.append("|parties::");
+		sb.append(getParties());
+		sb.append("|reftoken::");
+		sb.append(getReftoken());
+		sb.append("|docLoc::");
+		sb.append(getDocLoc());
+		sb.append("|court::");
+		sb.append(getCourt());
+		sb.append("|url::");
+		sb.append(getUrl());
+		sb.append("|year::");
+		sb.append(getYear());
+		sb.append("|firstPageNumber::");
+		sb.append(getFirstPageNumber());
+		sb.append("|lastPageNumber::");
+		sb.append(getLastPageNumber());		
 		return sb.toString();
 	}
-
+	
 	@Override
-	public String descriptor() {
-		// return typeDesc() + " (" + getCitation() + ")";
-		return format(0); // default no exclusions
-	}
-
-	@Override
-	public String getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(String id) {
-		if(id == null) throw new NullPointerException();
-		this.id = id;
+	public void deserializeFromString(String data) {
+		String[] sarr1 = data.split("\\|");
+		
+		for(String sub : sarr1) {
+			String[] sarr2 = sub.split("::");
+			String name = sarr2[0];
+			String value = (sarr2.length == 2) ? sarr2[1] : "";
+			if("parties".equals(name)) {
+				parties = value;
+			}
+			else if("reftoken".equals(name)) {
+				reftoken = value;
+			}
+			else if("docLoc".equals(name)) {
+				docLoc = value;
+			}
+			else if("court".equals(name)) {
+				court = value;
+			}
+			else if("url".equals(name)) {
+				url = value;
+			}
+			else if("year".equals(name)) {
+				year = Integer.parseInt(value);
+			} 
+			else if ("firstPageNumber".equals(name)) {
+				firstPageNumber = Integer.parseInt(value);
+			}
+			else if ("lastPageNumber".equals(name)) {
+				lastPageNumber = Integer.parseInt(value);
+			}
+		}
 	}
 
 	@Override
 	protected void doClone(IEntity cln) {
 		super.doClone(cln);
 		CaseRef cr = (CaseRef) cln;
-		cr.id = id;
 		cr.parties = parties;
 		cr.reftoken = reftoken;
 		cr.docLoc = docLoc;
 		cr.court = court;
-		cr.url = url;
 		cr.year = year;
 		cr.firstPageNumber = firstPageNumber;
 		cr.lastPageNumber = lastPageNumber;
@@ -221,17 +272,6 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 	}
 
 	/**
-	 * @return the sourcing url of this case.
-	 */
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	/**
 	 * @return the 4-digit numeric case year (e.g.: 1975)
 	 */
 	public int getYear() {
@@ -265,8 +305,8 @@ public class CaseRef extends EntityBase implements Comparable<CaseRef> {
 		return lastPageNumber;
 	}
 
-	public void setLastPageNumber(int lastPageNumber) {
-		this.lastPageNumber = lastPageNumber;
+	public void setLastPageNumber(int lastPageNuber) {
+		this.lastPageNumber = lastPageNuber;
 	}
 
 	@Override

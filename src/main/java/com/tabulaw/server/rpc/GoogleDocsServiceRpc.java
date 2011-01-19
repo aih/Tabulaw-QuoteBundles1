@@ -224,7 +224,7 @@ public class GoogleDocsServiceRpc extends RpcServlet implements
 		return get;
 	}
 
-	private DocRef saveDocument(GoogleDocument document, String htmlContent) {
+	private DocRef saveDocument(GoogleDocument document, String htmlContent) throws Exception {
 		final PersistContext pc = (PersistContext) getThreadLocalRequest()
 				.getSession(false).getServletContext()
 				.getAttribute(PersistContext.KEY);

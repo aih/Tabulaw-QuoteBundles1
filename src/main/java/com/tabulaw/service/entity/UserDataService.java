@@ -37,7 +37,9 @@ import com.tabulaw.model.EntityFactory;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.QuoteUserBinding;
+import com.tabulaw.model.Reference;
 import com.tabulaw.model.UserState;
+import com.tabulaw.service.sanitizer.ISanitizer;
 
 /**
  * Manages the persistence of user related data that is not part of the user
@@ -74,16 +76,19 @@ public class UserDataService extends AbstractEntityService {
 			return orphanBundleId;
 		}
 	}
-
+	
+	private ISanitizer sanitizer;
 	/**
 	 * Constructor
 	 * @param dao
 	 * @param validationFactory
 	 */
 	@Inject
-	public UserDataService(IEntityDao dao, ValidatorFactory validationFactory) {
+	public UserDataService(IEntityDao dao, ValidatorFactory validationFactory, ISanitizer sanitizer) {
 		super(dao, validationFactory);
+		this.sanitizer = sanitizer; 
 	}
+
 
 	/**
 	 * Gets a list of all docs for a given user.
@@ -396,8 +401,20 @@ public class UserDataService extends AbstractEntityService {
 	public void saveDocContent(DocContent docContent) throws ConstraintViolationException {
 		if(docContent == null) throw new NullPointerException();
 		validate(docContent);
+		sanitize(docContent);
 		dao.persist(docContent);
 	}
+
+	private void sanitize(DocContent docContent) throws ConstraintViolationException{
+		String content = docContent.getHtmlContent();
+		try {
+			docContent.setHtmlContent(sanitizer.sanitizeHtml(content));
+		}
+		catch (Exception e) {
+			throw new ConstraintViolationException(e.getMessage(),null);
+		}
+	}
+
 
 	/**
 	 * Creates or updates the given contract doc.
@@ -659,8 +676,11 @@ public class UserDataService extends AbstractEntityService {
 	}
 	
 	@Transactional
-	public Quote addOrphanQuote(String userId, String title, String quoteText, String quoteBundleId) throws ConstraintViolationException,EntityNotFoundException {
+	public Quote addOrphanQuote(String userId, String title, Reference reference, String quoteText, String quoteBundleId) throws ConstraintViolationException,EntityNotFoundException {
 		DocRef document = EntityFactory.get().buildDoc(title, new Date(), true);
+		if (reference != null) {
+			document.setReference(reference);
+		}
 		saveDoc(document);
 
 		DocContent docContent = EntityFactory.get().buildDocContent(document.getId(), quoteText);

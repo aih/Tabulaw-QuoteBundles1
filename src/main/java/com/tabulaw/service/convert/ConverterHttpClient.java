@@ -55,7 +55,9 @@ public class ConverterHttpClient {
 	}
 
 	public void shutdown() {
-		httpClient.getConnectionManager().shutdown();
+		if (httpClient != null) { 
+			httpClient.getConnectionManager().shutdown();
+		}
 	}
 
 }
