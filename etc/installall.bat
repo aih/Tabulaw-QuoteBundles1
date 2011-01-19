@@ -10,3 +10,6 @@ cd ..
 cd gwt
 call installall.bat
 cd ..
+cd html
+call installall.bat
+cd ..
