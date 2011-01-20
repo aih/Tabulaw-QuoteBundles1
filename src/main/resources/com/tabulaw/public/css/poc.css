@@ -547,7 +547,7 @@ div.ro {
 } 
 
 .qbundle .quotes.dragdrop-dropTarget {
-	max-height: 300px;
+	/*max-height: 300px; WEBAPP-109*/
 }
 
 .qbundle .qbcurrent {
@@ -1205,7 +1205,7 @@ docHeaderMenuItem img {
 
 .bundles .boundaryArea {
 	width: 100%;
-	overflow-y: auto !important;
+	/*overflow-y: auto !important; WEBAPP-109*/
 	/*min-height: 578px;*/
 	/*height: 535px;
 		*/
