@@ -496,10 +496,6 @@
 					<artifactId>avalon-framework-impl</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>jdom</groupId>
-					<artifactId>jdom</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>xalan</groupId>
 					<artifactId>xalan-patched</artifactId>
 				</exclusion>
