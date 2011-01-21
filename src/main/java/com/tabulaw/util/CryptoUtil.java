@@ -17,6 +17,9 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
@@ -199,4 +202,45 @@ public abstract class CryptoUtil {
 		}
 		return hexString.toString();
 	}
+	
+	private static int SALT_LENGTH = 8;
+	private static int SALT_OFFSET = 4;
+	private static int ITERATION_COUNT = 924;
+
+	/*
+	 * This method used in new user registration
+	 */
+	public static boolean checkBetaKey(String userEmail, String betaKey) {
+		String calculatedHash = encodeString(userEmail);
+
+		return calculatedHash.equals(betaKey);
+	}
+	
+
+	/*
+	 * Two private method which implement custom algorithm for hash calculation
+	 */
+	private static String encodeString(String s){
+		byte[]  iteratedCode = addSalt(DigestUtils.sha(s));
+	
+        for (int i=0; i<ITERATION_COUNT; i++) {
+        	iteratedCode = addSalt(iteratedCode );
+        	iteratedCode=DigestUtils.md5(iteratedCode);
+        }
+        return new String(Hex.encodeHex(iteratedCode)).substring(0, 20);
+	} 
+	
+	private static byte[] addSalt(byte[] encodedValue){
+		ByteArrayOutputStream bytes =
+            new ByteArrayOutputStream(encodedValue.length + SALT_LENGTH);
+        bytes.write(encodedValue, 0, encodedValue.length);
+        byte[] salt = new byte[SALT_LENGTH];
+        
+        System.arraycopy(encodedValue, SALT_OFFSET, salt, 0, SALT_LENGTH);
+
+        bytes.write(salt, 0, SALT_LENGTH);
+        
+        return bytes.toByteArray();
+	}
+	
 }

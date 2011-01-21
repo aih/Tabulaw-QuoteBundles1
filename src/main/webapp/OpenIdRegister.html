@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ page language="java" import="java.util.*,java.lang.*" %> 
+<jsp:useBean id="loginSession" class="com.tabulaw.server.jsp.LoginSessionBean" > 	</jsp:useBean>
+<c:set target="${loginSession}" property="request" value="${pageContext.request}" />
+
+<c:if test="${loginSession.loggedIn}">
+	<c:redirect url="Poc.html"/>
+</c:if> 
+
+<jsp:useBean id="loginBean" class="com.tabulaw.server.jsp.LoginBean" > 	</jsp:useBean>
+<c:set target="${loginBean}" property="request" value="${pageContext.request}" />
+
+<c:if test="${loginBean.loginValid && loginSession.loggedIn}">
+	<c:redirect url="Poc.html"/>
+</c:if>
+<jsp:useBean id="registerBean" class="com.tabulaw.server.jsp.RegisterBean" > 	</jsp:useBean>
+ 
+<c:set target="${registerBean}" property="request" value="${pageContext.request}" />
+<c:set target="${registerBean}" property="loginRequired" value="true" />
+
+<c:if test="${registerBean.registrationValid}">
+	<c:redirect url="Login.html?registration=success"/>
+</c:if> 
+ 
+<html>
+	<head>
+		<link rel="shortcut icon" href="favicon.ico">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>Tabulaw</title>
+	</head>
+	<body>
+		<form class="register" method="post" action="OpenIdRegister.html">
+			<div>Register</div>
+				<c:if test="${fn:length(registerBean.errors)>0}">
+						<div class="msg errors">
+							<c:forEach var="error" items="${registerBean.errors}">
+									<div><c:out value="${error}"/></div>
+							</c:forEach><br />				
+						</div>
+				</c:if> 
+			<div>
+				<input type="hidden" id="userEmail" name="userEmail" value="<c:out value="${param.userEmail}"/>">
+				<input type="hidden" id="userName" name="userName" value="<c:out value="${param.userEmail}"/>">
+				<table>
+					<tr>
+						<td>beta key<sup class="rqd">*</sup></td>
+						<td><input type="text" id="betaKey" name="betaKey"></td>
+					</tr>
+				</table>
+			</div>
+			<div>
+				<input type="submit" id="submitRegister" name="submitRegister" value="Submit"></input>
+			</div>
+		</form>
+		<div>
+			<a href="_Login.html">Cancel</a>
+		</div>
+	</body>
+</html>

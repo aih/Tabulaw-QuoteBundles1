@@ -45,8 +45,10 @@ import com.google.step2.servlet.InjectableServlet;
 import com.tabulaw.model.User;
 import com.tabulaw.oauth.OAuthParameters;
 
+
 @SuppressWarnings("serial")
 public class OpenIdServlet extends InjectableServlet {
+	private static final String REDIRECT_URL = "/OpenIdRegister.html"; 
 
 	private final static Log log = LogFactory.getLog(OpenIdServlet.class);
 
@@ -135,8 +137,6 @@ public class OpenIdServlet extends InjectableServlet {
 			throws ServletException, IOException {
 		try {
 			UserInfo openIdUser = completeAuthentication(req);
-			signInUser(req, resp, openIdUser);
-			// req.getSession().setAttribute("user", openIdUser);
 			if (openIdUser == null) {
 				IOUtils.write("Invalid OpenId authorization.",
 						resp.getOutputStream());
@@ -148,7 +148,8 @@ public class OpenIdServlet extends InjectableServlet {
 						resp.getOutputStream());
 			}
 			if ("true".equalsIgnoreCase(redirectOnSuccess)) {
-				resp.sendRedirect(addGWTHosted(req, homePath));
+//				resp.sendRedirect(addGWTHosted(req, homePath));
+				resp.sendRedirect(req.getContextPath() + REDIRECT_URL+"?userEmail=" + openIdUser.getEmail());
 			}
 		} catch (OpenIDException e) {
 			log.error("", e);
@@ -156,10 +157,6 @@ public class OpenIdServlet extends InjectableServlet {
 		}
 	}
 
-	private User signInUser(HttpServletRequest req, HttpServletResponse resp,
-			UserInfo openIdUser) throws IOException {
-		return new UserSignIn(req).signInUser(openIdUser);
-	}
 
 	/**
 	 * Builds an auth request for a given OpenID provider.

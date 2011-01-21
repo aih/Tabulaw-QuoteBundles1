@@ -22,9 +22,9 @@ public class LoginBean {
 	private static final Log log = LogFactory.getLog(LoginBean.class);
 
 	private HttpServletRequest request;
-	private String emailAddress;
-	private String password;
-	private List<String> errors = new ArrayList<String>();
+	protected String emailAddress;
+	protected String password;
+	protected List<String> errors = new ArrayList<String>();
 
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;

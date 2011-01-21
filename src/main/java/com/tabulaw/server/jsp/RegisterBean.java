@@ -1,7 +1,6 @@
 package com.tabulaw.server.jsp;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -18,8 +17,9 @@ import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.WebAppContext;
 import com.tabulaw.server.rpc.UserServiceRpc;
 import com.tabulaw.service.entity.UserService;
+import com.tabulaw.util.CryptoUtil;
 
-public class RegisterBean {
+public class RegisterBean extends LoginBean{
 
 	private static final Log log = LogFactory.getLog(RegisterBean.class);
 
@@ -27,11 +27,9 @@ public class RegisterBean {
 
 	private String userName;
 
-	private String emailAddress;
-	private String password;
+	private String betaKey;
 	private String passwordConfirm;
-
-	private List<String> errors = new ArrayList<String>();
+	private boolean isLoginRequired = false;
 
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;
@@ -45,27 +43,33 @@ public class RegisterBean {
 					.getParameter("userPswd")));
 			setPasswordConfirm(StringUtils.defaultString(request
 					.getParameter("userPswdConfirm")));
+
+			setBetaKey(StringUtils.defaultString(request
+					.getParameter("betaKey")));
 		}
 	}
+	
+
+	public String getBetaKey() {
+		return betaKey;
+	}
+
+
+	public void setBetaKey(String betaKey) {
+		this.betaKey = betaKey;
+	}
+
 
 	public HttpServletRequest getRequest() {
 		return request;
 	}
 
-	public void setEmailAddress(String emailAddress) {
-		this.emailAddress = emailAddress;
+	public boolean isLoginRequired() {
+		return isLoginRequired;
 	}
 
-	public String getEmailAddress() {
-		return emailAddress;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getPassword() {
-		return password;
+	public void setLoginRequired(boolean isLoginRequired) {
+		this.isLoginRequired = isLoginRequired;
 	}
 
 	public void setPasswordConfirm(String passwordConfirm) {
@@ -76,9 +80,6 @@ public class RegisterBean {
 		return passwordConfirm;
 	}
 
-	public void setErrors(List<String> errors) {
-		this.errors = errors;
-	}
 
 	public String getUserName() {
 		return userName;
@@ -86,10 +87,6 @@ public class RegisterBean {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
-	}
-
-	public List<String> getErrors() {
-		return errors;
 	}
 
 	public boolean isRegistrationValid() {
@@ -102,7 +99,11 @@ public class RegisterBean {
 		}
 
 		UserService userService = null;
-
+		
+		if (!CryptoUtil.checkBetaKey(getEmailAddress(), getBetaKey())) {
+			errors.add("You beta key is invalid. Please contact Tabulaw support");
+		}
+		
 		if (getUserName().isEmpty()) {
 			errors.add("User name is required.");
 		}
@@ -157,6 +158,9 @@ public class RegisterBean {
 		} catch (Exception e) {
 			errors.add("Internal error");
 			log.error("", e);
+		}
+		if (isLoginRequired) {
+			isLoginValid();
 		}
 	}
 

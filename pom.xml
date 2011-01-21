@@ -20,6 +20,7 @@
 		<spring.version>2.5.6.SEC01</spring.version>
 		<springextensions.db4o.version>1.0.0e</springextensions.db4o.version>
 		<aspectj.version>1.6.9</aspectj.version>
+	 <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
 	</properties>
 
 	<url>https://github.com/aih/Tabulaw-QuoteBundles1</url>
@@ -38,8 +39,8 @@
 	</developers>
 
 	<repositories>
-		<!-- to get latest GWT (2.1-SNAPSHOT) <repository> <id>google-maven-snapshot-repository</id> 
-			<name>Google Maven Snapshot Repository</name> <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url> 
+		<!-- to get latest GWT (2.1-SNAPSHOT) <repository> <id>google-maven-snapshot-repository</id>
+			<name>Google Maven Snapshot Repository</name> <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
 			<snapshots> <enabled>true</enabled> </snapshots> </repository> -->
 		<repository>
 			<id>source.db4o</id>
@@ -57,11 +58,11 @@
 			<id>maven2-repository.dev.java.net</id>
 			<url>http://download.java.net/maven/2/</url>
 		</repository>
-		<repository>
+		<!--repository>
 			<id>docx4j</id>
 			<name>docx4j Maven 2 repository</name>
 			<url>http://dev.plutext.org/svn/docx4j/trunk/docx4j/m2</url>
-		</repository>
+		</repository-->
 		<repository>
 			<id>itextpdf.com</id>
 			<name>Maven Repository for iText</name>
@@ -250,7 +251,7 @@
 					<suiteXmlFiles>
 						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
 					</suiteXmlFiles>
-					<!-- for GWT junit tests: <includes> <include>**/*GWTTest.java</include> 
+					<!-- for GWT junit tests: <includes> <include>**/*GWTTest.java</include>
 						</includes> -->
 				</configuration>
 			</plugin>
@@ -354,7 +355,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.1-beta-1</version>
-				<!-- <configuration> <webXml>src/main/webapp/WEB-INF/web.xml</webXml> 
+				<!-- <configuration> <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
 					<warSourceDirectory>target/war</warSourceDirectory> </configuration> -->
 				<executions>
 					<execution>
@@ -494,10 +495,6 @@
 				<exclusion>
 					<groupId>org.apache.avalon.framework</groupId>
 					<artifactId>avalon-framework-impl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>jdom</groupId>
-					<artifactId>jdom</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>xalan</groupId>
@@ -823,7 +820,7 @@
 			<artifactId>google-collect</artifactId>
 			<version>snapshot-20080321</version>
 		</dependency>
-		<!-- 
+		<!--
 		<dependency>
 			<groupId>com.google.collections</groupId>
 			<artifactId>google-collections</artifactId>
@@ -863,3 +860,4 @@
         </dependency>
 	</dependencies>
 </project>
+
