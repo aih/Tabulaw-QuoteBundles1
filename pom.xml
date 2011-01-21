@@ -57,11 +57,11 @@
 			<id>maven2-repository.dev.java.net</id>
 			<url>http://download.java.net/maven/2/</url>
 		</repository>
-		<repository>
+		<!--repository>
 			<id>docx4j</id>
 			<name>docx4j Maven 2 repository</name>
 			<url>http://dev.plutext.org/svn/docx4j/trunk/docx4j/m2</url>
-		</repository>
+		</repository-->
 		<repository>
 			<id>itextpdf.com</id>
 			<name>Maven Repository for iText</name>
