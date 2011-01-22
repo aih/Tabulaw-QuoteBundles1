@@ -5,24 +5,18 @@
 <jsp:useBean id="loginSession" class="com.tabulaw.server.jsp.LoginSessionBean" > 	</jsp:useBean>
 <c:set target="${loginSession}" property="request" value="${pageContext.request}" />
 
-<c:if test="${loginSession.loggedIn}">
-	<c:redirect url="Poc.html"/>
-</c:if> 
-
-<jsp:useBean id="loginBean" class="com.tabulaw.server.jsp.LoginBean" > 	</jsp:useBean>
-<c:set target="${loginBean}" property="request" value="${pageContext.request}" />
-
-<c:if test="${loginBean.loginValid && loginSession.loggedIn}">
-	<c:redirect url="Poc.html"/>
-</c:if>
 <jsp:useBean id="registerBean" class="com.tabulaw.server.jsp.RegisterBean" > 	</jsp:useBean>
- 
 <c:set target="${registerBean}" property="request" value="${pageContext.request}" />
 <c:set target="${registerBean}" property="loginRequired" value="true" />
+<c:set target="${registerBean}" property="generatePassword" value="true" />
+
+<c:if test="${registerBean.loginValid || loginSession.loggedIn}">
+	<c:redirect url="Poc.html"/>
+</c:if>
 
 <c:if test="${registerBean.registrationValid}">
-	<c:redirect url="Login.html?registration=success"/>
-</c:if> 
+	<c:redirect url="Login.html"/>
+</c:if>
  
 <html>
 	<head>
@@ -41,8 +35,8 @@
 						</div>
 				</c:if> 
 			<div>
-				<input type="hidden" id="userEmail" name="userEmail" value="<c:out value="${param.userEmail}"/>">
-				<input type="hidden" id="userName" name="userName" value="<c:out value="${param.userEmail}"/>">
+				<input type="hidden" id="userEmail" name="userEmail" value='<c:out value="${param.userEmail}"/>'>
+				<input type="hidden" id="userName" name="userName" value='<c:out value="${param.userEmail}"/>'>
 				<table>
 					<tr>
 						<td>beta key<sup class="rqd">*</sup></td>

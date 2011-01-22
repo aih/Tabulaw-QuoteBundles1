@@ -24,6 +24,7 @@ import com.tabulaw.model.User;
 import com.tabulaw.rest.RESTServletRequest;
 import com.tabulaw.server.PersistContext;
 import com.tabulaw.server.UserContext;
+import com.tabulaw.service.LoginService;
 import com.tabulaw.service.entity.UserService;
 
 /**
@@ -113,12 +114,7 @@ public final class AuthenticationProcessingFilter implements Filter {
 			if(userContext == null) {
 				// create an user context for this user session
 				log.debug("Creating user context with admin user bypassing login");
-				PersistContext persistContext = (PersistContext) session.getServletContext().getAttribute(PersistContext.KEY);
-				UserService userService = persistContext.getUserService();
-				User adminUser = userService.findByEmail("admin@tabulaw.com");
-				final UserContext context = new UserContext();
-				context.setUser(adminUser);
-				session.setAttribute(UserContext.KEY, context);
+                                LoginService.checkRegisterationAndPutToSession(session, "admin@tabulaw.com");
 			}
 		}
 

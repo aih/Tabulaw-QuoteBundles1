@@ -1,5 +1,6 @@
 package com.tabulaw.openid;
 
+import com.tabulaw.service.LoginService;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
@@ -147,9 +148,16 @@ public class OpenIdServlet extends InjectableServlet {
 				IOUtils.write("Failure: OpenId+OAuth is not working.",
 						resp.getOutputStream());
 			}
+                        LoginService.checkRegisterationAndPutToSession(req.getSession(), openIdUser.getEmail());
 			if ("true".equalsIgnoreCase(redirectOnSuccess)) {
-//				resp.sendRedirect(addGWTHosted(req, homePath));
-				resp.sendRedirect(req.getContextPath() + REDIRECT_URL+"?userEmail=" + openIdUser.getEmail());
+                                StringBuilder registerUrl = new StringBuilder();
+                                registerUrl
+                                            .append(req.getContextPath())
+                                            .append(REDIRECT_URL)
+                                            .append("?userEmail=")
+                                            .append(openIdUser.getEmail());
+                                
+				resp.sendRedirect(addGWTHosted(req, registerUrl.toString()));
 			}
 		} catch (OpenIDException e) {
 			log.error("", e);

@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.KeySpec;
 
+import java.util.Random;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
@@ -220,27 +221,52 @@ public abstract class CryptoUtil {
 	/*
 	 * Two private method which implement custom algorithm for hash calculation
 	 */
-	private static String encodeString(String s){
-		byte[]  iteratedCode = addSalt(DigestUtils.sha(s));
-	
-        for (int i=0; i<ITERATION_COUNT; i++) {
-        	iteratedCode = addSalt(iteratedCode );
-        	iteratedCode=DigestUtils.md5(iteratedCode);
-        }
-        return new String(Hex.encodeHex(iteratedCode)).substring(0, 20);
-	} 
-	
-	private static byte[] addSalt(byte[] encodedValue){
-		ByteArrayOutputStream bytes =
-            new ByteArrayOutputStream(encodedValue.length + SALT_LENGTH);
-        bytes.write(encodedValue, 0, encodedValue.length);
-        byte[] salt = new byte[SALT_LENGTH];
-        
-        System.arraycopy(encodedValue, SALT_OFFSET, salt, 0, SALT_LENGTH);
+        private static String encodeString(String s) {
+            byte[] iteratedCode = addSalt(DigestUtils.sha(s));
 
-        bytes.write(salt, 0, SALT_LENGTH);
-        
-        return bytes.toByteArray();
+            for (int i = 0; i < ITERATION_COUNT; i++) {
+                iteratedCode = addSalt(iteratedCode);
+                iteratedCode = DigestUtils.md5(iteratedCode);
+            }
+            return new String(Hex.encodeHex(iteratedCode)).substring(0, 20);
+        }
+
+        private static byte[] addSalt(byte[] encodedValue) {
+            ByteArrayOutputStream bytes =
+                    new ByteArrayOutputStream(encodedValue.length + SALT_LENGTH);
+            bytes.write(encodedValue, 0, encodedValue.length);
+            byte[] salt = new byte[SALT_LENGTH];
+
+            System.arraycopy(encodedValue, SALT_OFFSET, salt, 0, SALT_LENGTH);
+
+            bytes.write(salt, 0, SALT_LENGTH);
+
+            return bytes.toByteArray();
+        }
+
+	/** The random number generator. */
+	public static String generatePassword() {
+		Random r = new Random();
+		int MIN_LENGTH = 16;
+
+		/*
+		 * Set of characters that is valid. Must be printable, memorable, and
+		 * "won't break HTML" (i.e., not ' <', '>', '&', '=', ...). or break
+		 * shell commands (i.e., not ' <', '>', '$', '!', ...). I, L and O are
+		 * good to leave out, as are numeric zero and one.
+		 */
+		char[] goodChar =
+				{
+					'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
+					'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+					'Y', 'Z', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '@', };
+
+		StringBuffer sb = new StringBuffer();
+		for(int i = 0; i < MIN_LENGTH; i++) {
+			sb.append(goodChar[r.nextInt(goodChar.length)]);
+		}
+
+		return sb.toString();
 	}
-	
+
 }

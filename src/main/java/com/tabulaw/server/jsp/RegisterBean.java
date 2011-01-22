@@ -1,5 +1,6 @@
 package com.tabulaw.server.jsp;
 
+import com.tabulaw.service.LoginService;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,14 +24,14 @@ public class RegisterBean extends LoginBean{
 
 	private static final Log log = LogFactory.getLog(RegisterBean.class);
 
-	private HttpServletRequest request;
-
 	private String userName;
 
 	private String betaKey;
 	private String passwordConfirm;
 	private boolean isLoginRequired = false;
+	private boolean generatePassword = false;
 
+        @Override
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;
 		if (request != null) {
@@ -59,10 +60,6 @@ public class RegisterBean extends LoginBean{
 		this.betaKey = betaKey;
 	}
 
-
-	public HttpServletRequest getRequest() {
-		return request;
-	}
 
 	public boolean isLoginRequired() {
 		return isLoginRequired;
@@ -101,20 +98,23 @@ public class RegisterBean extends LoginBean{
 		UserService userService = null;
 		
 		if (!CryptoUtil.checkBetaKey(getEmailAddress(), getBetaKey())) {
-			errors.add("You beta key is invalid. Please contact Tabulaw support");
+			errors.add("Your beta key is invalid. Please contact Tabulaw support");
 		}
 		
 		if (getUserName().isEmpty()) {
 			errors.add("User name is required.");
 		}
 
-		if (getPassword().isEmpty()) {
-			errors.add("Password is required.");
-		}
-		if (!getPassword().equals(getPasswordConfirm())) {
-			errors.add("Password doesn't match.");
-		}
-		if (getEmailAddress().isEmpty()) {
+                if (!generatePassword) {
+                    if (getPassword().isEmpty()) {
+                            errors.add("Password is required.");
+                    }
+                    if (!getPassword().equals(getPasswordConfirm())) {
+                            errors.add("Password doesn't match.");
+                    }
+                }
+
+                if (getEmailAddress().isEmpty()) {
 			errors.add("Empty email address.");
 		} else {
 			HttpSession session = request.getSession(false);
@@ -146,23 +146,31 @@ public class RegisterBean extends LoginBean{
 		return errors.isEmpty();
 	}
 
-	private void doUserRegister(UserService userService) {
-		try {
-			User user = userService.create(getUserName(),
-					getEmailAddress(), getPassword());
-			sendEmail(user);
-		} catch (EntityExistsException e) {
-			errors.add("Email already exists");
-		} catch (ConstraintViolationException e) {
-			errors.add("Invalid email format");
-		} catch (Exception e) {
-			errors.add("Internal error");
-			log.error("", e);
-		}
-		if (isLoginRequired) {
-			isLoginValid();
-		}
-	}
+    private void doUserRegister(UserService userService) {
+        User user = null;
+        try {
+            String persistedPassword;
+            if (generatePassword) {
+                persistedPassword = CryptoUtil.generatePassword();
+            } else {
+                persistedPassword = getPassword();
+            }
+            user = userService.create(getUserName(),
+                    getEmailAddress(), persistedPassword);
+            sendEmail(user);
+        } catch (EntityExistsException e) {
+            errors.add("Email already exists");
+        } catch (ConstraintViolationException e) {
+            errors.add("Invalid email format");
+        } catch (Exception e) {
+            errors.add("Internal error");
+            log.error("", e);
+        }
+        if (isLoginRequired && errors.size() == 0) {
+            HttpSession session = getSession();
+            LoginService.putUserToSessionContext(session, user);
+        }
+    }
 
 	private void sendEmail(User user) {
 		try {
@@ -181,4 +189,19 @@ public class RegisterBean extends LoginBean{
 		return (WebAppContext) getRequest().getSession().getServletContext()
 				.getAttribute(WebAppContext.KEY);
 	}
+
+    /**
+     * @return the generatePassword
+     */
+    public boolean isGeneratePassword() {
+        return generatePassword;
+    }
+
+    /**
+     * @param generatePassword the generatePassword to set
+     */
+    public void setGeneratePassword(boolean generatePassword) {
+        this.generatePassword = generatePassword;
+    }
+
 }

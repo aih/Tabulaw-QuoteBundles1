@@ -1,5 +1,9 @@
 package com.tabulaw.server.jsp;
 
+import com.tabulaw.service.AccountDisabledException;
+import com.tabulaw.service.AccountExpiredException;
+import com.tabulaw.service.AccountLockedException;
+import com.tabulaw.service.InvalidCredentialsException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,109 +16,94 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.User;
-import com.tabulaw.server.PersistContext;
-import com.tabulaw.server.UserContext;
-import com.tabulaw.service.entity.UserService;
+import com.tabulaw.service.LoginService;
 
 public class LoginBean {
 
-	private static final Log log = LogFactory.getLog(LoginBean.class);
+    private static final Log log = LogFactory.getLog(LoginBean.class);
+    protected HttpServletRequest request;
+    protected String emailAddress;
+    protected String password;
+    protected List<String> errors = new ArrayList<String>();
 
-	private HttpServletRequest request;
-	protected String emailAddress;
-	protected String password;
-	protected List<String> errors = new ArrayList<String>();
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+        if (request != null) {
+            setEmailAddress(StringUtils.defaultString(
+                    request.getParameter("userEmail")).trim());
+            setPassword(StringUtils.defaultString(request.getParameter("userPswd")));
+        }
+    }
 
-	public void setRequest(HttpServletRequest request) {
-		this.request = request;
-		if (request != null) {
-			setEmailAddress(StringUtils.defaultString(
-					request.getParameter("userEmail")).trim());
-			setPassword(StringUtils.defaultString(request
-					.getParameter("userPswd")));
-		}
-	}
+    public HttpServletRequest getRequest() {
+        return request;
+    }
 
-	public HttpServletRequest getRequest() {
-		return request;
-	}
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
 
-	public void setEmailAddress(String emailAddress) {
-		this.emailAddress = emailAddress;
-	}
+    public String getEmailAddress() {
+        return emailAddress;
+    }
 
-	public String getEmailAddress() {
-		return emailAddress;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
+    }
 
-	public void setErrors(List<String> errors) {
-		this.errors = errors;
-	}
+    public List<String> getErrors() {
+        return errors;
+    }
 
-	public List<String> getErrors() {
-		return errors;
-	}
+    protected HttpSession getSession() {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            log.fatal("No http session exists.");
+            errors.add("No http session exists.");
+        }
+        return session;
+    }
 
-	public boolean isLoginValid() {
-		setErrors(new ArrayList<String>());
+    public boolean isLoginValid() {
+        setErrors(new ArrayList<String>());
 
-		if (request == null) {
-			return false;
-		} else if (request.getParameter("submitLogin") == null) {
-			return false;
-		}
+        if (request == null) {
+            return false;
+        } else if (request.getParameter("submitLogin") == null) {
+            return false;
+        }
 
-		HttpSession session = request.getSession(false);
+        HttpSession session = getSession();
 
-		if (session == null) {
-			log.fatal("No http session exists.");
-			errors.add("No http session exists.");
-		} else {
-			try {
-				PersistContext persistContext = (PersistContext) session
-						.getServletContext().getAttribute(PersistContext.KEY);
-				UserService userService = persistContext.getUserService();
+        if (session != null) {
+            try {
+                LoginService.authenticateUser(session, emailAddress, password);
 
-				User user = userService.findByEmail(getEmailAddress());
+            } catch (AccountDisabledException ex) {
+                errors.add(ex.getMessage());
+            } catch (AccountLockedException ex) {
+                errors.add(ex.getMessage());
+            } catch (InvalidCredentialsException ex) {
+                errors.add(ex.getMessage());
+            } catch (AccountExpiredException ex) {
+                errors.add(ex.getMessage());
+            } catch (IllegalArgumentException e) {
+                errors.add("Invalid or empty password.");
+            } catch (ConstraintViolationException e) {
+                errors.add("Invalid email format");
+            } catch (EntityNotFoundException e) {
+                errors.add("Invalid user or password.");
+            }
+        }
 
-				if (UserService.isPasswordValid(getPassword(),user.getPassword(), user.getEmailAddress())) {
-					if (!user.isEnabled()) {
-						errors.add("Your account is disabled.");
-						return false;
-					}
-					if (user.isExpired()) {
-						errors.add("Your account has expired.");
-						return false;
-					} 
-					if (user.isLocked()) {
-						errors.add("Your account is locked.");
-						return false;
-					} 
-					final UserContext context = new UserContext();
-					context.setUser(user);
-					session.setAttribute(UserContext.KEY, context);
-				} else {
-					errors.add("Invalid user or password.");
-				}
-				
-			} catch (IllegalArgumentException e) {
-				errors.add("Invalid or empty password.");
-			} catch (ConstraintViolationException e) {
-				errors.add("Invalid email format");
-			} catch (EntityNotFoundException e) {
-				errors.add("Invalid user or password.");
-			}
-		}
-
-		return errors.isEmpty();
-	}
+        return errors.isEmpty();
+    }
 }
