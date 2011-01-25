@@ -45,16 +45,17 @@ import com.tabulaw.model.DocRef;
 
 /**
  * Lists doc search results.
+ * 
  * @author jpk
  */
-public class DocSearchListingWidget extends Composite implements SelectionHandler<String> {
+public class DocSearchListingWidget extends Composite implements
+		SelectionHandler<String> {
 
 	static class ListingConfig extends AbstractListingConfig {
 
 		static final Sorting defaultSorting = new Sorting("title");
 
-		static final Column[] cols = new Column[] { new Column("Result"),
-		};
+		static final Column[] cols = new Column[] { new Column("Result"), };
 
 		public ListingConfig() {
 			super("Document", null, cols, defaultSorting, 5);
@@ -86,18 +87,19 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 				@Override
 				protected void doExecute() {
 					setSource(Operator.this.sourcingWidget);
-					DocSearchRequest dsr = new DocSearchRequest("GOOGLE_SCHOLAR", query, ofst, getPageSize(), true);
+					DocSearchRequest dsr = new DocSearchRequest(
+							"GOOGLE_SCHOLAR", query, ofst, getPageSize(), true);
 					Poc.getDocService().search(dsr, this);
 				}
 
 				@Override
 				protected void handleSuccess(DocSearchPayload result) {
 					super.handleSuccess(result);
-					if(result.hasErrors()) {
+					if (result.hasErrors()) {
 						Notifier.get().showFor(result);
-					}
-					else {
-						List<CaseDocSearchResult> searchResults = result.getResults();
+					} else {
+						List<CaseDocSearchResult> searchResults = result
+								.getResults();
 						offset = ofst;
 						fireListingEvent(ListingOp.FETCH, searchResults);
 					}
@@ -134,13 +136,17 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 		}
 	}
 
-	static class DocListing extends ModelListingWidget<CaseDocSearchResult, DocSearchListingWidget.Table> implements IRpcHandler {
+	static class DocListing
+			extends
+			ModelListingWidget<CaseDocSearchResult, DocSearchListingWidget.Table>
+			implements IRpcHandler {
 
 		final RpcUiHandler rpcui;
 
 		public DocListing() {
-			super(config.getListingId(), config.getListingElementName(), new Table(config),
-					new ListingNavBar<CaseDocSearchResult>(config, null));
+			super(config.getListingId(), config.getListingElementName(),
+					new Table(config), new ListingNavBar<CaseDocSearchResult>(
+							config, null));
 			rpcui = new RpcUiHandler(this);
 			addHandler(this, RpcEvent.TYPE);
 		}
@@ -156,7 +162,8 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 		}
 	}
 
-	static class Table extends ModelListingTable<CaseDocSearchResult> implements IRpcHandler {
+	static class Table extends ModelListingTable<CaseDocSearchResult> implements
+			IRpcHandler {
 
 		final RpcUiHandler rpcui;
 
@@ -164,11 +171,18 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 			super(config, new ITableCellRenderer<CaseDocSearchResult>() {
 
 				@Override
-				public void renderCell(int rowIndex, int cellIndex, CaseDocSearchResult rowData, Column column, HTMLTable table) {
+				public void renderCell(int rowIndex, int cellIndex,
+						CaseDocSearchResult rowData, Column column,
+						HTMLTable table) {
 					// same as doc suggest (for now)
-					String html =
-							"<div class=\"entry\"><div class=\"title\">" + rowData.getTitleHtml() + "</div><div class=\"summary\">"
-									+ rowData.getSummary() + "</div></div>";
+					String html = "<div class=\"entry\">";
+					html += "<div class=\"title\">" + rowData.getTitleHtml()
+							+ "</div>";
+					html += "<div class=\"citation\">" + rowData.getCitation()
+					+ "</div>";
+					html += "<div class=\"summary\">" + rowData.getSummary()
+							+ "</div>";
+					html += "</div>";
 					table.setHTML(rowIndex, cellIndex, html);
 				}
 
@@ -183,9 +197,11 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 
 		@Override
 		protected void onCellClick(int colIndex, int rowIndex) {
-			if(rowIndex == 0) return;
+			if (rowIndex == 0)
+				return;
 			final CaseDocSearchResult caseDoc = getRowData(rowIndex);
-			if(caseDoc == null) return;
+			if (caseDoc == null)
+				return;
 			final String docRemoteUrl = caseDoc.getUrl();
 			new RpcCommand<DocPayload>() {
 
@@ -198,14 +214,14 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 				@Override
 				protected void handleFailure(Throwable caught) {
 					super.handleFailure(caught);
-					//Log.error("Unable to fetch remote document", caught);
+					// Log.error("Unable to fetch remote document", caught);
 					Notifier.get().showFor(caught);
 				}
 
 				@Override
 				protected void handleSuccess(DocPayload result) {
 					super.handleSuccess(result);
-					if(result.hasErrors()) {
+					if (result.hasErrors()) {
 						Notifier.get().showFor(result);
 						return;
 					}
@@ -214,16 +230,20 @@ public class DocSearchListingWidget extends Composite implements SelectionHandle
 
 					// persist the new doc and propagate through app
 					ClientModelCache.get().persist(mNewDoc, Table.this);
-					if(mNewDocContent != null) ClientModelCache.get().persist(mNewDocContent, null);
+					if (mNewDocContent != null)
+						ClientModelCache.get().persist(mNewDocContent, null);
 
 					DeferredCommand.addCommand(new Command() {
 
 						@Override
 						public void execute() {
-							// show the doc (letting the model change event finish
+							// show the doc (letting the model change event
+							// finish
 							// first)
-							final DocViewInitializer dvi = new DocViewInitializer(mNewDoc.getModelKey());
-							ViewManager.get().dispatch(new ShowViewRequest(dvi));
+							final DocViewInitializer dvi = new DocViewInitializer(
+									mNewDoc.getModelKey());
+							ViewManager.get()
+									.dispatch(new ShowViewRequest(dvi));
 						}
 					});
 				}

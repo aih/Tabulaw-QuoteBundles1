@@ -984,7 +984,7 @@ docHeaderMenuItem img {
 	
 }
 
-.docs .gwt-SuggestBoxPopup .item .entry .citation {
+.entry .citation {
 	color: green;
 	font-size: smaller;
 	white-space: normal;
