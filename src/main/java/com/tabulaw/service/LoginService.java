@@ -12,25 +12,21 @@ import javax.servlet.http.HttpSession;
  * @author Andrey Levchenko
  */
 public class LoginService {
-    public static void authenticateUser(HttpSession session, String email, String password) throws
-                                                AccountDisabledException,
-                                                AccountLockedException,
-                                                InvalidCredentialsException,
-                                                AccountExpiredException
+    public static void authenticateUser(HttpSession session, String email, String password) throws LoginNotAllowedException
     {
         User user = getSessionUser(session, email);
 
         if (!UserService.isPasswordValid(password, user.getPassword(), user.getEmailAddress())) {
-            throw new InvalidCredentialsException("Wrong user name or password");
+            throw new LoginNotAllowedException("Wrong user name or password");
         }
         if (!user.isEnabled()) {
-            throw new AccountDisabledException("Your account is disabled");
+            throw new LoginNotAllowedException("Your account is disabled");
         }
         if (user.isExpired()) {
-            throw new AccountExpiredException("Your account has expired.");
+            throw new LoginNotAllowedException("Your account has expired.");
         }
         if (user.isLocked()) {
-            throw new AccountLockedException("Your account is locked.");
+            throw new LoginNotAllowedException("Your account is locked.");
         }
 
         putUserToSessionContext(session, user);
@@ -46,13 +42,13 @@ public class LoginService {
         try {
             User user = getSessionUser(session, email);
             putUserToSessionContext(session, user);
-        } catch (InvalidCredentialsException ex) {
+        } catch (LoginNotAllowedException ex) {
             return false;
         }
         return true;
     }
 
-    private static User getSessionUser(HttpSession session, String email) throws InvalidCredentialsException {
+    private static User getSessionUser(HttpSession session, String email) throws LoginNotAllowedException {
         PersistContext persistContext = (PersistContext) session.getServletContext().getAttribute(PersistContext.KEY);
         UserService userService = persistContext.getUserService();
 
@@ -60,7 +56,7 @@ public class LoginService {
         try {
             user = userService.findByEmail(email);
         } catch (EntityNotFoundException ex) {
-            throw new InvalidCredentialsException("Wrong user name or password");
+            throw new LoginNotAllowedException("Wrong user name or password");
         }
         return user;
     }

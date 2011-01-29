@@ -5,12 +5,12 @@ package com.tabulaw.service;
  *
  * @author Andrey Levchenko
  */
-public class AccountLockedException extends Exception{
+public class LoginNotAllowedException extends Exception{
 	/**
 	 * Constructor
 	 * @param msg
 	 */
-	public AccountLockedException(String msg) {
+	public LoginNotAllowedException(String msg) {
 		super(msg);
 	}
 
@@ -19,7 +19,7 @@ public class AccountLockedException extends Exception{
 	 * @param msg
 	 * @param t
 	 */
-	public AccountLockedException(String msg, Throwable t) {
+	public LoginNotAllowedException(String msg, Throwable t) {
 		super(msg, t);
 	}
 

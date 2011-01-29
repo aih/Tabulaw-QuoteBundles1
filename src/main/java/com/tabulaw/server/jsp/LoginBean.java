@@ -1,9 +1,5 @@
 package com.tabulaw.server.jsp;
 
-import com.tabulaw.service.AccountDisabledException;
-import com.tabulaw.service.AccountExpiredException;
-import com.tabulaw.service.AccountLockedException;
-import com.tabulaw.service.InvalidCredentialsException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.service.LoginNotAllowedException;
 import com.tabulaw.service.LoginService;
 
 public class LoginBean {
@@ -87,13 +84,7 @@ public class LoginBean {
             try {
                 LoginService.authenticateUser(session, emailAddress, password);
 
-            } catch (AccountDisabledException ex) {
-                errors.add(ex.getMessage());
-            } catch (AccountLockedException ex) {
-                errors.add(ex.getMessage());
-            } catch (InvalidCredentialsException ex) {
-                errors.add(ex.getMessage());
-            } catch (AccountExpiredException ex) {
+            } catch (LoginNotAllowedException ex) {
                 errors.add(ex.getMessage());
             } catch (IllegalArgumentException e) {
                 errors.add("Invalid or empty password.");
