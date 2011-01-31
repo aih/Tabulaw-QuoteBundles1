@@ -72,7 +72,7 @@ public class BundleQuotesMenuBar extends MenuBar {
 		addItem("New Quote ...", new Command() {
 			@Override
 			public void execute() {
-				UpdateQuoteBundle.updateQuoteBundleTitle(BundleQuotesMenuBar.this);
+				UpdateQuoteBundle.updateQuoteBundleTitle();
 				UserQuoteDialog userQuoteDialog = new UserQuoteDialog();
 				userQuoteDialog.setGlassEnabled(true);
 				userQuoteDialog.center();
