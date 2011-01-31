@@ -39,15 +39,15 @@ public class UpdateQuoteBundle {
 		while (true) {
 			if (title.toLowerCase().startsWith("untitled")) {
 				title = prompt(
-						"Title cannot be named 'Untitled ...'. Please set Quote Bundle title for this quote",
+						"Please give this Quote Bundle a title",
 						title);
 			} else if (title.isEmpty()) {
 				title = prompt(
-						"Title cannot be empty. Please set Quote Bundle title for this quote",
+						"Title cannot be empty. Please give this Quote Bundle a title",
 						title);
 			} else if (alreadyQuoteBundleTitleExist(qbs, title)) {
 				title = prompt(
-						"Title already exists. Please set Quote Bundle title for this quote",
+						"Title already exists. Please give this Quote Bundle a title",
 						title);
 			} else {
 				return title;
