@@ -45,6 +45,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 		IHasModel<Quote>, IHasQuoteHandlers, ResizeHandler {
 
 	static class Header extends Composite {
+		private static int LEFT_PADDING_FOR_ICONS = 27;
 
 		private final FlowPanel panel = new FlowPanel();
 
@@ -107,7 +108,7 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 
 		private void syncElementWidth() {
 			if (panel.getOffsetWidth() > 0) {
-				title.setWidth(Integer.toString(panel.getOffsetWidth() - buttonsPanel.getOffsetWidth() - 20)+"px");
+				title.setWidth(Integer.toString(panel.getOffsetWidth() - buttonsPanel.getOffsetWidth() - LEFT_PADDING_FOR_ICONS)+"px");
 			}
 		}
 
@@ -171,6 +172,9 @@ public abstract class AbstractQuoteWidget<B extends AbstractBundleWidget<?, ?, ?
 						int popupTop =  html.getAbsoluteTop();
 						if (html.getAbsoluteTop() + QuotePopupPanel.MAX_HEIGHT > Window.getClientHeight()) {
 							popupTop-=QuotePopupPanel.MAX_HEIGHT;
+						}
+						if (popupLeft < 0){
+							popupLeft = 2;
 						}
 						quotePopup.setPopupPosition(popupLeft, popupTop);
 						quotePopup.show();

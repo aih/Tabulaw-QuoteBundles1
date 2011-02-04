@@ -5,14 +5,18 @@
  */
 package com.tabulaw.client.app.view;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.Resources;
 import com.tabulaw.client.app.ui.AddBundleDialog;
 import com.tabulaw.client.app.ui.BundlesManageWidget;
 import com.tabulaw.client.app.ui.SearchWidget;
+import com.tabulaw.client.ui.EmbedableDockLayoutPanel;
 import com.tabulaw.client.ui.ImageButton;
 import com.tabulaw.client.view.StaticViewInitializer;
 import com.tabulaw.client.view.ViewClass;
@@ -71,17 +75,8 @@ public class BundlesView extends AbstractPocView<StaticViewInitializer> {
 		super();
 		qbPanel = new BundlesManageWidget();
 		
-		HTML viewName = new HTML(getLongViewName());
-		viewName.setStyleName("viewTitle");
 		
-		
-
-		
-		navColWidgets = new Widget[] {
-			viewName,
-			new NewQuoteBundleButton(),
-			qbPanel.getQuoteBundleListingWidget()
-		};
+		navColWidgets = new Widget[] {buildBundleListLayout()};
 		
 		addWidget(qbPanel);
 	}
@@ -120,5 +115,17 @@ public class BundlesView extends AbstractPocView<StaticViewInitializer> {
 	@Override
 	protected void doRefresh() {
 		qbPanel.refresh();
+	}
+	private Widget buildBundleListLayout(){
+		HTML viewName = new HTML(getLongViewName());
+		viewName.setStyleName("viewTitle");
+
+		DockLayoutPanel navColWidget = new EmbedableDockLayoutPanel(Unit.PX, 300);
+		FlowPanel north =  new FlowPanel();
+		north.add(viewName);
+		north.add(new NewQuoteBundleButton());
+		navColWidget.addNorth(north, 70);
+		navColWidget.add(qbPanel.getQuoteBundleListingWidget());
+		return navColWidget;
 	}
 }

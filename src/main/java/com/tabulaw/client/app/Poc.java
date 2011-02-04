@@ -5,7 +5,12 @@ import java.util.List;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
@@ -29,6 +34,7 @@ import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.client.ui.Position;
+import com.tabulaw.client.ui.QuoteResizeEvent;
 import com.tabulaw.client.ui.login.IUserSessionHandler;
 import com.tabulaw.client.ui.login.UserSessionEvent;
 import com.tabulaw.client.ui.msg.GlobalMsgPanel;
@@ -59,6 +65,27 @@ import com.tabulaw.model.UserState;
  * @author jpk
  */
 public class Poc implements EntryPoint, IUserSessionHandler {
+	
+	public static class ContainerLayoutPanel extends DockLayoutPanel {
+		/*to handle browser resize events*/
+		private HandlerManager resizeHandlerManager = new HandlerManager(this);
+		
+		public ContainerLayoutPanel(Unit unit) {
+			super(unit);
+		}
+
+		@Override
+			public void onResize() {
+				super.onResize();
+				//TODO rename event
+				resizeHandlerManager.fireEvent(new QuoteResizeEvent());
+			}
+		public HandlerRegistration addResizeHandler(ResizeHandler handler) {
+			return resizeHandlerManager.addHandler(ResizeEvent.getType(), handler);
+		}
+		
+	}
+	
 
 	private static IUserAdminServiceAsync userAdminService;
 
@@ -315,6 +342,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 	private static NavTabsPanel navTabs;
 	private static FlowPanel mainColPanel = new FlowPanel();
 	private static CurrentQuoteBundleDisplayWidget crntQuoteBudleWidget = new CurrentQuoteBundleDisplayWidget();
+	private static ContainerLayoutPanel container = new ContainerLayoutPanel(Unit.PX);
 	
 	private void build() {
 
@@ -324,9 +352,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 		ViewManager.initialize(portal.getPanel(), 10);
 		portal.setVisible(false);
-		
-		DockLayoutPanel container = new DockLayoutPanel(Unit.PX);
-		container.getElement().setId("container");
 		
 		navTabs = new NavTabsPanel(this) ;
 
@@ -358,9 +383,12 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 		container.addWest(navColPanel,180);
 		container.addNorth(navRow,44);
 		container.addSouth(footer,30);
+
 		
 		container.add(mainColPanel);
 		container.getElement().setId("container");
+		container.getWidgetContainerElement(mainColPanel).setId("center");
+		
 		
 		RootLayoutPanel root = RootLayoutPanel.get();
 		
@@ -389,5 +417,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 	public static IGoogleDocsServiceAsync getGoogledocsService() {
 		return googleDocsService;
+	}
+	public static HandlerRegistration addResizeHandler(ResizeHandler handler) {
+		return container.addResizeHandler(handler);
 	}
 }

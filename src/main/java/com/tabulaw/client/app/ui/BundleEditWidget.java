@@ -97,6 +97,9 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		public EditHeader(boolean orphan) {
 			super();
 
+			//elipsis style breaks correct behavior for EditHeader
+			pName.getReadOnlyWidget().removeStyleName("tabulaw-util-elipsis");
+
 			if(!orphan) {
 				delete = new Image(Resources.INSTANCE.trash());
 				delete.setTitle("Remove Quote Bundle...");

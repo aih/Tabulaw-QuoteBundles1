@@ -5,8 +5,8 @@
  */
 package com.tabulaw.client.ui;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
  * avoid css collapse of the panel when no children exist.
  * @author jpk
  */
-public class VerticalPanelWithSpacer extends VerticalPanel {
+public class VerticalPanelWithSpacer extends FlowPanel {
 
 	static class Styles {
 
