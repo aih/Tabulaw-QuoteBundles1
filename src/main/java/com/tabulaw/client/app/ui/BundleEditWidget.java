@@ -16,6 +16,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -96,15 +97,14 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		 */
 		public EditHeader(boolean orphan) {
 			super();
-
-			//elipsis style breaks correct behavior for EditHeader
-			pName.getReadOnlyWidget().removeStyleName("tabulaw-util-elipsis");
+			HTML spacer = new HTML("&nbsp;", true);
+			buttons.add(spacer);
+			buttons.setCellWidth(spacer, "100%");
 
 			if(!orphan) {
 				delete = new Image(Resources.INSTANCE.trash());
 				delete.setTitle("Remove Quote Bundle...");
 				delete.setStyleName(Styles.DELETE);
-				delete.setStyleName("tabulawMenuItem");
 				delete.addClickHandler(new ClickHandler() {
 
 					@Override
@@ -140,11 +140,9 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 				current = new Image(Resources.INSTANCE.Star());
 				current.setTitle("Current Quote Bundle");
 				current.setStyleName(Styles.CURRENT);
-				current.setStyleName("tabulawMenuItem");
 				notCurrent = new Image(Resources.INSTANCE.StarPressed());
 				notCurrent.setTitle("Set as current");
 				notCurrent.setStyleName(Styles.CURRENT);
-				notCurrent.setStyleName("tabulawMenuItem");
 				notCurrent.addClickHandler(new ClickHandler() {
 
 					@Override
@@ -178,7 +176,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			// convert.setStyleName(Styles.CONVERT);
 
 			downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/>", true, downloadMenu);
-			downloadMenuTop.setStyleName("tabulawMenuItem");
 
 			MenuItem fireRtf = new MenuItem("rtf format", new DownloadBundleCommand(RTF_MIME_TYPE));
 			MenuItem fireDocx = new MenuItem("docx format", new DownloadBundleCommand(DOCX_MIME_TYPE));
@@ -187,6 +184,8 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			downloadMenu.addItem(fireRtf);
 			downloadMenu.addItem(fireDocx);
 			downloadMenu.addItem(fireDoc);
+			
+			downloadMenuTop.setStyleName(null);
 
 			buttons.add(downloadMenuTop);
 
@@ -197,17 +196,14 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			emailInProgress.setVisible(false);
 			email.setTitle("Email");
 			email.setStyleName(Styles.EMAIL);
-			email.setStyleName("tabulawMenuItem");
 			emailInProgress.setTitle("Email");
 			emailInProgress.setStyleName(Styles.EMAIL);
-			emailInProgress.setStyleName("tabulawMenuItem");
 			buttons.add(email);
 			buttons.add(emailInProgress);
 
 			close = new Image(Resources.INSTANCE.XButton());
 			close.setTitle("Close");
 			close.setStyleName(Styles.X);
-			close.setStyleName("tabulawMenuItem");
 			buttons.add(close);
 
 			if(delete != null) {

@@ -4,6 +4,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -51,7 +52,7 @@ public class EditableBundleHeader extends Composite {
 
 	protected final EditableTextWidget pName, pDesc;
 
-	protected final FlowPanel buttons = new FlowPanel();
+	protected final HorizontalPanel buttons = new HorizontalPanel();
 
 	protected QuoteBundle bundle;
 
@@ -66,12 +67,12 @@ public class EditableBundleHeader extends Composite {
 		setMenuBarText("Quote Bundles");
 
 		buttons.setStyleName(Styles.BUTTONS);
-		header.insert(buttons, 0);
 
 		header.setStyleName("qbheader");
 		header.add(lblQb);
 		header.add(menuBar);
-
+		header.add(buttons);
+		
 		initWidget(header);
 
 		pName = new EditableTextWidget();

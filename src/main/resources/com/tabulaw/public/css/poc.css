@@ -538,11 +538,11 @@ div.ro {
 }
 
 .qbundle .qbbuttons {
-	float: right;
+	/*float: right;*/
 }
 
 .qbundle .qbbuttons img {
-	margin: 20px 10px 5px 0px;
+	margin: 5px 10px 5px 0px;
 	cursor: pointer;
 } 
 
