@@ -17,7 +17,7 @@ public class BundleUserBinding extends EntityBase {
 
 	private static final long serialVersionUID = -4676769373977438262L;
 
-	private String bundleId, userId;
+	private String id, bundleId, userId;
 
 	private boolean orphaned;
 	
@@ -70,12 +70,12 @@ public class BundleUserBinding extends EntityBase {
 
 	@Override
 	public String getId() {
-		return bundleId + '|' + userId;
+		return id;
 	}
 
 	@Override
 	public void setId(String id) {
-		throw new UnsupportedOperationException();
+		this.id = id;
 	}
 
 	@NotNull

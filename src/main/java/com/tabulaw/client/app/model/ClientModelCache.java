@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -55,7 +57,7 @@ public class ClientModelCache {
 		 * @param startEndRange 2 element array where first element is start, second
 		 *        element is end
 		 */
-		public IdCache(Integer[] startEndRange) {
+		public IdCache(Long[] startEndRange) {
 			super();
 			this.current = startEndRange[0].intValue();
 			this.max = startEndRange[1].intValue();
@@ -120,9 +122,9 @@ public class ClientModelCache {
 	 * Sets a batch of ids for use in entity creation.
 	 * @param nextIdBatch
 	 */
-	public void setNextIdBatch(Map<String, Integer[]> nextIdBatch) {
+	public void setNextIdBatch(Map<String, Long[]> nextIdBatch) {
 		for(String et : nextIdBatch.keySet()) {
-			Integer[] rng = nextIdBatch.get(et);
+			Long[] rng = nextIdBatch.get(et);
 			IdCache idCache = new IdCache(rng);
 			nextIdCache.put(et, idCache);
 		}
@@ -158,7 +160,8 @@ public class ClientModelCache {
 	 */
 	public User getUser() {
 		List<? extends IEntity> list = entities.get(EntityType.USER.name());
-		return list.size() < 1 ? null : (User) list.get(0).clone();
+		User ret = list.size() < 1 ? null : (User) list.get(0).clone();
+        return ret;
 	}
 
 	/**

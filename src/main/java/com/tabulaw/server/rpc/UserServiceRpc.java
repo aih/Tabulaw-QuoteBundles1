@@ -328,7 +328,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 			payload.setOrphanQuoteContainerId(bc.getOrphanBundleId());
 
 			// get the next ids for client-side use
-			Map<String, Integer[]> nextIds = getNextIdMap();
+			Map<String, Long[]> nextIds = getNextIdMap();
 			payload.setNextIds(nextIds);
 
 			status.addMsg("User Context retrieved.", MsgLevel.INFO,
@@ -498,35 +498,38 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 		}
 	}
 
-	private Map<String, Integer[]> getNextIdMap() {
+	private Map<String, Long[]> getNextIdMap() {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
 		long[] bundleIdRange = userDataService.generateQuoteBundleIds(100);
 		long[] quoteIdRange = userDataService.generateQuoteIds(100);
 
-		Integer[] iBundleIdRange = new Integer[] {
-				Integer.valueOf((int) bundleIdRange[0]),
-				Integer.valueOf((int) bundleIdRange[1]), };
+        long startId = System.currentTimeMillis();
+        long endId = startId+1000;
+        // wait 1 second
 
-		Integer[] iQuoteIdRange = new Integer[] {
-				Integer.valueOf((int) quoteIdRange[0]),
-				Integer.valueOf((int) quoteIdRange[1]), };
+        synchronized (this) {
+            try { Thread.sleep(1001); } catch (Exception e) { }
+        }
 
-		HashMap<String, Integer[]> idMap = new HashMap<String, Integer[]>(2);
+		Long[] iBundleIdRange = new Long[] {startId, endId};
+		Long[] iQuoteIdRange = new Long[] {startId, endId};
+
+		HashMap<String, Long[]> idMap = new HashMap<String, Long[]>(2);
 		idMap.put(EntityType.QUOTE_BUNDLE.name(), iBundleIdRange);
 		idMap.put(EntityType.QUOTE.name(), iQuoteIdRange);
 
 		return idMap;
 	}
 
-	@Override
-	public IdsPayload fetchIdBatch() {
-		Status status = new Status();
-		IdsPayload payload = new IdsPayload(status);
-		payload.setIds(getNextIdMap());
-		return payload;
-	}
+    @Override
+    public IdsPayload fetchIdBatch() {
+        Status status = new Status();
+        IdsPayload payload = new IdsPayload(status);
+        payload.setIds(getNextIdMap());
+        return payload;
+    }
 
 	@Override
 	public ModelPayload<QuoteBundle> addBundleForUser(String userId,

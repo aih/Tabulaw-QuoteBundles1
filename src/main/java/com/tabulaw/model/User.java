@@ -49,6 +49,8 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 	public static final String SUPERUSER = "Tabulaw Administrator";
 
+    private String id;
+
 	private String name;
 
 	private String emailAddress;
@@ -93,12 +95,12 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 	@Override
 	public String getId() {
-		return emailAddress;
+		return id;
 	}
 
 	@Override
 	public void setId(String id) {
-		throw new UnsupportedOperationException();
+		this.id = id;
 	}
 
 	@Override
@@ -118,6 +120,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 		ArrayList<Role> croles = roles == null ? null : new ArrayList<Role>(roles);
 
+        u.id = id;
 		u.name = name;
 		u.emailAddress = emailAddress;
 		u.password = password;
@@ -240,10 +243,6 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 	public int getNumRoles() {
 		return roles == null ? 0 : roles.size();
-	}
-
-	public void setUsername(String username) {
-		setEmailAddress(username);
 	}
 
 	public boolean isExpired() {

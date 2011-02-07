@@ -33,7 +33,7 @@ public class UserContextPayload extends Payload {
 	/**
 	 * Map of id ranges keyed by entity type.
 	 */
-	private Map<String, Integer[]> nextIds;
+	private Map<String, Long[]> nextIds;
 
 	/**
 	 * Constructor
@@ -87,11 +87,11 @@ public class UserContextPayload extends Payload {
 	/**
 	 * @return Map of assignable ranges keyed by entity type.
 	 */
-	public Map<String, Integer[]> getNextIds() {
+	public Map<String, Long[]> getNextIds() {
 		return nextIds;
 	}
 
-	public void setNextIds(Map<String, Integer[]> nextIds) {
+	public void setNextIds(Map<String, Long[]> nextIds) {
 		this.nextIds = nextIds;
 	}
 
