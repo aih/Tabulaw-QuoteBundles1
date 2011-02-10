@@ -43,3 +43,7 @@ eclipse settings:
 	1. goto your local maven repository
 	2. find antisamy-1.4.2.pom file there
 	3. remove <parent> at the top of file
+
+ 8) Copy pgsql driver from /etc/database to tomcat home directory
+ 9) Create database tabulaw from backup in /etc/database, user/password = postgres/postgres
+    You can change database name, login, password in src/main/webapp/META-INF/context.xml
