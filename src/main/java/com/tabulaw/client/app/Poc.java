@@ -1,7 +1,6 @@
 package com.tabulaw.client.app;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
@@ -193,9 +192,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					hideLoginPanel();
 					// attach the global msg panel in its native place
 					parkGlobalMsgPanel();
-
-					// cache initial batch of next ids
-					ClientModelCache.get().setNextIdBatch(result.getNextIds());
 
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);

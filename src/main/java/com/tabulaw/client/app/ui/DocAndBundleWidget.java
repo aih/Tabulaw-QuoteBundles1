@@ -23,6 +23,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.client.UUID;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
@@ -244,7 +245,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				Quote quote = EntityFactory.get().buildQuote(mark.getText(), wDocViewer.getModel(), serializedMark, 0, 0);
 				quote.setMark(mark);
 				// eagerly set id since EntityBase.equals() depends on it
-				quote.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
+				quote.setId(UUID.uuid());
 				wDocQuoteBundle.addQuote(quote, true, true);
 				break;
 			}
@@ -293,7 +294,7 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				String qbName = getNextUntitledQuoteBundle(qbs);
 				String qbDesc = "Quote Bundle for " + qbName;
 				crntQb = EntityFactory.get().buildBundle(qbName, qbDesc);
-				crntQb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
+				crntQb.setId(UUID.uuid());
 
 				// client-side persist
 				ClientModelCache.get().getUserState().setCurrentQuoteBundleId(crntQb.getId());

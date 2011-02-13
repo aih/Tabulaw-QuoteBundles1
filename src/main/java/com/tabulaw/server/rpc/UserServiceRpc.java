@@ -327,10 +327,6 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 			payload.setBundles(bc.getBundles());
 			payload.setOrphanQuoteContainerId(bc.getOrphanBundleId());
 
-			// get the next ids for client-side use
-			Map<String, Long[]> nextIds = getNextIdMap();
-			payload.setNextIds(nextIds);
-
 			status.addMsg("User Context retrieved.", MsgLevel.INFO,
 					MsgAttr.STATUS.flag);
 		} catch (final RuntimeException e) {
@@ -497,39 +493,6 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 			// TODO anything?
 		}
 	}
-
-	private Map<String, Long[]> getNextIdMap() {
-		PersistContext context = getPersistContext();
-		UserDataService userDataService = context.getUserDataService();
-
-		long[] bundleIdRange = userDataService.generateQuoteBundleIds(100);
-		long[] quoteIdRange = userDataService.generateQuoteIds(100);
-
-        long startId = System.currentTimeMillis();
-        long endId = startId+1000;
-        // wait 1 second
-
-        synchronized (this) {
-            try { Thread.sleep(1001); } catch (Exception e) { }
-        }
-
-		Long[] iBundleIdRange = new Long[] {startId, endId};
-		Long[] iQuoteIdRange = new Long[] {startId, endId};
-
-		HashMap<String, Long[]> idMap = new HashMap<String, Long[]>(2);
-		idMap.put(EntityType.QUOTE_BUNDLE.name(), iBundleIdRange);
-		idMap.put(EntityType.QUOTE.name(), iQuoteIdRange);
-
-		return idMap;
-	}
-
-    @Override
-    public IdsPayload fetchIdBatch() {
-        Status status = new Status();
-        IdsPayload payload = new IdsPayload(status);
-        payload.setIds(getNextIdMap());
-        return payload;
-    }
 
 	@Override
 	public ModelPayload<QuoteBundle> addBundleForUser(String userId,

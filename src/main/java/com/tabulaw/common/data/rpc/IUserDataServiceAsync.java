@@ -20,8 +20,6 @@ import com.tabulaw.model.UserState;
  */
 public interface IUserDataServiceAsync {
 
-    void fetchIdBatch(AsyncCallback<IdsPayload> callback);
-
 	void saveUserState(UserState userState, AsyncCallback<Void> callback);
 
 	void saveBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload<QuoteBundle>> callback);

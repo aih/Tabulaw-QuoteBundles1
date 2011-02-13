@@ -6,6 +6,7 @@
 package com.tabulaw.client.app.ui;
 
 import com.google.gwt.user.client.DeferredCommand;
+import com.tabulaw.client.UUID;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
@@ -58,7 +59,7 @@ public class AddBundleDialog extends Dialog implements IEditHandler<FieldGroup> 
 			String qbDesc = (String) fieldGroup.getFieldWidget("qbDesc").getValue();
 
 			QuoteBundle qb = EntityFactory.get().buildBundle(qbName, qbDesc);
-			qb.setId(ClientModelCache.get().getNextId(EntityType.QUOTE_BUNDLE.name()));
+			qb.setId(UUID.uuid());
 
 			// default set the current quote bundle if not set yet
 			if(ClientModelCache.get().getUserState().getCurrentQuoteBundleId() == null) {

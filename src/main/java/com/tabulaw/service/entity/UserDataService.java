@@ -100,7 +100,7 @@ public class UserDataService {
         Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc, tw_permission where permission_doc=doc_id AND permission_user=?", Statement.NO_GENERATED_KEYS);
-            ps.setInt(1, Integer.decode(userId));
+            ps.setString(1, userId);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -174,7 +174,7 @@ public class UserDataService {
         Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc where doc_id=?", Statement.NO_GENERATED_KEYS);
-            ps.setInt(1, Integer.parseInt(docId));
+            ps.setString(1, docId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return dao.loadDocRef(rs);
@@ -212,7 +212,7 @@ public class UserDataService {
         Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc where doc_id=?", Statement.NO_GENERATED_KEYS);
-            ps.setInt(1, Integer.parseInt(docId));
+            ps.setString(1, docId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return dao.loadDocContent(rs);
@@ -295,7 +295,7 @@ public class UserDataService {
         Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("select * from tw_userstate where userstate_user=?", Statement.NO_GENERATED_KEYS);
-            ps.setInt(1, Integer.decode(userId));
+            ps.setString(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 return dao.loadUserState(rs);
@@ -323,9 +323,10 @@ public class UserDataService {
         Dao dao = new Dao();
 
         try {
-            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_userstate(userstate_quotebundle, userstate_user) values (?,?)", Statement.RETURN_GENERATED_KEYS);
-            ps1.setInt(1, Integer.parseInt(userState.getCurrentQuoteBundleId()));
-            ps1.setInt(2, Integer.parseInt(userState.getUserId()));
+            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_userstate(userstate_quotebundle, userstate_user, userstate_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+            ps1.setString(1, userState.getCurrentQuoteBundleId());
+            ps1.setString(2, userState.getUserId());
+            ps1.setString(3, UUID.uuid());
             ps1.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
@@ -352,7 +353,7 @@ public class UserDataService {
         Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("select * from tw_quotebundle, tw_permission where permission_quotebundle=quotebundle_id AND permission_orphanedquotebundle=TRUE AND permission_user=?", Statement.NO_GENERATED_KEYS);
-            ps.setInt(1, Integer.decode(userId));
+            ps.setString(1, userId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -362,21 +363,21 @@ public class UserDataService {
             } else {
                 // create the orphaned quote container
                 QuoteBundle oqc = new QuoteBundle();
+                oqc.setId(UUID.uuid());
                 oqc.setName("Un-Assigned Quotes");
                 oqc.setDescription("Quotes not currently assigned to a bundle");
 
-                PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quotebundle(quotebundle_name, quotebundle_description) values (?,?)", Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quotebundle(quotebundle_name, quotebundle_description, quotebundle_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
                 ps1.setString(1, oqc.getName());
                 ps1.setString(2, oqc.getDescription());
+                ps1.setString(3, oqc.getId());
 
                 ps1.executeUpdate();
-                ResultSet rs1 = ps1.getGeneratedKeys();
-                if (rs1 != null && rs1.next())
-                    oqc.setId(String.valueOf(rs1.getLong(1)));
 
-                PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quotebundle, permission_user, permission_orphanedquotebundle) values (?,?,true)", Statement.RETURN_GENERATED_KEYS);
-                ps2.setInt(1, Integer.parseInt(oqc.getId()));
-                ps2.setInt(2, Integer.parseInt(userId));
+                PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quotebundle, permission_user, permission_orphanedquotebundle, permission_id) values (?,?,true,?)", Statement.NO_GENERATED_KEYS);
+                ps2.setString(1, oqc.getId());
+                ps2.setString(2, userId);
+                ps2.setString(3, UUID.uuid());
                 ps2.executeUpdate();
 
                 return oqc;
@@ -394,7 +395,7 @@ public class UserDataService {
         Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("select * from tw_quote, tw_doc, tw_bundleitem where quote_doc=doc_id and bundleitem_quote=quote_id and bundleitem_quotebundle=?", Statement.NO_GENERATED_KEYS);
-            ps.setInt(1, Integer.decode(bundleId));
+            ps.setString(1, bundleId);
             ResultSet rs = ps.executeQuery();
 
             List<Quote> list = new ArrayList<Quote>();
@@ -428,7 +429,7 @@ public class UserDataService {
         Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("select * from tw_quotebundle, tw_permission where permission_quotebundle=quotebundle_id AND permission_user=? order by quotebundle_name", Statement.NO_GENERATED_KEYS);
-            ps.setInt(1, Integer.decode(userId));
+            ps.setString(1, userId);
             ResultSet rs = ps.executeQuery();
 
             String orphanedQuoteContainerId = null;
@@ -488,7 +489,7 @@ public class UserDataService {
             PreparedStatement ps1 = dao.getPreparedStatement("update tw_quotebundle set quotebundle_name=?, quotebundle_description=? where quotebundle_id=?", Statement.RETURN_GENERATED_KEYS);
             ps1.setString(1, bundle.getName());
             ps1.setString(2, bundle.getDescription());
-            ps1.setInt(3, Integer.parseInt(bundle.getId()));
+            ps1.setString(3, bundle.getId());
 
             ps1.executeUpdate();
         } catch (SQLException ex) {
@@ -523,15 +524,16 @@ public class UserDataService {
 
         Dao dao = new Dao();
         try {
-            PreparedStatement ps = dao.getPreparedStatement("insert into tw_doc(doc_title, doc_date, doc_referencedoc) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+
+            doc.setId(UUID.uuid()) ;
+
+            PreparedStatement ps = dao.getPreparedStatement("insert into tw_doc(doc_title, doc_date, doc_referencedoc, doc_id) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
             ps.setString(1, doc.getTitle());
             ps.setDate(2, new java.sql.Date(doc.getDate().getTime()));
             ps.setBoolean(3, false);
+            ps.setString(4, doc.getId());
 
             ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs != null && rs.next())
-                doc.setId(String.valueOf(rs.getLong(1)));
             System.out.println("id=" + doc.getId());
             return doc;
 
@@ -554,7 +556,7 @@ public class UserDataService {
             ps.setString(1, docContent.getHtmlContent());
             ps.setInt(2, docContent.getFirstPageNumber());
             ps.setString(3, dao.toXML(docContent.getPagesXPath()));
-            ps.setInt(4, Integer.parseInt(docContent.getId()));
+            ps.setString(4, docContent.getId());
 
             ps.executeUpdate();
 
@@ -604,7 +606,7 @@ public class UserDataService {
 
         try {
             PreparedStatement ps1 = dao.getPreparedStatement("delete from tw_doc where doc_id=?", Statement.RETURN_GENERATED_KEYS);
-            ps1.setInt(1, Integer.parseInt(docId));
+            ps1.setString(1, docId);
             ps1.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
@@ -670,15 +672,12 @@ public class UserDataService {
         if (userId == null || bundle == null) throw new NullPointerException();
         Dao dao = new Dao();
         try {
-            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quotebundle(quotebundle_id, quotebundle_name, quotebundle_description) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            ps1.setInt(1, Integer.parseInt(bundle.getId()));
+            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quotebundle(quotebundle_id, quotebundle_name, quotebundle_description) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+            ps1.setString(1, bundle.getId());
             ps1.setString(2, bundle.getName());
             ps1.setString(3, bundle.getDescription());
 
             ps1.executeUpdate();
-            ResultSet rs1 = ps1.getGeneratedKeys();
-            if (rs1 != null && rs1.next())
-                bundle.setId(String.valueOf(rs1.getLong(1)));
 
             addBundleUserBinding(userId, bundle.getId());
             return bundle;
@@ -713,13 +712,13 @@ public class UserDataService {
                 QuoteBundle oqb = getOrphanedQuoteBundleForUser(userId);
 
                 PreparedStatement ps2 = dao.getPreparedStatement("update tw_bundleitem set bundleitem_quotebundle=? where bundleitem_quotebundle=?", Statement.RETURN_GENERATED_KEYS);
-                ps2.setInt(1, Integer.parseInt(oqb.getId()));
-                ps2.setInt(2, Integer.parseInt(bundleId));
+                ps2.setString(1, oqb.getId());
+                ps2.setString(2, bundleId);
                 ps2.executeUpdate();
             }
 
             PreparedStatement ps1 = dao.getPreparedStatement("delete from tw_quotebundle where quotebundle_id=?", Statement.RETURN_GENERATED_KEYS);
-            ps1.setInt(1, Integer.parseInt(bundleId));
+            ps1.setString(1, bundleId);
             ps1.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
@@ -766,22 +765,20 @@ public class UserDataService {
         Dao dao = new Dao();
         try {
             // insert quote
-            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quote(quote_doc, quote_endpage, quote_quote, quote_serializedmark, quote_startpage, quote_id) values (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            ps1.setInt(1, Integer.parseInt(quote.getDocument().getId()));
+            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quote(quote_doc, quote_endpage, quote_quote, quote_serializedmark, quote_startpage, quote_id) values (?,?,?,?,?,?)", Statement.NO_GENERATED_KEYS);
+            ps1.setString(1, quote.getDocument().getId());
             ps1.setInt(2, quote.getStartPage());
             ps1.setString(3, quote.getQuote());
             ps1.setString(4, quote.getSerializedMark());
             ps1.setInt(5, quote.getStartPage());
-            ps1.setInt(6, Integer.parseInt(quote.getId()));
+            ps1.setString(6, quote.getId());
             ps1.executeUpdate();
-//            ResultSet rs1 = ps1.getGeneratedKeys();
-//            if (rs1 != null && rs1.next())
-//                quote.setId(String.valueOf(rs1.getLong(1)));
 
             // add quote to bundle
-            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_bundleitem(bundleitem_quote, bundleitem_quotebundle) values (?,?)", Statement.RETURN_GENERATED_KEYS);
-            ps2.setInt(1, Integer.parseInt(quote.getId()));
-            ps2.setInt(2, Integer.parseInt(bundleId));
+            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_bundleitem(bundleitem_quote, bundleitem_quotebundle, bundleitem_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+            ps2.setString(1, quote.getId());
+            ps2.setString(2, bundleId);
+            ps2.setString(3, UUID.uuid());
             ps2.executeUpdate();
 
             addQuoteUserBinding(userId, quote.getId());
@@ -810,7 +807,7 @@ public class UserDataService {
         try {
 
             PreparedStatement ps2 = dao.getPreparedStatement("delete from tw_quote where quote_id=?", Statement.RETURN_GENERATED_KEYS);
-            ps2.setInt(1, Integer.parseInt(quoteId));
+            ps2.setString(1, quoteId);
             ps2.executeUpdate();
 
         } catch (SQLException ex) {
@@ -838,9 +835,9 @@ public class UserDataService {
         try {
 
             PreparedStatement ps2 = dao.getPreparedStatement("update tw_bundleitem set bundleitem_quotebundle=? where bundleitem_quotebundle=? and bundleitem_quote=?", Statement.RETURN_GENERATED_KEYS);
-            ps2.setInt(1, Integer.parseInt(targetBundleId));
-            ps2.setInt(2, Integer.parseInt(sourceBundleId));
-            ps2.setInt(3, Integer.parseInt(quoteId));
+            ps2.setString(1, targetBundleId);
+            ps2.setString(2, sourceBundleId);
+            ps2.setString(3, quoteId);
             ps2.executeUpdate();
 
         } catch (SQLException ex) {
@@ -862,9 +859,10 @@ public class UserDataService {
         System.out.println("addBundleUserBinding " + userId);
         Dao dao = new Dao();
         try {
-            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quotebundle, permission_user, permission_orphanedquotebundle) values (?,?,true)", Statement.RETURN_GENERATED_KEYS);
-            ps2.setInt(1, Integer.parseInt(bundleId));
-            ps2.setInt(2, Integer.parseInt(userId));
+            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quotebundle, permission_user, permission_orphanedquotebundle, permission_id) values (?,?,true,?)", Statement.NO_GENERATED_KEYS);
+            ps2.setString(1, bundleId);
+            ps2.setString(2, userId);
+            ps2.setString(3, UUID.uuid());
             ps2.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
@@ -886,8 +884,8 @@ public class UserDataService {
 
         try {
             PreparedStatement ps1 = dao.getPreparedStatement("delete from tw_permission where permission_quotebundle=? and permission_user=?", Statement.RETURN_GENERATED_KEYS);
-            ps1.setInt(1, Integer.parseInt(bundleId));
-            ps1.setInt(2, Integer.parseInt(userId));
+            ps1.setString(1, bundleId);
+            ps1.setString(2, userId);
             ps1.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
@@ -908,9 +906,10 @@ public class UserDataService {
         System.out.println("addDocUserBinding " + userId);
         Dao dao = new Dao();
         try {
-            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_doc, permission_user) values (?,?)", Statement.RETURN_GENERATED_KEYS);
-            ps2.setInt(1, Integer.parseInt(docId));
-            ps2.setInt(2, Integer.parseInt(userId));
+            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_doc, permission_user, permission_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+            ps2.setString(1, docId);
+            ps2.setString(2, userId);
+            ps2.setString(3, UUID.uuid());
             ps2.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
@@ -944,8 +943,8 @@ public class UserDataService {
         Dao dao = new Dao();
         try {
             PreparedStatement ps2 = dao.getPreparedStatement("delete from tw_permission where permission_doc=? and permission_user=?", Statement.RETURN_GENERATED_KEYS);
-            ps2.setInt(1, Integer.parseInt(docId));
-            ps2.setInt(2, Integer.parseInt(userId));
+            ps2.setString(1, docId);
+            ps2.setString(2, userId);
             ps2.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
@@ -1000,9 +999,10 @@ public class UserDataService {
         System.out.println("addQuoteUserBinding " + userId + " quoteId=" + quoteId);
         Dao dao = new Dao();
         try {
-            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quote, permission_user) values (?,?)", Statement.RETURN_GENERATED_KEYS);
-            ps2.setInt(1, Integer.parseInt(quoteId));
-            ps2.setInt(2, Integer.parseInt(userId));
+            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quote, permission_user, permission_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+            ps2.setString(1, quoteId);
+            ps2.setString(2, userId);
+            ps2.setString(3, UUID.uuid());
             ps2.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);

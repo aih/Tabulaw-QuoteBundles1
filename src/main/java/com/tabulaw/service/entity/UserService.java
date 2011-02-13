@@ -125,7 +125,7 @@ public class UserService implements IForgotPasswordHandler {
             ps.setString(5,user.getName());
             // ps.setString(6,user.getPassword());
             ps.setString(6, dao.toXML(user.getRoles()));
-            ps.setInt(7, Integer.parseInt(user.getId()));
+            ps.setString(7, user.getId());
 
             ps.executeUpdate();
             return user;
@@ -179,9 +179,12 @@ public class UserService implements IForgotPasswordHandler {
         // set the role as user
         user.addRole(Role.USER);
 
+        // set id
+        user.setId(UUID.uuid());
+
         Dao dao = new Dao();
         try {
-            PreparedStatement ps = dao.getPreparedStatement("insert into tw_user(user_emailaddress, user_enabled, user_expires, user_locked, user_name, user_password, user_roles) values (?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = dao.getPreparedStatement("insert into tw_user(user_emailaddress, user_enabled, user_expires, user_locked, user_name, user_password, user_roles, user_id) values (?,?,?,?,?,?,?,?)", Statement.NO_GENERATED_KEYS);
             ps.setString(1,user.getEmailAddress());
             ps.setBoolean(2, user.isEnabled());
             ps.setDate(3,new java.sql.Date(user.getExpires().getTime()));
@@ -189,11 +192,9 @@ public class UserService implements IForgotPasswordHandler {
             ps.setString(5,user.getName());
             ps.setString(6,user.getPassword());
             ps.setString(7, dao.toXML(user.getRoles()));
+            ps.setString(8, user.getId());
 
             ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs!=null && rs.next())
-                user.setId(String.valueOf(rs.getLong(1)));
             System.out.println("id="+user.getId());
             return user;
 
@@ -247,8 +248,8 @@ public class UserService implements IForgotPasswordHandler {
         Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("update tw_user set user_password=? where user_id=?", Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1,password);
-            ps.setInt(2, Integer.parseInt(userId));
+            ps.setString(1, password);
+            ps.setString(2, userId);
 
             ps.executeUpdate();
         } catch (SQLException ex) {
