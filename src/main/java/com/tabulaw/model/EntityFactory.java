@@ -5,6 +5,8 @@
  */
 package com.tabulaw.model;
 
+import com.tabulaw.client.UUID;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -134,6 +136,7 @@ public class EntityFactory {
 	 */
 	public CaseRef buildCase(String parties, String reftoken, String docLoc, String court, String url, int year, int firstPage, int lastPage) {
 		CaseRef e = (CaseRef) create(EntityType.CASE);
+        e.setId(UUID.uuid());
 		e.setReftoken(reftoken);
 		e.setParties(parties);
 		e.setDocLoc(docLoc);
@@ -153,6 +156,7 @@ public class EntityFactory {
 	 */
 	public DocRef buildDoc(String docTitle, Date docDate, boolean referenceDoc) {
 		DocRef doc = (DocRef) create(EntityType.DOCUMENT);
+        doc.setId(UUID.uuid());
 		doc.setTitle(docTitle);
 		doc.setDate(docDate);
 		doc.setReferenceDoc(referenceDoc);
@@ -193,6 +197,7 @@ public class EntityFactory {
 	public DocRef buildCaseDoc(String docTitle, Date docDate, boolean referenceDoc, String parties, String reftoken,
 			String docLoc, String court, String url, int year, int firstPage, int lastPage) {
 		DocRef doc = buildDoc(docTitle, docDate, referenceDoc);
+        doc.setId(UUID.uuid());
 		doc.setReference(buildCase(parties, reftoken, docLoc, court, url, year, firstPage, lastPage));
 		return doc;
 	}
@@ -205,6 +210,7 @@ public class EntityFactory {
 	 */
 	public QuoteBundle buildBundle(String name, String description) {
 		QuoteBundle m = (QuoteBundle) create(EntityType.QUOTE_BUNDLE);
+        m.setId(UUID.uuid());
 		m.setName(name);
 		m.setDescription(description);
 		return m;
@@ -221,6 +227,7 @@ public class EntityFactory {
 	 */
 	public Quote buildQuote(String quoteText, DocRef document, String serializedMark, int startPage, int endPage) {
 		Quote m = (Quote) create(EntityType.QUOTE);
+        m.setId(UUID.uuid());
 		m.setQuote(quoteText);
 		if(document != null) m.setDocument(document);
 		m.setSerializedMark(serializedMark);

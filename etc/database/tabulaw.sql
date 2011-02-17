@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.0.3
 -- Dumped by pg_dump version 9.0.3
--- Started on 2011-02-14 21:10:54
+-- Started on 2011-02-18 01:26:13
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -52,7 +52,8 @@ CREATE TABLE tw_caseref (
     caseref_court text,
     caseref_url text,
     caseref_firstpagenumber integer,
-    caseref_lastpagenumber integer
+    caseref_lastpagenumber integer,
+    caseref_year integer
 );
 
 
@@ -174,7 +175,7 @@ ALTER TABLE ONLY tw_caseref
 
 
 --
--- TOC entry 1814 (class 2606 OID 16727)
+-- TOC entry 1815 (class 2606 OID 16727)
 -- Dependencies: 1523 1523
 -- Name: doc_id; Type: CONSTRAINT; Schema: public; Owner: -
 --
@@ -184,7 +185,7 @@ ALTER TABLE ONLY tw_doc
 
 
 --
--- TOC entry 1821 (class 2606 OID 16729)
+-- TOC entry 1822 (class 2606 OID 16729)
 -- Dependencies: 1524 1524
 -- Name: permission_id; Type: CONSTRAINT; Schema: public; Owner: -
 --
@@ -194,7 +195,7 @@ ALTER TABLE ONLY tw_permission
 
 
 --
--- TOC entry 1824 (class 2606 OID 16731)
+-- TOC entry 1825 (class 2606 OID 16731)
 -- Dependencies: 1525 1525
 -- Name: quote_id; Type: CONSTRAINT; Schema: public; Owner: -
 --
@@ -204,7 +205,7 @@ ALTER TABLE ONLY tw_quote
 
 
 --
--- TOC entry 1826 (class 2606 OID 16733)
+-- TOC entry 1827 (class 2606 OID 16733)
 -- Dependencies: 1526 1526
 -- Name: quotebundle_id; Type: CONSTRAINT; Schema: public; Owner: -
 --
@@ -214,7 +215,7 @@ ALTER TABLE ONLY tw_quotebundle
 
 
 --
--- TOC entry 1828 (class 2606 OID 16735)
+-- TOC entry 1829 (class 2606 OID 16735)
 -- Dependencies: 1527 1527
 -- Name: user_id; Type: CONSTRAINT; Schema: public; Owner: -
 --
@@ -224,7 +225,7 @@ ALTER TABLE ONLY tw_user
 
 
 --
--- TOC entry 1832 (class 2606 OID 16737)
+-- TOC entry 1833 (class 2606 OID 16737)
 -- Dependencies: 1528 1528
 -- Name: userstate_id; Type: CONSTRAINT; Schema: public; Owner: -
 --
@@ -252,7 +253,7 @@ CREATE INDEX fki_bundleitem_quotebundle ON tw_bundleitem USING btree (bundleitem
 
 
 --
--- TOC entry 1815 (class 1259 OID 16739)
+-- TOC entry 1816 (class 1259 OID 16739)
 -- Dependencies: 1523
 -- Name: fki_doc_caseref; Type: INDEX; Schema: public; Owner: -
 --
@@ -261,7 +262,7 @@ CREATE INDEX fki_doc_caseref ON tw_doc USING btree (doc_caseref);
 
 
 --
--- TOC entry 1816 (class 1259 OID 16795)
+-- TOC entry 1817 (class 1259 OID 16795)
 -- Dependencies: 1524
 -- Name: fki_permission_doc; Type: INDEX; Schema: public; Owner: -
 --
@@ -270,7 +271,7 @@ CREATE INDEX fki_permission_doc ON tw_permission USING btree (permission_doc);
 
 
 --
--- TOC entry 1817 (class 1259 OID 16796)
+-- TOC entry 1818 (class 1259 OID 16796)
 -- Dependencies: 1524
 -- Name: fki_permission_quote; Type: INDEX; Schema: public; Owner: -
 --
@@ -279,7 +280,7 @@ CREATE INDEX fki_permission_quote ON tw_permission USING btree (permission_quote
 
 
 --
--- TOC entry 1818 (class 1259 OID 16797)
+-- TOC entry 1819 (class 1259 OID 16797)
 -- Dependencies: 1524
 -- Name: fki_permission_quotebundle; Type: INDEX; Schema: public; Owner: -
 --
@@ -288,7 +289,7 @@ CREATE INDEX fki_permission_quotebundle ON tw_permission USING btree (permission
 
 
 --
--- TOC entry 1819 (class 1259 OID 16798)
+-- TOC entry 1820 (class 1259 OID 16798)
 -- Dependencies: 1524
 -- Name: fki_permission_user; Type: INDEX; Schema: public; Owner: -
 --
@@ -297,7 +298,7 @@ CREATE INDEX fki_permission_user ON tw_permission USING btree (permission_user);
 
 
 --
--- TOC entry 1822 (class 1259 OID 16799)
+-- TOC entry 1823 (class 1259 OID 16799)
 -- Dependencies: 1525
 -- Name: fki_quote_doc; Type: INDEX; Schema: public; Owner: -
 --
@@ -306,7 +307,7 @@ CREATE INDEX fki_quote_doc ON tw_quote USING btree (quote_doc);
 
 
 --
--- TOC entry 1829 (class 1259 OID 16740)
+-- TOC entry 1830 (class 1259 OID 16740)
 -- Dependencies: 1528
 -- Name: fki_userstate_quotebundle; Type: INDEX; Schema: public; Owner: -
 --
@@ -315,7 +316,7 @@ CREATE INDEX fki_userstate_quotebundle ON tw_userstate USING btree (userstate_qu
 
 
 --
--- TOC entry 1830 (class 1259 OID 16741)
+-- TOC entry 1831 (class 1259 OID 16741)
 -- Dependencies: 1528
 -- Name: fki_userstate_user; Type: INDEX; Schema: public; Owner: -
 --
@@ -324,8 +325,17 @@ CREATE INDEX fki_userstate_user ON tw_userstate USING btree (userstate_user);
 
 
 --
--- TOC entry 1833 (class 2606 OID 16742)
--- Dependencies: 1525 1823 1521
+-- TOC entry 1813 (class 1259 OID 16809)
+-- Dependencies: 1522
+-- Name: i_caseref_url; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX i_caseref_url ON tw_caseref USING btree (caseref_url);
+
+
+--
+-- TOC entry 1834 (class 2606 OID 16742)
+-- Dependencies: 1521 1824 1525
 -- Name: bundleitem_quote; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -334,8 +344,8 @@ ALTER TABLE ONLY tw_bundleitem
 
 
 --
--- TOC entry 1834 (class 2606 OID 16747)
--- Dependencies: 1521 1526 1825
+-- TOC entry 1835 (class 2606 OID 16747)
+-- Dependencies: 1526 1521 1826
 -- Name: bundleitem_quotebundle; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -344,8 +354,8 @@ ALTER TABLE ONLY tw_bundleitem
 
 
 --
--- TOC entry 1835 (class 2606 OID 16752)
--- Dependencies: 1811 1523 1522
+-- TOC entry 1836 (class 2606 OID 16752)
+-- Dependencies: 1523 1811 1522
 -- Name: doc_caseref; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -354,8 +364,8 @@ ALTER TABLE ONLY tw_doc
 
 
 --
--- TOC entry 1836 (class 2606 OID 16757)
--- Dependencies: 1813 1524 1523
+-- TOC entry 1837 (class 2606 OID 16757)
+-- Dependencies: 1814 1524 1523
 -- Name: permission_doc; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -364,8 +374,8 @@ ALTER TABLE ONLY tw_permission
 
 
 --
--- TOC entry 1837 (class 2606 OID 16762)
--- Dependencies: 1524 1525 1823
+-- TOC entry 1838 (class 2606 OID 16762)
+-- Dependencies: 1524 1824 1525
 -- Name: permission_quote; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -374,8 +384,8 @@ ALTER TABLE ONLY tw_permission
 
 
 --
--- TOC entry 1838 (class 2606 OID 16767)
--- Dependencies: 1526 1825 1524
+-- TOC entry 1839 (class 2606 OID 16767)
+-- Dependencies: 1826 1526 1524
 -- Name: permission_quotebundle; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -384,8 +394,8 @@ ALTER TABLE ONLY tw_permission
 
 
 --
--- TOC entry 1839 (class 2606 OID 16772)
--- Dependencies: 1524 1827 1527
+-- TOC entry 1840 (class 2606 OID 16772)
+-- Dependencies: 1828 1527 1524
 -- Name: permission_user; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -394,8 +404,8 @@ ALTER TABLE ONLY tw_permission
 
 
 --
--- TOC entry 1840 (class 2606 OID 16777)
--- Dependencies: 1813 1525 1523
+-- TOC entry 1841 (class 2606 OID 16777)
+-- Dependencies: 1814 1523 1525
 -- Name: quote_doc; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -404,8 +414,8 @@ ALTER TABLE ONLY tw_quote
 
 
 --
--- TOC entry 1841 (class 2606 OID 16782)
--- Dependencies: 1825 1526 1528
+-- TOC entry 1842 (class 2606 OID 16782)
+-- Dependencies: 1526 1826 1528
 -- Name: userstate_quotebundle; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -414,8 +424,8 @@ ALTER TABLE ONLY tw_userstate
 
 
 --
--- TOC entry 1842 (class 2606 OID 16787)
--- Dependencies: 1527 1827 1528
+-- TOC entry 1843 (class 2606 OID 16787)
+-- Dependencies: 1527 1528 1828
 -- Name: userstate_user; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -423,7 +433,7 @@ ALTER TABLE ONLY tw_userstate
     ADD CONSTRAINT userstate_user FOREIGN KEY (userstate_user) REFERENCES tw_user(user_id) ON DELETE CASCADE;
 
 
--- Completed on 2011-02-14 21:10:55
+-- Completed on 2011-02-18 01:26:13
 
 --
 -- PostgreSQL database dump complete

@@ -67,13 +67,13 @@ public class Dao {
             }
     }
 
-    public Quote loadQuoteWithDocRef(ResultSet rs)
+    public Quote loadQuoteWithDocRefWithCaseRef(ResultSet rs)
     {
         try {
             Quote ret = new Quote();
             ret.setId(rs.getString("quote_id"));
             ret.setEndPage(rs.getInt("quote_endpage"));
-            ret.setDocument(loadDocRef(rs));
+            ret.setDocument(loadDocRefWithCaseRef(rs));
             ret.setQuote(rs.getString("quote_quote"));
             ret.setSerializedMark(rs.getString("quote_serializedmark"));
             ret.setStartPage(rs.getInt("quote_startpage"));
@@ -123,16 +123,29 @@ public class Dao {
         }
     }
 
-    public DocRef loadDocRef(ResultSet rs)
+    public DocRef loadDocRefWithCaseRef(ResultSet rs)
     {
         try {
             DocRef ret = new DocRef();
             ret.setId(rs.getString("doc_id"));
             ret.setTitle(rs.getString("doc_title"));
             ret.setDate(rs.getDate("doc_date"));
+            ret.setReferenceDoc(rs.getBoolean("doc_referencedoc"));
 
-            // Don't load references for now
-            ret.setReferenceDoc(false);
+            String docCaseRef = rs.getString("doc_caseref");
+            if (docCaseRef!=null && !docCaseRef.isEmpty()) {
+                CaseRef caseRef = new CaseRef();
+                caseRef.setId(rs.getString("caseref_id"));
+                caseRef.setCourt(rs.getString("caseref_court"));
+                caseRef.setDocLoc(rs.getString("caseref_docloc"));
+                caseRef.setFirstPageNumber(rs.getInt("caseref_firstpagenumber"));
+                caseRef.setLastPageNumber(rs.getInt("caseref_lastpagenumber"));
+                caseRef.setParties(rs.getString("caseref_parties"));
+                caseRef.setReftoken(rs.getString("caseref_reftoken"));
+                caseRef.setUrl(rs.getString("caseref_url"));
+                caseRef.setYear(rs.getInt("caseref_year"));
+                ret.setReference(caseRef);
+            }
             return ret;
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);

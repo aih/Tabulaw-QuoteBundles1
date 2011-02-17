@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.ConstraintViolationException;
@@ -18,21 +19,7 @@ import javax.validation.ValidatorFactory;
 import com.google.inject.Inject;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.dao.NonUniqueResultException;
-import com.tabulaw.dao.Sorting;
-import com.tabulaw.model.BundleUserBinding;
-import com.tabulaw.model.ClauseBundle;
-import com.tabulaw.model.ContractDoc;
-import com.tabulaw.model.ContractDocUserBinding;
-import com.tabulaw.model.DocContent;
-import com.tabulaw.model.DocRef;
-import com.tabulaw.model.DocUserBinding;
-import com.tabulaw.model.EntityFactory;
-import com.tabulaw.model.Quote;
-import com.tabulaw.model.QuoteBundle;
-import com.tabulaw.model.QuoteUserBinding;
-import com.tabulaw.model.Reference;
-import com.tabulaw.model.UserState;
+import com.tabulaw.model.*;
 import com.tabulaw.service.sanitizer.ISanitizer;
 
 /**
@@ -99,12 +86,12 @@ public class UserDataService {
 
         Dao dao = new Dao();
         try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc, tw_permission where permission_doc=doc_id AND permission_user=?", Statement.NO_GENERATED_KEYS);
+            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id, tw_permission where permission_doc=doc_id AND permission_user=?", Statement.NO_GENERATED_KEYS);
             ps.setString(1, userId);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                ret.add(dao.loadDocRef(rs));
+                ret.add(dao.loadDocRefWithCaseRef(rs));
             }
             return ret;
         } catch (SQLException ex) {
@@ -137,11 +124,11 @@ public class UserDataService {
 
         Dao dao = new Dao();
         try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc", Statement.NO_GENERATED_KEYS);
+            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id", Statement.NO_GENERATED_KEYS);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                ret.add(dao.loadDocRef(rs));
+                ret.add(dao.loadDocRefWithCaseRef(rs));
             }
             return ret;
         } catch (SQLException ex) {
@@ -173,11 +160,11 @@ public class UserDataService {
         System.out.println("getDoc " + docId);
         Dao dao = new Dao();
         try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc where doc_id=?", Statement.NO_GENERATED_KEYS);
+            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id where doc_id=?", Statement.NO_GENERATED_KEYS);
             ps.setString(1, docId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return dao.loadDocRef(rs);
+                return dao.loadDocRefWithCaseRef(rs);
             }
             throw new EntityNotFoundException("No document found with id: '" + docId);
 
@@ -226,62 +213,6 @@ public class UserDataService {
         }
     }
 
-    /**
-     * Generates assignable surrogate primary keys for quote bundles guaranteed to
-     * be unique throughout the life of the datastore.
-     *
-     * @param numIds the number of ids to generate
-     * @return list of generated ids
-     */
-    public long[] generateQuoteBundleIds(int numIds) {
-        System.out.println("generateQuoteBundleIds " + numIds);
-
-        long[] arr = new long[numIds];
-        for (int i = 0; i < numIds; i++) {
-
-            Dao dao = new Dao();
-            try {
-                PreparedStatement ps1 = dao.getPreparedStatement("select nextval('tw_quotebundle_quotebundle_id_seq')", Statement.NO_GENERATED_KEYS);
-                ResultSet rs1 = ps1.executeQuery();
-                if (rs1 != null && rs1.next())
-                    arr[i] = rs1.getLong(1);
-
-            } catch (SQLException ex) {
-                throw new IllegalStateException(ex);
-            } finally {
-                dao.cleanUp();
-            }
-        }
-
-        return arr;
-    }
-
-    /**
-     * Generates assignable surrogate primary keys for quotes guaranteed to be
-     * unique throughout the life of the datastore.
-     *
-     * @param numIds the number of ids to generate
-     * @return list of generated ids
-     */
-    public long[] generateQuoteIds(int numIds) {
-        System.out.println("generateQuoteIds " + numIds);
-        long[] arr = new long[numIds];
-        for (int i = 0; i < numIds; i++) {
-
-            Dao dao = new Dao();
-            try {
-                PreparedStatement ps1 = dao.getPreparedStatement("select nextval('tw_quote_quote_id_seq')", Statement.NO_GENERATED_KEYS);
-                ResultSet rs1 = ps1.executeQuery();
-                if (rs1 != null && rs1.next())
-                    arr[i] = rs1.getLong(1);
-            } catch (SQLException ex) {
-                throw new IllegalStateException(ex);
-            } finally {
-                dao.cleanUp();
-            }
-        }
-        return arr;
-    }
 
     /**
      * Gets the user state for the given user id
@@ -358,7 +289,7 @@ public class UserDataService {
 
             if (rs.next()) {
                 QuoteBundle qb = dao.loadQuoteBundle(rs);
-                qb.setQuotes(getQuotesWithDocRef(qb.getId()));
+                qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
                 return qb;
             } else {
                 // create the orphaned quote container
@@ -390,17 +321,17 @@ public class UserDataService {
         }
     }
 
-    private List<Quote> getQuotesWithDocRef(String bundleId)
+    private List<Quote> getQuotesWithDocRefWithCaseRef(String bundleId)
     {
         Dao dao = new Dao();
         try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_quote, tw_doc, tw_bundleitem where quote_doc=doc_id and bundleitem_quote=quote_id and bundleitem_quotebundle=?", Statement.NO_GENERATED_KEYS);
+            PreparedStatement ps = dao.getPreparedStatement("select * from tw_quote, tw_doc left outer join tw_caseref on doc_caseref=caseref_id, tw_bundleitem where quote_doc=doc_id and bundleitem_quote=quote_id and bundleitem_quotebundle=?", Statement.NO_GENERATED_KEYS);
             ps.setString(1, bundleId);
             ResultSet rs = ps.executeQuery();
 
             List<Quote> list = new ArrayList<Quote>();
             while (rs.next()) {
-                Quote quote = dao.loadQuoteWithDocRef(rs);
+                Quote quote = dao.loadQuoteWithDocRefWithCaseRef(rs);
                 list.add(quote);
             }
 
@@ -437,7 +368,7 @@ public class UserDataService {
             while (rs.next()) {
                 BundleUserBinding bub = dao.loadBundleUserBinding(rs);
                 QuoteBundle qb = dao.loadQuoteBundle(rs);
-                qb.setQuotes(getQuotesWithDocRef(qb.getId()));
+                qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
                 list.add(qb);
                 if (bub.isOrphaned())
                     orphanedQuoteContainerId = bub.getBundleId();
@@ -463,7 +394,28 @@ public class UserDataService {
      */
     public QuoteBundle getQuoteBundle(String bundleId) throws EntityNotFoundException {
         System.out.println("getQuoteBundle " + bundleId);
-        throw new UnsupportedOperationException();
+
+        if (bundleId == null) throw new NullPointerException();
+
+        Dao dao = new Dao();
+        try {
+            PreparedStatement ps = dao.getPreparedStatement("select * from tw_quotebundle where quotebundle_id=?", Statement.NO_GENERATED_KEYS);
+            ps.setString(1, bundleId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                QuoteBundle qb = dao.loadQuoteBundle(rs);
+                qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
+                return qb;
+            } else {
+                throw new EntityNotFoundException("getQuoteBundle " + bundleId);
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException(ex);
+        } finally {
+            dao.cleanUp();
+        }
+
     }
 
     /**
@@ -524,14 +476,34 @@ public class UserDataService {
 
         Dao dao = new Dao();
         try {
+            Reference ref = doc.getReference();
+            String referenceId=null;;
+
+            if (ref!=null && ref instanceof CaseRef) {
+                CaseRef caseRef = (CaseRef)ref;
+                caseRef.setId(UUID.uuid());
+                referenceId = caseRef.getId();
+
+                PreparedStatement ps0 = dao.getPreparedStatement("insert into tw_caseref(caseref_id, caseref_court, caseref_docloc, caseref_firstpagenumber, caseref_lastpagenumber, caseref_parties, caseref_reftoken, caseref_url, caseref_year) values (?,?,?,?,?,?,?,?,?)", Statement.NO_GENERATED_KEYS);
+                ps0.setString(1, caseRef.getId());
+                ps0.setString(2, caseRef.getCourt());
+                ps0.setString(3, caseRef.getDocLoc());
+                ps0.setInt(4, caseRef.getFirstPageNumber());
+                ps0.setInt(5, caseRef.getLastPageNumber());
+                ps0.setString(6, caseRef.getParties());
+                ps0.setString(7, caseRef.getReftoken());
+                ps0.setString(8, caseRef.getUrl());
+                ps0.setInt(9, caseRef.getYear());
+                ps0.executeUpdate();
+            }
 
             doc.setId(UUID.uuid()) ;
-
-            PreparedStatement ps = dao.getPreparedStatement("insert into tw_doc(doc_title, doc_date, doc_referencedoc, doc_id) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
-            ps.setString(1, doc.getTitle());
-            ps.setDate(2, new java.sql.Date(doc.getDate().getTime()));
-            ps.setBoolean(3, false);
-            ps.setString(4, doc.getId());
+            PreparedStatement ps = dao.getPreparedStatement("insert into tw_doc(doc_id, doc_caseref, doc_title, doc_date, doc_referencedoc) values (?,?,?,?,?)", Statement.NO_GENERATED_KEYS);
+            ps.setString(1, doc.getId());
+            ps.setString(2, doc.getReference()!=null ? referenceId : null);
+            ps.setString(3, doc.getTitle());
+            ps.setDate(4, new java.sql.Date(doc.getDate().getTime()));
+            ps.setBoolean(5, doc.isReferenceDoc());
 
             ps.executeUpdate();
             System.out.println("id=" + doc.getId());
@@ -605,7 +577,7 @@ public class UserDataService {
         Dao dao = new Dao();
 
         try {
-            PreparedStatement ps1 = dao.getPreparedStatement("delete from tw_doc where doc_id=?", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps1 = dao.getPreparedStatement("delete from tw_doc where doc_id=?", Statement.NO_GENERATED_KEYS);
             ps1.setString(1, docId);
             ps1.executeUpdate();
         } catch (SQLException ex) {
@@ -639,7 +611,23 @@ public class UserDataService {
      */
     public DocRef findCaseDocByRemoteUrl(String remoteUrl) throws EntityNotFoundException {
         System.out.println("findCaseDocByRemoteUrl " + remoteUrl);
-        throw new UnsupportedOperationException();
+
+        Dao dao = new Dao();
+        try {
+            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id where caseref_url=?", Statement.NO_GENERATED_KEYS);
+            ps.setString(1, remoteUrl);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return dao.loadDocRefWithCaseRef(rs);
+            } else {
+                throw new EntityNotFoundException("remoteUrl "+remoteUrl);
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException(ex);
+        } finally {
+            dao.cleanUp();
+        }
     }
 
     /**
@@ -742,7 +730,15 @@ public class UserDataService {
 
     public Quote addOrphanQuote(String userId, String title, Reference reference, String quoteText, String quoteBundleId) throws ConstraintViolationException, EntityNotFoundException {
         System.out.println("addOrphanedQuote " + userId);
-        throw new UnsupportedOperationException();
+        DocRef document = EntityFactory.get().buildDoc(title, new Date(), true);
+        saveDoc(document);
+
+        DocContent docContent = EntityFactory.get().buildDocContent(document.getId(), quoteText);
+        saveDocContent(docContent);
+
+        Quote quote = EntityFactory.get().buildQuote(quoteText, document, null, 1, 1);
+        quote = addQuoteToBundle(userId, quoteBundleId, quote);
+        return quote;
     }
 
 
