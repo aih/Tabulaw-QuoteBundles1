@@ -16,7 +16,7 @@ import java.util.Map;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.client.UUID;
+import com.tabulaw.util.UUID;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.ModelChangeEvent;

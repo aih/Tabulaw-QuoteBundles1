@@ -21,6 +21,7 @@ import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.model.*;
 import com.tabulaw.service.sanitizer.ISanitizer;
+import com.tabulaw.util.UUID;
 
 /**
  * Manages the persistence of user related data that is not part of the user

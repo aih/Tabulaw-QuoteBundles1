@@ -6,7 +6,7 @@
 package com.tabulaw.client.app.ui;
 
 import com.google.gwt.user.client.DeferredCommand;
-import com.tabulaw.client.UUID;
+import com.tabulaw.util.UUID;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;

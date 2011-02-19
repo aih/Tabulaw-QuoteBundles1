@@ -22,6 +22,7 @@ import com.tabulaw.model.IUserRef;
 import com.tabulaw.model.User;
 import com.tabulaw.model.User.Role;
 import com.tabulaw.util.CryptoUtil;
+import com.tabulaw.util.UUID;
 
 /**
  * Manages the persistence of {@link User}s.

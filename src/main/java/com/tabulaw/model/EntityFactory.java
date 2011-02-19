@@ -5,7 +5,7 @@
  */
 package com.tabulaw.model;
 
-import com.tabulaw.client.UUID;
+import com.tabulaw.util.UUID;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package com.tabulaw.client;
+package com.tabulaw.util;
 
 /*
 File: Math.uuid.js
