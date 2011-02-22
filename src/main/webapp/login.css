@@ -24,7 +24,7 @@ a {
 
 .tlogo {
 	margin-top: 15px;
-	margin-left: 2px;
+	margin-left: 25px;
 	margin-right:5px;
 	height: 5.5em;
 	
@@ -54,7 +54,7 @@ a {
 .b-menu-top{
 	position:absolute;
 	top:70px;
-	right:30px;
+	right:25px;
 }
 /*end_top_menu*/
 
@@ -503,12 +503,12 @@ a {
 
 .register-button-text {
 	position: absolute;
-	top:71px;
+	top:90px;
 	left: 50px;
 }
 .register-button {
 	position: absolute;
-	top:153px;
+	top:182px;
 	left: 50px;
 }
 
