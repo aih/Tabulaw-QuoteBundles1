@@ -23,14 +23,11 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.tabulaw.IMarshalable;
-import com.tabulaw.model.bk.BusinessKeyDef;
-import com.tabulaw.model.bk.BusinessObject;
 
 /**
  * The user entity. NOTE: no surrogate primary key is needed here.
  * @author jpk
  */
-@BusinessObject(businessKeys = @BusinessKeyDef(name = "Email Address", properties = { "emailAddress" }))
 @XmlRootElement(name = "user")
 public class User extends TimeStampEntity implements IUserRef, INamedEntity, Comparable<User> {
 
@@ -51,6 +48,8 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 	public static final int MAXLEN_PASSWORD = 255;
 
 	public static final String SUPERUSER = "Tabulaw Administrator";
+
+    private String id;
 
 	private String name;
 
@@ -96,12 +95,12 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 	@Override
 	public String getId() {
-		return emailAddress;
+		return id;
 	}
 
 	@Override
 	public void setId(String id) {
-		throw new UnsupportedOperationException();
+		this.id = id;
 	}
 
 	@Override
@@ -121,6 +120,7 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 		ArrayList<Role> croles = roles == null ? null : new ArrayList<Role>(roles);
 
+        u.id = id;
 		u.name = name;
 		u.emailAddress = emailAddress;
 		u.password = password;
@@ -243,10 +243,6 @@ public class User extends TimeStampEntity implements IUserRef, INamedEntity, Com
 
 	public int getNumRoles() {
 		return roles == null ? 0 : roles.size();
-	}
-
-	public void setUsername(String username) {
-		setEmailAddress(username);
 	}
 
 	public boolean isExpired() {

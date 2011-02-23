@@ -14,7 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
+import com.tabulaw.util.UUID;
+import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
@@ -46,33 +49,7 @@ public class ClientModelCache {
 		instance = new ClientModelCache(modelChangeDispatcher);
 	}
 
-	static class IdCache {
-
-		int current, max;
-
-		/**
-		 * Constructor
-		 * @param startEndRange 2 element array where first element is start, second
-		 *        element is end
-		 */
-		public IdCache(Integer[] startEndRange) {
-			super();
-			this.current = startEndRange[0].intValue();
-			this.max = startEndRange[1].intValue();
-		}
-
-		int getNextId() {
-			if(current > max) {
-				// TODO xhr call to get next batch
-				throw new IllegalStateException("Ran out of ids");
-			}
-			return current++;
-		}
-	}
-
 	private final IHasModelChangeHandlers modelChangeDispatcher;
-
-	private final HashMap<String, IdCache> nextIdCache = new HashMap<String, IdCache>();
 
 	private final HashMap<String, List<IEntity>> entities = new HashMap<String, List<IEntity>>();
 
@@ -117,32 +94,6 @@ public class ClientModelCache {
 	}
 
 	/**
-	 * Sets a batch of ids for use in entity creation.
-	 * @param nextIdBatch
-	 */
-	public void setNextIdBatch(Map<String, Integer[]> nextIdBatch) {
-		for(String et : nextIdBatch.keySet()) {
-			Integer[] rng = nextIdBatch.get(et);
-			IdCache idCache = new IdCache(rng);
-			nextIdCache.put(et, idCache);
-		}
-	}
-
-	/**
-	 * Gets the next available id for use in newly created entities
-	 * @param entityType
-	 * @return
-	 * @throws IllegalArgumentException When there are no cached ids for the given
-	 *         entity type
-	 */
-	public String getNextId(String entityType) throws IllegalArgumentException {
-		IdCache idCache = nextIdCache.get(entityType);
-		if(idCache == null) throw new IllegalArgumentException("No ids cached for entity type: " + entityType);
-		int nextId = idCache.getNextId();
-		return Integer.toString(nextId);
-	}
-
-	/**
 	 * Clears out the entire model entities.
 	 * <p>
 	 * No model change event is fired.
@@ -158,7 +109,8 @@ public class ClientModelCache {
 	 */
 	public User getUser() {
 		List<? extends IEntity> list = entities.get(EntityType.USER.name());
-		return list.size() < 1 ? null : (User) list.get(0).clone();
+		User ret = list.size() < 1 ? null : (User) list.get(0).clone();
+        return ret;
 	}
 
 	/**
@@ -260,7 +212,7 @@ public class ClientModelCache {
 	public void persist(IEntity m, Widget source) throws IllegalArgumentException {
 		if(m == null) throw new NullPointerException();
 		if(m.getId() == null) {
-			String nextId = getNextId(m.getEntityType());
+			String nextId = UUID.uuid();
 			m.setId(nextId);
 			if(Log.isDebugEnabled()) Log.debug("Set entity id on: " + m);
 		}

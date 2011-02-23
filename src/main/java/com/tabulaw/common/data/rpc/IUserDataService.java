@@ -24,13 +24,6 @@ import com.tabulaw.model.UserState;
 public interface IUserDataService extends RemoteService {
 
 	/**
-	 * Fetches a chunk of ids categorized by entity type for use in creating new
-	 * entitites client-side and subsequently persisting them.
-	 * @return a chunk of assignable categorized ids by entity type
-	 */
-	IdsPayload fetchIdBatch();
-
-	/**
 	 * Persists the given user state.
 	 * @param userState
 	 */

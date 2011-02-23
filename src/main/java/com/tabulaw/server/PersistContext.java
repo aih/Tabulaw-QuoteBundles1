@@ -8,10 +8,7 @@ import java.io.Serializable;
 
 import javax.servlet.ServletContext;
 
-import net.sf.ehcache.CacheManager;
-
 import com.google.inject.Inject;
-import com.tabulaw.schema.ISchemaInfo;
 import com.tabulaw.service.entity.UserDataService;
 import com.tabulaw.service.entity.UserService;
 
@@ -30,9 +27,6 @@ public final class PersistContext implements Serializable {
 	 */
 	public static final String KEY = Long.toString(serialVersionUID);
 
-	private final ISchemaInfo schemaInfo;
-	private final CacheManager cacheManager;
-
 	private final UserService userService;
 	private final UserDataService userDataService;
 
@@ -44,22 +38,11 @@ public final class PersistContext implements Serializable {
 	 * @param userDataService
 	 */
 	@Inject
-	public PersistContext(ISchemaInfo schemaInfo, CacheManager cacheManager,
-			UserService userService, UserDataService userDataService) {
+	public PersistContext(UserService userService, UserDataService userDataService) {
 		super();
-		this.schemaInfo = schemaInfo;
-		this.cacheManager = cacheManager;
 
 		this.userService = userService;
 		this.userDataService = userDataService;
-	}
-
-	public ISchemaInfo getSchemaInfo() {
-		return schemaInfo;
-	}
-
-	public CacheManager getCacheManager() {
-		return cacheManager;
 	}
 
 	public UserService getUserService() {

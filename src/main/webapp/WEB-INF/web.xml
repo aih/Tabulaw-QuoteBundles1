@@ -10,12 +10,19 @@
       Dependency Injection modules (class names) that collectively bootstrap the application.
       This context param is processed by com.tll.server.Bootstrapper.
     </description>
+
+
+<resource-ref>
+  <res-ref-name>jdbc/pgsql</res-ref-name>
+  <res-type>javax.sql.DataSource</res-type>
+  <res-auth>Container</res-auth>
+ </resource-ref>
+
 		<param-name>di.modules</param-name>
 		<param-value>
 			com.tabulaw.di.MailModule
 			com.tabulaw.di.ExceptionHandlerModule
 			com.tabulaw.di.ModelModule
-			com.tabulaw.di.Db4oDaoModule
 			com.tabulaw.di.PersistContextModule
 			com.tabulaw.di.DataConverterModule
 			com.tabulaw.di.HtmlSanitizerModule
@@ -31,7 +38,6 @@
 		<param-name>di.handlers</param-name>
 		<param-value>
     	com.tabulaw.server.WebAppContextBootstrapper
-    	com.tabulaw.server.Db4oBootstrapper
     	com.tabulaw.server.PersistContextBootstrapper
     	com.tabulaw.server.DataConverterBootstrapper
     </param-value>

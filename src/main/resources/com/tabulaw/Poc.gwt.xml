@@ -35,6 +35,8 @@
 		<include name="ObjectUtil.java" />
 		<include name="PropertyPath.java" />
 		<include name="StringUtil.java" />
+		<include name="UUID.java" />
+
 	</source>
   
   <source path="schema">

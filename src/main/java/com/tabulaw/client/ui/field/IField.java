@@ -9,7 +9,6 @@ import com.tabulaw.client.ui.IWidgetRef;
 import com.tabulaw.client.validate.IHasErrorHandler;
 import com.tabulaw.client.validate.IValidator;
 import com.tabulaw.client.validate.ValidationException;
-import com.tabulaw.schema.IPropertyMetadataProvider;
 
 /**
  * IField - Abstraction for managing the display and editing of data.
@@ -73,13 +72,6 @@ public interface IField extends HasName, IWidgetRef, IHasErrorHandler {
 	 * @param visible true/false
 	 */
 	void setVisible(boolean visible);
-
-	/**
-	 * Applies property metadata to this field based on a provider that obtains
-	 * property metadata via property name.
-	 * @param provider The property metadata provider.
-	 */
-	void applyPropertyMetadata(IPropertyMetadataProvider provider);
 
 	/**
 	 * Adds a validator.

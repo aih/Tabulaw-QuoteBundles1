@@ -14,7 +14,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.tabulaw.schema.Reference;
 import com.tabulaw.util.StringUtil;
 
 /**
@@ -22,11 +21,6 @@ import com.tabulaw.util.StringUtil;
  */
 // NO - we don't enforce this as we want to support "cloned" quotes that
 // reference the same quote for a given doc but are distinct existing in different bundles.
-/*
-@BusinessObject(businessKeys = @BusinessKeyDef(name = "Doc Hash and Mark", properties = {
-	"document.hash", "serializedMark"
-}))
-*/
 @XmlRootElement(name = "quote")
 public class Quote extends TimeStampEntity implements Comparable<Quote> {
 
@@ -125,7 +119,6 @@ public class Quote extends TimeStampEntity implements Comparable<Quote> {
 	}
 
 	@Valid
-	@Reference
 	@NotNull
 	@XmlElement(name = "docRef")
 	public DocRef getDocument() {

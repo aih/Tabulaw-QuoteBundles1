@@ -1,12 +1,16 @@
 package com.tabulaw.schema;
 
+import com.tabulaw.IMarshalable;
+
 
 /**
  * Schema based information for a particular field that exists in the schema.
  * @author jpk
  */
-public final class PropertyMetadata extends AbstractSchemaProperty {
+public final class PropertyMetadata implements IMarshalable {
 
+	private PropertyType propertyType;
+	
 	private boolean managed;
 	private boolean required;
 	/**
@@ -30,10 +34,17 @@ public final class PropertyMetadata extends AbstractSchemaProperty {
 	 */
 	public PropertyMetadata(final PropertyType propertyType, final boolean managed, final boolean required,
 			final int maxLen) {
-		super(propertyType);
+		if(propertyType == null) {
+			throw new IllegalArgumentException("A property type must be specified.");
+		}
 		this.managed = managed;
 		this.required = required;
 		this.maxLen = maxLen;
+		this.propertyType = propertyType;
+	}
+	
+	public PropertyType getPropertyType() {
+		return propertyType;
 	}
 
 	public String descriptor() {

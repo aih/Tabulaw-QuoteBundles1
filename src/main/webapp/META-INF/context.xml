@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <Resource name="jdbc/pgsql" auth="Container"
+          type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
+          url="jdbc:postgresql://localhost/tab"
+          username="postgres" password="postgres" maxActive="5" maxIdle="3" maxWait="-1"/>
+
+</Context>

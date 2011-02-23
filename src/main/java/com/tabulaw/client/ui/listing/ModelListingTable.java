@@ -8,8 +8,6 @@ package com.tabulaw.client.ui.listing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.ui.Model;
-
 import com.tabulaw.model.IModelKeyProvider;
 import com.tabulaw.model.ModelKey;
 

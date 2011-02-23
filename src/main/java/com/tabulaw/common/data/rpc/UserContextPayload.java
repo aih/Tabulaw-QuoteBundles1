@@ -31,11 +31,6 @@ public class UserContextPayload extends Payload {
 	private String orphanQuoteContainerId;
 
 	/**
-	 * Map of id ranges keyed by entity type.
-	 */
-	private Map<String, Integer[]> nextIds;
-
-	/**
 	 * Constructor
 	 */
 	public UserContextPayload() {
@@ -82,17 +77,6 @@ public class UserContextPayload extends Payload {
 
 	public void setBundles(List<QuoteBundle> bundles) {
 		this.bundles = bundles;
-	}
-
-	/**
-	 * @return Map of assignable ranges keyed by entity type.
-	 */
-	public Map<String, Integer[]> getNextIds() {
-		return nextIds;
-	}
-
-	public void setNextIds(Map<String, Integer[]> nextIds) {
-		this.nextIds = nextIds;
 	}
 
 	/**

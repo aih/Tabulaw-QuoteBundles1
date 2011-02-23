@@ -15,7 +15,7 @@ import com.tabulaw.common.data.Status;
  */
 public class IdsPayload extends Payload {
 
-	private Map<String, Integer[]> ids;
+	private Map<String, Long[]> ids;
 
 	public IdsPayload() {
 		super();
@@ -25,11 +25,11 @@ public class IdsPayload extends Payload {
 		super(status);
 	}
 
-	public Map<String, Integer[]> getIds() {
+	public Map<String, Long[]> getIds() {
 		return ids;
 	}
 
-	public void setIds(Map<String, Integer[]> ids) {
+	public void setIds(Map<String, Long[]> ids) {
 		this.ids = ids;
 	}
 }

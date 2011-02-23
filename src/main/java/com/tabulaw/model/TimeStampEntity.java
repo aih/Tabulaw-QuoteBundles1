@@ -2,8 +2,6 @@ package com.tabulaw.model;
 
 import java.util.Date;
 
-import com.tabulaw.schema.Managed;
-
 /**
  * An entity that contains audit information. The information currently stored
  * is the create/modify date and the create/modify user.
@@ -28,7 +26,6 @@ public abstract class TimeStampEntity extends EntityBase implements ITimeStampEn
 	 * property.
 	 * @return The automatically set date of creation.
 	 */
-	@Managed
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -43,7 +40,6 @@ public abstract class TimeStampEntity extends EntityBase implements ITimeStampEn
 	 * property.
 	 * @return The automatically set date of modification.
 	 */
-	@Managed
 	public Date getDateModified() {
 		return dateModified;
 	}

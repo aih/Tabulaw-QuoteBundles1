@@ -20,7 +20,6 @@ import com.tabulaw.client.validate.ErrorDisplay;
 import com.tabulaw.client.validate.IErrorHandler;
 import com.tabulaw.client.validate.IValidator;
 import com.tabulaw.client.validate.ValidationException;
-import com.tabulaw.schema.IPropertyMetadataProvider;
 import com.tabulaw.util.PropertyPath;
 import com.tabulaw.util.StringUtil;
 
@@ -576,13 +575,6 @@ public final class FieldGroup implements IField, Iterable<IField> {
 			for(final IField fld : flds) {
 				removeField(fld, clearErrors);
 			}
-		}
-	}
-
-	@Override
-	public void applyPropertyMetadata(IPropertyMetadataProvider provider) {
-		for(final IField f : fields) {
-			f.applyPropertyMetadata(provider);
 		}
 	}
 

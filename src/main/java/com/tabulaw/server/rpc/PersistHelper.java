@@ -11,38 +11,12 @@ import javax.validation.ConstraintViolationException;
 import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.common.msg.Msg.MsgAttr;
 import com.tabulaw.common.msg.Msg.MsgLevel;
-import com.tabulaw.model.IEntity;
-import com.tabulaw.schema.ISchemaInfo;
-import com.tabulaw.schema.ISchemaProperty;
 import com.tabulaw.server.PersistContext;
-import com.tabulaw.util.PropertyPath;
 
 /**
  * @author jpk
  */
 public class PersistHelper {
-
-	/**
-	 * Client-izes the given property path (need to account for possible nested).
-	 * <p>
-	 * It is assumed nested entities are only 1-level deep
-	 * @param <T> the entity type
-	 * @param schemaInfo
-	 * @param entityClass
-	 * @param path
-	 * @return the clientized path
-	 */
-	public static final <T> String clientizePropertyPath(ISchemaInfo schemaInfo, Class<T> entityClass, String path) {
-		final PropertyPath p = new PropertyPath(path);
-		if(p.depth() > 2) {
-			final String ppp = p.trim(1);
-			final ISchemaProperty sp = schemaInfo.getSchemaProperty(entityClass, ppp);
-			if(sp.getPropertyType().isNested()) {
-				path = ppp + '_' + p.last();
-			}
-		}
-		return path;
-	}
 
 	@SuppressWarnings("unchecked")
 	public static void handleValidationException(PersistContext context, ConstraintViolationException cve,
@@ -56,9 +30,8 @@ public class PersistHelper {
 			// since the validation api doesn't provide the index rather only empty
 			// brackets ([])
 			// in the ConstraintViolation's propertyPath property
-			Class<? extends IEntity> entityClass = (Class<? extends IEntity>) iv.getRootBeanClass();
 			payload.getStatus().addMsg(iv.getMessage(), MsgLevel.ERROR, MsgAttr.FIELD.flag,
-					clientizePropertyPath(context.getSchemaInfo(), entityClass, iv.getPropertyPath().toString()));
+					iv.getPropertyPath().toString());
 		}
 	}
 

@@ -34,6 +34,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.xml.client.Document;
 import com.google.gwt.xml.client.XMLParser;
+import com.tabulaw.util.UUID;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.app.ui.BundleListingWidget.BOption;
@@ -168,7 +169,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 
 			// copy the quote
 			Quote mQuoteClone = (Quote) sourceQuote.clone();
-			mQuoteClone.setId(ClientModelCache.get().getNextId(EntityType.QUOTE.name()));
+			mQuoteClone.setId(UUID.uuid());
 			mQuoteClone.setVersion(-1); // CRITICAL
 			// add and persist
 			targetBundleWidget.addQuote(mQuoteClone, true, true);

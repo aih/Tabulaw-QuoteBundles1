@@ -14,6 +14,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -210,17 +211,14 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 			@Override
 			public void onSuccess(UserContextPayload result) {
 				User liu = result.getUser();
+
 				if (liu == null) {
 					// not logged in
 					showLoginPanel();
 				} else {
 					hideLoginPanel();
-
 					// attach the global msg panel in its native place
 					parkGlobalMsgPanel();
-
-					// cache initial batch of next ids
-					ClientModelCache.get().setNextIdBatch(result.getNextIds());
 
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
@@ -252,8 +250,8 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 						Log.debug("Creating new UserState instance");
 						userState = new UserState(liu.getId());
 					}
-					ClientModelCache.get().persist(userState, getPortal());
 
+					ClientModelCache.get().persist(userState, getPortal());
 					// show doc listing view by default
 					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocsView.klas)));
 				}
