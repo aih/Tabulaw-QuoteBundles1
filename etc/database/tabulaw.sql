@@ -330,7 +330,7 @@ CREATE INDEX fki_userstate_user ON tw_userstate USING btree (userstate_user);
 -- Name: i_caseref_url; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX i_caseref_url ON tw_caseref USING btree (caseref_url);
+CREATE INDEX i_caseref_url ON tw_caseref USING btree (caseref_url);
 
 
 --
