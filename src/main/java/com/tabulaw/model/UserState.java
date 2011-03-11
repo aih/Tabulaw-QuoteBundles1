@@ -17,6 +17,7 @@ public class UserState extends EntityBase {
 	private String userId;
 
 	private String currentQuoteBundleId;
+    private String allQuoteBundleId;
 
 	/**
 	 * Constructor
@@ -46,6 +47,7 @@ public class UserState extends EntityBase {
 		UserState us = (UserState) cln;
 		us.userId = userId;
 		us.currentQuoteBundleId = currentQuoteBundleId;
+        us.allQuoteBundleId = allQuoteBundleId;
 	}
 
 	@Override
@@ -72,6 +74,14 @@ public class UserState extends EntityBase {
 		if(userId == null) throw new NullPointerException();
 		this.userId = userId;
 	}
+
+    public String getAllQuoteBundleId() {
+        return allQuoteBundleId;
+    }
+
+    public void setAllQuoteBundleId(String allQuoteBundleId) {
+        this.allQuoteBundleId = allQuoteBundleId;
+    }
 
 	public String getCurrentQuoteBundleId() {
 		return currentQuoteBundleId;

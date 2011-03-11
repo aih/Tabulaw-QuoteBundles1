@@ -192,22 +192,10 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearc
 			// propagate removal
 			ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
 
-			// add removed quote to un-assigned quotes bundle and propagate
-			// ONLY if we are not the orphaned quote container!
-			QuoteBundle ocq = ClientModelCache.get().getOrphanedQuoteBundle();
-			if(!bundle.equals(ocq)) {
-				ocq.addQuote(mQuote);
-				ClientModelCache.get().persist(ocq, AbstractBundleWidget.this);
-				
-				// server side persist (move to un-assigned bundle)
-				ServerPersistApi.get().moveQuote(mQuote.getId(), bundle.getId(), ocq.getId());
-			}
-			else {
 				ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
 				
 				// delete the quote
 				ServerPersistApi.get().deleteQuote(mQuote.getId());
-			}
 		}
 
 		return qw;

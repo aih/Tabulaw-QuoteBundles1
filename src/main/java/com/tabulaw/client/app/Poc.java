@@ -5,7 +5,6 @@ import java.util.List;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
@@ -14,7 +13,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -223,9 +221,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// cache user (i.e. the user context) and notify
 					ClientModelCache.get().persist(liu, null);
 					fireModelChangeEvent(new ModelChangeEvent(null, ModelChangeOp.LOADED, liu, null));
-
-					// set the orphan bundle id
-					ClientModelCache.get().setOrphanedQuoteBundleId(result.getOrphanQuoteContainerId());
 
 					// load up user bundles
 					List<QuoteBundle> userBundles = result.getBundles();

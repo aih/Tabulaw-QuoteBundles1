@@ -40,25 +40,16 @@ public class UserDataService {
     public static class BundleContainer {
 
         private final List<QuoteBundle> bundles;
-        private final String orphanBundleId;
 
-        public BundleContainer(List<QuoteBundle> bundles, String orphanBundleId) {
+        public BundleContainer(List<QuoteBundle> bundles) {
             super();
             this.bundles = bundles;
-            this.orphanBundleId = orphanBundleId;
         }
 
         public List<QuoteBundle> getBundles() {
             return bundles;
         }
 
-        /**
-         * @return the id of the bundle in the contained list of bundles that is the
-         *         one designated for holding orphaned quotes.
-         */
-        public String getOrphanBundleId() {
-            return orphanBundleId;
-        }
     }
 
     private ISanitizer sanitizer;
@@ -255,10 +246,11 @@ public class UserDataService {
         Dao dao = new Dao();
 
         try {
-            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_userstate(userstate_quotebundle, userstate_user, userstate_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_userstate(userstate_quotebundle, userstate_allquotebundle, userstate_user, userstate_id) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
             ps1.setString(1, userState.getCurrentQuoteBundleId());
-            ps1.setString(2, userState.getUserId());
-            ps1.setString(3, UUID.uuid());
+            ps1.setString(2, userState.getAllQuoteBundleId());
+            ps1.setString(3, userState.getUserId());
+            ps1.setString(4, UUID.uuid());
             ps1.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
@@ -270,7 +262,7 @@ public class UserDataService {
     }
 
     /**
-     * Gets the sole bundle dedicated to housing orphaned quotes for the given
+     * Gets the sole bundle dedicated to housing all quotes for the given
      * user id.
      * <p/>
      * Auto-creates this bundle if it is found not to exist.
@@ -278,40 +270,37 @@ public class UserDataService {
      * @param userId user id
      * @return non-<code>null</code> {@link QuoteBundle} instance
      */
-    public QuoteBundle getOrphanedQuoteBundleForUser(String userId) {
-        System.out.println("getOrphanedQuoteBundleForUser " + userId);
+    public QuoteBundle getAllQuoteBundleForUser(String userId) {
+        System.out.println("getAllQuoteBundleForUser " + userId);
         if (userId == null) throw new NullPointerException();
 
         Dao dao = new Dao();
         try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_quotebundle, tw_permission where permission_quotebundle=quotebundle_id AND permission_orphanedquotebundle=TRUE AND permission_user=?", Statement.NO_GENERATED_KEYS);
+            PreparedStatement ps = dao.getPreparedStatement("select * from tw_quotebundle, tw_userstate where userstate_allquotebundle=quotebundle_id AND userstate_user=?", Statement.NO_GENERATED_KEYS);
             ps.setString(1, userId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 QuoteBundle qb = dao.loadQuoteBundle(rs);
                 qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
+                System.out.println("ALL BUNDLE ID:"+qb.getId());
                 return qb;
             } else {
-                // create the orphaned quote container
+                // create all quote bundle container
+
                 QuoteBundle oqc = new QuoteBundle();
                 oqc.setId(UUID.uuid());
-                oqc.setName("Un-Assigned Quotes");
-                oqc.setDescription("Quotes not currently assigned to a bundle");
+                oqc.setName("All Quotes");
+                oqc.setDescription("All quotes stored there");
+                addBundleForUser(userId, oqc);
 
-                PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quotebundle(quotebundle_name, quotebundle_description, quotebundle_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
-                ps1.setString(1, oqc.getName());
-                ps1.setString(2, oqc.getDescription());
-                ps1.setString(3, oqc.getId());
-
-                ps1.executeUpdate();
-
-                PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quotebundle, permission_user, permission_orphanedquotebundle, permission_id) values (?,?,true,?)", Statement.NO_GENERATED_KEYS);
-                ps2.setString(1, oqc.getId());
-                ps2.setString(2, userId);
-                ps2.setString(3, UUID.uuid());
-                ps2.executeUpdate();
-
+                UserState us = new UserState();
+                us.setId(UUID.uuid());
+                us.setCurrentQuoteBundleId(oqc.getId());
+                us.setAllQuoteBundleId(oqc.getId());
+                us.setUserId(userId);
+                saveUserState(us);
+                System.out.println("ALL BUNDLE ID:"+oqc.getId());
                 return oqc;
 
             }
@@ -347,7 +336,7 @@ public class UserDataService {
     /**
      * Gets all bundles for a given user.
      * <p/>
-     * Auto-creates an orphaned quote bundle if one doesn't exist for the user.
+     * Auto-creates an all quote bundle if one doesn't exist for the user.
      *
      * @param userId
      * @return list of quote bundles
@@ -355,8 +344,8 @@ public class UserDataService {
     public BundleContainer getBundlesForUser(String userId) {
         System.out.println("getBundlesForUser " + userId);
 
-        // first ensure an orphaned quotes container exists for user
-        getOrphanedQuoteBundleForUser(userId);
+        // first ensure an all quotes container exists for user
+        getAllQuoteBundleForUser(userId);
 
         Dao dao = new Dao();
         try {
@@ -364,21 +353,15 @@ public class UserDataService {
             ps.setString(1, userId);
             ResultSet rs = ps.executeQuery();
 
-            String orphanedQuoteContainerId = null;
             List<QuoteBundle> list = new ArrayList<QuoteBundle>();
             while (rs.next()) {
                 BundleUserBinding bub = dao.loadBundleUserBinding(rs);
                 QuoteBundle qb = dao.loadQuoteBundle(rs);
                 qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
                 list.add(qb);
-                if (bub.isOrphaned())
-                    orphanedQuoteContainerId = bub.getBundleId();
             }
 
-            if (orphanedQuoteContainerId == null)
-                throw new IllegalStateException("No orphaned quotes container found for user");
-
-            return new BundleContainer(list, orphanedQuoteContainerId);
+            return new BundleContainer(list);
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
         } finally {
@@ -478,7 +461,7 @@ public class UserDataService {
         Dao dao = new Dao();
         try {
             Reference ref = doc.getReference();
-            String referenceId=null;;
+            String referenceId=null;
 
             if (ref!=null && ref instanceof CaseRef) {
                 CaseRef caseRef = (CaseRef)ref;
@@ -698,7 +681,7 @@ public class UserDataService {
 
         try {
             if (!deleteQuotes) {
-                QuoteBundle oqb = getOrphanedQuoteBundleForUser(userId);
+                QuoteBundle oqb = getAllQuoteBundleForUser(userId);
 
                 PreparedStatement ps2 = dao.getPreparedStatement("update tw_bundleitem set bundleitem_quotebundle=? where bundleitem_quotebundle=?", Statement.RETURN_GENERATED_KEYS);
                 ps2.setString(1, oqb.getId());
@@ -730,7 +713,7 @@ public class UserDataService {
     }
 
     public Quote addOrphanQuote(String userId, String title, Reference reference, String quoteText, String quoteBundleId) throws ConstraintViolationException, EntityNotFoundException {
-        System.out.println("addOrphanedQuote " + userId);
+        System.out.println("addOrphanQuote " + userId);
         DocRef document = EntityFactory.get().buildDoc(title, new Date(), true);
         saveDoc(document);
 
@@ -777,6 +760,17 @@ public class UserDataService {
             ps2.setString(2, bundleId);
             ps2.setString(3, UUID.uuid());
             ps2.executeUpdate();
+
+            // add quote to all bundle
+            QuoteBundle all = getAllQuoteBundleForUser(userId);
+            if (!all.getId().equals(bundleId)) {
+                PreparedStatement ps3 = dao.getPreparedStatement("insert into tw_bundleitem(bundleitem_quote, bundleitem_quotebundle, bundleitem_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+                ps3.setString(1, quote.getId());
+                ps3.setString(2, all.getId());
+                ps3.setString(3, UUID.uuid());
+                ps3.executeUpdate();
+            }
+
 
             addQuoteUserBinding(userId, quote.getId());
             return quote;
@@ -856,7 +850,7 @@ public class UserDataService {
         System.out.println("addBundleUserBinding " + userId);
         Dao dao = new Dao();
         try {
-            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quotebundle, permission_user, permission_orphanedquotebundle, permission_id) values (?,?,true,?)", Statement.NO_GENERATED_KEYS);
+            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quotebundle, permission_user, permission_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
             ps2.setString(1, bundleId);
             ps2.setString(2, userId);
             ps2.setString(3, UUID.uuid());

@@ -11,18 +11,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.util.UUID;
-import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IEntity;
@@ -54,10 +50,9 @@ public class ClientModelCache {
 	private final HashMap<String, List<IEntity>> entities = new HashMap<String, List<IEntity>>();
 
 	/**
-	 * Points to the bundle that holds un-assigned quotes.
-	 * <br>Quotes that are removed from other bundles end up here bro.
+	 * Points to the bundle that holds all quotes.
 	 */
-	private ModelKey orphanedQuoteContainerKey;
+	private ModelKey allQuoteContainerKey;
 
 	/**
 	 * Constructor
@@ -139,18 +134,6 @@ public class ClientModelCache {
 			}
 		}
 		return null;
-	}
-
-	public ModelKey getOrphanedQuoteBundleKey() {
-		return orphanedQuoteContainerKey;
-	}
-
-	public QuoteBundle getOrphanedQuoteBundle() {
-		return (QuoteBundle) get(orphanedQuoteContainerKey);
-	}
-
-	public void setOrphanedQuoteBundleId(String orphanedQuoteBundleId) {
-		this.orphanedQuoteContainerKey = new ModelKey(EntityType.QUOTE_BUNDLE.name(), orphanedQuoteBundleId);
 	}
 
 	/**

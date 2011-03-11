@@ -325,7 +325,6 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 			BundleContainer bc = pc.getUserDataService().getBundlesForUser(
 					user.getId());
 			payload.setBundles(bc.getBundles());
-			payload.setOrphanQuoteContainerId(bc.getOrphanBundleId());
 
 			status.addMsg("User Context retrieved.", MsgLevel.INFO,
 					MsgAttr.STATUS.flag);

@@ -180,7 +180,7 @@ public class QuoteResource extends BaseResource {
 				throw new WebApplicationException(Status.FORBIDDEN);
 			}
 		} else {
-			QuoteBundle bundle = service.getOrphanedQuoteBundleForUser(getUserId());
+			QuoteBundle bundle = service.getAllQuoteBundleForUser(getUserId());
 			bundleId = bundle.getId(); 
 		}
 		DocContent content = service.getDocContent(docRefId);

@@ -503,7 +503,6 @@
 			<version>${gwt.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>com.allen_sauer.gwt.log</groupId>
 			<artifactId>gwt-log</artifactId>

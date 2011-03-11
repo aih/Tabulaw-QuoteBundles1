@@ -365,8 +365,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 		if(mbundles != null) {
 			for(int i = 0; i < mbundles.size(); i++) {
 				QuoteBundle qb = mbundles.get(i);
-				boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteBundleKey().equals(qb.getModelKey());
-				if(!isOrphanedBundle && i < NUM_COLUMNS) {
+				if(i < NUM_COLUMNS) {
 					insertQuoteBundleColumn(qb, columns.getWidgetCount());
 				}
 				else {
@@ -451,8 +450,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 		}
 
 		Log.debug("Inserting quote bundle col widget for: " + bundle);
-		boolean isOrphanedBundle = ClientModelCache.get().getOrphanedQuoteBundleKey().equals(bundle.getModelKey());
-		final BundleEditWidget qbw = new BundleEditWidget(quoteController, isOrphanedBundle, this);
+		final BundleEditWidget qbw = new BundleEditWidget(quoteController, false, this);
 		qbw.setModel(bundle);
 		qbw.setCloseHandler(new ClickHandler() {
 

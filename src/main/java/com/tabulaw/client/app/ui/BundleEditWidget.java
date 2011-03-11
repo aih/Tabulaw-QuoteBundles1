@@ -114,15 +114,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 							// client side (moved quote to orphaned container
 							// bundle then remove bundle)
 							List<Quote> quotes = bundle.getQuotes();
-							if(quotes != null) {
-								QuoteBundle oqc = ClientModelCache.get().getOrphanedQuoteBundle();
-								for(Quote q : bundle.getQuotes()) {
-									// ClientModelCache.get().remove(q.getModelKey(),
-									// Poc.getPortal());
-									oqc.addQuote(q);
-								}
-								ClientModelCache.get().persist(oqc, EditHeader.this);
-							}
 							ClientModelCache.get().remove(bundle.getModelKey(), EditHeader.this);
 
 							// server side (move quotes to orphaned quotes

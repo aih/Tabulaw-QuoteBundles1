@@ -39,7 +39,6 @@ import com.tabulaw.client.ui.QuoteResizeEvent;
 import com.tabulaw.client.ui.UpdateQuoteBundle;
 import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocKey;
 import com.tabulaw.model.DocRef;
@@ -50,7 +49,6 @@ import com.tabulaw.model.ModelKey;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.Reference.ReferenceFormat;
-import com.tabulaw.util.StringUtil;
 
 /**
  * Displays a document on the left and quote bundle on the right separated by a
@@ -271,10 +269,8 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 
 			// don't auto-create if there are existing eligible bundles
 			// TODO establish a priority scheme by which eligible bundles are sorted
-			QuoteBundle oqb = ClientModelCache.get().getOrphanedQuoteBundle();
 			List<QuoteBundle> qbs = (List<QuoteBundle>) ClientModelCache.get().getAll(EntityType.QUOTE_BUNDLE);
 			for(QuoteBundle qb : qbs) {
-				if(!qb.equals(oqb)) {
 					// set this as the current qb
 					crntQb = qb;
 					Log.debug("Current bundle set to: " + crntQb);
@@ -282,7 +278,6 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 					// notify app of current qb change via update model change
 					Poc.fireModelChangeEvent(new ModelChangeEvent(this, ModelChangeOp.UPDATED, crntQb, null));
 					break;
-				}
 			}
 
 			if(crntQb == null) {
