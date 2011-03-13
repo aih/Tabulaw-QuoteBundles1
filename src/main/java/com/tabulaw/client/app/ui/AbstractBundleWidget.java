@@ -14,6 +14,8 @@ import com.tabulaw.client.app.search.SearchEvent;
 import com.tabulaw.client.model.IHasModel;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.ModelKey;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.util.ObjectUtil;
@@ -158,6 +160,13 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearc
 					// add the quote updating the bundle quote refs too
 					ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
 					ClientModelCache.get().persist(newQuote, AbstractBundleWidget.this);
+					
+					// updates client cache : add quote to all quotes bundle
+					// no changes on backend here
+					QuoteBundle allQuotesBundle = ClientModelCache.get().getAllQuoteBundle();
+					allQuotesBundle.addQuote(newQuote);
+					ClientModelCache.get().persist(allQuotesBundle, AbstractBundleWidget.this);
+					
 				}
 				
 				@Override
@@ -192,10 +201,10 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearc
 			// propagate removal
 			ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
 
-				ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
+			ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
 				
-				// delete the quote
-				ServerPersistApi.get().deleteQuote(mQuote.getId());
+			// delete the quote
+			ServerPersistApi.get().deleteQuote(mQuote.getId());
 		}
 
 		return qw;
