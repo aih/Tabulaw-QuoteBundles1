@@ -135,6 +135,14 @@ public class ClientModelCache {
 		}
 		return null;
 	}
+	/**
+	 * @return the 'all quotes' bundle for current user.
+	 */
+	public QuoteBundle getAllQuoteBundle() {
+		String allQuotesBundleId = getUserState().getAllQuoteBundleId();
+		QuoteBundle allQuotesBundle = (QuoteBundle)get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), allQuotesBundleId));
+		return allQuotesBundle;
+	}
 
 	/**
 	 * Gets the model identified by the given key.
