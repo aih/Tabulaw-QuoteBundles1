@@ -38,7 +38,7 @@ public interface IUserDataServiceAsync {
 
 	void deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes, AsyncCallback<Payload> callback);
 
-	void deleteQuote(String userId, String quoteId, AsyncCallback<Payload> callback);
+	void deleteQuote(String userId, String bundleId, String quoteId, AsyncCallback<Payload> callback);
 
 	void addQuoteToBundle(String userId, String bundleId, Quote quote, AsyncCallback<ModelPayload<Quote>> callback);
 

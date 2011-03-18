@@ -180,10 +180,10 @@ public class ServerPersistApi {
 		});
 	}
 
-	public void deleteQuote(String quoteId) {
+	public void deleteQuote(String bundleId, String quoteId) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		Poc.getUserDataService().deleteQuote(userId, quoteId, new AsyncCallback<Payload>() {
+		Poc.getUserDataService().deleteQuote(userId, bundleId, quoteId, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

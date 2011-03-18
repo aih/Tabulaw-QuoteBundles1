@@ -195,7 +195,7 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearc
 				ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
 				
 				// delete the quote
-				ServerPersistApi.get().deleteQuote(mQuote.getId());
+				ServerPersistApi.get().deleteQuote(bundle.getId(), mQuote.getId());
 		}
 
 		return qw;

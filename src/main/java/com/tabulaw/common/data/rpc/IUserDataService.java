@@ -113,7 +113,7 @@ public interface IUserDataService extends RemoteService {
 	 * @param quoteId
 	 * @return the status of the deletion
 	 */
-	Payload deleteQuote(String userId, String quoteId);
+	Payload deleteQuote(String userId, String bundleId, String quoteId);
 
 	/**
 	 * Moves an existing quote from an existing source bundle to an existing
@@ -193,7 +193,6 @@ public interface IUserDataService extends RemoteService {
 	 * Adds new quote to specified bundle and creates appropriate doc   
 	 * @param userId
 	 * @param title title for doc
-	 * @param quote quote to add
 	 * @param quoteBundleId quote bundle id
 	 * @return the persisted quote
 	 */

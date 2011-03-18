@@ -620,7 +620,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 	}
 
 	@Override
-	public Payload deleteQuote(String userId, String quoteId) {
+	public Payload deleteQuote(String userId, String bundleId, String quoteId) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
@@ -628,7 +628,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 		Payload payload = new Payload(status);
 
 		try {
-			userDataService.deleteQuote(userId, quoteId);
+			userDataService.deleteQuote(userId, bundleId, quoteId);
 			status.addMsg("Quote deleted.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		} catch (final EntityNotFoundException e) {
 			exceptionToStatus(e, payload.getStatus());

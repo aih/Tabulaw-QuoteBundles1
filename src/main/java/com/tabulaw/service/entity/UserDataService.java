@@ -792,14 +792,23 @@ public class UserDataService {
      * @throws EntityNotFoundException when the quote isn't found to exist in the
      *                                 bundle
      */
-    public void deleteQuote(String userId, String quoteId) throws EntityNotFoundException {
+    public void deleteQuote(String userId, String bundleId, String quoteId) throws EntityNotFoundException {
         System.out.println("deleteQuote " + userId);
+        QuoteBundle all = getAllQuoteBundleForUser(userId);
+
         Dao dao = new Dao();
         try {
-
-            PreparedStatement ps2 = dao.getPreparedStatement("delete from tw_quote where quote_id=?", Statement.RETURN_GENERATED_KEYS);
-            ps2.setString(1, quoteId);
-            ps2.executeUpdate();
+            if (all.getId().equals(bundleId)) {
+                // Delete from all means delete quote
+                PreparedStatement ps2 = dao.getPreparedStatement("delete from tw_quote where quote_id=?", Statement.RETURN_GENERATED_KEYS);
+                ps2.setString(1, quoteId);
+                ps2.executeUpdate();
+            } else {
+                PreparedStatement ps2 = dao.getPreparedStatement("delete from tw_bundleitem where bundleitem_quote=? and bundleitem_quotebundle=?", Statement.RETURN_GENERATED_KEYS);
+                ps2.setString(1, quoteId);
+                ps2.setString(2, bundleId);
+                ps2.executeUpdate();
+            }
 
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
