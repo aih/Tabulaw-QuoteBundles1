@@ -778,14 +778,6 @@ docHeaderMenuItem img {
 	padding: 0 4px;
 }
 
-.saveWarningDialog-cancel {
-	margin-left: 40px;
-}
-
-.saveWarningDialog-save {
-	margin-left: 70px;
-}
-
 .saveWarningDialog-question {
 	font-weight: bold;
 	margin-bottom: 5px;
@@ -1389,4 +1381,11 @@ docHeaderMenuItem img {
 
 .doc-import-dialog {
 	top: 20px !important;
+}
+.external-link {
+	text-decoration : underline;
+}
+.buttons-panel {
+	margin-left : 5px;
+	margin-right : 5px;
 }

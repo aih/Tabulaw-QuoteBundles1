@@ -7,6 +7,9 @@ package com.tabulaw.client.app.ui;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.AnchorElement;
+import com.google.gwt.dom.client.EventTarget;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -21,30 +24,35 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.xml.client.Document;
 import com.google.gwt.xml.client.XMLParser;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
+import com.tabulaw.client.app.model.GoogleScholarDocFetcher;
 import com.tabulaw.client.app.model.MarkOverlay;
+import com.tabulaw.client.ui.AbstractInfoDialog;
 import com.tabulaw.client.ui.Dialog;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.msg.Msgs;
 import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.model.DocContent;
@@ -80,6 +88,28 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	public static enum ViewMode {
 		EDIT,
 		STATIC;
+	}
+
+	public static enum LinkType {
+		INTERNAL_LINK,
+		GOOGLE_SCHOLAR,
+		EXTERNAL_LINK;
+
+		private static String GOOGLE_SCHOLAR_PATTERN = "^http://scholar\\.google\\.com/scholar_case\\?case=[0-9]+\\&+.+"; //[0-9]
+		private static String LOCAL_PATTERN = Window.Location.getProtocol() + "//"+Window.Location.getHost();
+		
+		
+		public static LinkType parse(String href) {
+			if (href.matches(GOOGLE_SCHOLAR_PATTERN)){
+				return LinkType.GOOGLE_SCHOLAR; 
+			}
+
+			if (href.startsWith(LOCAL_PATTERN)){
+				return LinkType.INTERNAL_LINK; 
+			}
+			
+			return EXTERNAL_LINK; 
+		}
 	}
 
 	private class DownloadDocCommand implements Command {
@@ -207,13 +237,36 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		}
 	};
 
-	private class SaveWarningDialog extends DialogBox implements ClickHandler {
+	private static class LinkWarningDialog extends AbstractInfoDialog {
+		private Button okButton = new Button("Open in new window", this);
+		private Button cancelButton = new Button("Cancel", this);
+		
+		String href;
+		
+		public LinkWarningDialog(String href) {
+			super("External link detected");
+			this.href = href;
+			HTML link = new HTML(href);
+			link.addStyleName("external-link");
+			addContents(link);
+			addButton(okButton);
+			addButton(cancelButton);
+			setWidth("330px");
+		}
+		public void onClick(ClickEvent clkEvt) {
+			hide();
+			if(clkEvt.getSource() == okButton) {
+				Window.open(href, null, null);
+			}
+		}
+	}	
+
+	private class SaveWarningDialog extends AbstractInfoDialog {
 
 		private Button cancel, save, doNotSave;
 
 		public SaveWarningDialog(String docTitle) {
-			super();
-			VerticalPanel dialogBoxContents = new VerticalPanel();
+			super(null);
 			Label questionLabel = new Label("Do you want to save changes you made in the document:", true);
 
 			Label docTitleLabel = new Label("'" + docTitle + "' ?", true);
@@ -222,24 +275,19 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			questionLabel.setStyleName("saveWarningDialog-question");
 			Label warningLabel = new Label("Your changes will be lost if you don't save them.", true);
 			warningLabel.setStyleName("saveWarningDialog-warning");
-			HorizontalPanel buttonsPanel = new HorizontalPanel();
 
 			doNotSave = new Button("Don't save", this);
 			cancel = new Button("Cancel", this);
-			cancel.addStyleName("saveWarningDialog-cancel");
 			save = new Button("Save...", this);
-			save.addStyleName("saveWarningDialog-save");
 
-			buttonsPanel.add(doNotSave);
-			buttonsPanel.add(cancel);
-			buttonsPanel.add(save);
+			addButton(doNotSave);
+			addButton(cancel);
+			addButton(save);
 
-			dialogBoxContents.add(questionLabel);
-			dialogBoxContents.add(docTitleLabel);
-			dialogBoxContents.add(warningLabel);
-			dialogBoxContents.add(buttonsPanel);
+			addContents(questionLabel);
+			addContents(docTitleLabel);
+			addContents(warningLabel);
 			this.setWidth("330px");
-			this.setWidget(dialogBoxContents);
 
 		}
 
@@ -469,11 +517,55 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			// html content
 			// frame.setUrl("");
 			setDocHtml(htmlContent);
+			addHrefHandlers();
 			Log.debug("DocViewer html content set directly");
 		}
 		else {
 			throw new IllegalStateException("No doc content specified");
 		}
+	}
+
+	private void addHrefHandlers() {
+		NodeList<com.google.gwt.dom.client.Element> anchors = frame.getElement().getElementsByTagName("a");
+		for (int i = 0; i < anchors.getLength(); i++) {
+			Element elementToListen = (Element) anchors.getItem(i);
+			DOM.setEventListener(elementToListen, new EventListener() {
+				@Override
+				public void onBrowserEvent(Event event) {
+					// TODO Auto-generated method stub
+					EventTarget target = event.getEventTarget();
+					if (AnchorElement.is(target)) {
+						AnchorElement anchor = target.cast();
+						LinkType linkType = LinkType.parse(anchor.getHref());
+						switch (linkType) {
+						case INTERNAL_LINK:
+							break;
+						case EXTERNAL_LINK:
+							event.preventDefault();
+							LinkWarningDialog dialog = new LinkWarningDialog(anchor.getHref());
+							dialog.center();
+							break;
+						case GOOGLE_SCHOLAR:
+							event.preventDefault();
+							showInProgressMessage("Google Scholar" , "Loading document");
+							Command callback = new Command() {
+								
+								@Override
+								public void execute() {
+									clearInProgressMessage();									
+								}
+							};
+							
+							GoogleScholarDocFetcher.fetchGoogleScholarDoc(anchor.getHref(), DocViewer.this, frame, callback );
+							break;
+						}
+					}
+				}
+			});
+			DOM.sinkEvents(elementToListen, Event.ONCLICK);
+
+		}
+
 	}
 
 	public String getDocHtml() {
@@ -682,7 +774,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 		}
 	};
 
-	private Dialog emailDocumentInProgress = null;
+	private Dialog inProgressMessage = null;
 
 	private void emailDocument() {
 		if(doc != null) {
@@ -691,8 +783,8 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 	}
 
 	void emailDocument(final DocRef doc) {
-		if(emailDocumentInProgress == null) {
-			setEmailQuoteBundleInProgress(true);
+		if(inProgressMessage == null) {
+			showInProgressMessage("Email Document" , "Document is sending via email");
 			String id = doc.getId();
 			String url = "/services/docments/" + id + "/send_by_email?sessionToken=" + Cookies.getCookie("JSESSIONID");
 			final RequestBuilder rb = new RequestBuilder(RequestBuilder.POST, url);
@@ -700,7 +792,7 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 
 				@Override
 				public void onResponseReceived(Request request, Response response) {
-					setEmailQuoteBundleInProgress(false);
+					clearInProgressMessage();
 					try {
 						if("OK".equalsIgnoreCase(response.getStatusText())) {
 							Document xml = XMLParser.parse(response.getText());
@@ -734,27 +826,25 @@ public class DocViewer extends Composite implements IHasDocHandlers, HasValueCha
 			}
 		}
 	}
-
-	private void setEmailQuoteBundleInProgress(boolean inprogress) {
-		if(inprogress) {
-			if(emailDocumentInProgress == null) {
-				emailDocumentInProgress = new Dialog(null, true);
-				emailDocumentInProgress.setText("Email Document");
-				emailDocumentInProgress.add(new HTML("Document is sending via email <img src=\"images/ajax-loader.gif\">"));
-				emailDocumentInProgress.setGlassEnabled(true);
-				emailDocumentInProgress.center();
-			}
+	private void showInProgressMessage(String header, String msg) {
+		if(inProgressMessage == null) {
+			inProgressMessage = new Dialog(null, true);
+			inProgressMessage.setText(header);
+			inProgressMessage.add(new HTML(msg + "<img src=\"images/ajax-loader.gif\">"));
+			inProgressMessage.setGlassEnabled(true);
+			inProgressMessage.center();
 		}
-		else {
-			if(emailDocumentInProgress != null) {
-				emailDocumentInProgress.hide();
-				emailDocumentInProgress = null;
-			}
+		
+	}
+	private void clearInProgressMessage() {
+		if(inProgressMessage != null) {
+			inProgressMessage.hide();
+			inProgressMessage = null;
 		}
 	}
 
 	private void onEmailDocumentError() {
-		setEmailQuoteBundleInProgress(false);
+		clearInProgressMessage();
 		Notifier.get().error("Unable to send document via email.");
 	}
 }
