@@ -73,7 +73,11 @@ public class GoogleScholarDocFetcher {
 	
 	public static void fetchGoogleScholarDoc(String url, Widget source, Widget popupErrorContainer, Command callback){
 		Log.debug("Checking for client cache of docRemoteUrl: " + url);
-		DocRef mDoc = ClientModelCache.get().getCaseDocByRemoteUrl(url);
+		//Google scholar url can contains unnecessary details so we use base part only
+		String[] urlParts = url.split("\\&");
+		String uniqueUrl = urlParts[0];
+		
+		DocRef mDoc = ClientModelCache.get().getCaseDocByRemoteUrl(uniqueUrl);
 		if(mDoc == null) {
 			Log.debug("Fetching remote doc: " + url);
 
