@@ -95,17 +95,6 @@ public class UserDataService {
     }
 
     /**
-     * Gets a list of all contract docs for a given user.
-     *
-     * @param userId user id
-     * @return list of docs
-     */
-    public List<ContractDoc> getContractDocsForUser(String userId) {
-        System.out.println("getContractDocsForUser " + userId);
-        throw new UnsupportedOperationException();
-    }
-
-    /**
      * Provides a list of all doc refs in the system.
      *
      * @return doc list
@@ -128,16 +117,6 @@ public class UserDataService {
         } finally {
             dao.cleanUp();
         }
-    }
-
-    /**
-     * Provides a list of all contract doc in the system.
-     *
-     * @return doc list
-     */
-    public List<ContractDoc> getAllContractDocs() {
-        System.out.println("getAllContractDocs");
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -167,19 +146,7 @@ public class UserDataService {
         }
     }
 
-    /**
-     * Gets the contract doc given the id.
-     *
-     * @param id
-     * @return to loaded doc ref
-     * @throws EntityNotFoundException
-     */
-    public ContractDoc getContractDoc(String id) throws EntityNotFoundException {
-        System.out.println("getContractDoc " + id);
-        throw new UnsupportedOperationException();
-    }
-
-    /**
+   /**
      * Gets the doc <em>content</em> given the doc id.
      *
      * @param docId {@link DocRef} id
@@ -531,19 +498,6 @@ public class UserDataService {
 
 
     /**
-     * Creates or updates the given contract doc.
-     *
-     * @param doc the doc to save
-     * @return the saved doc
-     * @throws ConstraintViolationException When the given contract doc isn't
-     *                                      valid
-     */
-    public ContractDoc saveContractDoc(ContractDoc doc) throws ConstraintViolationException {
-        System.out.println("saveContractDoc");
-        throw new UnsupportedOperationException();
-    }
-
-    /**
      * Deletes the doc and doc content given its id as well as all doc/user
      * bindings as well as any referenced quotes <em>permanently</em>.
      * <p/>
@@ -569,20 +523,6 @@ public class UserDataService {
         } finally {
             dao.cleanUp();
         }
-
-    }
-
-    /**
-     * Deletes the contract doc given its id as well as all contract doc/user
-     * bindings.
-     *
-     * @param docId id of the contract doc to delete
-     * @throws EntityNotFoundException when the contract doc of the given id can't
-     *                                 be found
-     */
-    public void deleteContractDoc(String docId) throws EntityNotFoundException {
-        System.out.println("deleteContactDoc " + docId);
-        throw new UnsupportedOperationException();
 
     }
 
@@ -918,18 +858,6 @@ public class UserDataService {
         }
     }
 
-    /**
-     * Adds an association of an existing contract doc to an existing user.
-     *
-     * @param userId
-     * @param docId
-     * @throws EntityExistsException if the association already exists
-     */
-    public void addContractDocUserBinding(String userId, String docId) throws EntityExistsException {
-        System.out.println("addContractDocUserBinding " + userId);
-        throw new UnsupportedOperationException();
-
-    }
 
     /**
      * Removes a user doc association.
@@ -953,18 +881,6 @@ public class UserDataService {
         }
     }
 
-    /**
-     * Removes a user contract doc association.
-     *
-     * @param userId
-     * @param docId
-     * @throws EntityNotFoundException when the association doesn't exist
-     */
-    public void removeContractDocUserBinding(String userId, String docId) throws EntityNotFoundException {
-        System.out.println("removeContractDocUserBinding " + userId);
-        throw new UnsupportedOperationException();
-
-    }
 
     /**
      * Returns all user/doc bindings that exist for a given doc
@@ -977,16 +893,6 @@ public class UserDataService {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Returns all contract doc/user bindings that exist for a given contract doc
-     *
-     * @param docId id of the contract doc
-     * @return list of contract doc user bindings
-     */
-    public List<ContractDocUserBinding> getContractDocUserBindingsForDoc(String docId) {
-        System.out.println("getContractDocUserBindingsForDoc " + docId);
-        throw new UnsupportedOperationException();
-    }
 
     /**
      * Adds an association of an existing quote to an existing user.
@@ -1009,38 +915,6 @@ public class UserDataService {
         } finally {
             dao.cleanUp();
         }
-    }
-
-    /**
-     * Removes a user quote association.
-     *
-     * @param userId
-     * @param quoteId
-     * @throws EntityNotFoundException when the association doesn't exist
-     */
-    public void removeQuoteUserBinding(String userId, String quoteId) throws EntityNotFoundException {
-        System.out.println("removeQuoteUserBinding " + userId);
-        throw new UnsupportedOperationException();
-    }
-
-    public List<QuoteUserBinding> getQuoteUserBindingsForQuote(String quoteId) {
-        System.out.println("getQuoteUserBindingForQuote " + quoteId);
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Updates an existing quote/user binding's orphan property.
-     * <p/>
-     * Use for orphaning and un-orphaning a quote.
-     *
-     * @param userId
-     * @param bundleId
-     * @param orphan
-     * @throws EntityNotFoundException
-     */
-    public void updateBundleUserBinding(String userId, String bundleId, boolean orphan) throws EntityNotFoundException {
-        System.out.println("updateBundleUserBinding " + userId);
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -1098,54 +972,6 @@ public class UserDataService {
 
     public List<Quote> findQuotesForUser(String userId) {
         System.out.println("findQuotesForUser " + userId);
-        throw new UnsupportedOperationException();
-
-    }
-
-    /**
-     * Creates or updates a clause bundle
-     *
-     * @param cb the clause bundle to persist
-     * @return the persisted bundle
-     * @throws ConstraintViolationException
-     * @throws EntityExistsException
-     */
-    public ClauseBundle persistClauseBundle(ClauseBundle cb) throws ConstraintViolationException, EntityExistsException {
-        System.out.println("persistClauseBundle");
-        throw new UnsupportedOperationException();
-
-    }
-
-    /**
-     * Deletes a clause bundle from the system.
-     *
-     * @param id id of the clause bundle to be deleted
-     * @throws EntityNotFoundException
-     */
-    public void deleteClauseBundle(String id) throws EntityNotFoundException {
-        System.out.println("deleteClauseBundle " + id);
-        throw new UnsupportedOperationException();
-
-    }
-
-    /**
-     * Retrieves the clause bundle of the given id
-     *
-     * @param id id of the clause bundle
-     * @return clause bundle
-     * @throws EntityNotFoundException
-     */
-    public ClauseBundle getClauseBundle(String id) throws EntityNotFoundException {
-        System.out.println("getClauseBundle " + id);
-        throw new UnsupportedOperationException();
-
-    }
-
-    /**
-     * @return list of all defined clause bundles in the system.
-     */
-    public List<ClauseBundle> getAllClauseBundles() {
-        System.out.println("getAllClauseBundle");
         throw new UnsupportedOperationException();
 
     }
