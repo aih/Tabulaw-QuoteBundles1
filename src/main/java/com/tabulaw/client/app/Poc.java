@@ -222,6 +222,14 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					ClientModelCache.get().persist(liu, null);
 					fireModelChangeEvent(new ModelChangeEvent(null, ModelChangeOp.LOADED, liu, null));
 
+					// cache user state
+					UserState userState = result.getUserState();
+					if (userState == null) {
+						Log.debug("Creating new UserState instance");
+						userState = new UserState(liu.getId());
+					}
+					ClientModelCache.get().persist(userState, getPortal());
+
 					// load up user bundles
 					List<QuoteBundle> userBundles = result.getBundles();
 
@@ -239,14 +247,6 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// from cache)
 					ViewManager.get().loadView(new StaticViewInitializer(BundlesView.klas));
 
-					// cache user state
-					UserState userState = result.getUserState();
-					if (userState == null) {
-						Log.debug("Creating new UserState instance");
-						userState = new UserState(liu.getId());
-					}
-
-					ClientModelCache.get().persist(userState, getPortal());
 					// show doc listing view by default
 					ViewManager.get().dispatch(new ShowViewRequest(new StaticViewInitializer(DocsView.klas)));
 				}

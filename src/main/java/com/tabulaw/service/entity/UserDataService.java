@@ -200,6 +200,7 @@ public class UserDataService {
 
     }
 
+
     /**
      * Saves user state.
      *
@@ -211,14 +212,24 @@ public class UserDataService {
         if (userState == null) throw new NullPointerException();
 
         Dao dao = new Dao();
-
+        
         try {
-            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_userstate(userstate_quotebundle, userstate_allquotebundle, userstate_user, userstate_id) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
-            ps1.setString(1, userState.getCurrentQuoteBundleId());
-            ps1.setString(2, userState.getAllQuoteBundleId());
-            ps1.setString(3, userState.getUserId());
-            ps1.setString(4, UUID.uuid());
-            ps1.executeUpdate();
+            PreparedStatement ps = dao.getPreparedStatement("select * from tw_userstate where userstate_id=?", Statement.NO_GENERATED_KEYS);
+            ps.setString(1, userState.getId());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+	            PreparedStatement ps1 = dao.getPreparedStatement("update tw_userstate set userstate_quotebundle=? where userstate_id=?", Statement.NO_GENERATED_KEYS);
+	            ps1.setString(1, userState.getCurrentQuoteBundleId());
+	            ps1.setString(2, userState.getId());
+	            ps1.executeUpdate();
+            } else {
+	            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_userstate(userstate_quotebundle, userstate_allquotebundle, userstate_user, userstate_id) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
+	            ps1.setString(1, userState.getCurrentQuoteBundleId());
+	            ps1.setString(2, userState.getAllQuoteBundleId());
+	            ps1.setString(3, userState.getUserId());
+	            ps1.setString(4, UUID.uuid());
+	            ps1.executeUpdate();
+            }
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
         } finally {
@@ -263,7 +274,6 @@ public class UserDataService {
 
                 UserState us = new UserState();
                 us.setId(UUID.uuid());
-                us.setCurrentQuoteBundleId(oqc.getId());
                 us.setAllQuoteBundleId(oqc.getId());
                 us.setUserId(userId);
                 saveUserState(us);

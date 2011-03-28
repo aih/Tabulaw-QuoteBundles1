@@ -149,8 +149,8 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 
 			QuoteBundle sourceBundle = sourceBundleWidget.getModel();
 
-			// move the quote if moving to/from orphaned quote container
-			if(sourceBundleWidget.isOrphanedQuoteContainer() || targetBundleWidget.isOrphanedQuoteContainer()) {
+			// move the quote if moving to/from all quote container
+			if(sourceBundleWidget.isAllQuoteBundle() || targetBundleWidget.isAllQuoteBundle()) {
 
 				// move the source quote to target bundle
 				if(!sourceBundle.removeQuote(sourceQuote)) throw new IllegalStateException();
@@ -450,7 +450,7 @@ public class BundlesManageWidget extends AbstractModelChangeAwareWidget implemen
 		}
 
 		Log.debug("Inserting quote bundle col widget for: " + bundle);
-		final BundleEditWidget qbw = new BundleEditWidget(quoteController, false, this);
+		final BundleEditWidget qbw = new BundleEditWidget(quoteController, this);
 		qbw.setModel(bundle);
 		qbw.setCloseHandler(new ClickHandler() {
 
