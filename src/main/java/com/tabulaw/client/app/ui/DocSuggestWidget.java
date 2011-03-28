@@ -8,7 +8,6 @@ package com.tabulaw.client.app.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -19,8 +18,6 @@ import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
@@ -34,24 +31,14 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.Resources;
-import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.view.DocViewInitializer;
+import com.tabulaw.client.app.model.GoogleScholarDocFetcher;
 import com.tabulaw.client.ui.IRpcHandler;
 import com.tabulaw.client.ui.Notifier;
-import com.tabulaw.client.ui.RpcCommand;
 import com.tabulaw.client.ui.RpcEvent;
 import com.tabulaw.client.ui.RpcUiHandler;
-import com.tabulaw.client.ui.msg.Msgs;
-import com.tabulaw.client.view.ShowViewRequest;
-import com.tabulaw.client.view.ViewManager;
 import com.tabulaw.common.data.dto.CaseDocSearchResult;
-import com.tabulaw.common.data.rpc.DocPayload;
 import com.tabulaw.common.data.rpc.DocSearchPayload;
 import com.tabulaw.common.data.rpc.DocSearchRequest;
-import com.tabulaw.common.msg.Msg;
-import com.tabulaw.model.DocContent;
-import com.tabulaw.model.DocKey;
-import com.tabulaw.model.DocRef;
 
 /**
  * Search as you type doc search widget.
@@ -255,65 +242,8 @@ public class DocSuggestWidget extends Composite implements IRpcHandler, HasSelec
 					// fetch the doc
 					final CaseDocSearchResult caseDoc = docSuggest.doc;
 					final String docRemoteUrl = caseDoc.getUrl();
-					Log.debug("Checking for client cache of docRemoteUrl: " + docRemoteUrl);
-					DocRef mDoc = ClientModelCache.get().getCaseDocByRemoteUrl(docRemoteUrl);
-					if(mDoc == null) {
-						Log.debug("Fetching remote doc: " + docRemoteUrl);
-
-						new RpcCommand<DocPayload>() {
-
-							@Override
-							protected void doExecute() {
-								this.source = DocSuggestWidget.this;
-								Poc.getDocService().fetch(docRemoteUrl, this);
-							}
-
-							@Override
-							protected void handleFailure(Throwable caught) {
-								super.handleFailure(caught);
-								Log.error("Unable to fetch remote document", caught);
-							}
-
-							@Override
-							protected void handleSuccess(DocPayload result) {
-								super.handleSuccess(result);
-								if(result.hasErrors()) {
-									Msgs.post(result.getStatus().getMsgs(Msg.MsgAttr.EXCEPTION.flag), docSuggestBox);
-									return;
-								}
-
-								final DocRef docRef = result.getDocRef();
-								final DocKey docKey = docRef.getModelKey();
-								final DocContent docContent = result.getDocContent();
-
-								// persist the new doc and propagate through app
-								ClientModelCache.get().persist(docRef, DocSuggestWidget.this);
-								if(docContent != null) ClientModelCache.get().persist(docContent, null);
-
-								DeferredCommand.addCommand(new Command() {
-
-									@Override
-									public void execute() {
-										// show the doc (letting the model change event finish
-										// first)
-										final DocViewInitializer dvi = new DocViewInitializer(docKey);
-										ViewManager.get().dispatch(new ShowViewRequest(dvi));
-									}
-								});
-							}
-
-						}.execute();
-					}
-					else {
-						final DocViewInitializer dvi = new DocViewInitializer(mDoc.getModelKey());
-						DeferredCommand.addCommand(new Command() {
-
-							@Override
-							public void execute() {
-								ViewManager.get().dispatch(new ShowViewRequest(dvi));
-							}
-						});
-					}
+					
+					GoogleScholarDocFetcher.fetchGoogleScholarDoc(docRemoteUrl,DocSuggestWidget.this,docSuggestBox);
 
 					// clear out the suggest text
 					docSuggestBox.setValue("", false);

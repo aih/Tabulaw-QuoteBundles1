@@ -321,7 +321,7 @@ public class ClientModelCache {
 			Reference ref = ((DocRef) m).getReference();
 			if(ref == null) continue;
 			String surl = ref.getUrl();
-			if(surl != null && surl.equals(remoteCaseUrl)) return (DocRef) m;
+			if(surl != null && surl.startsWith(remoteCaseUrl)) return (DocRef) m;
 		}
 		return null;
 	}
