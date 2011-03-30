@@ -218,9 +218,10 @@ public class UserDataService {
             ps.setString(1, userState.getId());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-	            PreparedStatement ps1 = dao.getPreparedStatement("update tw_userstate set userstate_quotebundle=? where userstate_id=?", Statement.NO_GENERATED_KEYS);
+	            PreparedStatement ps1 = dao.getPreparedStatement("update tw_userstate set userstate_quotebundle=?, userstate_allquotebundle=?  where userstate_id=?", Statement.NO_GENERATED_KEYS);
 	            ps1.setString(1, userState.getCurrentQuoteBundleId());
-	            ps1.setString(2, userState.getId());
+	            ps1.setString(2, userState.getAllQuoteBundleId());
+	            ps1.setString(3, userState.getId());
 	            ps1.executeUpdate();
             } else {
 	            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_userstate(userstate_quotebundle, userstate_allquotebundle, userstate_user, userstate_id) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
@@ -272,10 +273,16 @@ public class UserDataService {
                 oqc.setDescription("All quotes stored there");
                 addBundleForUser(userId, oqc);
 
-                UserState us = new UserState();
-                us.setId(UUID.uuid());
+                UserState us = null;
+                
+                try {
+                	us = getUserState(userId);
+                } catch(EntityNotFoundException enf){
+                    us = new UserState();
+                    us.setId(UUID.uuid());
+                    us.setUserId(userId);
+                }
                 us.setAllQuoteBundleId(oqc.getId());
-                us.setUserId(userId);
                 saveUserState(us);
                 System.out.println("ALL BUNDLE ID:"+oqc.getId());
                 return oqc;

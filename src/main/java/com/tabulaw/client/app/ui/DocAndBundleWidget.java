@@ -19,6 +19,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
@@ -300,10 +301,16 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				ClientModelCache.get().persist(crntQb, this);
 
 				// server-side persist
-				ServerPersistApi.get().addBundle(crntQb);
+				ServerPersistApi.get().addBundle(crntQb, new Command() {
+					@Override
+					public void execute() {
+						//persist current quote bundle changes  
+						ServerPersistApi.get().saveUserState(null);
+					}
+				});
+			} else {
+				ServerPersistApi.get().saveUserState(null);
 			}
-			//persist current quote bundle changes  
-			ServerPersistApi.get().saveUserState(null);
 
 		}
 

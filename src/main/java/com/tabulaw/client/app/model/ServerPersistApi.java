@@ -99,8 +99,11 @@ public class ServerPersistApi {
 			}
 		});
 	}
-
 	public void addBundle(QuoteBundle bundle) {
+		addBundle(bundle, null);
+	}
+
+	public void addBundle(QuoteBundle bundle, final Command cmd) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
 		Poc.getUserDataService().addBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
@@ -108,11 +111,13 @@ public class ServerPersistApi {
 			@Override
 			public void onFailure(Throwable caught) {
 				Notifier.get().showFor(caught);
+				if(cmd != null) cmd.execute();
 			}
 
 			@Override
 			public void onSuccess(ModelPayload<QuoteBundle> result) {
 				handlePersistResponse(result);
+				if(cmd != null) cmd.execute();
 			}
 		});
 	}

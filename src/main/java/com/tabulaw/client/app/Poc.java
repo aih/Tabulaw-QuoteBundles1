@@ -225,8 +225,7 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 					// cache user state
 					UserState userState = result.getUserState();
 					if (userState == null) {
-						Log.debug("Creating new UserState instance");
-						userState = new UserState(liu.getId());
+						throw new NullPointerException();
 					}
 					ClientModelCache.get().persist(userState, getPortal());
 
