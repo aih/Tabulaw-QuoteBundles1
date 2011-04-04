@@ -30,6 +30,7 @@ import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.UserState;
 
 /**
  * Supports editing capability for a quote bundle.
@@ -95,100 +96,36 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		 * Constructor
 		 * @param orphan is this header for an orphaned quote container instance?
 		 */
-		public EditHeader(boolean orphan) {
+		public EditHeader() {
 			super();
 			HTML spacer = new HTML("&nbsp;", true);
 			buttons.add(spacer);
 			buttons.setCellWidth(spacer, "100%");
 
-			if(!orphan) {
-				delete = new Image(Resources.INSTANCE.trash());
-				delete.setTitle("Remove Quote Bundle...");
-				delete.setStyleName(Styles.DELETE);
-				delete.addClickHandler(new ClickHandler() {
+			delete = getDeleteImage();
 
-					@Override
-					public void onClick(ClickEvent event) {
-						if(Window.confirm("Remove '" + bundle.descriptor() + "'?")) {
-
-							// client side (moved quote to orphaned container
-							// bundle then remove bundle)
-							List<Quote> quotes = bundle.getQuotes();
-							ClientModelCache.get().remove(bundle.getModelKey(), EditHeader.this);
-
-							// server side (move quotes to orphaned quotes
-							// container)
-							ServerPersistApi.get().deleteBundle(bundle.getId(), false);
-						}
-					}
-				});
-			}
-			else {
-				delete = null;
-			}
-
-			if(!orphan) {
-				current = new Image(Resources.INSTANCE.Star());
-				current.setTitle("Current Quote Bundle");
-				current.setStyleName(Styles.CURRENT);
-				notCurrent = new Image(Resources.INSTANCE.StarPressed());
-				notCurrent.setTitle("Set as current");
-				notCurrent.setStyleName(Styles.CURRENT);
-				notCurrent.addClickHandler(new ClickHandler() {
-
-					@Override
-					public void onClick(ClickEvent event) {
-						if(ClientModelCache.get().getUserState().setCurrentQuoteBundleId(bundle.getId())) {
-							Notifier.get().info("Current Quote Bundle set.");
-							// we need to globally notify all views of the
-							// current quote bundle
-							// change and we do it by firing a model change
-							// event
-							Poc.fireModelChangeEvent(new ModelChangeEvent(current, ModelChangeOp.UPDATED, bundle, null));
-						}
-					}
-				});
-				buttons.add(current);
-				buttons.add(notCurrent);
-				current.setVisible(false);
-				notCurrent.setVisible(false);
-			}
-			else {
-				current = null;
-				notCurrent = null;
-			}
-
-			MenuBar downloadMenuTop = new MenuBar();
-
-			MenuBar downloadMenu = new MenuBar(true);
-
-			// convert = new Image(Resources.INSTANCE.msword());
-			// convert.setTitle("Download Quote Bundle...");
-			// convert.setStyleName(Styles.CONVERT);
-
-			downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/>", true, downloadMenu);
-
-			MenuItem fireRtf = new MenuItem("rtf format", new DownloadBundleCommand(RTF_MIME_TYPE));
-			MenuItem fireDocx = new MenuItem("docx format", new DownloadBundleCommand(DOCX_MIME_TYPE));
-			MenuItem fireDoc = new MenuItem("doc format", new DownloadBundleCommand(DOC_MIME_TYPE));
-
-			downloadMenu.addItem(fireRtf);
-			downloadMenu.addItem(fireDocx);
-			downloadMenu.addItem(fireDoc);
+			buttons.add(delete);
 			
-			downloadMenuTop.setStyleName(null);
+			notCurrent = getNonCurrentImage();
+			current = getCurrentImage();
 
-			buttons.add(downloadMenuTop);
+			buttons.add(current);
+			buttons.add(notCurrent);
+
+
+			buttons.add(getDownloadMenuBar());
 
 			email =
 					new PushButton(new Image(Resources.INSTANCE.IconEnvelope()), new Image(
 							Resources.INSTANCE.IconEnvelopePressed()));
-			emailInProgress = new PushButton(new Image(Resources.INSTANCE.AjaxLoader()));
-			emailInProgress.setVisible(false);
 			email.setTitle("Email");
 			email.setStyleName(Styles.EMAIL);
+
+			emailInProgress = new PushButton(new Image(Resources.INSTANCE.AjaxLoader()));
+			emailInProgress.setVisible(false);
 			emailInProgress.setTitle("Email");
 			emailInProgress.setStyleName(Styles.EMAIL);
+
 			buttons.add(email);
 			buttons.add(emailInProgress);
 
@@ -197,9 +134,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			close.setStyleName(Styles.X);
 			buttons.add(close);
 
-			if(delete != null) {
-				buttons.add(delete);
-			}
 		}
 
 		@Override
@@ -212,9 +146,14 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		 * bundle header level model state check method.
 		 */
 		private void modelStateCheck() {
+			checkCurrentQuoteBundle();
+			checkAllQuoteBundle();
+		}
+		private void checkCurrentQuoteBundle() {
 			QuoteBundle cqb = ClientModelCache.get().getCurrentQuoteBundle();
 			boolean isCurrent = cqb != null && cqb.equals(bundle);
 			// close.setVisible(!isCurrent);
+			
 			if(isCurrent) {
 				setLabelText("Current Bundle");
 				addStyleName(Styles.QB_CURRENT);
@@ -223,14 +162,113 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 				setLabelText("Quote Bundle");
 				removeStyleName(Styles.QB_CURRENT);
 			}
+			
 			if(current != null) current.setVisible(isCurrent);
 			if(notCurrent != null) notCurrent.setVisible(!isCurrent);
-			// if(delete != null) delete.setVisible(!isCurrent);
+		}
+		private void checkAllQuoteBundle() {
+			QuoteBundle aqb = ClientModelCache.get().getAllQuoteBundle();
+			boolean isAll = aqb != null && aqb.equals(bundle);
+
+			if (isAll) {
+				current.setVisible(false);
+				notCurrent.setVisible(false);
+			}
+			delete.setVisible(!isAll);
+			pName.setEditable(!isAll);
+			pDesc.setEditable(!isAll);
+			
+			if(isAll) {
+				addStyleName("orphaned");
+			} else {
+				removeStyleName("orphaned");
+			}
+			
+			
+			
+		}
+		private Image getDeleteImage() {
+			Image image = new Image(Resources.INSTANCE.trash());
+			image.setTitle("Remove Quote Bundle...");
+			image.setStyleName(Styles.DELETE);
+			image.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					if(Window.confirm("Remove '" + bundle.descriptor() + "'?")) {
+
+						// client side (moved quote to orphaned container
+						// bundle then remove bundle)
+						List<Quote> quotes = bundle.getQuotes();
+						ClientModelCache.get().remove(bundle.getModelKey(), EditHeader.this);
+
+						// server side (move quotes to orphaned quotes
+						// container)
+						ServerPersistApi.get().deleteBundle(bundle.getId(), false);
+					}
+				}
+			});
+			return image;
+		}
+		private Image getCurrentImage() {
+			Image image = new Image(Resources.INSTANCE.Star());
+			image.setTitle("Current Quote Bundle");
+			image.setStyleName(Styles.CURRENT);
+			image.setVisible(false);
+			return image;
+		}
+		private Image getNonCurrentImage() {
+			Image image = new Image(Resources.INSTANCE.StarPressed());
+			image.setTitle("Set as current");
+			image.setStyleName(Styles.CURRENT);
+			image.setVisible(false);
+			image.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					UserState userState = ClientModelCache.get().getUserState();
+					if(userState.setCurrentQuoteBundleId(bundle.getId())) {
+						ServerPersistApi.get().saveUserState(new Command(){
+
+							@Override
+							public void execute() {
+								Notifier.get().info("Current Quote Bundle set.");
+								// we need to globally notify all views of the
+								// current quote bundle
+								// change and we do it by firing a model change
+								// event
+								Poc.fireModelChangeEvent(new ModelChangeEvent(EditHeader.this, ModelChangeOp.UPDATED, bundle, null));
+							}
+							
+						});
+					}
+				}
+			});
+			return (image);
+		}
+		private MenuBar getDownloadMenuBar() {
+			MenuBar downloadMenuTop = new MenuBar();
+
+			MenuBar downloadMenu = new MenuBar(true);
+
+			downloadMenuTop.addItem("<img src='poc/images/word-16.gif'/>", true, downloadMenu);
+
+			MenuItem fireRtf = new MenuItem("rtf format", new DownloadBundleCommand(RTF_MIME_TYPE));
+			MenuItem fireDocx = new MenuItem("docx format", new DownloadBundleCommand(DOCX_MIME_TYPE));
+			MenuItem fireDoc = new MenuItem("doc format", new DownloadBundleCommand(DOC_MIME_TYPE));
+
+			downloadMenu.addItem(fireRtf);
+			downloadMenu.addItem(fireDocx);
+			downloadMenu.addItem(fireDoc);
+			
+			downloadMenuTop.setStyleName(null);
+			
+			return downloadMenuTop;
+			
 		}
 
 	} // EditHeader
 
-	private final boolean orphanedQuoteContainer;
 	private final HasResizeHandlers resizeHandlerManager;
 	private HandlerRegistration searchHandlerRegistration;
 	protected final FlowPanel panel = new FlowPanel();
@@ -240,28 +278,17 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	 * @param dragController optional
 	 * @param orphanedQuoteContainer
 	 */
-	public BundleEditWidget(PickupDragController dragController, boolean orphanedQuoteContainer,
-			HasResizeHandlers resizeHandlerManager) {
+	public BundleEditWidget(PickupDragController dragController, HasResizeHandlers resizeHandlerManager) {
 		super();
-		this.header = new EditHeader(orphanedQuoteContainer);
+		this.header = new EditHeader();
 		panel.setStyleName("qbundle");
 		panel.add(header);
 		panel.add(quotePanel);
 		initWidget(panel);
 
-		this.orphanedQuoteContainer = orphanedQuoteContainer;
-		header.pName.setEditable(!orphanedQuoteContainer);
-		header.pDesc.setEditable(!orphanedQuoteContainer);
 		this.resizeHandlerManager = resizeHandlerManager;
-		if(orphanedQuoteContainer) {
-			addStyleName("orphaned");
-		}
 
 		setDragController(dragController);
-	}
-
-	public boolean isOrphanedQuoteContainer() {
-		return orphanedQuoteContainer;
 	}
 
 	public void setCloseHandler(ClickHandler closeHandler) {

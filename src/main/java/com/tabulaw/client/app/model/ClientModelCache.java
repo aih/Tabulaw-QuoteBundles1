@@ -140,7 +140,8 @@ public class ClientModelCache {
 	 */
 	public QuoteBundle getAllQuoteBundle() {
 		String allQuotesBundleId = getUserState().getAllQuoteBundleId();
-		QuoteBundle allQuotesBundle = (QuoteBundle)get(new ModelKey(EntityType.QUOTE_BUNDLE.name(), allQuotesBundleId));
+		ModelKey key = new ModelKey(EntityType.QUOTE_BUNDLE.name(), allQuotesBundleId);
+		QuoteBundle allQuotesBundle = (QuoteBundle)get(key);
 		return allQuotesBundle;
 	}
 

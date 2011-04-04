@@ -167,7 +167,7 @@ ALTER TABLE public.tw_user OWNER TO postgres;
 CREATE TABLE tw_userstate (
     userstate_id text NOT NULL,
     userstate_user text NOT NULL,
-    userstate_quotebundle text NOT NULL,
+    userstate_quotebundle text,
     userstate_allquotebundle text
 );
 

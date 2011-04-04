@@ -200,6 +200,7 @@ public class UserDataService {
 
     }
 
+
     /**
      * Saves user state.
      *
@@ -211,14 +212,25 @@ public class UserDataService {
         if (userState == null) throw new NullPointerException();
 
         Dao dao = new Dao();
-
+        
         try {
-            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_userstate(userstate_quotebundle, userstate_allquotebundle, userstate_user, userstate_id) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
-            ps1.setString(1, userState.getCurrentQuoteBundleId());
-            ps1.setString(2, userState.getAllQuoteBundleId());
-            ps1.setString(3, userState.getUserId());
-            ps1.setString(4, UUID.uuid());
-            ps1.executeUpdate();
+            PreparedStatement ps = dao.getPreparedStatement("select * from tw_userstate where userstate_id=?", Statement.NO_GENERATED_KEYS);
+            ps.setString(1, userState.getId());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+	            PreparedStatement ps1 = dao.getPreparedStatement("update tw_userstate set userstate_quotebundle=?, userstate_allquotebundle=?  where userstate_id=?", Statement.NO_GENERATED_KEYS);
+	            ps1.setString(1, userState.getCurrentQuoteBundleId());
+	            ps1.setString(2, userState.getAllQuoteBundleId());
+	            ps1.setString(3, userState.getId());
+	            ps1.executeUpdate();
+            } else {
+	            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_userstate(userstate_quotebundle, userstate_allquotebundle, userstate_user, userstate_id) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
+	            ps1.setString(1, userState.getCurrentQuoteBundleId());
+	            ps1.setString(2, userState.getAllQuoteBundleId());
+	            ps1.setString(3, userState.getUserId());
+	            ps1.setString(4, UUID.uuid());
+	            ps1.executeUpdate();
+            }
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
         } finally {
@@ -261,11 +273,16 @@ public class UserDataService {
                 oqc.setDescription("All quotes stored there");
                 addBundleForUser(userId, oqc);
 
-                UserState us = new UserState();
-                us.setId(UUID.uuid());
-                us.setCurrentQuoteBundleId(oqc.getId());
+                UserState us = null;
+                
+                try {
+                	us = getUserState(userId);
+                } catch(EntityNotFoundException enf){
+                    us = new UserState();
+                    us.setId(UUID.uuid());
+                    us.setUserId(userId);
+                }
                 us.setAllQuoteBundleId(oqc.getId());
-                us.setUserId(userId);
                 saveUserState(us);
                 System.out.println("ALL BUNDLE ID:"+oqc.getId());
                 return oqc;
@@ -759,6 +776,37 @@ public class UserDataService {
     }
 
     /**
+     * adds an association of an existing quote to an existing
+     * bundle.
+     *
+     * @param userId
+     * @param quoteId        id of the quote to move
+     * @param bundleId id of the bundle to which to add the quote
+     * @throws EntityNotFoundException When a participating entity is not found
+     */
+    public void attachQuote(String userId, String quoteId, String bundleId)
+            throws EntityNotFoundException {
+        if (userId == null || bundleId == null || quoteId == null) throw new NullPointerException();
+
+        Dao dao = new Dao();
+        try {
+
+            // add quote to bundle
+            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_bundleitem(bundleitem_quote, bundleitem_quotebundle, bundleitem_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+            ps2.setString(1, quoteId);
+            ps2.setString(2, bundleId);
+            ps2.setString(3, UUID.uuid());
+            ps2.executeUpdate();
+
+        } catch (SQLException ex) {
+            throw new IllegalStateException(ex);
+        } finally {
+            dao.cleanUp();
+        }
+
+    }
+
+    /**
      * Moves an existing quote from an existing source bundle to an existing
      * target bundle.
      *
@@ -787,7 +835,6 @@ public class UserDataService {
         }
 
     }
-
     /**
      * Adds an association of an existing quote bundle to an existing user.
      *

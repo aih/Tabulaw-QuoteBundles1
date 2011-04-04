@@ -25,7 +25,7 @@ public class QuoteEditWidget extends AbstractQuoteWidget<BundleEditWidget> {
 	@Override
 	public void setParentQuoteBundleWidget(BundleEditWidget parentQuoteBundleWidget) {
 		super.setParentQuoteBundleWidget(parentQuoteBundleWidget);
-		boolean oc = parentQuoteBundleWidget.isOrphanedQuoteContainer();
+		boolean oc = parentQuoteBundleWidget.isAllQuoteBundle();
 		showDeleteButton(oc);
 		showQuoteLinkButton(!oc);
 		showXButton(!oc);

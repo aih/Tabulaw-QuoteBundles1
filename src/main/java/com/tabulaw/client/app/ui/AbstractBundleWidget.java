@@ -201,9 +201,8 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearc
 			// propagate removal
 			ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
 
-			QuoteBundle allQuoteBundle = ClientModelCache.get().getAllQuoteBundle();
 			//remove quote from all quote bundle only!
-			if (bundle.equals(allQuoteBundle)) {
+			if (isAllQuoteBundle()) {
 				ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
 			}
 				
@@ -361,5 +360,9 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearc
 				addQuote(mchanged, false, true);
 			}
 		}
+	}
+	protected boolean isAllQuoteBundle() {
+		QuoteBundle allQuoteBundle = ClientModelCache.get().getAllQuoteBundle();
+		return (bundle.equals(allQuoteBundle)); 
 	}
 }

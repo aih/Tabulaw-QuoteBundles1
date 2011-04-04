@@ -114,7 +114,10 @@ public class Dao {
         try {
             UserState ret = new UserState();
             ret.setId(rs.getString("userstate_id"));
-            ret.setCurrentQuoteBundleId(rs.getString("userstate_quotebundle"));
+            String currentQuoteBundleId = rs.getString("userstate_quotebundle");
+            if (currentQuoteBundleId!=null) {
+            	ret.setCurrentQuoteBundleId(currentQuoteBundleId);
+            }
             ret.setUserId(rs.getString("userstate_user"));
             ret.setAllQuoteBundleId(rs.getString("userstate_allquotebundle"));
             return ret;

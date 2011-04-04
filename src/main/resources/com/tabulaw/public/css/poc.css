@@ -567,18 +567,15 @@ div.ro {
 	color: red;
 }
 
-.orphaned .qbheader,.orphaned .qheader {
+.orphaned  {
 	opacity: 0.8;
 	filter: progid : DXImageTransform.Microsoft.Alpha ( opacity = 80 );
 }
 
-.orphaned .qbheader .echo {
+.orphaned .echo {
 	display: none;
 }
 
-.orphaned .qheader .buttons { /*display: none;*/
-	
-}
 
 /* wquote */
 .wquote { /*width: 250px;*/

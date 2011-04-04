@@ -14,6 +14,8 @@ public class UserState extends EntityBase {
 
 	private static final long serialVersionUID = -8340803996969639170L;
 
+	private String id;
+
 	private String userId;
 
 	private String currentQuoteBundleId;
@@ -45,6 +47,7 @@ public class UserState extends EntityBase {
 		super.doClone(cln);
 
 		UserState us = (UserState) cln;
+		us.id = id;
 		us.userId = userId;
 		us.currentQuoteBundleId = currentQuoteBundleId;
         us.allQuoteBundleId = allQuoteBundleId;
@@ -57,12 +60,12 @@ public class UserState extends EntityBase {
 
 	@Override
 	public String getId() {
-		return getUserId();
+		return this.id;
 	}
 
 	@Override
 	public void setId(String id) {
-		setUserId(id);
+		this.id = id;
 	}
 
 	@NotNull

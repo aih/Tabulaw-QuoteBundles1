@@ -19,11 +19,11 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.tabulaw.util.UUID;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.app.model.MarkOverlay;
@@ -48,7 +48,9 @@ import com.tabulaw.model.IEntity;
 import com.tabulaw.model.ModelKey;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.UserState;
 import com.tabulaw.model.Reference.ReferenceFormat;
+import com.tabulaw.util.UUID;
 
 /**
  * Displays a document on the left and quote bundle on the right separated by a
@@ -265,16 +267,20 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 	@SuppressWarnings("unchecked")
 	private boolean maybeSetCurrentQuoteBundle() {
 		QuoteBundle crntQb = ClientModelCache.get().getCurrentQuoteBundle();
+		UserState userState = ClientModelCache.get().getUserState(); 
 		if(crntQb == null) {
-
+			QuoteBundle allQb = ClientModelCache.get().getAllQuoteBundle();
 			// don't auto-create if there are existing eligible bundles
 			// TODO establish a priority scheme by which eligible bundles are sorted
 			List<QuoteBundle> qbs = (List<QuoteBundle>) ClientModelCache.get().getAll(EntityType.QUOTE_BUNDLE);
 			for(QuoteBundle qb : qbs) {
+					if (qb.equals(allQb)) {
+						continue;
+					}
 					// set this as the current qb
 					crntQb = qb;
 					Log.debug("Current bundle set to: " + crntQb);
-					ClientModelCache.get().getUserState().setCurrentQuoteBundleId(qb.getId());
+					userState.setCurrentQuoteBundleId(qb.getId());
 					// notify app of current qb change via update model change
 					Poc.fireModelChangeEvent(new ModelChangeEvent(this, ModelChangeOp.UPDATED, crntQb, null));
 					break;
@@ -289,14 +295,21 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 				String qbName = getNextUntitledQuoteBundle(qbs);
 				String qbDesc = "Quote Bundle for " + qbName;
 				crntQb = EntityFactory.get().buildBundle(qbName, qbDesc);
-				crntQb.setId(UUID.uuid());
 
 				// client-side persist
-				ClientModelCache.get().getUserState().setCurrentQuoteBundleId(crntQb.getId());
+				userState.setCurrentQuoteBundleId(crntQb.getId());
 				ClientModelCache.get().persist(crntQb, this);
 
 				// server-side persist
-				ServerPersistApi.get().addBundle(crntQb);
+				ServerPersistApi.get().addBundle(crntQb, new Command() {
+					@Override
+					public void execute() {
+						//persist current quote bundle changes  
+						ServerPersistApi.get().saveUserState(null);
+					}
+				});
+			} else {
+				ServerPersistApi.get().saveUserState(null);
 			}
 
 		}

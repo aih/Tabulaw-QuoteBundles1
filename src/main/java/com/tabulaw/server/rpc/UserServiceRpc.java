@@ -312,7 +312,15 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 
 		try {
 
-			// get the retained user state if there is one
+			// get the user's quote bundles
+			BundleContainer bc = pc.getUserDataService().getBundlesForUser(
+					user.getId());
+			payload.setBundles(bc.getBundles());
+
+			/* get the retained user state if there is one
+			 * this should go after getBundlesForUser 
+			 * because userstate is created there for first-time users 
+			 */
 			try {
 				UserState userState = pc.getUserDataService().getUserState(
 						user.getId());
@@ -320,12 +328,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 			} catch (EntityNotFoundException e) {
 				// ok
 			}
-
-			// get the user's quote bundles
-			BundleContainer bc = pc.getUserDataService().getBundlesForUser(
-					user.getId());
-			payload.setBundles(bc.getBundles());
-
+			
 			status.addMsg("User Context retrieved.", MsgLevel.INFO,
 					MsgAttr.STATUS.flag);
 		} catch (final RuntimeException e) {
@@ -656,6 +659,29 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 			userDataService.moveQuote(userId, quoteId, sourceBundleId,
 					targetBundleId);
 			status.addMsg("Quote moved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		} catch (final EntityNotFoundException e) {
+			exceptionToStatus(e, payload.getStatus());
+		} catch (final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		} catch (Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+	@Override
+	public Payload attachQuote(String userId, String quoteId, String bundleId) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		try {
+			userDataService.attachQuote(userId, quoteId, bundleId);
+			status.addMsg("Quote attached.", MsgLevel.INFO, MsgAttr.STATUS.flag);
 		} catch (final EntityNotFoundException e) {
 			exceptionToStatus(e, payload.getStatus());
 		} catch (final RuntimeException e) {
