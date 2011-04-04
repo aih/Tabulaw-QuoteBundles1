@@ -671,6 +671,29 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 
 		return payload;
 	}
+	@Override
+	public Payload attachQuote(String userId, String quoteId, String bundleId) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		Payload payload = new Payload(status);
+
+		try {
+			userDataService.attachQuote(userId, quoteId, bundleId);
+			status.addMsg("Quote attached.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		} catch (final EntityNotFoundException e) {
+			exceptionToStatus(e, payload.getStatus());
+		} catch (final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		} catch (Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
 
 	@Override
 	public ModelPayload<QuoteBundle> saveBundleForUser(String userId,

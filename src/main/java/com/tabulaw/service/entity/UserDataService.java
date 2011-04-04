@@ -776,6 +776,37 @@ public class UserDataService {
     }
 
     /**
+     * adds an association of an existing quote to an existing
+     * bundle.
+     *
+     * @param userId
+     * @param quoteId        id of the quote to move
+     * @param bundleId id of the bundle to which to add the quote
+     * @throws EntityNotFoundException When a participating entity is not found
+     */
+    public void attachQuote(String userId, String quoteId, String bundleId)
+            throws EntityNotFoundException {
+        if (userId == null || bundleId == null || quoteId == null) throw new NullPointerException();
+
+        Dao dao = new Dao();
+        try {
+
+            // add quote to bundle
+            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_bundleitem(bundleitem_quote, bundleitem_quotebundle, bundleitem_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+            ps2.setString(1, quoteId);
+            ps2.setString(2, bundleId);
+            ps2.setString(3, UUID.uuid());
+            ps2.executeUpdate();
+
+        } catch (SQLException ex) {
+            throw new IllegalStateException(ex);
+        } finally {
+            dao.cleanUp();
+        }
+
+    }
+
+    /**
      * Moves an existing quote from an existing source bundle to an existing
      * target bundle.
      *
@@ -804,7 +835,6 @@ public class UserDataService {
         }
 
     }
-
     /**
      * Adds an association of an existing quote bundle to an existing user.
      *

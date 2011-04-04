@@ -7,6 +7,7 @@ package com.tabulaw.common.data.rpc;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.tabulaw.dao.EntityNotFoundException;
 import com.tabulaw.model.ClauseBundle;
 import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.DocRef;
@@ -125,6 +126,19 @@ public interface IUserDataService extends RemoteService {
 	 * @return the status of the removal
 	 */
 	Payload moveQuote(String userId, String quoteId, String sourceBundleId, String targetBundleId);
+	
+	
+    /**
+     * adds an association of an existing quote to an existing
+     * bundle.
+     *
+     * @param userId
+     * @param quoteId        id of the quote to move
+     * @param bundleId id of the bundle to which to add the quote
+	 * @return the status of the add operation
+     */
+	Payload attachQuote(String userId, String quoteId, String bundleId);
+	
 
 	/**
 	 * Gets the docs associated with a particular user.

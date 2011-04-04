@@ -56,4 +56,6 @@ public interface IUserDataServiceAsync {
 	void updateDocContent(String docId, String htmlContent, AsyncCallback<Payload> callback);
 	
 	void addOrphanQuote(String userId, String title, Reference reference, String quoteText, String quoteBundleId, AsyncCallback<ModelListPayload<EntityBase>> callback);
+
+	void attachQuote(String userId, String quoteId, String bundleId, AsyncCallback<Payload> callback);
 }
