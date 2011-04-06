@@ -2,6 +2,7 @@
 *.class
 *.war
 *.svn
+.gwt
 .classpath
 .project
 /test-output
