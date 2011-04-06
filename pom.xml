@@ -11,7 +11,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gwt.version>2.0.3</gwt.version>
+		<gwt.version>2.2.0</gwt.version>
 		<gwt.compile.style>OBF</gwt.compile.style>
 		<gwt.log.level>INFO</gwt.log.level>
 		<gwt.compile.module>com.tabulaw.PocDev</gwt.compile.module>
@@ -39,13 +39,19 @@
 	</developers>
 
 	<repositories>
-		<!-- to get latest GWT (2.1-SNAPSHOT) <repository> <id>google-maven-snapshot-repository</id>
-			<name>Google Maven Snapshot Repository</name> <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
+		<!-- to get latest GWT (2.1-SNAPSHOT)
+		<repository> <id>google-maven-snapshot-repository</id>
+			<name>Google Maven Snapshot Repository</name> 
+			<url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
 			<snapshots> <enabled>true</enabled> </snapshots> </repository> -->
-		<repository>
+		  <!--  <repository>
 			<id>source.db4o</id>
 			<url>http://source.db4o.com/maven</url>
-		</repository>
+		</repository> -->  
+		<!-- <repository>
+      		<id>gwt-servlet-war-release</id>
+      		<url>http://gwt-servlet-war.googlecode.com/svn/maven2/</url>        
+    	</repository> -->
 		<repository>
 			<id>htmlcleaner</id>
 			<url>http://maven.xwiki.org/externals</url>
@@ -99,7 +105,7 @@
 				<gwt.compile.module>com.tabulaw.PocDev</gwt.compile.module>
 			</properties>
 		</profile>
-<!--		<profile>
+		<profile>
 			<id>prod</id>
 			<properties>
 				<gwt.compile.style>OBF</gwt.compile.style>
@@ -107,7 +113,7 @@
 				<gwt.compile.module>com.tabulaw.PocProd</gwt.compile.module>
 			</properties>
 		</profile>
--->
+
 	</profiles>
 
 	<scm>
@@ -245,6 +251,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.7</version>
 				<configuration>
 					<skipTests>true</skipTests><!-- TODO temp -->
 					<useSystemClassLoader>false</useSystemClassLoader>
@@ -278,7 +285,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
-				<version>1.2</version>
+				<version>2.2.0</version>
 				<configuration>
 					<module>${gwt.compile.module}</module>
 					<logLevel>${gwt.log.level}</logLevel>
@@ -491,6 +498,12 @@
 			<version>${gwt.version}</version>
 			<scope>runtime</scope>
 		</dependency>
+		<!-- <dependency>
+      		<groupId>pl.ncdc.gwt</groupId>
+      		<artifactId>gwt-servlet-war</artifactId>
+      		<version>2.2.0</version>
+      		<type>war</type>
+    	</dependency>  -->
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
@@ -503,7 +516,6 @@
 			<version>${gwt.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>com.allen_sauer.gwt.log</groupId>
 			<artifactId>gwt-log</artifactId>
