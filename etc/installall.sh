@@ -9,3 +9,6 @@ popd
 pushd step2
 ./installall.sh
 popd
+pushd gwt
+./installall.sh
+popd
