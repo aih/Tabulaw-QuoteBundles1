@@ -103,7 +103,6 @@ public class Dao {
             ret.setId(rs.getString("permission_id"));
             ret.setUserId(rs.getString("permission_user"));
             ret.setBundleId(rs.getString("permission_quotebundle"));
-            ret.setOrphaned(rs.getBoolean("permission_orphanedquotebundle"));
             return ret;
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
@@ -115,8 +114,12 @@ public class Dao {
         try {
             UserState ret = new UserState();
             ret.setId(rs.getString("userstate_id"));
-            ret.setCurrentQuoteBundleId(rs.getString("userstate_quotebundle"));
+            String currentQuoteBundleId = rs.getString("userstate_quotebundle");
+            if (currentQuoteBundleId!=null) {
+            	ret.setCurrentQuoteBundleId(currentQuoteBundleId);
+            }
             ret.setUserId(rs.getString("userstate_user"));
+            ret.setAllQuoteBundleId(rs.getString("userstate_allquotebundle"));
             return ret;
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);

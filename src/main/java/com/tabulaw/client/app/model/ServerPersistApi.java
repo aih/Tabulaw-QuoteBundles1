@@ -99,8 +99,11 @@ public class ServerPersistApi {
 			}
 		});
 	}
-
 	public void addBundle(QuoteBundle bundle) {
+		addBundle(bundle, null);
+	}
+
+	public void addBundle(QuoteBundle bundle, final Command cmd) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
 		Poc.getUserDataService().addBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
@@ -108,11 +111,13 @@ public class ServerPersistApi {
 			@Override
 			public void onFailure(Throwable caught) {
 				Notifier.get().showFor(caught);
+				if(cmd != null) cmd.execute();
 			}
 
 			@Override
 			public void onSuccess(ModelPayload<QuoteBundle> result) {
 				handlePersistResponse(result);
+				if(cmd != null) cmd.execute();
 			}
 		});
 	}
@@ -179,11 +184,27 @@ public class ServerPersistApi {
 			}
 		});
 	}
-
-	public void deleteQuote(String quoteId) {
+	public void attachQuote(String quoteId, String bundleId) {
 		if(!doServerPersist) return;
 		String userId = ClientModelCache.get().getUser().getId();
-		Poc.getUserDataService().deleteQuote(userId, quoteId, new AsyncCallback<Payload>() {
+		Poc.getUserDataService().attachQuote(userId, quoteId, bundleId, new AsyncCallback<Payload>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Notifier.get().showFor(caught);
+			}
+
+			@Override
+			public void onSuccess(Payload result) {
+				handlePersistResponse(result);
+			}
+		});
+	}
+
+	public void deleteQuote(String bundleId, String quoteId) {
+		if(!doServerPersist) return;
+		String userId = ClientModelCache.get().getUser().getId();
+		Poc.getUserDataService().deleteQuote(userId, bundleId, quoteId, new AsyncCallback<Payload>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

@@ -180,7 +180,7 @@ public class QuoteResource extends BaseResource {
 				throw new WebApplicationException(Status.FORBIDDEN);
 			}
 		} else {
-			QuoteBundle bundle = service.getOrphanedQuoteBundleForUser(getUserId());
+			QuoteBundle bundle = service.getAllQuoteBundleForUser(getUserId());
 			bundleId = bundle.getId(); 
 		}
 		DocContent content = service.getDocContent(docRefId);
@@ -261,11 +261,11 @@ public class QuoteResource extends BaseResource {
 	
 	@DELETE
 	@Path("/{id}")
-	public void delete(@PathParam("id") String id) {
+	public void delete(@PathParam("bundleId") String bundleId, @PathParam("id") String id) {
 		if (! getDataService().isQuoteAvailableForUser(getUserId(), id)) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
-		getDataService().deleteQuote(getUserId(), id);
+		getDataService().deleteQuote(getUserId(), bundleId, id);
 	}	
 	
 	@XmlRootElement(name = "quotes")

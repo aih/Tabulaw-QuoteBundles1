@@ -14,9 +14,12 @@ public class UserState extends EntityBase {
 
 	private static final long serialVersionUID = -8340803996969639170L;
 
+	private String id;
+
 	private String userId;
 
 	private String currentQuoteBundleId;
+    private String allQuoteBundleId;
 
 	/**
 	 * Constructor
@@ -44,8 +47,10 @@ public class UserState extends EntityBase {
 		super.doClone(cln);
 
 		UserState us = (UserState) cln;
+		us.id = id;
 		us.userId = userId;
 		us.currentQuoteBundleId = currentQuoteBundleId;
+        us.allQuoteBundleId = allQuoteBundleId;
 	}
 
 	@Override
@@ -55,12 +60,12 @@ public class UserState extends EntityBase {
 
 	@Override
 	public String getId() {
-		return getUserId();
+		return this.id;
 	}
 
 	@Override
 	public void setId(String id) {
-		setUserId(id);
+		this.id = id;
 	}
 
 	@NotNull
@@ -72,6 +77,14 @@ public class UserState extends EntityBase {
 		if(userId == null) throw new NullPointerException();
 		this.userId = userId;
 	}
+
+    public String getAllQuoteBundleId() {
+        return allQuoteBundleId;
+    }
+
+    public void setAllQuoteBundleId(String allQuoteBundleId) {
+        this.allQuoteBundleId = allQuoteBundleId;
+    }
 
 	public String getCurrentQuoteBundleId() {
 		return currentQuoteBundleId;

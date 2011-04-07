@@ -14,6 +14,8 @@ import com.tabulaw.client.app.search.SearchEvent;
 import com.tabulaw.client.model.IHasModel;
 import com.tabulaw.client.ui.AbstractModelChangeAwareWidget;
 import com.tabulaw.model.DocRef;
+import com.tabulaw.model.EntityType;
+import com.tabulaw.model.ModelKey;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.util.ObjectUtil;
@@ -158,6 +160,13 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearc
 					// add the quote updating the bundle quote refs too
 					ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
 					ClientModelCache.get().persist(newQuote, AbstractBundleWidget.this);
+					
+					// updates client cache : add quote to all quotes bundle
+					// no changes on backend here
+					QuoteBundle allQuotesBundle = ClientModelCache.get().getAllQuoteBundle();
+					allQuotesBundle.addQuote(newQuote);
+					ClientModelCache.get().persist(allQuotesBundle, AbstractBundleWidget.this);
+					
 				}
 				
 				@Override
@@ -192,22 +201,13 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearc
 			// propagate removal
 			ClientModelCache.get().persist(bundle, AbstractBundleWidget.this);
 
-			// add removed quote to un-assigned quotes bundle and propagate
-			// ONLY if we are not the orphaned quote container!
-			QuoteBundle ocq = ClientModelCache.get().getOrphanedQuoteBundle();
-			if(!bundle.equals(ocq)) {
-				ocq.addQuote(mQuote);
-				ClientModelCache.get().persist(ocq, AbstractBundleWidget.this);
-				
-				// server side persist (move to un-assigned bundle)
-				ServerPersistApi.get().moveQuote(mQuote.getId(), bundle.getId(), ocq.getId());
-			}
-			else {
+			//remove quote from all quote bundle only!
+			if (isAllQuoteBundle()) {
 				ClientModelCache.get().remove(mQuote.getModelKey(), AbstractBundleWidget.this);
-				
-				// delete the quote
-				ServerPersistApi.get().deleteQuote(mQuote.getId());
 			}
+				
+			// delete the quote
+			ServerPersistApi.get().deleteQuote(bundle.getId(), mQuote.getId());
 		}
 
 		return qw;
@@ -360,5 +360,9 @@ extends AbstractModelChangeAwareWidget implements IHasModel<QuoteBundle>, ISearc
 				addQuote(mchanged, false, true);
 			}
 		}
+	}
+	protected boolean isAllQuoteBundle() {
+		QuoteBundle allQuoteBundle = ClientModelCache.get().getAllQuoteBundle();
+		return (bundle.equals(allQuoteBundle)); 
 	}
 }

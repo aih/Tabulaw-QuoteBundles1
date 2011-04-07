@@ -19,8 +19,6 @@ public class BundleUserBinding extends EntityBase {
 
 	private String id, bundleId, userId;
 
-	private boolean orphaned;
-	
 	/**
 	 * Constructor
 	 */
@@ -34,23 +32,10 @@ public class BundleUserBinding extends EntityBase {
 	 * @param userId
 	 * @param orphaned Is this bundle for orphaned quotes?
 	 */
-	public BundleUserBinding(String bundleId, String userId, boolean orphaned) {
+	public BundleUserBinding(String bundleId, String userId) {
 		super();
 		this.bundleId = bundleId;
 		this.userId = userId;
-		this.orphaned = orphaned;
-	}
-
-	/**
-	 * Is this a binding to an orphaned quote?
-	 * @return true/false
-	 */
-	public boolean isOrphaned() {
-		return orphaned;
-	}
-
-	public void setOrphaned(boolean orphaned) {
-		this.orphaned = orphaned;
 	}
 
 	@Override

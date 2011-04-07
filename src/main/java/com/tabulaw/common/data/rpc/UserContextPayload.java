@@ -6,7 +6,6 @@
 package com.tabulaw.common.data.rpc;
 
 import java.util.List;
-import java.util.Map;
 
 import com.tabulaw.common.data.Status;
 import com.tabulaw.model.QuoteBundle;
@@ -28,7 +27,7 @@ public class UserContextPayload extends Payload {
 
 	private List<QuoteBundle> bundles;
 
-	private String orphanQuoteContainerId;
+	private String allQuoteContainerId;
 
 	/**
 	 * Constructor
@@ -77,17 +76,5 @@ public class UserContextPayload extends Payload {
 
 	public void setBundles(List<QuoteBundle> bundles) {
 		this.bundles = bundles;
-	}
-
-	/**
-	 * @return id of the bundle contained in {@link #getBundles()} holding the
-	 *         orphaned (un-assigned) quotes.
-	 */
-	public String getOrphanQuoteContainerId() {
-		return orphanQuoteContainerId;
-	}
-
-	public void setOrphanQuoteContainerId(String orphanQuoteContainerId) {
-		this.orphanQuoteContainerId = orphanQuoteContainerId;
 	}
 }
