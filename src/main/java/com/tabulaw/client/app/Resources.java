@@ -86,6 +86,9 @@ public interface Resources extends ClientBundle {
 	@Source("../../public/images/permalink.gif")
 	ImageResource permalink();
 
+	@Source("../../public/images/lock.jpg")
+	ImageResource lock();
+
 	// -----Rich text toolbar buttons---//
 	@Source("../../public/images/toolbar/bold.gif")
 	ImageResource bold();

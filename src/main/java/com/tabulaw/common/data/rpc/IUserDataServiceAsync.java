@@ -11,6 +11,7 @@ import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.Reference;
+import com.tabulaw.model.User;
 import com.tabulaw.model.UserState;
 
 /**
@@ -58,4 +59,12 @@ public interface IUserDataServiceAsync {
 	void addOrphanQuote(String userId, String title, Reference reference, String quoteText, String quoteBundleId, AsyncCallback<ModelListPayload<EntityBase>> callback);
 
 	void attachQuote(String userId, String quoteId, String bundleId, AsyncCallback<Payload> callback);
+
+	void shareBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload<QuoteBundle>> callback);
+
+	void getUserByEmail(String emailAddress, AsyncCallback<ModelPayload<User>> callback);
+
+	void getBundleUsers(String bundleId, AsyncCallback<UserListPayload> callback);
+
+	void suggestUserName(String query, int suggestionCount, AsyncCallback<UserListPayload> callback);
 }

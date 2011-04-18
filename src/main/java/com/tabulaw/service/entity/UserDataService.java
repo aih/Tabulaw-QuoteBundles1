@@ -1022,5 +1022,80 @@ public class UserDataService {
         throw new UnsupportedOperationException();
 
     }
+    
+    /**
+     * Creates copy of  quote bundle and quote to bundle links and then  and grants permission for this bundle to specified user
+     *
+     * @param bundleId
+     * @param userId
+     * @return the persisted bundle
+     */
+    
+    public QuoteBundle shareBundleForUser(String userId, QuoteBundle bundle) throws ConstraintViolationException {
+        System.out.println("shareBundleForUser " + userId + " | bundleId " + bundle.getId());
+        if (userId == null || bundle == null) throw new NullPointerException();
+        String newBundleId = UUID.uuid(); 
+        Dao dao = new Dao();
+        try {
+            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quotebundle(quotebundle_id, quotebundle_name, quotebundle_description) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+            ps1.setString(1, newBundleId);
+            ps1.setString(2, bundle.getName());
+            ps1.setString(3, bundle.getDescription());
+            ps1.executeUpdate();
+        } catch (SQLException ex) {
+            throw new IllegalStateException(ex);
+        } finally {
+            dao.cleanUp();
+        }
+        //copy links
+        for (Quote quote : getQuotesWithDocRefWithCaseRef(bundle.getId())) {
+        	attachQuote(userId, quote.getId(), newBundleId);
+        	//add access right
+        	addQuoteUserBinding(userId, quote.getId());
+        }
+
+        addBundleUserBinding(userId, newBundleId);
+        return getQuoteBundle(newBundleId);
+
+
+    }
+    /**
+     * Returns list of users whose have access to quotes of selected bundle
+     *
+     * @param currentUserId currently logged user
+     * @param bundleId
+     * @return list of users
+     */
+    
+    public List<User> getBundleUsers(String currentUserId, String bundleId) throws ConstraintViolationException {
+        System.out.println("getBundleUsers  bundleId " + bundleId);
+        List<User> result = new ArrayList<User>();
+
+        Dao dao = new Dao();
+        try {
+        	String query = "select distinct u.* from tw_bundleitem  fi \n" +
+        			"inner join tw_bundleitem oi on fi.bundleitem_quote=oi.bundleitem_quote \n" +
+        			"inner join tw_permission p on p.permission_quotebundle = fi.bundleitem_quotebundle \n" +
+        			"inner join tw_user u on p.permission_user = u.user_id \n" +
+        			"where oi.bundleitem_quotebundle=? \n" +
+        			"and fi.bundleitem_quotebundle!=oi.bundleitem_quotebundle \n" +
+        			"and p.permission_user != ?\n";
+            PreparedStatement ps = dao.getPreparedStatement(query, Statement.NO_GENERATED_KEYS);
+            ps.setString(1, bundleId);
+            ps.setString(2, currentUserId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+            	result.add(dao.loadUser(rs));
+            }
+            return result;
+        } catch (SQLException ex) {
+            throw new IllegalStateException(ex);
+        } finally {
+            dao.cleanUp();
+        }
+
+
+    }
+
 
 }

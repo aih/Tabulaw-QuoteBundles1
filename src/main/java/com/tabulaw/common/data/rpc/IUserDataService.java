@@ -15,6 +15,7 @@ import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.Reference;
+import com.tabulaw.model.User;
 import com.tabulaw.model.UserState;
 
 /**
@@ -193,5 +194,13 @@ public interface IUserDataService extends RemoteService {
 	 * @return the resultant status wrapped in a payload
 	 */
 	Payload updateDocContent(String docId, String htmlContent);
+
+	ModelPayload<QuoteBundle> shareBundleForUser(String userId, QuoteBundle bundle);
+
+	ModelPayload<User> getUserByEmail(String emailAddress);
+
+	UserListPayload getBundleUsers(String bundleId);
+
+	UserListPayload suggestUserName(String query, int suggestionCount);
 	
 }

@@ -28,6 +28,7 @@ import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
+import com.tabulaw.client.ui.ShareBundleDialog;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.UserState;
@@ -66,7 +67,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	 */
 	static class EditHeader extends EditableBundleHeader {
 
-		private final Image delete, current, notCurrent, close;
+		private final Image delete, current, notCurrent, close, share;
 
 		private final PushButton email;
 		private final PushButton emailInProgress;
@@ -101,6 +102,9 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			HTML spacer = new HTML("&nbsp;", true);
 			buttons.add(spacer);
 			buttons.setCellWidth(spacer, "100%");
+
+			share = getShareImage();
+			buttons.add(share);
 
 			delete = getDeleteImage();
 
@@ -175,6 +179,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 				notCurrent.setVisible(false);
 			}
 			delete.setVisible(!isAll);
+			share.setVisible(!isAll);
 			pName.setEditable(!isAll);
 			pDesc.setEditable(!isAll);
 			
@@ -265,6 +270,20 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			
 			return downloadMenuTop;
 			
+		}
+		private Image getShareImage() {
+			Image image = new Image(Resources.INSTANCE.lock());
+			image.setTitle("Share Quote Bundle...");
+			image.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					ShareBundleDialog shareBundleDialog = new ShareBundleDialog("Share Quote Bundle...");
+					shareBundleDialog.setBundle(bundle);
+					shareBundleDialog.center();
+				}
+			});
+			return image;
 		}
 
 	} // EditHeader

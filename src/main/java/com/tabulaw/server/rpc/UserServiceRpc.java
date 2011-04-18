@@ -20,7 +20,6 @@ import com.tabulaw.common.data.rpc.IUserAdminService;
 import com.tabulaw.common.data.rpc.IUserContextService;
 import com.tabulaw.common.data.rpc.IUserCredentialsService;
 import com.tabulaw.common.data.rpc.IUserDataService;
-import com.tabulaw.common.data.rpc.IdsPayload;
 import com.tabulaw.common.data.rpc.ModelListPayload;
 import com.tabulaw.common.data.rpc.ModelPayload;
 import com.tabulaw.common.data.rpc.Payload;
@@ -35,13 +34,10 @@ import com.tabulaw.mail.EmailDispatcher;
 import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailManager;
 import com.tabulaw.mail.MailRouting;
-import com.tabulaw.model.ClauseBundle;
-import com.tabulaw.model.ContractDoc;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityBase;
 import com.tabulaw.model.EntityFactory;
-import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IUserRef;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
@@ -76,16 +72,9 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 		try {
 			List<User> list = svc.getAllUsers();
 			assert list != null;
+			clearUserPasswords(list);
 
-			// clear out passwords
-			ArrayList<User> userList = new ArrayList<User>(list.size());
-			for (User user : list) {
-				User clnUser = (User) user.clone();
-				clnUser.setPassword(null);
-				userList.add(clnUser);
-			}
-
-			payload.setUsers(userList);
+			payload.setUsers(list);
 			status.addMsg("Users retrieved.", MsgLevel.INFO,
 					MsgAttr.STATUS.flag);
 		} catch (final RuntimeException e) {
@@ -972,5 +961,115 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 		}
 
 		return payload;
+	}
+	
+	@Override
+	public ModelPayload<QuoteBundle> shareBundleForUser(String userId,QuoteBundle bundle) {
+		PersistContext context = getPersistContext();
+		UserDataService userDataService = context.getUserDataService();
+
+		Status status = new Status();
+		ModelPayload<QuoteBundle> payload = new ModelPayload<QuoteBundle>(
+				status);
+
+		try {
+			bundle = userDataService.shareBundleForUser(userId, bundle);
+
+			payload.setModel(bundle);
+			status.addMsg("Bundle created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		} catch (final EntityExistsException e) {
+			exceptionToStatus(e, payload.getStatus());
+		} catch (final ConstraintViolationException cve) {
+			PersistHelper.handleValidationException(context, cve, payload);
+		} catch (final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		} catch (Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+	
+	@Override
+	public UserListPayload suggestUserName(String query, int suggestionCount) {
+		final Status status = new Status();
+		UserListPayload payload = new UserListPayload(status);
+
+		final PersistContext pc = getPersistContext();
+		UserService svc = pc.getUserService();
+
+		try {
+			List<User> list = svc.suggestUsername(query, suggestionCount);
+			clearUserPasswords(list);
+			payload.setUsers(list);
+			status.addMsg("Users retrieved.", MsgLevel.INFO,
+					MsgAttr.STATUS.flag);
+		} catch (final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		} catch (Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+	@Override
+	public ModelPayload<User> getUserByEmail(String emailAddress) {
+		final Status status = new Status();
+		ModelPayload<User> payload = new ModelPayload<User>(status);
+
+		final PersistContext pc = getPersistContext();
+		UserService svc = pc.getUserService();
+
+		try {
+			User model = svc.findByEmail(emailAddress);
+			model.setPassword(null);
+			payload.setModel(model);
+			status.addMsg("User retrieved.", MsgLevel.INFO, MsgAttr.STATUS.flag);
+		} catch (EntityNotFoundException enfe) {
+			exceptionToStatus(enfe, payload.getStatus());
+		} catch (final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		} catch (Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+	@Override
+	public UserListPayload getBundleUsers(String bundleId) {
+		final Status status = new Status();
+		UserListPayload payload = new UserListPayload(status);
+
+		final PersistContext pc = getPersistContext();
+		UserDataService svc = pc.getUserDataService();
+		User user = getUserContext().getUser();
+
+		try {
+			List<User> list = svc.getBundleUsers(user.getId(), bundleId);
+			clearUserPasswords(list);
+			payload.setUsers(list);
+			status.addMsg("Users retrieved.", MsgLevel.INFO,
+					MsgAttr.STATUS.flag);
+		} catch (final RuntimeException e) {
+			exceptionToStatus(e, payload.getStatus());
+			handleException(e);
+			throw e;
+		} catch (Exception e) {
+			exceptionToStatus(e, payload.getStatus());
+		}
+
+		return payload;
+	}
+
+	private void clearUserPasswords(List<User> users) {
+		for (User user : users){
+			user.setPassword(null);
+		}
 	}
 }

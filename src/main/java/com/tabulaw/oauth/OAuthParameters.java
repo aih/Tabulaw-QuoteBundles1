@@ -1,12 +1,12 @@
 package com.tabulaw.oauth;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.gdata.client.authn.oauth.GoogleOAuthParameters;
-import com.google.gwt.dev.util.collect.HashMap;
 
 public class OAuthParameters extends GoogleOAuthParameters {
 
