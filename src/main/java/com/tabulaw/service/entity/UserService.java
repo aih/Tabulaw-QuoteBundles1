@@ -295,16 +295,19 @@ public class UserService implements IForgotPasswordHandler {
     /**
      * @return tries to suggest user using name or email address.
      */
-    public List<User> suggestUsername(String query, int suggestionCount) {
+    public List<User> suggestUsername(String query, User currentUser ,int suggestionCount) {
         System.out.println("suggestUsername");
         List<User> ret = new ArrayList<User>();
-        String likeExp = String.format("%%%s%%", query);
+        String likeExp = String.format("%%%s%%", query).toLowerCase();
         Dao dao = new Dao();
         try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_user where user_name like ? or user_emailaddress like ? limit ?", Statement.NO_GENERATED_KEYS);
+        	String sqlQuery = "select * from tw_user " +
+        			"where (lower(user_name) like ? or lower(user_emailaddress) like ?) and user_id!=? limit ?";
+            PreparedStatement ps = dao.getPreparedStatement(sqlQuery, Statement.NO_GENERATED_KEYS);
             ps.setString(1, likeExp);
             ps.setString(2, likeExp);
-            ps.setInt(3, suggestionCount);
+            ps.setString(3, currentUser.getId());
+            ps.setInt(4, suggestionCount);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 ret.add(dao.loadUser(rs));

@@ -195,12 +195,12 @@ public interface IUserDataService extends RemoteService {
 	 */
 	Payload updateDocContent(String docId, String htmlContent);
 
-	ModelPayload<QuoteBundle> shareBundleForUser(String userId, QuoteBundle bundle);
-
 	ModelPayload<User> getUserByEmail(String emailAddress);
 
 	UserListPayload getBundleUsers(String bundleId);
 
 	UserListPayload suggestUserName(String query, int suggestionCount);
+
+	ModelPayload<QuoteBundle> shareBundleForUser(User user, QuoteBundle bundle);
 	
 }

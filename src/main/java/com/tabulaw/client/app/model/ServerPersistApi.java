@@ -13,6 +13,7 @@ import com.tabulaw.common.data.rpc.ModelPayload;
 import com.tabulaw.common.data.rpc.Payload;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.User;
 import com.tabulaw.model.UserState;
 
 /**
@@ -287,8 +288,8 @@ public class ServerPersistApi {
 	}
 	public void shareBundle(QuoteBundle bundle, final Command cmd) {
 		if(!doServerPersist) return;
-		String userId = ClientModelCache.get().getUser().getId();
-		Poc.getUserDataService().shareBundleForUser(userId, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
+		User user = ClientModelCache.get().getUser();
+		Poc.getUserDataService().shareBundleForUser(user, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

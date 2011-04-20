@@ -964,7 +964,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 	}
 	
 	@Override
-	public ModelPayload<QuoteBundle> shareBundleForUser(String userId,QuoteBundle bundle) {
+	public ModelPayload<QuoteBundle> shareBundleForUser(User user, QuoteBundle bundle) {
 		PersistContext context = getPersistContext();
 		UserDataService userDataService = context.getUserDataService();
 
@@ -973,7 +973,9 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 				status);
 
 		try {
-			bundle = userDataService.shareBundleForUser(userId, bundle);
+			bundle = userDataService.shareBundleForUser(user.getId(), bundle);
+			
+			sendShareNotificationEmail(user, getUserContext().getUser(), "Quote bundle", getWebAppContext());
 
 			payload.setModel(bundle);
 			status.addMsg("Bundle created.", MsgLevel.INFO, MsgAttr.STATUS.flag);
@@ -999,9 +1001,10 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 
 		final PersistContext pc = getPersistContext();
 		UserService svc = pc.getUserService();
+		User currentUser = getUserContext().getUser();
 
 		try {
-			List<User> list = svc.suggestUsername(query, suggestionCount);
+			List<User> list = svc.suggestUsername(query, currentUser, suggestionCount);
 			clearUserPasswords(list);
 			payload.setUsers(list);
 			status.addMsg("Users retrieved.", MsgLevel.INFO,
@@ -1071,5 +1074,27 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 		for (User user : users){
 			user.setPassword(null);
 		}
+	}
+	private void sendShareNotificationEmail(User recepient, User sender, String resourceType, WebAppContext wc){
+		final Map<String, Object> data = new HashMap<String, Object>();
+		
+		data.put("subject", "Tabulaw resource has been shared");
+		data.put("userName", sender.getName());
+		data.put("resourceType", resourceType);
+
+		final EmailDispatcher emailDispatcher = wc.getEmailDispatcher();
+		
+		MailManager mailManager = emailDispatcher.getMailManager();
+		final MailRouting mr = mailManager.buildAppSenderMailRouting(recepient.getEmailAddress());
+
+		final IMailContext mailContext = mailManager.buildHtmlTemplateContext(
+				mr, "share-notification", data);
+		try {
+			emailDispatcher.queueEmail(mailContext);
+		} catch (InterruptedException e) {
+			// TODO anything?
+			System.out.println(e.getMessage());
+		}
+		
 	}
 }

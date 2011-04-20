@@ -60,11 +60,11 @@ public interface IUserDataServiceAsync {
 
 	void attachQuote(String userId, String quoteId, String bundleId, AsyncCallback<Payload> callback);
 
-	void shareBundleForUser(String userId, QuoteBundle bundle, AsyncCallback<ModelPayload<QuoteBundle>> callback);
-
 	void getUserByEmail(String emailAddress, AsyncCallback<ModelPayload<User>> callback);
 
 	void getBundleUsers(String bundleId, AsyncCallback<UserListPayload> callback);
 
 	void suggestUserName(String query, int suggestionCount, AsyncCallback<UserListPayload> callback);
+
+	void shareBundleForUser(User user, QuoteBundle bundle, AsyncCallback<ModelPayload<QuoteBundle>> callback);
 }

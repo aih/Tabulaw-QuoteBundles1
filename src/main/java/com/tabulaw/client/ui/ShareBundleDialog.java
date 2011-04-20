@@ -68,7 +68,7 @@ public class ShareBundleDialog extends AbstractInfoDialog {
 	            public void onSuccess(ModelPayload<User> payload) {
             		User user = payload.getModel();
 	            	if	(user!=null) {
-	            		Poc.getUserDataService().shareBundleForUser(user.getId(), bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
+	            		Poc.getUserDataService().shareBundleForUser(user, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

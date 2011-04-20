@@ -1037,10 +1037,11 @@ public class UserDataService {
         String newBundleId = UUID.uuid(); 
         Dao dao = new Dao();
         try {
-            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quotebundle(quotebundle_id, quotebundle_name, quotebundle_description) values (?,?,?)", Statement.NO_GENERATED_KEYS);
+            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quotebundle(quotebundle_id, quotebundle_name, quotebundle_description, parent_quotebundle) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
             ps1.setString(1, newBundleId);
             ps1.setString(2, bundle.getName());
             ps1.setString(3, bundle.getDescription());
+            ps1.setString(4, bundle.getId());
             ps1.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);
@@ -1073,6 +1074,7 @@ public class UserDataService {
 
         Dao dao = new Dao();
         try {
+/*        	Quote based version
         	String query = "select distinct u.* from tw_bundleitem  fi \n" +
         			"inner join tw_bundleitem oi on fi.bundleitem_quote=oi.bundleitem_quote \n" +
         			"inner join tw_permission p on p.permission_quotebundle = fi.bundleitem_quotebundle \n" +
@@ -1080,6 +1082,12 @@ public class UserDataService {
         			"where oi.bundleitem_quotebundle=? \n" +
         			"and fi.bundleitem_quotebundle!=oi.bundleitem_quotebundle \n" +
         			"and p.permission_user != ?\n";
+*/        	
+        	String query = "select u.* from tw_quotebundle gb\n" +
+        			"inner join tw_permission p on p.permission_quotebundle = gb.quotebundle_id \n" +
+        			"inner join tw_user u on p.permission_user = u.user_id \n" +
+        			"where gb.parent_quotebundle=? \n" + 
+        			"and p.permission_user!= ?\n";
             PreparedStatement ps = dao.getPreparedStatement(query, Statement.NO_GENERATED_KEYS);
             ps.setString(1, bundleId);
             ps.setString(2, currentUserId);
