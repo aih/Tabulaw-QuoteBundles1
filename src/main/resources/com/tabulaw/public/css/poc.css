@@ -1386,3 +1386,13 @@ docHeaderMenuItem img {
 	margin-left : 5px;
 	margin-right : 5px;
 }
+.add-permission-button {
+	margin: 5px;
+ }
+.share-permission-panel {
+	text-align: right;
+	margin: 5px;
+}
+.suggest-user-panel input {
+	width: 60%;
+}

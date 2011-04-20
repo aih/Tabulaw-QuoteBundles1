@@ -3,6 +3,7 @@ package com.tabulaw.client.app.ui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
@@ -71,8 +72,7 @@ public class UsernameSuggestOracle extends SuggestOracle{
     /**
      * Number of suggestions to request from the server.
      */
-//    private static final int numberOfServerSuggestions = 100;
-    private static final int numberOfServerSuggestions = 75;
+    private static final int numberOfServerSuggestions = 25; //to fit on screen  
 
 
     /**
@@ -80,6 +80,12 @@ public class UsernameSuggestOracle extends SuggestOracle{
      */
     private boolean requestInProgress = false;
 
+    /**
+     * Is there a request in progress
+     */
+    private Set<User> exclusions;
+
+    
     /**
      * The most recent request made by the client.
      */
@@ -90,6 +96,10 @@ public class UsernameSuggestOracle extends SuggestOracle{
      */
     private ServerResponse mostRecentServerResponse = null;
 
+    public UsernameSuggestOracle (Set<User> exclusions) {
+    	this.exclusions = exclusions;
+    }
+    
     /**
      * Called by the SuggestBox to get some suggestions.
      *
@@ -120,26 +130,19 @@ public class UsernameSuggestOracle extends SuggestOracle{
                     new Response(Collections.<Suggestion>emptyList()));
             return;
         }
-        // If we have a response from the server, and it includes all the possible suggestions for its request, and
-        // that request is a superset of the request we're trying to satisfy now then use the server results, otherwise
-        // ask the server for some suggestions.
-        if (mostRecentServerResponse != null) {
-            if (mostRecentQuery.equals(mostRecentServerResponse.getQuery())) {
-                Response resp = new Response(mostRecentServerResponse.getSuggestions());
+        
+		if (mostRecentServerResponse != null) {
+			if (mostRecentQuery.equals(mostRecentServerResponse.getQuery())) {
+				Response resp = new Response(mostRecentServerResponse.getSuggestions());
 
-                callback.onSuggestionsReady(mostRecentClientRequest, resp);
+				callback.onSuggestionsReady(mostRecentClientRequest, resp);
 
-            } else if (mostRecentServerResponse.isComplete() &&
-                    mostRecentQuery.startsWith(mostRecentServerResponse.getQuery())) {
-                Response resp = new Response(mostRecentServerResponse.getSuggestions());
-
-                callback.onSuggestionsReady(mostRecentClientRequest, resp);
-            } else {
-                makeRequest(mostRecentClientRequest, callback);
-            }
-        } else {
-            makeRequest(mostRecentClientRequest, callback);
-        }
+			} else {
+				makeRequest(mostRecentClientRequest, callback);
+			}
+		} else {
+			makeRequest(mostRecentClientRequest, callback);
+		}
     }
 
     /**
@@ -158,8 +161,10 @@ public class UsernameSuggestOracle extends SuggestOracle{
                 requestInProgress = false;
                 List<Suggestion> suggestionList = new ArrayList<Suggestion>(); 
                 for (User user : result.getUsers()) {
-                	MultiWordSuggestOracle.MultiWordSuggestion suggestion = new MultiWordSuggestOracle.MultiWordSuggestion(user.getEmailAddress(),user.getEmailAddress());
-                	suggestionList.add(suggestion);
+                	if (exclusions!=null && !exclusions.contains(user)) {
+	                	MultiWordSuggestOracle.MultiWordSuggestion suggestion = new MultiWordSuggestOracle.MultiWordSuggestion(user.getEmailAddress(),user.getEmailAddress());
+	                	suggestionList.add(suggestion);
+                	}
                 }
                 mostRecentServerResponse = new ServerResponse(request, numberOfServerSuggestions, suggestionList);
                 UsernameSuggestOracle.this.returnSuggestions(callback);

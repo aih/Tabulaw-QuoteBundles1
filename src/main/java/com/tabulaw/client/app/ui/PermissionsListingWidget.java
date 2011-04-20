@@ -14,7 +14,9 @@ import com.tabulaw.client.ui.listing.AbstractListingConfig;
 import com.tabulaw.client.ui.listing.Column;
 import com.tabulaw.client.ui.listing.DataListingOperator;
 import com.tabulaw.client.ui.listing.IListingConfig;
+import com.tabulaw.client.ui.listing.IListingHandler;
 import com.tabulaw.client.ui.listing.ITableCellRenderer;
+import com.tabulaw.client.ui.listing.ListingEvent;
 import com.tabulaw.client.ui.listing.ModelListingTable;
 import com.tabulaw.client.ui.listing.ModelListingWidget;
 import com.tabulaw.client.util.Fmt;
@@ -120,5 +122,9 @@ public class PermissionsListingWidget extends Composite {
 				}
 			}.execute();
 		}
+	}
+
+	public void addListingHandler(IListingHandler<User> handler) {
+		listingWidget.addHandler(handler, ListingEvent.TYPE);
 	}
 }

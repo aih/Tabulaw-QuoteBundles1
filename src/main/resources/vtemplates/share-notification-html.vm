@@ -1,5 +1,0 @@
-<html>
-<body>
-<p>${userName} has shared a ${resourceType} with you on Tabulaw.  Click <a href="beta.tabulaw.com">here</a> to see what's new."</p>
-</body>
-</html>

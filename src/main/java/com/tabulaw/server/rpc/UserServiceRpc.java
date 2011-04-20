@@ -1001,10 +1001,9 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 
 		final PersistContext pc = getPersistContext();
 		UserService svc = pc.getUserService();
-		User currentUser = getUserContext().getUser();
 
 		try {
-			List<User> list = svc.suggestUsername(query, currentUser, suggestionCount);
+			List<User> list = svc.suggestUsername(query, suggestionCount);
 			clearUserPasswords(list);
 			payload.setUsers(list);
 			status.addMsg("Users retrieved.", MsgLevel.INFO,
@@ -1087,7 +1086,7 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 		MailManager mailManager = emailDispatcher.getMailManager();
 		final MailRouting mr = mailManager.buildAppSenderMailRouting(recepient.getEmailAddress());
 
-		final IMailContext mailContext = mailManager.buildHtmlTemplateContext(
+		final IMailContext mailContext = mailManager.buildTextTemplateContext(
 				mr, "share-notification", data);
 		try {
 			emailDispatcher.queueEmail(mailContext);
