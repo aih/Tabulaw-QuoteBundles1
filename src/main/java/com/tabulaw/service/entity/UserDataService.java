@@ -13,15 +13,32 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.sql.DataSource;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidatorFactory;
+
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.inject.Inject;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
-import com.tabulaw.model.*;
+import com.tabulaw.model.BundleUserBinding;
+import com.tabulaw.model.CaseRef;
+import com.tabulaw.model.DocContent;
+import com.tabulaw.model.DocRef;
+import com.tabulaw.model.DocUserBinding;
+import com.tabulaw.model.EntityFactory;
+import com.tabulaw.model.Quote;
+import com.tabulaw.model.QuoteBundle;
+import com.tabulaw.model.Reference;
+import com.tabulaw.model.User;
+import com.tabulaw.model.UserState;
 import com.tabulaw.service.sanitizer.ISanitizer;
 import com.tabulaw.util.UUID;
+import com.thoughtworks.xstream.XStream;
 
 /**
  * Manages the persistence of user related data that is not part of the user
@@ -30,6 +47,87 @@ import com.tabulaw.util.UUID;
  * @author jpk
  */
 public class UserDataService {
+	private class QuoteBundleRowMapper implements ParameterizedRowMapper<QuoteBundle> {
+
+		public QuoteBundle mapRow(ResultSet rs, int rownum) throws SQLException {
+            QuoteBundle ret = new QuoteBundle();
+            ret.setId(rs.getString("quotebundle_id"));
+            ret.setName(rs.getString("quotebundle_name"));
+            ret.setDescription(rs.getString("quotebundle_description"));
+            return ret;
+		}
+	}
+	
+	private class DocRefWithCaseRefRowMapper implements ParameterizedRowMapper<DocRef> {
+
+		public DocRef mapRow(ResultSet rs, int rownum) throws SQLException {
+			DocRef ret = new DocRef();
+			ret.setId(rs.getString("doc_id"));
+			ret.setTitle(rs.getString("doc_title"));
+			ret.setDate(rs.getDate("doc_date"));
+			ret.setReferenceDoc(rs.getBoolean("doc_referencedoc"));
+
+			String docCaseRef = rs.getString("doc_caseref");
+			if (docCaseRef != null && !docCaseRef.isEmpty()) {
+				CaseRef caseRef = new CaseRef();
+				caseRef.setId(rs.getString("caseref_id"));
+				caseRef.setCourt(rs.getString("caseref_court"));
+				caseRef.setDocLoc(rs.getString("caseref_docloc"));
+				caseRef.setFirstPageNumber(rs.getInt("caseref_firstpagenumber"));
+				caseRef.setLastPageNumber(rs.getInt("caseref_lastpagenumber"));
+				caseRef.setParties(rs.getString("caseref_parties"));
+				caseRef.setReftoken(rs.getString("caseref_reftoken"));
+				caseRef.setUrl(rs.getString("caseref_url"));
+				caseRef.setYear(rs.getInt("caseref_year"));
+				ret.setReference(caseRef);
+			}
+			return ret;
+		}
+	}
+	
+	private class DocContentRowMapper implements ParameterizedRowMapper<DocContent> {
+
+		public DocContent mapRow(ResultSet rs, int rownum) throws SQLException {
+            DocContent ret = new DocContent();
+            ret.setId(rs.getString("doc_id"));
+            ret.setHtmlContent(rs.getString("doc_htmlcontent"));
+            ret.setPagesXPath((List<int[]>) xs.fromXML(rs.getString("doc_pagesxpath")));
+            ret.setFirstPageNumber(rs.getInt("doc_firstpagenumber"));
+            return ret;
+        }
+    }
+	
+	private class UserStateRowMapper implements ParameterizedRowMapper<UserState> {
+
+		public UserState mapRow(ResultSet rs, int rownum) throws SQLException {
+            UserState ret = new UserState();
+            ret.setId(rs.getString("userstate_id"));
+            String currentQuoteBundleId = rs.getString("userstate_quotebundle");
+            if (currentQuoteBundleId!=null) {
+            	ret.setCurrentQuoteBundleId(currentQuoteBundleId);
+            }
+            ret.setUserId(rs.getString("userstate_user"));
+            ret.setAllQuoteBundleId(rs.getString("userstate_allquotebundle"));
+            return ret;
+        }
+    }
+	
+	private class QuoteRowMapper implements ParameterizedRowMapper<Quote> {
+
+		public Quote mapRow(ResultSet rs, int rownum) throws SQLException {
+            Quote ret = new Quote();
+            ret.setId(rs.getString("quote_id"));
+            ret.setEndPage(rs.getInt("quote_endpage"));
+            //TODO set quote doc
+//            ret.setDocument(loadDocRefWithCaseRef(rs));
+            ret.setQuote(rs.getString("quote_quote"));
+            ret.setSerializedMark(rs.getString("quote_serializedmark"));
+            ret.setStartPage(rs.getInt("quote_startpage"));
+            return ret;
+    }
+	
+	}
+	
 
     /**
      * A simple way to provide a list of bundles in addition to conveying which of
@@ -53,6 +151,9 @@ public class UserDataService {
     }
 
     private ISanitizer sanitizer;
+    private SimpleJdbcTemplate simpleJdbcTemplate;
+    private XStream xs;
+    
 
     /**
      * Constructor
@@ -60,10 +161,21 @@ public class UserDataService {
      * @param validationFactory
      */
     @Inject
-    public UserDataService(ValidatorFactory validationFactory, ISanitizer sanitizer) {
+    public UserDataService(ValidatorFactory validationFactory, ISanitizer sanitizer, DataSource ds) {
         this.sanitizer = sanitizer;
+        
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(ds);
+		
+        xs = new XStream();
+        xs.alias("role", User.Role.class);
+		
+        
     }
 
+    public String toXML(Object obj)
+    {
+        return xs.toXML(obj);
+    }
 
     /**
      * Gets a list of all docs for a given user.
@@ -71,26 +183,15 @@ public class UserDataService {
      * @param userId user id
      * @return list of docs
      */
+    @Transactional
     public List<DocRef> getDocsForUser(String userId) {
         System.out.println("getDocsForUser " + userId);
         if (userId == null) throw new NullPointerException();
-        List<DocRef> ret = new ArrayList<DocRef>();
-
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id, tw_permission where permission_doc=doc_id AND permission_user=?", Statement.NO_GENERATED_KEYS);
-            ps.setString(1, userId);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                ret.add(dao.loadDocRefWithCaseRef(rs));
-            }
-            return ret;
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        List<DocRef> ret = this.simpleJdbcTemplate.query(
+        		"select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id, tw_permission where permission_doc=doc_id AND permission_user=?",
+				new DocRefWithCaseRefRowMapper(),
+				userId);        
+        return ret;
 
     }
 
@@ -99,24 +200,13 @@ public class UserDataService {
      *
      * @return doc list
      */
+	@Transactional
     public List<DocRef> getAllDocs() {
         System.out.println("getAllDocs");
-        List<DocRef> ret = new ArrayList<DocRef>();
-
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id", Statement.NO_GENERATED_KEYS);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                ret.add(dao.loadDocRefWithCaseRef(rs));
-            }
-            return ret;
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        List<DocRef> ret = this.simpleJdbcTemplate.query(
+        		"select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id, tw_permission where permission_doc=doc_id AND permission_user=?",
+				new DocRefWithCaseRefRowMapper());        
+        return ret;
     }
 
     /**
@@ -127,23 +217,17 @@ public class UserDataService {
      * @throws EntityNotFoundException
      */
 
+	@Transactional
     public DocRef getDoc(String docId) throws EntityNotFoundException {
         System.out.println("getDoc " + docId);
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id where doc_id=?", Statement.NO_GENERATED_KEYS);
-            ps.setString(1, docId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return dao.loadDocRefWithCaseRef(rs);
-            }
+        DocRef doc = this.simpleJdbcTemplate
+		.queryForObject(
+				"select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id where doc_id=?",
+				new DocRefWithCaseRefRowMapper(), docId);
+        if (doc == null) {
             throw new EntityNotFoundException("No document found with id: '" + docId);
-
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
         }
+        return doc;
     }
 
    /**
@@ -153,23 +237,18 @@ public class UserDataService {
      * @return to loaded doc content
      * @throws EntityNotFoundException
      */
+	@Transactional
     public DocContent getDocContent(String docId) throws EntityNotFoundException {
         System.out.println("getDocContent " + docId);
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc where doc_id=?", Statement.NO_GENERATED_KEYS);
-            ps.setString(1, docId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return dao.loadDocContent(rs);
-            }
-            throw new EntityNotFoundException("No document found with id: '" + docId);
-
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
+        DocContent content = this.simpleJdbcTemplate.queryForObject(
+        		"select * from tw_doc where doc_id=?",
+				new DocContentRowMapper(),
+				docId);
+        if (content == null) {
+        	throw new EntityNotFoundException("No document found with id: '" + docId);
         }
+        
+        return content;
     }
 
 
@@ -180,23 +259,18 @@ public class UserDataService {
      * @return the user's state entity
      * @throws EntityNotFoundException
      */
+	@Transactional
     public UserState getUserState(String userId) throws EntityNotFoundException {
         System.out.println("getUserState " + userId);
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_userstate where userstate_user=?", Statement.NO_GENERATED_KEYS);
-            ps.setString(1, userId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                return dao.loadUserState(rs);
-            }
+        UserState userState = this.simpleJdbcTemplate.queryForObject(
+        		"select * from tw_userstate where userstate_user=?",
+				new UserStateRowMapper(),
+				userId);
+        if (userState == null) {
             throw new EntityNotFoundException("No user state with user id: '" + userId + "' was found.");
-
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
         }
+        
+        return userState;
 
     }
 
@@ -207,38 +281,26 @@ public class UserDataService {
      * @param userState
      * @throws EntityExistsException
      */
-    public void saveUserState(UserState userState) throws EntityExistsException {
-        System.out.println("saveUserState id:" + userState.getId() + " | bundleId" + userState.getCurrentQuoteBundleId() + " | user id: " + userState.getUserId());
-        if (userState == null) throw new NullPointerException();
+	public void saveUserState(UserState userState) throws EntityExistsException {
+		System.out.println("saveUserState id:" + userState.getId() + " | bundleId"
+				+ userState.getCurrentQuoteBundleId() + " | user id: " + userState.getUserId());
+		if (userState == null)
+			throw new NullPointerException();
 
-        Dao dao = new Dao();
-        
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_userstate where userstate_id=?", Statement.NO_GENERATED_KEYS);
-            ps.setString(1, userState.getId());
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-	            PreparedStatement ps1 = dao.getPreparedStatement("update tw_userstate set userstate_quotebundle=?, userstate_allquotebundle=?  where userstate_id=?", Statement.NO_GENERATED_KEYS);
-	            ps1.setString(1, userState.getCurrentQuoteBundleId());
-	            ps1.setString(2, userState.getAllQuoteBundleId());
-	            ps1.setString(3, userState.getId());
-	            ps1.executeUpdate();
-            } else {
-	            PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_userstate(userstate_quotebundle, userstate_allquotebundle, userstate_user, userstate_id) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
-	            ps1.setString(1, userState.getCurrentQuoteBundleId());
-	            ps1.setString(2, userState.getAllQuoteBundleId());
-	            ps1.setString(3, userState.getUserId());
-	            ps1.setString(4, UUID.uuid());
-	            ps1.executeUpdate();
-            }
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
-
-
-    }
+		try {
+			getUserState(userState.getId());
+			this.simpleJdbcTemplate
+					.update(
+							"update tw_userstate set userstate_quotebundle=?, userstate_allquotebundle=?  where userstate_id=?",
+							userState.getCurrentQuoteBundleId(), userState.getAllQuoteBundleId(), userState.getId());
+		} catch (EntityNotFoundException enfe) {
+			this.simpleJdbcTemplate
+					.update(
+							"insert into tw_userstate(userstate_quotebundle, userstate_allquotebundle, userstate_user, userstate_id) values (?,?,?,?)",
+							userState.getCurrentQuoteBundleId(), userState.getAllQuoteBundleId(), userState.getId(),
+							UUID.uuid());
+		}
+	}
 
     /**
      * Gets the sole bundle dedicated to housing all quotes for the given
@@ -249,72 +311,53 @@ public class UserDataService {
      * @param userId user id
      * @return non-<code>null</code> {@link QuoteBundle} instance
      */
-    public QuoteBundle getAllQuoteBundleForUser(String userId) {
-        System.out.println("getAllQuoteBundleForUser " + userId);
-        if (userId == null) throw new NullPointerException();
+	@Transactional
+	public QuoteBundle getAllQuoteBundleForUser(String userId) {
+		System.out.println("getAllQuoteBundleForUser " + userId);
+		if (userId == null)
+			throw new NullPointerException();
 
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_quotebundle, tw_userstate where userstate_allquotebundle=quotebundle_id AND userstate_user=?", Statement.NO_GENERATED_KEYS);
-            ps.setString(1, userId);
-            ResultSet rs = ps.executeQuery();
+		QuoteBundle qb = this.simpleJdbcTemplate
+				.queryForObject(
+						"select * from tw_quotebundle, tw_userstate where userstate_allquotebundle=quotebundle_id AND userstate_user=?",
+						new QuoteBundleRowMapper(), userId);
+		if (qb == null) {
+			// create all quote bundle container
+			QuoteBundle oqc = new QuoteBundle();
+			oqc.setId(UUID.uuid());
+			oqc.setName("All Quotes");
+			oqc.setDescription("All quotes stored there");
+			addBundleForUser(userId, oqc);
 
-            if (rs.next()) {
-                QuoteBundle qb = dao.loadQuoteBundle(rs);
-                qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
-                System.out.println("ALL BUNDLE ID:"+qb.getId());
-                return qb;
-            } else {
-                // create all quote bundle container
+			UserState us = null;
 
-                QuoteBundle oqc = new QuoteBundle();
-                oqc.setId(UUID.uuid());
-                oqc.setName("All Quotes");
-                oqc.setDescription("All quotes stored there");
-                addBundleForUser(userId, oqc);
+			try {
+				us = getUserState(userId);
+			} catch (EntityNotFoundException enf) {
+				us = new UserState();
+				us.setId(UUID.uuid());
+				us.setUserId(userId);
+			}
+			us.setAllQuoteBundleId(oqc.getId());
+			saveUserState(us);
+			System.out.println("ALL BUNDLE ID:" + oqc.getId());
+			return oqc;
 
-                UserState us = null;
-                
-                try {
-                	us = getUserState(userId);
-                } catch(EntityNotFoundException enf){
-                    us = new UserState();
-                    us.setId(UUID.uuid());
-                    us.setUserId(userId);
-                }
-                us.setAllQuoteBundleId(oqc.getId());
-                saveUserState(us);
-                System.out.println("ALL BUNDLE ID:"+oqc.getId());
-                return oqc;
+		} else {
+			qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
+			System.out.println("ALL BUNDLE ID:" + qb.getId());
+			return qb;
+		}
 
-            }
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
-    }
+	}
 
     private List<Quote> getQuotesWithDocRefWithCaseRef(String bundleId)
     {
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_quote, tw_doc left outer join tw_caseref on doc_caseref=caseref_id, tw_bundleitem where quote_doc=doc_id and bundleitem_quote=quote_id and bundleitem_quotebundle=?", Statement.NO_GENERATED_KEYS);
-            ps.setString(1, bundleId);
-            ResultSet rs = ps.executeQuery();
-
-            List<Quote> list = new ArrayList<Quote>();
-            while (rs.next()) {
-                Quote quote = dao.loadQuoteWithDocRefWithCaseRef(rs);
-                list.add(quote);
-            }
-
-            return list;
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+    	
+        List<Quote> ret = this.simpleJdbcTemplate.query(
+        		"select * from tw_quote, tw_doc left outer join tw_caseref on doc_caseref=caseref_id, tw_bundleitem where quote_doc=doc_id and bundleitem_quote=quote_id and bundleitem_quotebundle=?",
+				new QuoteRowMapper(), bundleId);        
+        return ret;
     }
 
     /**
@@ -325,13 +368,13 @@ public class UserDataService {
      * @param userId
      * @return list of quote bundles
      */
+    @Transactional
     public BundleContainer getBundlesForUser(String userId) {
         System.out.println("getBundlesForUser " + userId);
 
         // first ensure an all quotes container exists for user
         getAllQuoteBundleForUser(userId);
 
-        Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("select * from tw_quotebundle, tw_permission where permission_quotebundle=quotebundle_id AND permission_user=? order by quotebundle_name", Statement.NO_GENERATED_KEYS);
             ps.setString(1, userId);
@@ -364,26 +407,16 @@ public class UserDataService {
         System.out.println("getQuoteBundle " + bundleId);
 
         if (bundleId == null) throw new NullPointerException();
-
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_quotebundle where quotebundle_id=?", Statement.NO_GENERATED_KEYS);
-            ps.setString(1, bundleId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                QuoteBundle qb = dao.loadQuoteBundle(rs);
-                qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
-                return qb;
-            } else {
-                throw new EntityNotFoundException("getQuoteBundle " + bundleId);
-            }
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
-
+        
+		QuoteBundle qb = this.simpleJdbcTemplate
+		.queryForObject(
+				"select * from tw_quotebundle where quotebundle_id=?",
+				new QuoteBundleRowMapper(), bundleId);
+		if (qb == null) {
+			throw new EntityNotFoundException("getQuoteBundle " + bundleId);
+		}
+		qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
+		return qb;
     }
 
     /**
@@ -403,21 +436,7 @@ public class UserDataService {
             ConstraintViolationException, EntityNotFoundException {
         if (userId == null || bundle == null) throw new NullPointerException();
         System.out.println("updateBundlePropsForUser " + userId + " bundleId=" + bundle.getId());
-
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps1 = dao.getPreparedStatement("update tw_quotebundle set quotebundle_name=?, quotebundle_description=? where quotebundle_id=?", Statement.RETURN_GENERATED_KEYS);
-            ps1.setString(1, bundle.getName());
-            ps1.setString(2, bundle.getDescription());
-            ps1.setString(3, bundle.getId());
-
-            ps1.executeUpdate();
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
-
+        this.simpleJdbcTemplate.update("update tw_quotebundle set quotebundle_name=?, quotebundle_description=? where quotebundle_id=?", bundle.getName(), bundle.getDescription(), bundle.getId());
     }
 
     /**
@@ -442,7 +461,6 @@ public class UserDataService {
         System.out.println("saveDoc id=" + doc.getId());
         if (doc == null) throw new NullPointerException();
 
-        Dao dao = new Dao();
         try {
             Reference ref = doc.getReference();
             String referenceId=null;
@@ -490,7 +508,6 @@ public class UserDataService {
 
         if (docContent == null) throw new NullPointerException();
 
-        Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("update tw_doc set doc_htmlcontent=?, doc_firstpagenumber=?, doc_pagesxpath=? where doc_id=?", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, docContent.getHtmlContent());
@@ -529,8 +546,6 @@ public class UserDataService {
     public void deleteDoc(String docId) throws EntityNotFoundException {
         System.out.println("deleteDoc " + docId);
 
-        Dao dao = new Dao();
-
         try {
             PreparedStatement ps1 = dao.getPreparedStatement("delete from tw_doc where doc_id=?", Statement.NO_GENERATED_KEYS);
             ps1.setString(1, docId);
@@ -553,7 +568,6 @@ public class UserDataService {
     public DocRef findCaseDocByRemoteUrl(String remoteUrl) throws EntityNotFoundException {
         System.out.println("findCaseDocByRemoteUrl " + remoteUrl);
 
-        Dao dao = new Dao();
         try {
             PreparedStatement ps = dao.getPreparedStatement("select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id where caseref_url=?", Statement.NO_GENERATED_KEYS);
             ps.setString(1, remoteUrl);
@@ -599,7 +613,6 @@ public class UserDataService {
     public QuoteBundle addBundleForUser(String userId, QuoteBundle bundle) throws ConstraintViolationException {
         System.out.println("addBundleForUser " + userId + " | bundleId " + bundle.getId());
         if (userId == null || bundle == null) throw new NullPointerException();
-        Dao dao = new Dao();
         try {
             PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quotebundle(quotebundle_id, quotebundle_name, quotebundle_description) values (?,?,?)", Statement.NO_GENERATED_KEYS);
             ps1.setString(1, bundle.getId());
@@ -633,8 +646,6 @@ public class UserDataService {
      */
     public void deleteBundleForUser(String userId, String bundleId, boolean deleteQuotes) throws EntityNotFoundException {
         System.out.println("deleteBundleForUser " + userId);
-
-        Dao dao = new Dao();
 
         try {
             if (!deleteQuotes) {
@@ -699,7 +710,6 @@ public class UserDataService {
         if (userId == null || bundleId == null || quote == null) throw new NullPointerException();
         System.out.println("addQuoteToBundle " + userId + " bundleId=" + bundleId + " DocumentId=" + quote.getDocument().getId() + " QuoteId=" + quote.getId());
 
-        Dao dao = new Dao();
         try {
             // insert quote
             PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quote(quote_doc, quote_endpage, quote_quote, quote_serializedmark, quote_startpage, quote_id) values (?,?,?,?,?,?)", Statement.NO_GENERATED_KEYS);
@@ -753,24 +763,10 @@ public class UserDataService {
         System.out.println("deleteQuote " + userId);
         QuoteBundle all = getAllQuoteBundleForUser(userId);
 
-        Dao dao = new Dao();
-        try {
-            if (all.getId().equals(bundleId)) {
-                // Delete from all means delete quote
-                PreparedStatement ps2 = dao.getPreparedStatement("delete from tw_quote where quote_id=?", Statement.RETURN_GENERATED_KEYS);
-                ps2.setString(1, quoteId);
-                ps2.executeUpdate();
-            } else {
-                PreparedStatement ps2 = dao.getPreparedStatement("delete from tw_bundleitem where bundleitem_quote=? and bundleitem_quotebundle=?", Statement.RETURN_GENERATED_KEYS);
-                ps2.setString(1, quoteId);
-                ps2.setString(2, bundleId);
-                ps2.executeUpdate();
-            }
-
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
+        if (all.getId().equals(bundleId)) {
+            this.simpleJdbcTemplate.update("delete from tw_quote where quote_id=?", quoteId);
+        } else {
+            this.simpleJdbcTemplate.update("delete from tw_bundleitem where bundleitem_quote=? and bundleitem_quotebundle=?", quoteId, bundleId);
         }
 
     }
@@ -788,21 +784,7 @@ public class UserDataService {
             throws EntityNotFoundException {
         if (userId == null || bundleId == null || quoteId == null) throw new NullPointerException();
 
-        Dao dao = new Dao();
-        try {
-
-            // add quote to bundle
-            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_bundleitem(bundleitem_quote, bundleitem_quotebundle, bundleitem_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
-            ps2.setString(1, quoteId);
-            ps2.setString(2, bundleId);
-            ps2.setString(3, UUID.uuid());
-            ps2.executeUpdate();
-
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        this.simpleJdbcTemplate.update("insert into tw_bundleitem(bundleitem_quote, bundleitem_quotebundle, bundleitem_id) values (?,?,?)", quoteId, bundleId, UUID.uuid());
 
     }
 
@@ -818,22 +800,7 @@ public class UserDataService {
      */
     public void moveQuote(String userId, String quoteId, String sourceBundleId, String targetBundleId)
             throws EntityNotFoundException {
-
-        Dao dao = new Dao();
-        try {
-
-            PreparedStatement ps2 = dao.getPreparedStatement("update tw_bundleitem set bundleitem_quotebundle=? where bundleitem_quotebundle=? and bundleitem_quote=?", Statement.RETURN_GENERATED_KEYS);
-            ps2.setString(1, targetBundleId);
-            ps2.setString(2, sourceBundleId);
-            ps2.setString(3, quoteId);
-            ps2.executeUpdate();
-
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
-
+        this.simpleJdbcTemplate.update("update tw_bundleitem set bundleitem_quotebundle=? where bundleitem_quotebundle=? and bundleitem_quote=?", targetBundleId, sourceBundleId, quoteId);
     }
     /**
      * Adds an association of an existing quote bundle to an existing user.
@@ -844,18 +811,7 @@ public class UserDataService {
      */
     public void addBundleUserBinding(String userId, String bundleId) throws EntityExistsException {
         System.out.println("addBundleUserBinding " + userId);
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quotebundle, permission_user, permission_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
-            ps2.setString(1, bundleId);
-            ps2.setString(2, userId);
-            ps2.setString(3, UUID.uuid());
-            ps2.executeUpdate();
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        this.simpleJdbcTemplate.update("insert into tw_permission(permission_quotebundle, permission_user, permission_id) values (?,?,?)", bundleId, userId, UUID.uuid());
     }
 
     /**
@@ -867,19 +823,7 @@ public class UserDataService {
      */
     public void removeBundleUserBinding(String userId, String bundleId) throws EntityNotFoundException {
         System.out.println("removeBundleUserBinding " + userId);
-        Dao dao = new Dao();
-
-        try {
-            PreparedStatement ps1 = dao.getPreparedStatement("delete from tw_permission where permission_quotebundle=? and permission_user=?", Statement.RETURN_GENERATED_KEYS);
-            ps1.setString(1, bundleId);
-            ps1.setString(2, userId);
-            ps1.executeUpdate();
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
-
+        this.simpleJdbcTemplate.update("insert into tw_permission(permission_doc, permission_user, permission_id) values (?,?,?)", bundleId, userId);
     }
 
     /**
@@ -891,18 +835,7 @@ public class UserDataService {
      */
     public void addDocUserBinding(String userId, String docId) throws EntityExistsException {
         System.out.println("addDocUserBinding " + userId);
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_doc, permission_user, permission_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
-            ps2.setString(1, docId);
-            ps2.setString(2, userId);
-            ps2.setString(3, UUID.uuid());
-            ps2.executeUpdate();
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        this.simpleJdbcTemplate.update("insert into tw_permission(permission_doc, permission_user, permission_id) values (?,?,?)", docId, userId, UUID.uuid());
     }
 
 
@@ -915,17 +848,7 @@ public class UserDataService {
      */
     public void removeDocUserBinding(String userId, String docId) throws EntityNotFoundException {
         System.out.println("removeDocUserBinding " + userId + " docId = " + docId);
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps2 = dao.getPreparedStatement("delete from tw_permission where permission_doc=? and permission_user=?", Statement.RETURN_GENERATED_KEYS);
-            ps2.setString(1, docId);
-            ps2.setString(2, userId);
-            ps2.executeUpdate();
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        this.simpleJdbcTemplate.update("delete from tw_permission where permission_doc=? and permission_user=?", docId, userId);
     }
 
 
@@ -950,18 +873,8 @@ public class UserDataService {
      */
     public void addQuoteUserBinding(String userId, String quoteId) throws EntityExistsException {
         System.out.println("addQuoteUserBinding " + userId + " quoteId=" + quoteId);
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps2 = dao.getPreparedStatement("insert into tw_permission(permission_quote, permission_user, permission_id) values (?,?,?)", Statement.NO_GENERATED_KEYS);
-            ps2.setString(1, quoteId);
-            ps2.setString(2, userId);
-            ps2.setString(3, UUID.uuid());
-            ps2.executeUpdate();
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        this.simpleJdbcTemplate.update("insert into tw_permission(permission_quote, permission_user, permission_id) values (?,?,?)", quoteId, userId, UUID.uuid());
+
     }
 
     /**
@@ -1035,7 +948,6 @@ public class UserDataService {
         System.out.println("shareBundleForUser " + userId + " | bundleId " + bundle.getId());
         if (userId == null || bundle == null) throw new NullPointerException();
         String newBundleId = UUID.uuid(); 
-        Dao dao = new Dao();
         try {
             PreparedStatement ps1 = dao.getPreparedStatement("insert into tw_quotebundle(quotebundle_id, quotebundle_name, quotebundle_description, parent_quotebundle) values (?,?,?,?)", Statement.NO_GENERATED_KEYS);
             ps1.setString(1, newBundleId);
@@ -1072,7 +984,6 @@ public class UserDataService {
         System.out.println("getBundleUsers  bundleId " + bundleId);
         List<User> result = new ArrayList<User>();
 
-        Dao dao = new Dao();
         try {
 /*        	Quote based version
         	String query = "select distinct u.* from tw_bundleitem  fi \n" +
@@ -1105,5 +1016,13 @@ public class UserDataService {
 
     }
 
+	private MapSqlParameterSource createQuoteBundleParameterSource(QuoteBundle bundle) {
+		return new MapSqlParameterSource()
+			.addValue("quotebundle_id", bundle.getId())
+			.addValue("quotebundle_name", bundle.getName())
+			.addValue("quotebundle_description", bundle.getDescription());
+	}
+	
+	
 
 }

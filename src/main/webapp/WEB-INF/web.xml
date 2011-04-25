@@ -26,6 +26,7 @@
 			com.tabulaw.di.PersistContextModule
 			com.tabulaw.di.DataConverterModule
 			com.tabulaw.di.HtmlSanitizerModule
+			com.tabulaw.di.DataSourceDaoModule
     </param-value>
 	</context-param>
 
