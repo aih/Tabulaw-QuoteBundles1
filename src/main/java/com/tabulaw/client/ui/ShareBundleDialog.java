@@ -12,8 +12,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
@@ -64,7 +63,11 @@ public class ShareBundleDialog extends Dialog implements ClickHandler {
 		listing = new PermissionsListingWidget();
 		listing.addListingHandler(new RefreshHandler());
 		
+		Label listTitle = new Label("Shared with:");
+		listTitle.addStyleName("add-permission-list-title");
+		
 		panel.add(suggestPanel);
+		panel.add(listTitle);
 		panel.add(listing );
 		panel.add(buttonsPanel);
 

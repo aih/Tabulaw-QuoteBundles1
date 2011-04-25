@@ -1396,3 +1396,6 @@ docHeaderMenuItem img {
 .suggest-user-panel input {
 	width: 60%;
 }
+.add-permission-list-title {
+	margin-bottom : 3px;
+}
