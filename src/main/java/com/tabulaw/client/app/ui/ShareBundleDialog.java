@@ -1,4 +1,4 @@
-package com.tabulaw.client.ui;
+package com.tabulaw.client.app.ui;
 
 
 import java.util.HashSet;
@@ -16,8 +16,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.PermissionsListingWidget;
-import com.tabulaw.client.app.ui.UsernameSuggestOracle;
+import com.tabulaw.client.app.ui.BundleEditWidget.EditHeader;
+import com.tabulaw.client.model.ModelChangeEvent;
+import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
+import com.tabulaw.client.ui.Dialog;
 import com.tabulaw.client.ui.listing.IListingHandler;
 import com.tabulaw.client.ui.listing.ListingEvent;
 import com.tabulaw.common.data.rpc.ModelPayload;
@@ -110,7 +112,10 @@ public class ShareBundleDialog extends Dialog implements ClickHandler {
 							@Override
 							public void onSuccess(ModelPayload<QuoteBundle> result) {
 								listing.refresh();
+								bundle.addChildQuoteBundle(result.getModel());
 								suggestbox.setValue(null);
+								Poc.fireModelChangeEvent(new ModelChangeEvent(ShareBundleDialog.this, ModelChangeOp.UPDATED, bundle, null));
+								
 							}
 						});
 	            	}

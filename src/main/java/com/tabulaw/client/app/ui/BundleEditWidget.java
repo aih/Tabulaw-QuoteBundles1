@@ -18,6 +18,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PushButton;
@@ -28,7 +29,6 @@ import com.tabulaw.client.app.model.ServerPersistApi;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Notifier;
-import com.tabulaw.client.ui.ShareBundleDialog;
 import com.tabulaw.model.Quote;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.UserState;
@@ -67,10 +67,11 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	 */
 	static class EditHeader extends EditableBundleHeader {
 
-		private final Image delete, current, notCurrent, close, share;
+		private final Image delete, current, notCurrent, close;
 
 		private final PushButton email;
 		private final PushButton emailInProgress;
+		private final Label  shareLabel; 
 
 		private class DownloadBundleCommand implements Command {
 
@@ -103,9 +104,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			buttons.add(spacer);
 			buttons.setCellWidth(spacer, "100%");
 
-			share = getShareImage();
-			buttons.add(share);
-
 			delete = getDeleteImage();
 
 			buttons.add(delete);
@@ -137,6 +135,9 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			close.setTitle("Close");
 			close.setStyleName(Styles.X);
 			buttons.add(close);
+			shareLabel = getShareLabel();	
+
+			buttons.add(shareLabel);
 
 		}
 
@@ -179,7 +180,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 				notCurrent.setVisible(false);
 			}
 			delete.setVisible(!isAll);
-			share.setVisible(!isAll);
+			shareLabel.setVisible(!isAll);
 			pName.setEditable(!isAll);
 			pDesc.setEditable(!isAll);
 			
@@ -271,10 +272,17 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			return downloadMenuTop;
 			
 		}
-		private Image getShareImage() {
-			Image image = new Image(Resources.INSTANCE.lock());
-			image.setTitle("Share Quote Bundle...");
-			image.addClickHandler(new ClickHandler() {
+		private void setShareLabelText(){
+			if (bundle!=null && bundle.getChildQuoteBundles().size()>0){
+				shareLabel.setText("Shared");
+			} else {
+				shareLabel.setText("Share");
+			}
+		}
+		private Label getShareLabel() {
+			Label  shareLabel = new Label("");
+			shareLabel.addStyleName("share-label");
+			shareLabel.addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
@@ -283,7 +291,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 					shareBundleDialog.center();
 				}
 			});
-			return image;
+			return shareLabel;
 		}
 
 	} // EditHeader
@@ -392,6 +400,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		modelStateCheck();
 		dropAreaCheck();
 		makeModelChangeAware();
+		header.setShareLabelText();
 	}
 
 	@Override
@@ -404,5 +413,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
 		modelStateCheck();
+		header.setShareLabelText();
 	}
 }

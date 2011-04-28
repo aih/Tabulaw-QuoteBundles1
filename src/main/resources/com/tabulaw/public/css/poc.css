@@ -1399,3 +1399,9 @@ docHeaderMenuItem img {
 .add-permission-list-title {
 	margin-bottom : 3px;
 }
+.share-label {
+	padding : 5px;
+	font-size : 11px;
+	font-family: Georgia,"Times New Roman",Times,serif;
+	cursor: pointer;
+}

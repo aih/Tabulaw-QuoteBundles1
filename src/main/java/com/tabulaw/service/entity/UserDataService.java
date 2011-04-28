@@ -342,6 +342,8 @@ public class UserDataService {
                 BundleUserBinding bub = dao.loadBundleUserBinding(rs);
                 QuoteBundle qb = dao.loadQuoteBundle(rs);
                 qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
+                qb.setChildQuoteBundles(getChildQuoteBundles(qb.getId()));
+                
                 list.add(qb);
             }
 
@@ -374,6 +376,7 @@ public class UserDataService {
             if (rs.next()) {
                 QuoteBundle qb = dao.loadQuoteBundle(rs);
                 qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
+                qb.setChildQuoteBundles(getChildQuoteBundles(qb.getId()));
                 return qb;
             } else {
                 throw new EntityNotFoundException("getQuoteBundle " + bundleId);
@@ -1105,5 +1108,28 @@ public class UserDataService {
 
     }
 
+    public List<QuoteBundle> getChildQuoteBundles(String bundleId) throws ConstraintViolationException {
+        System.out.println("getBundleUsers  bundleId " + bundleId);
+        List<QuoteBundle> result = new ArrayList<QuoteBundle>();
+
+        Dao dao = new Dao();
+        try {
+        	String query = "select cqb.* from tw_quotebundle cqb\n" +
+        			"where cqb.parent_quotebundle=?"; 
+            PreparedStatement ps = dao.getPreparedStatement(query, Statement.NO_GENERATED_KEYS);
+            ps.setString(1, bundleId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+            	result.add(dao.loadQuoteBundle(rs));
+            }
+            return result;
+        } catch (SQLException ex) {
+            throw new IllegalStateException(ex);
+        } finally {
+            dao.cleanUp();
+        }
+
+
+    }
 
 }
