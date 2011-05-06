@@ -339,7 +339,7 @@ public class UserDataService {
 
             List<QuoteBundle> list = new ArrayList<QuoteBundle>();
             while (rs.next()) {
-                BundleUserBinding bub = dao.loadBundleUserBinding(rs);
+//                BundleUserBinding bub = dao.loadBundleUserBinding(rs);
                 QuoteBundle qb = dao.loadQuoteBundle(rs);
                 qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
                 qb.setChildQuoteBundles(getChildQuoteBundles(qb.getId()));
@@ -1131,5 +1131,39 @@ public class UserDataService {
 
 
     }
+
+
+	public List<BundleUserBinding> getSharedPermissions(String userId) {
+        System.out.println("getSharedPermission userId" + userId);
+        List<BundleUserBinding> result = new ArrayList<BundleUserBinding>();
+
+        Dao dao = new Dao();
+        try {
+        	String query = "select * from tw_permission p " +
+        			"inner join tw_user u on p.permission_user = u.user_id " +
+        			"where permission_quotebundle in ( " +
+        			"select quotebundle_id from tw_quotebundle " +
+        			"where parent_quotebundle in ( " +
+        			"select permission_quotebundle from tw_permission where permission_user=?) " +
+        			"union " +
+        			"select parent_quotebundle from tw_quotebundle " +
+        			"where quotebundle_id in ( " +
+        			"select permission_quotebundle from tw_permission where permission_user=?) " +
+        			")";
+ 
+            PreparedStatement ps = dao.getPreparedStatement(query, Statement.NO_GENERATED_KEYS);
+            ps.setString(1, userId);
+            ps.setString(2, userId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+            	result.add(dao.loadBundleUserBinding(rs));
+            }
+            return result;
+        } catch (SQLException ex) {
+            throw new IllegalStateException(ex);
+        } finally {
+            dao.cleanUp();
+        }
+	}
 
 }

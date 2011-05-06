@@ -71,7 +71,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 
 		private final PushButton email;
 		private final PushButton emailInProgress;
-		private final Label  shareLabel; 
+		private final ShareLabel  shareLabel; 
 
 		private class DownloadBundleCommand implements Command {
 
@@ -135,7 +135,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			close.setTitle("Close");
 			close.setStyleName(Styles.X);
 			buttons.add(close);
-			shareLabel = getShareLabel();	
+			shareLabel = new ShareLabel();	
 
 			buttons.add(shareLabel);
 
@@ -144,6 +144,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		@Override
 		public void setModel(QuoteBundle bundle) {
 			super.setModel(bundle);
+			shareLabel.setBundle(bundle);
 			modelStateCheck();
 		}
 
@@ -272,27 +273,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 			return downloadMenuTop;
 			
 		}
-		private void setShareLabelText(){
-			if (bundle!=null && bundle.getChildQuoteBundles().size()>0){
-				shareLabel.setText("Shared");
-			} else {
-				shareLabel.setText("Share");
-			}
-		}
-		private Label getShareLabel() {
-			Label  shareLabel = new Label("");
-			shareLabel.addStyleName("share-label");
-			shareLabel.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					ShareBundleDialog shareBundleDialog = new ShareBundleDialog("Share Quote Bundle...");
-					shareBundleDialog.setBundle(bundle);
-					shareBundleDialog.center();
-				}
-			});
-			return shareLabel;
-		}
 
 	} // EditHeader
 
@@ -400,7 +380,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		modelStateCheck();
 		dropAreaCheck();
 		makeModelChangeAware();
-		header.setShareLabelText();
 	}
 
 	@Override
@@ -413,6 +392,5 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 	public void onModelChangeEvent(ModelChangeEvent event) {
 		super.onModelChangeEvent(event);
 		modelStateCheck();
-		header.setShareLabelText();
 	}
 }

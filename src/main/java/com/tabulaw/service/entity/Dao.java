@@ -89,6 +89,7 @@ public class Dao {
             QuoteBundle ret = new QuoteBundle();
             ret.setId(rs.getString("quotebundle_id"));
             ret.setName(rs.getString("quotebundle_name"));
+            ret.setParentBundleId(rs.getString("parent_quotebundle"));
             ret.setDescription(rs.getString("quotebundle_description"));
             return ret;
         } catch (SQLException ex) {
@@ -101,7 +102,8 @@ public class Dao {
         try {
             BundleUserBinding ret = new BundleUserBinding();
             ret.setId(rs.getString("permission_id"));
-            ret.setUserId(rs.getString("permission_user"));
+            User user =  loadUser(rs);
+            ret.setUser(user);
             ret.setBundleId(rs.getString("permission_quotebundle"));
             return ret;
         } catch (SQLException ex) {

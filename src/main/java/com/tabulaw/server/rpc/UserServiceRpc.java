@@ -34,6 +34,7 @@ import com.tabulaw.mail.EmailDispatcher;
 import com.tabulaw.mail.IMailContext;
 import com.tabulaw.mail.MailManager;
 import com.tabulaw.mail.MailRouting;
+import com.tabulaw.model.BundleUserBinding;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityBase;
@@ -317,6 +318,8 @@ public class UserServiceRpc extends RpcServlet implements IUserContextService,
 			} catch (EntityNotFoundException e) {
 				// ok
 			}
+			List <BundleUserBinding> sharePermissions = pc.getUserDataService().getSharedPermissions(user.getId());
+			payload.setSharedPermissions(sharePermissions);
 			
 			status.addMsg("User Context retrieved.", MsgLevel.INFO,
 					MsgAttr.STATUS.flag);

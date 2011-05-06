@@ -13,11 +13,12 @@ import javax.validation.constraints.NotNull;
  * NOTE: No primary surrogate key is needed here.
  * @author jpk
  */
-public class BundleUserBinding extends EntityBase {
+public class BundleUserBinding extends EntityBase  implements Comparable<BundleUserBinding> {
 
 	private static final long serialVersionUID = -4676769373977438262L;
 
-	private String id, bundleId, userId;
+	private String id, bundleId;
+	private User user;
 
 	/**
 	 * Constructor
@@ -30,22 +31,25 @@ public class BundleUserBinding extends EntityBase {
 	 * Constructor
 	 * @param bundleId
 	 * @param userId
-	 * @param orphaned Is this bundle for orphaned quotes?
 	 */
-	public BundleUserBinding(String bundleId, String userId) {
+	public BundleUserBinding(String bundleId, User user) {
 		super();
 		this.bundleId = bundleId;
-		this.userId = userId;
+		this.user = user;
 	}
 
 	@Override
 	protected void doClone(IEntity cln) {
-		throw new UnsupportedOperationException();
+		BundleUserBinding bub = (BundleUserBinding)cln;
+		bub.bundleId = this.bundleId;
+		bub.id = this.id;
+		User cuser = (User)this.user.clone();
+		bub.user = cuser; 
 	}
 
 	@Override
 	protected IEntity newInstance() {
-		throw new UnsupportedOperationException();
+		return new BundleUserBinding();
 	}
 
 	@Override
@@ -74,13 +78,19 @@ public class BundleUserBinding extends EntityBase {
 	}
 
 	@NotNull
-	public String getUserId() {
-		return userId;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserId(String userId) {
-		if(userId == null) throw new NullPointerException();
-		this.userId = userId;
+	public void setUser(User user) {
+		if(user == null) throw new NullPointerException();
+		this.user = user;
+	}
+
+	@Override
+	public int compareTo(BundleUserBinding o) {
+		// TODO Any criteria to compare permissions?
+		return 0;
 	}
 
 	/*
