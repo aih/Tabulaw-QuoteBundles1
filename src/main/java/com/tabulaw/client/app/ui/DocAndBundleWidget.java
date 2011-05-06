@@ -236,7 +236,10 @@ public class DocAndBundleWidget extends AbstractModelChangeAwareWidget implement
 					return;
 				}
 
-				UpdateQuoteBundle.updateQuoteBundleTitle(wDocQuoteBundle.getModel());
+				/*
+				 * WEBAPP-121
+					UpdateQuoteBundle.updateQuoteBundleTitle(wDocQuoteBundle.getModel());
+				 */
 				
 				// create the quote
 				String serializedMark = mark.serialize();
