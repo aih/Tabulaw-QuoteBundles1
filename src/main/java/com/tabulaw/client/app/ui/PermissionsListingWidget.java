@@ -9,7 +9,9 @@ import java.util.List;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLTable;
+import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.ui.listing.AbstractListingConfig;
 import com.tabulaw.client.ui.listing.Column;
@@ -52,17 +54,36 @@ public class PermissionsListingWidget extends Composite {
 		}
 	} // ListingConfig
 
+	static class UserListing extends ModelListingWidget<User, ModelListingTable<User>> {
+		private String noDataWarning = ""; 
+		public UserListing(IListingConfig config, ModelListingTable<User> table) {
+			super(config.getListingId(), config.getListingElementName(), table, null);
+		}
+		@Override
+		protected Widget createNoDataRowsWidget() {
+			return new HTML(noDataWarning + "You have not shared this Quote Bundle with other users.", true);
+		}
+		public void updateText(QuoteBundle bundle){
+			if(bundle.getParentBundleId() != null){
+				User user = ClientModelCache.get().getQuoteBundleOwner(bundle.getParentBundleId());
+				noDataWarning = user.getName() + " shared this with you. <br/>";
+			}
+		}
+		
+	}
+	
 	static final IListingConfig config = new ListingConfig();
 
 	private final Operator operator;
 
-	private final ModelListingWidget<User, ModelListingTable<User>> listingWidget;
+	private final UserListing listingWidget;
 
 	private final FlowPanel pnl = new FlowPanel();
 	private QuoteBundle bundle;
 
 	public void setBundleId(QuoteBundle bundle) {
 		this.bundle = bundle;
+		listingWidget.updateText(bundle);
 	}
 
 	/**
@@ -85,7 +106,7 @@ public class PermissionsListingWidget extends Composite {
 
 		operator = new Operator();
 
-		listingWidget = new ModelListingWidget<User, ModelListingTable<User>>(config.getListingId(), config.getListingElementName(),table, null);
+		listingWidget = new UserListing(config, table);
 		listingWidget.setOperator(operator);
 
 
