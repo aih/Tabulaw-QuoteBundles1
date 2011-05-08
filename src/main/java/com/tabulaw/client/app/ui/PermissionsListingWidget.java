@@ -5,11 +5,12 @@
  */
 package com.tabulaw.client.app.ui;
 
+import java.util.List;
+
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLTable;
-import com.tabulaw.client.app.Poc;
-import com.tabulaw.client.ui.RpcCommand;
+import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.client.ui.listing.AbstractListingConfig;
 import com.tabulaw.client.ui.listing.Column;
 import com.tabulaw.client.ui.listing.DataListingOperator;
@@ -20,9 +21,9 @@ import com.tabulaw.client.ui.listing.ListingEvent;
 import com.tabulaw.client.ui.listing.ModelListingTable;
 import com.tabulaw.client.ui.listing.ModelListingWidget;
 import com.tabulaw.client.util.Fmt;
-import com.tabulaw.common.data.rpc.UserListPayload;
 import com.tabulaw.dao.Sorting;
 import com.tabulaw.listhandler.InMemoryListHandler;
+import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.User;
 
 /**
@@ -58,10 +59,10 @@ public class PermissionsListingWidget extends Composite {
 	private final ModelListingWidget<User, ModelListingTable<User>> listingWidget;
 
 	private final FlowPanel pnl = new FlowPanel();
-	private String bundleId;
+	private QuoteBundle bundle;
 
-	public void setBundleId(String bundleId) {
-		this.bundleId = bundleId;
+	public void setBundleId(QuoteBundle bundle) {
+		this.bundle = bundle;
 	}
 
 	/**
@@ -106,21 +107,10 @@ public class PermissionsListingWidget extends Composite {
 		@Override
 		public void refresh() {
 			listingGenerated = false; // force the data to re-pop into the table
-			new RpcCommand<UserListPayload>() {
-
-				@Override
-				protected void doExecute() {
-					setSource(listingWidget);
-					Poc.getUserDataService().getBundleUsers(bundleId, this);
-				}
-
-				@Override
-				protected void handleSuccess(UserListPayload result) {
-					super.handleSuccess(result);
-					getDataProvider().setList(result.getUsers());
-					firstPage();
-				}
-			}.execute();
+			List<User> users = ClientModelCache.get().getQuoteBundlesOwners(bundle.getChildQuoteBundles());  
+			getDataProvider().setList(users);
+			firstPage();
+			
 		}
 	}
 

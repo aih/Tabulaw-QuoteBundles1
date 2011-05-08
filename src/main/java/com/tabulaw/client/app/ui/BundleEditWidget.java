@@ -144,7 +144,6 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		@Override
 		public void setModel(QuoteBundle bundle) {
 			super.setModel(bundle);
-			shareLabel.setBundle(bundle);
 			modelStateCheck();
 		}
 
@@ -154,6 +153,7 @@ public class BundleEditWidget extends AbstractBundleWidget<BundleEditWidget, Quo
 		private void modelStateCheck() {
 			checkCurrentQuoteBundle();
 			checkAllQuoteBundle();
+			shareLabel.setBundle(bundle);
 		}
 		private void checkCurrentQuoteBundle() {
 			QuoteBundle cqb = ClientModelCache.get().getCurrentQuoteBundle();

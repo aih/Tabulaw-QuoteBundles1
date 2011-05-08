@@ -16,13 +16,13 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.tabulaw.client.app.Poc;
 import com.tabulaw.client.app.model.ClientModelCache;
-import com.tabulaw.client.app.ui.BundleEditWidget.EditHeader;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.client.ui.Dialog;
 import com.tabulaw.client.ui.listing.IListingHandler;
 import com.tabulaw.client.ui.listing.ListingEvent;
 import com.tabulaw.common.data.rpc.ModelPayload;
+import com.tabulaw.model.BundleUserBinding;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.User;
 
@@ -48,7 +48,7 @@ public class ShareBundleDialog extends Dialog implements ClickHandler {
 
 	public void setBundle(QuoteBundle bundle) {
 		this.bundle = bundle;
-		listing.setBundleId(bundle.getId());
+		listing.setBundleId(bundle);
 	}
 	public ShareBundleDialog(String title) {
 		setText(title);
@@ -100,7 +100,7 @@ public class ShareBundleDialog extends Dialog implements ClickHandler {
 	            	Window.alert(caught.getLocalizedMessage());
 	            }
 	            public void onSuccess(ModelPayload<User> payload) {
-            		User user = payload.getModel();
+            		final User user = payload.getModel();
 	            	if	(user!=null && !usersWithPermission.contains(user)) {
 	            		Poc.getUserDataService().shareBundleForUser(user, bundle, new AsyncCallback<ModelPayload<QuoteBundle>>() {
 
@@ -113,9 +113,14 @@ public class ShareBundleDialog extends Dialog implements ClickHandler {
 							public void onSuccess(ModelPayload<QuoteBundle> result) {
 								listing.refresh();
 								bundle.addChildQuoteBundle(result.getModel());
+								updateClientCache(result.getModel().getId(), user);
 								suggestbox.setValue(null);
 								Poc.fireModelChangeEvent(new ModelChangeEvent(ShareBundleDialog.this, ModelChangeOp.UPDATED, bundle, null));
 								
+							}
+							private void updateClientCache(String bundleId, User user) {
+								BundleUserBinding bundleUserBinding = new BundleUserBinding (bundleId, user);
+								ClientModelCache.get().persist(bundleUserBinding, ShareBundleDialog.this);
 							}
 						});
 	            	}

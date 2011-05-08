@@ -1,27 +1,61 @@
 package com.tabulaw.client.app.ui;
 
+import java.util.List;
+
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.tabulaw.client.app.model.ClientModelCache;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.User;
 
 public class ShareLabel extends Label implements MouseUpHandler, MouseOutHandler, MouseOverHandler {
+	public static class SharePopupPanel extends PopupPanel{
+		public void setPopupPosition(Widget parent) {
+			int top = parent.getAbsoluteTop() + parent.getOffsetHeight();
+			int left = parent.getAbsoluteLeft();
+			setPopupPosition(left, top);
+		}
+		
+	}
+	
+	public static class SharedByPopupPanel extends SharePopupPanel{
+		public SharedByPopupPanel(QuoteBundle bundle) {
+			User owner = ClientModelCache.get().getQuoteBundleOwner(bundle.getParentBundleId());
+			String email =owner.getEmailAddress();
+			add(new HTML(email));
+		} 
+	}
+	
+	public static class SharedWithPopupPanel extends SharePopupPanel{
+		public SharedWithPopupPanel(QuoteBundle bundle) {
+
+			List<User> recipients = ClientModelCache.get().getQuoteBundlesOwners(bundle.getChildQuoteBundles());
+			
+			FlowPanel contents = new FlowPanel(); 
+
+			for (User recipient : recipients) {
+				String email = recipient.getEmailAddress();
+				HTML row = new HTML(email); 
+				contents.add(row);
+			}
+			add(contents);
+		} 
+	}
+	
 	private QuoteBundle bundle;
-	PopupPanel popup = new PopupPanel();
-	HTML popupContent = new HTML("some text");
+	SharePopupPanel popup = null;
 
 	public ShareLabel() {
 		addStyleName("share-label");
-
-		popup.add(popupContent);
 
 		addMouseUpHandler(this);
 		addMouseOverHandler(this);
@@ -35,21 +69,24 @@ public class ShareLabel extends Label implements MouseUpHandler, MouseOutHandler
 
 	@Override
 	public void onMouseOut(MouseOutEvent event) {
-		popup.hide();
+		if (popup != null) {
+			popup.hide();
+		}
 	}
 
 	@Override
 	public void onMouseOver(MouseOverEvent event) {
-		int popupTop = getAbsoluteTop() + getOffsetHeight();
-		int popupLeft = getAbsoluteLeft();
-		popup.setPopupPosition(popupLeft, popupTop);
-		popup.show();
-
+		if (popup != null) {
+			popup.setPopupPosition(this);
+			popup.show();
+		}
 	}
 
 	@Override
 	public void onMouseUp(MouseUpEvent event) {
-		popup.hide();
+		if (popup != null) {
+			popup.hide();
+		}
 		ShareBundleDialog shareBundleDialog = new ShareBundleDialog("Share Quote Bundle...");
 		shareBundleDialog.setBundle(bundle);
 		shareBundleDialog.center();
@@ -60,10 +97,10 @@ public class ShareLabel extends Label implements MouseUpHandler, MouseOutHandler
 		if (bundle != null) {
 			if (bundle.getParentBundleId()!=null) {
 				setText("Shared by");
-				User owner = ClientModelCache.get().getQuoteBundleOwner(bundle.getParentBundleId());
-				popupContent.setHTML(owner.getEmailAddress());
+				popup = new SharedByPopupPanel(bundle);
 			} else if (bundle.getChildQuoteBundles().size() > 0) {
 				setText("Shared with");
+				popup = new SharedWithPopupPanel(bundle);
 			} else {
 				setText("Share");
 			}

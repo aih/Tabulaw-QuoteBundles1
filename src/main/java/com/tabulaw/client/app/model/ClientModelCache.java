@@ -349,4 +349,15 @@ public class ClientModelCache {
 		}
 		return null;
 	}
+
+	public List<User> getQuoteBundlesOwners(List<QuoteBundle> childQuoteBundles) {
+		List<User> result = new ArrayList<User>(); 
+		for (QuoteBundle bundle : childQuoteBundles){
+			User user = getQuoteBundleOwner(bundle.getId());
+			if (user != null) {
+				result.add(user);
+			}
+		}
+		return result;
+	}
 }
