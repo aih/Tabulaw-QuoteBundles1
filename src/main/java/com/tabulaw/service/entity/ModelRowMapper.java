@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+import com.tabulaw.model.BundleUserBinding;
 import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
@@ -20,6 +21,7 @@ public class ModelRowMapper {
 		QuoteBundle ret = new QuoteBundle();
 		ret.setId(rs.getString("quotebundle_id"));
 		ret.setName(rs.getString("quotebundle_name"));
+		ret.setParentBundleId(rs.getString("parent_quotebundle"));
 		ret.setDescription(rs.getString("quotebundle_description"));
 		return ret;
 	}
@@ -97,4 +99,17 @@ public class ModelRowMapper {
 
 		return ret;
 	}
+	protected BundleUserBinding loadBundleUserBinding(ResultSet rs) throws SQLException {
+        try {
+            BundleUserBinding ret = new BundleUserBinding();
+            ret.setId(rs.getString("permission_id"));
+            User user =  loadUser(rs);
+            ret.setUser(user);
+            ret.setBundleId(rs.getString("permission_quotebundle"));
+            return ret;
+        } catch (SQLException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
+	
 }

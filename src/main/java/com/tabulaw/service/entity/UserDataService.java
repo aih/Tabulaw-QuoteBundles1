@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.inject.Inject;
 import com.tabulaw.dao.EntityExistsException;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.model.BundleUserBinding;
 import com.tabulaw.model.CaseRef;
 import com.tabulaw.model.DocContent;
 import com.tabulaw.model.DocRef;
@@ -80,6 +81,13 @@ public class UserDataService {
 	
 	}
 
+	private class BundleUserBindingRowMapper extends ModelRowMapper implements ParameterizedRowMapper<BundleUserBinding> {
+
+		public BundleUserBinding mapRow(ResultSet rs, int rownum) throws SQLException {
+            return loadBundleUserBinding(rs);
+    }
+	
+	}
     /**
      * A simple way to provide a list of bundles in addition to conveying which of
      * them is the orphan qoute container.
@@ -330,7 +338,8 @@ public class UserDataService {
         //add quotes to each bundle
         for (QuoteBundle bundle : list) {
         	bundle.setQuotes(getQuotesWithDocRefWithCaseRef(bundle.getId()));
-        	
+        	bundle.setChildQuoteBundles(getChildQuoteBundles(bundle.getId()));
+       	
         }
 
         return new BundleContainer(list);
@@ -354,6 +363,7 @@ public class UserDataService {
 			QuoteBundle qb = this.simpleJdbcTemplate.queryForObject(
 					"select * from tw_quotebundle where quotebundle_id=?", new QuoteBundleRowMapper(), bundleId);
 			qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
+            qb.setChildQuoteBundles(getChildQuoteBundles(qb.getId()));
 			return qb;
 		} catch (EmptyResultDataAccessException erd) {
 			throw new EntityNotFoundException("getQuoteBundle " + bundleId, erd);
@@ -851,9 +861,6 @@ public class UserDataService {
         System.out.println("shareBundleForUser " + userId + " | bundleId " + bundle.getId());
         if (userId == null || bundle == null) throw new NullPointerException();
         String newBundleId = UUID.uuid();
-        System.out.println("bundleid= " + newBundleId);
-        
-        userId = "some wrong id";
 
         //create copy of bundle
 	    this.simpleJdbcTemplate.update("insert into tw_quotebundle(quotebundle_id, quotebundle_name, quotebundle_description, parent_quotebundle) values (?,?,?,?)"
@@ -887,7 +894,7 @@ public class UserDataService {
     public List<User> getBundleUsers(String currentUserId, String bundleId) throws ConstraintViolationException {
         System.out.println("getBundleUsers  bundleId " + bundleId);
         List<User> result = this.simpleJdbcTemplate.query(
-    			"select u.* from tw_quotebundle gb\n" +
+            	"select u.* from tw_quotebundle gb\n" +
     			"inner join tw_permission p on p.permission_quotebundle = gb.quotebundle_id \n" +
     			"inner join tw_user u on p.permission_user = u.user_id \n" +
     			"where gb.parent_quotebundle=? \n" + 
@@ -905,5 +912,39 @@ public class UserDataService {
 	}
 	
 	
+
+	@Transactional
+    public List<QuoteBundle> getChildQuoteBundles(String bundleId) throws ConstraintViolationException {
+        System.out.println("getBundleUsers  bundleId " + bundleId);
+        List<QuoteBundle> result = this.simpleJdbcTemplate.query(
+        			"select cqb.* from tw_quotebundle cqb\n" +
+        			"where cqb.parent_quotebundle=?",
+    				new QuoteBundleRowMapper(), bundleId);
+
+        return result;
+
+    }
+
+
+    @Transactional
+    public List<BundleUserBinding> getSharedPermissions(String userId) {
+        System.out.println("getSharedPermission userId" + userId);
+        List<BundleUserBinding> result = this.simpleJdbcTemplate.query(
+    			"select * from tw_permission p " +
+    			"inner join tw_user u on p.permission_user = u.user_id " +
+    			"where permission_quotebundle in ( " +
+    			"select quotebundle_id from tw_quotebundle " +
+    			"where parent_quotebundle in ( " +
+    			"select permission_quotebundle from tw_permission where permission_user=?) " +
+    			"union " +
+    			"select parent_quotebundle from tw_quotebundle " +
+    			"where quotebundle_id in ( " +
+    			"select permission_quotebundle from tw_permission where permission_user=?) " +
+    			")",
+				new BundleUserBindingRowMapper(), userId, userId);        
+
+        return result;
+
+	}
 
 }

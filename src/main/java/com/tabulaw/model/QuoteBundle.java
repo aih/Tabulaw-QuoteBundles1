@@ -27,9 +27,21 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 
 	private String id;
 
+	private String parentBundleId;
+
+	public String getParentBundleId() {
+		return parentBundleId;
+	}
+
+	public void setParentBundleId(String parentBundleId) {
+		this.parentBundleId = parentBundleId;
+	}
+
 	private String name, description;
 
 	private List<Quote> quotes;
+
+	private List<QuoteBundle> childQuoteBundles;
 
 	/**
 	 * Constructor
@@ -73,11 +85,20 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 				cquotes.add((Quote) q.clone());
 			}
 		}
+		ArrayList<QuoteBundle> cchildQuoteBundles = null;
+		if(childQuoteBundles != null) {
+			cchildQuoteBundles = new ArrayList<QuoteBundle>(childQuoteBundles.size());
+			for(QuoteBundle cqb : childQuoteBundles) {
+				cchildQuoteBundles.add((QuoteBundle) cqb.clone());
+			}
+		}
 
 		qb.id = id;
 		qb.name = name;
+		qb.parentBundleId = parentBundleId;
 		qb.description = description;
 		qb.quotes = cquotes;
+		qb.childQuoteBundles = cchildQuoteBundles;
 	}
 
 	@Override
@@ -175,7 +196,20 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 		if(quotes == null) return null;
 		return quotes.remove(index);
 	}
+	public void addChildQuoteBundle(QuoteBundle childQuoteBundle){
+		getChildQuoteBundles().add(childQuoteBundle);
+	}
 
+	public List<QuoteBundle> getChildQuoteBundles() {
+		if(childQuoteBundles == null) childQuoteBundles= new ArrayList<QuoteBundle>();
+		return childQuoteBundles;
+	}
+
+	public void setChildQuoteBundles(List<QuoteBundle> childQuoteBundles) {
+		this.childQuoteBundles = childQuoteBundles;
+	}
+	
+	
 	/**
 	 * Removes any and all contained quotes.
 	 */

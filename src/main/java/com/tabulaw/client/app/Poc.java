@@ -54,6 +54,7 @@ import com.tabulaw.common.data.rpc.IUserCredentialsServiceAsync;
 import com.tabulaw.common.data.rpc.IUserDataService;
 import com.tabulaw.common.data.rpc.IUserDataServiceAsync;
 import com.tabulaw.common.data.rpc.UserContextPayload;
+import com.tabulaw.model.BundleUserBinding;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.User;
 import com.tabulaw.model.UserState;
@@ -241,6 +242,10 @@ public class Poc implements EntryPoint, IUserSessionHandler {
 
 					// cache bundles (w/ no notification)
 					ClientModelCache.get().persistAll(userBundles);
+					
+					//cache shared permissions
+					List<BundleUserBinding> sharedPermissions = result.getSharedPermissions();
+					ClientModelCache.get().persistAll(sharedPermissions);
 
 					// load bundles view (this will pull all just stored bundles
 					// from cache)

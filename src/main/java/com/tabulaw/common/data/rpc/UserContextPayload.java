@@ -8,6 +8,7 @@ package com.tabulaw.common.data.rpc;
 import java.util.List;
 
 import com.tabulaw.common.data.Status;
+import com.tabulaw.model.BundleUserBinding;
 import com.tabulaw.model.QuoteBundle;
 import com.tabulaw.model.User;
 import com.tabulaw.model.UserState;
@@ -28,6 +29,8 @@ public class UserContextPayload extends Payload {
 	private List<QuoteBundle> bundles;
 
 	private String allQuoteContainerId;
+
+	private List<BundleUserBinding> sharedPermissions;
 
 	/**
 	 * Constructor
@@ -77,4 +80,16 @@ public class UserContextPayload extends Payload {
 	public void setBundles(List<QuoteBundle> bundles) {
 		this.bundles = bundles;
 	}
+
+	/**
+	 * @return bundle to user bindings which contain bundles shared by user and bundles shared with current user.
+	 */
+	public List<BundleUserBinding> getSharedPermissions() {
+		return sharedPermissions;
+	}
+
+	public void setSharedPermissions(List<BundleUserBinding> sharedPermissions) {
+		this.sharedPermissions = sharedPermissions;
+	}
+	
 }
