@@ -451,6 +451,8 @@ public class UserDataService {
 	@Transactional
     public void saveDocContent(DocContent docContent) throws ConstraintViolationException {
         System.out.println("saveDocContent id:" + docContent.getId());
+        
+        sanitize(docContent);
 
         this.simpleJdbcTemplate.update("update tw_doc set doc_htmlcontent=?, doc_firstpagenumber=?, doc_pagesxpath=? where doc_id=?"
         		, docContent.getHtmlContent()
@@ -463,9 +465,14 @@ public class UserDataService {
     }
 
     private void sanitize(DocContent docContent) throws ConstraintViolationException {
-        System.out.println("sanitize");
-        throw new UnsupportedOperationException();
-    }
+		String content = docContent.getHtmlContent();
+		try {
+			docContent.setHtmlContent(sanitizer.sanitizeHtml(content));
+		}
+		catch (Exception e) {
+			throw new ConstraintViolationException(e.getMessage(),null);
+		}
+	}
 
 
     /**
