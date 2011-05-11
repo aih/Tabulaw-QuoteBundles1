@@ -19,17 +19,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.aspectj.AnnotationTransactionAspect;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Binder;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
+import com.google.inject.matcher.Matchers;
 import com.tabulaw.config.Config;
 import com.tabulaw.config.IConfigAware;
 import com.tabulaw.config.IConfigKey;
-import com.tabulaw.service.entity.Dao;
 
 /**
  * Db4oDaoModule
@@ -102,50 +106,37 @@ public class DataSourceDaoModule extends AbstractModule implements IConfigAware 
 	protected final void configure() {
 		log.info("Loading dao module...");
 
-		log.info("Binding Spring's Db4oTransactionManager to Spring's @Transactional annotation..");
-		bind(Dao.class).toProvider(new Provider<Dao>() {
-
-			@Override
-			public Dao get() {
-				return new Dao();
-			}
-		}).in(Scopes.SINGLETON);
+		log.info("Binding Spring's TransactionManager to Spring's @Transactional annotation..");
+		final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
 
 		bind(DataSource.class).toProvider(new Provider<DataSource>() {
 
 			@Override
 			public DataSource get() {
+				Context initContext;
+				DataSource ds = null;
 				try {
-					Context initContext;
 					initContext = new InitialContext();
-					DataSource ds = (DataSource) initContext.lookup("java:/comp/env/jdbc/pgsql");
-
-					return ds;
-				} catch (NamingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					return null;
+					 ds = (DataSource) initContext.lookup("java:/comp/env/jdbc/pgsql");
+				} catch (NamingException e1) {
+					e1.printStackTrace();
 				}
+				return ds;
 			}
 		}).in(Scopes.SINGLETON);
 
 		// PlatformTransactionManager (for transactions)
 		bind(PlatformTransactionManager.class).toProvider(new Provider<PlatformTransactionManager>() {
-
-			@Inject
-			Dao dao;
-
 			@Inject
 			DataSource ds;
 
 			@Override
 			public PlatformTransactionManager get() {
-				final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
 
 				// set the transaction timeout
 				final int timeout = config == null ? DEFAULT_TRANS_TIMEOUT : config.getInt(ConfigKeys.DB_TRANS_TIMEOUT
 						.getKey(), DEFAULT_TRANS_TIMEOUT);
-				dataSourceTransactionManager.setDefaultTimeout(timeout);
+//				dataSourceTransactionManager.setDefaultTimeout(timeout);
 				log.info("Set default transaction timeout to: " + timeout);
 
 				dataSourceTransactionManager.setDataSource(ds);
@@ -160,6 +151,9 @@ public class DataSourceDaoModule extends AbstractModule implements IConfigAware 
 		}).asEagerSingleton();
 		// IMPT: asEagerSingleton() to force binding trans manager to
 		// @Transactional!
+		
+		bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class),
+                new TransactionInterceptor(dataSourceTransactionManager, new AnnotationTransactionAttributeSource()));		
 	}
 
 }

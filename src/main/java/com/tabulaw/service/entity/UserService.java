@@ -1,19 +1,15 @@
 package com.tabulaw.service.entity;
 
-import java.beans.XMLEncoder;
-import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.Calendar;
+import java.util.List;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.validation.ValidationException;
 import javax.validation.ValidatorFactory;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import com.google.inject.Inject;
 import com.tabulaw.dao.EntityExistsException;
@@ -23,6 +19,7 @@ import com.tabulaw.model.User;
 import com.tabulaw.model.User.Role;
 import com.tabulaw.util.CryptoUtil;
 import com.tabulaw.util.UUID;
+import com.tabulaw.util.XStreamUtils;
 
 /**
  * Manages the persistence of {@link User}s.
@@ -58,7 +55,7 @@ public class UserService implements IForgotPasswordHandler {
         return CryptoUtil.encrypt(rawPasswordToCheck).equals(encPassword);
     }
 
-    // private final UserCache userCache;
+    private SimpleJdbcTemplate simpleJdbcTemplate;
 
     /**
      * Constructor
@@ -66,9 +63,12 @@ public class UserService implements IForgotPasswordHandler {
      * @param vfactory
      */
     @Inject
-    public UserService(ValidatorFactory vfactory) {
-
+    public UserService(ValidatorFactory vfactory, DataSource ds) {
+    	simpleJdbcTemplate = new SimpleJdbcTemplate(ds);
+		
+        
     }
+
 
     public void init() {
 
@@ -79,20 +79,11 @@ public class UserService implements IForgotPasswordHandler {
      */
     public List<User> getAllUsers() {
         System.out.println("getAllUsers");
-        List<User> ret = new ArrayList<User>();
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_user", Statement.NO_GENERATED_KEYS);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                ret.add(dao.loadUser(rs));
-            }
-            return ret;
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        List<User> result = this.simpleJdbcTemplate.query(
+        		"select * from tw_user",
+				new UserRowMapper());        
+
+        return result;
     }
 
     /**
@@ -116,27 +107,25 @@ public class UserService implements IForgotPasswordHandler {
      */
     public User updateUser(User user) {
         System.out.println("updateUser " + user.getId() +" pwd="+user.getPassword());
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("update tw_user set user_emailaddress=?, user_enabled=?, user_expires=?, user_locked=?, user_name=?, user_roles=? where user_id=?", Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1,user.getEmailAddress());
-            ps.setBoolean(2, user.isEnabled());
-            ps.setDate(3,new java.sql.Date(user.getExpires().getTime()));
-            ps.setBoolean(4,user.isLocked());
-            ps.setString(5,user.getName());
-            // ps.setString(6,user.getPassword());
-            ps.setString(6, dao.toXML(user.getRoles()));
-            ps.setString(7, user.getId());
+        
+        this.simpleJdbcTemplate.update(
+        			"update tw_user set " +
+        			"	user_emailaddress=?," +
+        			"	user_enabled=?," +
+        			"	user_expires=?," +
+        			"	user_locked=?," +
+        			"	user_name=?," +
+        			"	user_roles=?" +
+        			"	where user_id=?" 
+        			,user.getEmailAddress()
+        			,user.isEnabled()
+        			,new java.sql.Date(user.getExpires().getTime())
+        			,user.isLocked()
+        			,user.getName()
+        			,XStreamUtils.toXML(user.getRoles())
+        			,user.getId());
 
-            ps.executeUpdate();
-            return user;
-
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
-
+        return user;
     }
 
     /**
@@ -183,27 +172,27 @@ public class UserService implements IForgotPasswordHandler {
         // set id
         user.setId(UUID.uuid());
 
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("insert into tw_user(user_emailaddress, user_enabled, user_expires, user_locked, user_name, user_password, user_roles, user_id) values (?,?,?,?,?,?,?,?)", Statement.NO_GENERATED_KEYS);
-            ps.setString(1,user.getEmailAddress());
-            ps.setBoolean(2, user.isEnabled());
-            ps.setDate(3,new java.sql.Date(user.getExpires().getTime()));
-            ps.setBoolean(4,user.isLocked());
-            ps.setString(5,user.getName());
-            ps.setString(6,user.getPassword());
-            ps.setString(7, dao.toXML(user.getRoles()));
-            ps.setString(8, user.getId());
+        this.simpleJdbcTemplate.update(
+        		"insert into tw_user(" +
+        		"	user_emailaddress," +
+        		"	user_enabled," +
+        		"	user_expires," +
+        		"	user_locked," +
+        		"	user_name," +
+        		"	user_password," +
+        		"	user_roles," +
+        		"	user_id)" +
+        		" values (?,?,?,?,?,?,?,?)"
+                , user.getEmailAddress()
+                , user.isEnabled()
+                , new java.sql.Date(user.getExpires().getTime())
+                , user.isLocked()
+                , user.getName()
+                , user.getPassword()
+                , XStreamUtils.toXML(user.getRoles())
+                , user.getId());
 
-            ps.executeUpdate();
-            System.out.println("id="+user.getId());
-            return user;
-
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        return user;
    }
 
     public IUserRef getUserRef(String username) throws EntityNotFoundException {
@@ -213,21 +202,15 @@ public class UserService implements IForgotPasswordHandler {
 
     public User findByEmail(String emailAddress) throws EntityNotFoundException {
         System.out.println("findByEmail " + emailAddress);
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("select * from tw_user where user_emailaddress=?", Statement.NO_GENERATED_KEYS);
-            ps.setString(1,emailAddress);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                return dao.loadUser(rs);
-            }
-            throw new EntityNotFoundException("No user with email address: '" + emailAddress + "' was found.");
 
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+		try {
+			User user = this.simpleJdbcTemplate.queryForObject("select * from tw_user where user_emailaddress=?",
+					new UserRowMapper(), emailAddress);
+			return user;
+
+		} catch (EmptyResultDataAccessException erd) {
+			throw new EntityNotFoundException("No such user", erd);
+		}
     }
 
     @Override
@@ -246,18 +229,9 @@ public class UserService implements IForgotPasswordHandler {
      */
     public void setPassword(String userId, String password) throws ChangeUserCredentialsFailedException {
         System.out.println("setPassword " + userId);
-        Dao dao = new Dao();
-        try {
-            PreparedStatement ps = dao.getPreparedStatement("update tw_user set user_password=? where user_id=?", Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, password);
-            ps.setString(2, userId);
-
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        this.simpleJdbcTemplate.update("update tw_user set user_password=? where user_id=?"
+        		, password
+        		, userId);
     }
 
     /*
@@ -297,26 +271,14 @@ public class UserService implements IForgotPasswordHandler {
      */
     public List<User> suggestUsername(String query, int suggestionCount) {
         System.out.println("suggestUsername");
-        List<User> ret = new ArrayList<User>();
         String likeExp = String.format("%%%s%%", query).toLowerCase();
-        Dao dao = new Dao();
-        try {
-        	String sqlQuery = "select * from tw_user " +
-        			"where lower(user_name) like ? or lower(user_emailaddress) like ?  limit ?";
-            PreparedStatement ps = dao.getPreparedStatement(sqlQuery, Statement.NO_GENERATED_KEYS);
-            ps.setString(1, likeExp);
-            ps.setString(2, likeExp);
-            ps.setInt(3, suggestionCount);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-           		ret.add(dao.loadUser(rs));
-            }
-            return ret;
-        } catch (SQLException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            dao.cleanUp();
-        }
+        List<User> ret = simpleJdbcTemplate.query("select * from tw_user where lower(user_name) like ? or lower(user_emailaddress) like ?  limit ?"
+        		, new UserRowMapper()
+        		, likeExp
+        		, likeExp
+        		, suggestionCount
+        		);
+        return ret;
     }
     
 }
