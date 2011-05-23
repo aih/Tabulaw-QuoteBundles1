@@ -51,6 +51,10 @@
 			<url>http://maven.xwiki.org/externals</url>
 		</repository>
 		<repository>
+			<id>jboss-public-repository-group</id>
+			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+		</repository>
+		<repository>
 			<id>jboss</id>
 			<url>http://repository.jboss.com/maven2/</url>
 		</repository>
