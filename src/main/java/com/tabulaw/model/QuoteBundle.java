@@ -27,6 +27,16 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 
 	private String id;
 
+	private String parentBundleId;
+
+	public String getParentBundleId() {
+		return parentBundleId;
+	}
+
+	public void setParentBundleId(String parentBundleId) {
+		this.parentBundleId = parentBundleId;
+	}
+
 	private String name, description;
 
 	private List<Quote> quotes;
@@ -85,6 +95,7 @@ public class QuoteBundle extends TimeStampEntity implements INamedEntity, Compar
 
 		qb.id = id;
 		qb.name = name;
+		qb.parentBundleId = parentBundleId;
 		qb.description = description;
 		qb.quotes = cquotes;
 		qb.childQuoteBundles = cchildQuoteBundles;

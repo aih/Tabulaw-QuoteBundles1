@@ -19,6 +19,7 @@ import com.tabulaw.client.model.IHasModelChangeHandlers;
 import com.tabulaw.client.model.ModelChangeEvent;
 import com.tabulaw.client.model.ModelChangeEvent.ModelChangeOp;
 import com.tabulaw.dao.EntityNotFoundException;
+import com.tabulaw.model.BundleUserBinding;
 import com.tabulaw.model.DocRef;
 import com.tabulaw.model.EntityType;
 import com.tabulaw.model.IEntity;
@@ -337,5 +338,26 @@ public class ClientModelCache {
 			}
 		}
 		return rlist;
+	}
+	@SuppressWarnings("unchecked")
+	public User getQuoteBundleOwner(String quoteBundleId) {
+		List<BundleUserBinding> sharedPermissions = (List<BundleUserBinding>) get().getAll(EntityType.BUNDLE_USER_BINDING);
+		for (BundleUserBinding bub : sharedPermissions){
+			if (bub.getBundleId().equals(quoteBundleId)){
+				return bub.getUser();
+			}
+		}
+		return null;
+	}
+
+	public List<User> getQuoteBundlesOwners(List<QuoteBundle> childQuoteBundles) {
+		List<User> result = new ArrayList<User>(); 
+		for (QuoteBundle bundle : childQuoteBundles){
+			User user = getQuoteBundleOwner(bundle.getId());
+			if (user != null) {
+				result.add(user);
+			}
+		}
+		return result;
 	}
 }

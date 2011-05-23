@@ -449,7 +449,7 @@ ALTER TABLE ONLY tw_quote
 --
 
 ALTER TABLE ONLY tw_userstate
-    ADD CONSTRAINT userstate_allquotebundle FOREIGN KEY (userstate_allquotebundle) REFERENCES tw_quotebundle(quotebundle_id) ON DELETE CASCADE;
+    ADD CONSTRAINT userstate_allquotebundle FOREIGN KEY (userstate_allquotebundle) REFERENCES tw_quotebundle(quotebundle_id) ON DELETE SET NULL;
 
 
 --
@@ -459,7 +459,7 @@ ALTER TABLE ONLY tw_userstate
 --
 
 ALTER TABLE ONLY tw_userstate
-    ADD CONSTRAINT userstate_quotebundle FOREIGN KEY (userstate_quotebundle) REFERENCES tw_quotebundle(quotebundle_id) ON DELETE CASCADE;
+    ADD CONSTRAINT userstate_quotebundle FOREIGN KEY (userstate_quotebundle) REFERENCES tw_quotebundle(quotebundle_id) ON DELETE SET NULL;
 
 
 --
