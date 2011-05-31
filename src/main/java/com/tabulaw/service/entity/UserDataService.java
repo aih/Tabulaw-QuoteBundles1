@@ -153,7 +153,7 @@ public class UserDataService {
     public List<DocRef> getAllDocs() {
         System.out.println("getAllDocs");
         List<DocRef> ret = this.simpleJdbcTemplate.query(
-        		"select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id, tw_permission where permission_doc=doc_id AND permission_user=?",
+        		"select * from tw_doc left outer join tw_caseref on doc_caseref=caseref_id, tw_permission where permission_doc=doc_id",
 				new DocRefWithCaseRefRowMapper());        
         return ret;
     }

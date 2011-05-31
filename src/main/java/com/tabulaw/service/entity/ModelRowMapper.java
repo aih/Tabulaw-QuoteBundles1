@@ -92,6 +92,8 @@ public class ModelRowMapper {
 		ret.setExpires(rs.getDate("user_expires"));
 		ret.setLocked(rs.getBoolean("user_locked"));
 		ret.setName(rs.getString("user_name"));
+		//0 means that user was persisted
+		ret.setVersion(0); 
 		// skip OAuthParameters
 		// skip OAuthParametersExtra
 		ret.setPassword(rs.getString("user_password"));

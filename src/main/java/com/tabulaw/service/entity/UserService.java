@@ -96,7 +96,10 @@ public class UserService implements IForgotPasswordHandler {
      */
     public void deleteUser(String userId) throws EntityNotFoundException {
         System.out.println("deleteUser " + userId);
-        throw new UnsupportedOperationException();
+        this.simpleJdbcTemplate.update(
+    			"delete from tw_user " +
+    			"	where user_id=?" 
+    			,userId);
     }
 
     /**
