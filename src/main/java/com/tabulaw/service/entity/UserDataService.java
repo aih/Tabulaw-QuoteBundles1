@@ -227,30 +227,24 @@ public class UserDataService {
      */
 	@Transactional
 	public void saveUserState(UserState userState) throws EntityExistsException {
-		System.out.println("saveUserState id:" + userState.getId() + " | bundleId"
-				+ userState.getCurrentQuoteBundleId() + " | user id: " + userState.getUserId());
+		System.out.println("saveUserState id:" + userState.getId() + " | bundleId" + userState.getCurrentQuoteBundleId() + " | user id: "
+				+ userState.getUserId());
 		if (userState == null)
 			throw new NullPointerException();
 
-		try {
-			getUserState(userState.getUserId());
-			this.simpleJdbcTemplate
-					.update(
-							"update tw_userstate set userstate_quotebundle=?, userstate_allquotebundle=?  where userstate_id=?",
-							userState.getCurrentQuoteBundleId(), userState.getAllQuoteBundleId(), userState.getId());
-		} catch (EntityNotFoundException enfe) {
-			//TODO Check insert operation
-			this.simpleJdbcTemplate
-					.update(
-							"insert into tw_userstate(" +
-							"userstate_quotebundle, " +
-							"userstate_allquotebundle, " +
-							"userstate_user, " +
-							"userstate_id) values (?,?,?,?)",
-							userState.getCurrentQuoteBundleId()
-							, userState.getAllQuoteBundleId()
-							, userState.getUserId(),
-							UUID.uuid());
+		if (checkUserStateCount(userState.getUserId()) == 0) {
+			this.simpleJdbcTemplate.update("insert into tw_userstate("
+											+ "userstate_quotebundle, "
+											+ "userstate_allquotebundle, "
+											+ "userstate_user, "
+											+ "userstate_id) values (?,?,?,?)"
+											, userState.getCurrentQuoteBundleId()
+											, userState.getAllQuoteBundleId()
+											,userState.getUserId()
+											, UUID.uuid());
+		} else {
+			this.simpleJdbcTemplate.update("update tw_userstate set userstate_quotebundle=?, userstate_allquotebundle=?  where userstate_id=?",
+					userState.getCurrentQuoteBundleId(), userState.getAllQuoteBundleId(), userState.getId());
 		}
 	}
 
@@ -269,15 +263,9 @@ public class UserDataService {
 		if (userId == null)
 			throw new NullPointerException();
 
-		try {
-			QuoteBundle qb = this.simpleJdbcTemplate
-					.queryForObject(
-							"select * from tw_quotebundle, tw_userstate where userstate_allquotebundle=quotebundle_id AND userstate_user=?",
-							new QuoteBundleRowMapper(), userId);
-			qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
-			System.out.println("ALL BUNDLE ID:" + qb.getId());
-			return qb;
-		} catch (EmptyResultDataAccessException erd) {
+		Long qbCount = this.simpleJdbcTemplate.queryForLong(
+				"select count(*) from tw_quotebundle, tw_userstate where userstate_allquotebundle=quotebundle_id AND userstate_user=?", userId);
+		if (qbCount == 0) {
 			// create all quote bundle container
 			QuoteBundle oqc = new QuoteBundle();
 			oqc.setId(UUID.uuid());
@@ -287,20 +275,37 @@ public class UserDataService {
 
 			UserState us = null;
 
-			try {
-				us = getUserState(userId);
-			} catch (EntityNotFoundException enf) {
+			
+			if (checkUserStateCount(userId) == 0) {
 				us = new UserState();
 				us.setId(UUID.uuid());
 				us.setUserId(userId);
+			} else {
+				us = getUserState(userId);
 			}
+			
 			us.setAllQuoteBundleId(oqc.getId());
 			saveUserState(us);
 			System.out.println("ALL BUNDLE ID:" + oqc.getId());
 			return oqc;
 
-		} 
+		} else {
+			QuoteBundle qb = this.simpleJdbcTemplate.queryForObject(
+					"select * from tw_quotebundle, tw_userstate where userstate_allquotebundle=quotebundle_id AND userstate_user=?",
+					new QuoteBundleRowMapper(), userId);
+			qb.setQuotes(getQuotesWithDocRefWithCaseRef(qb.getId()));
+			System.out.println("ALL BUNDLE ID:" + qb.getId());
+			return qb;
 
+		}
+
+	}
+	private Long checkUserStateCount(String userId) {
+		Long usCount = this.simpleJdbcTemplate.queryForLong(
+				"select count(*) from tw_userstate where userstate_user=?", userId);
+		
+		return usCount;
+		
 	}
 
     private List<Quote> getQuotesWithDocRefWithCaseRef(String bundleId)
