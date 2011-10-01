@@ -5,6 +5,8 @@
 .gwt
 .classpath
 .project
+shell/*
+tabtest.dump
 /test-output
 /target
 /userDataServiceTestDb

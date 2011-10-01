@@ -233,7 +233,7 @@ public class UserService implements IForgotPasswordHandler {
     public void setPassword(String userId, String password) throws ChangeUserCredentialsFailedException {
         System.out.println("setPassword " + userId);
         this.simpleJdbcTemplate.update("update tw_user set user_password=? where user_id=?"
-        		, password
+        		, encodePassword(password, userId)
         		, userId);
     }
 
