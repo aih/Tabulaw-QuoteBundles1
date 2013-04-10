@@ -97,9 +97,6 @@ public class RegisterBean extends LoginBean{
 
 		UserService userService = null;
 		
-		if (!CryptoUtil.checkBetaKey(getEmailAddress(), getBetaKey())) {
-			errors.add("Your beta key is invalid. Please contact Tabulaw support");
-		}
 		
 		if (getUserName().isEmpty()) {
 			errors.add("User name is required.");

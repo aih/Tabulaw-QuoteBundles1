@@ -5,7 +5,7 @@
 .gwt
 .classpath
 .project
-shell/*
+scripts/*
 tabtest.dump
 /test-output
 /target

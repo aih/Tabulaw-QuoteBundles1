@@ -23,7 +23,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="com.google.gdt.eclipse.maven.mavenClasspathProvider"/>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.google.gwt.dev.DevMode"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-codeServerPort 9997 -remoteUI &quot;${gwt_remote_ui_server_port}:${unique_id}&quot; -startupUrl Poc.html -logLevel INFO -war D:\work\tabulaw.andrl\Tabulaw-QuoteBundles1\target\war com.tabulaw.PocDev -noserver com.tabulaw.Poc com.tabulaw.PocDev com.tabulaw.PocProd com.tabulaw.Poc com.tabulaw.PocDev com.tabulaw.PocProd"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-codeServerPort 9997 -war D:\work\tabulaw.andrl\Tabulaw-QuoteBundles1\target\war com.tabulaw.PocDev com.tabulaw.Poc com.tabulaw.PocDev com.tabulaw.PocProd com.tabulaw.Poc com.tabulaw.PocDev com.tabulaw.PocProd"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="tabulaw"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea -Xmx512m"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XstartOnFirstThread -ea -Xmx512m"/>
 </launchConfiguration>
